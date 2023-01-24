@@ -1,0 +1,12 @@
+.git
+.vscode
+cypress
+node_modules
+public
+src
+.dockerignore
+.gitignore
+cypress.json
+Dockerfile
+package-lock.json
+README.md

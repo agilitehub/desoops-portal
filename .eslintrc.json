@@ -1,0 +1,13 @@
+{
+  "extends": ["react-app", "react-app/jest"],
+  "rules": {
+    "default-case": 0,
+    "no-tabs": ["error", { "allowIndentationTabs": true }],
+    "max-len": 0,
+    // "indent": ["error", 2, { "SwitchCase": 1 }],
+    "indent": 0,
+    "linebreak-style": 0,
+    "quotes": ["error", "single", { "avoidEscape": true }],
+    "semi": ["error", "never"]
+  }
+}
