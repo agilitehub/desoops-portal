@@ -103,3 +103,4 @@ build
 hosting.YnVpbGQ.cache
 .vscode
 env-templates
+.firebaserc
