@@ -13,10 +13,10 @@ import BatchTransactions from './custom/batch-transactions/components/app-wrappe
 export const initLeftMenuItems = () => {
   return [
     {
-      key: Enums.tabKeys.BATCH_TRANSACTIONS,
+      key: Enums.tabKeys.BATCH_PAYMENTS,
       title: (
         <>
-          <UnorderedListOutlined style={{ marginRight: 10 }} /> {Enums.appTitles.BATCH_TRANSACTIONS}
+          <UnorderedListOutlined style={{ marginRight: 10 }} /> {Enums.moduleTitles.BATCH_PAYMENTS}
         </>
       )
     }
@@ -25,10 +25,10 @@ export const initLeftMenuItems = () => {
 
 export const generateContent = (key) => {
   switch (key) {
-    case Enums.tabKeys.BATCH_TRANSACTIONS:
+    case Enums.tabKeys.BATCH_PAYMENTS:
       return {
         key,
-        title: Enums.appTitles.BATCH_TRANSACTIONS,
+        title: Enums.moduleTitles.BATCH_PAYMENTS,
         closable: true,
         content: (
           <Suspense fallback={<Spin />}>

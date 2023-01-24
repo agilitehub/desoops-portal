@@ -533,7 +533,7 @@ const _BatchTransactionsForm = () => {
         desoState.profile.Profile.PublicKeyBase58Check !==
         response.NFTCollectionResponse.ProfileEntryResponse.PublicKeyBase58Check
       ) {
-        setValidationMessage('You are not the creator of this NFT. Please revise')
+        setValidationMessage(Enums.messages.NOT_NFT_CREATOR)
       } else {
         for (const entry of nftEntries.NFTEntryResponses) {
           const user = await getUserStateless(entry.OwnerPublicKeyBase58Check)

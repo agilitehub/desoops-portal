@@ -9,7 +9,7 @@ export const getHodlers = (Username, IsDAOCoin) => {
       let errMsg = null
 
       try {
-        response = await Axios.post(Enums.urls.GET_HODLERS, {
+        response = await Axios.post(Enums.desoUrls.GET_HODLERS, {
           PublicKeyBase58Check: Enums.values.EMPTY_STRING,
           Username,
           LastPublicKeyBase58Check: Enums.values.EMPTY_STRING,
@@ -57,7 +57,8 @@ export const payCeatorHodler = (senderKey, receiverKey, amount, type) => {
               ProfilePublicKeyBase58CheckOrUsername: senderKey,
               ReceiverPublicKeyBase58CheckOrUsername: receiverKey,
               // Hex String
-              DAOCoinToTransferNanos: '0x' + (amount * 1000000000 * 1000000000).toString(16),
+              DAOCoinToTransferNanos:
+                Enums.values.HEX_PREFIX + (amount * Enums.values.NANO_VALUE * Enums.values.NANO_VALUE).toString(16),
               MinFeeRateNanosPerKB: 1000
             }
 
@@ -112,7 +113,8 @@ export const payDaoHodler = (senderKey, receiverKey, amount, type) => {
               ProfilePublicKeyBase58CheckOrUsername: senderKey,
               ReceiverPublicKeyBase58CheckOrUsername: receiverKey,
               // Hex String
-              DAOCoinToTransferNanos: '0x' + (amount * 1000000000 * 1000000000).toString(16),
+              DAOCoinToTransferNanos:
+                Enums.values.HEX_PREFIX + (amount * Enums.values.NANO_VALUE * Enums.values.NANO_VALUE).toString(16),
               MinFeeRateNanosPerKB: 1000
             }
 

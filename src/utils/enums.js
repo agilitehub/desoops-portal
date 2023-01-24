@@ -1,26 +1,15 @@
 const Enums = {
-  appTitles: {
-    BATCH_TRANSACTIONS: 'Batch Transactions'
+  moduleTitles: {
+    BATCH_PAYMENTS: 'Batch Payments'
   },
-  urls: {
-    LOGIN_URL: 'https://identity.deso.org/log-in?accessLevelRequest=4',
-    IDENTITY_URL: 'https://identity.deso.org',
+  desoUrls: {
     DAO_BALANCE: 'https://blockproducer.deso.org/api/v0/get-hodlers-for-public-key',
     EXCHANGE_RATE: 'https://blockproducer.deso.org/api/v0/get-exchange-rate',
     GET_HODLERS: 'https://desocialworld.com/api/v0/get-hodlers-for-public-key'
   },
-  routes: {
-    CREATE_PAYMENT_TRANSACTION: '/api/createPaymentTransaction'
-  },
-  headers: {
-    RECORD_ID: 'record-id',
-    GHOST_ID: 'ghost-id',
-    TASK_ID: 'task-id'
-  },
   values: {
     ENV_PRODUCTION: 'production',
     ENV_DEVELOPMENT: 'development',
-    IDENTITY: 'identity',
     LOGIN: 'login',
     NANO_VALUE: 1000000000,
     DESO: 'deso',
@@ -33,19 +22,15 @@ const Enums = {
     HEX_PREFIX: '0x',
     YES: 'Yes',
     NO: 'No',
-    EMPTY_STRING: ''
-  },
-  events: {
-    MESSAGE: 'message'
-  },
-  methods: {
-    INIT: 'initialize'
+    EMPTY_STRING: '',
+    DIV_ROOT: 'root'
   },
   messages: {
-    UNKNOWN_ERROR: 'Unknown Error Occured. Please check console'
+    UNKNOWN_ERROR: 'Unknown Error Occured. Please check console',
+    NOT_NFT_CREATOR: 'You are not the creator of this NFT. Please revise'
   },
   tabKeys: {
-    BATCH_TRANSACTIONS: 'batch_transactions',
+    BATCH_PAYMENTS: 'batch_payments',
     DESO_LOGIN: 'deso-login'
   }
 }

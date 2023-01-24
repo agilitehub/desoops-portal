@@ -36,7 +36,7 @@ const DeSoLoginForm = () => {
       dispatch({
         type: AgiliteReactEnums.reducers.ADD_TAB,
         payload: {
-          key: Enums.tabKeys.BATCH_TRANSACTIONS,
+          key: Enums.tabKeys.BATCH_PAYMENTS,
           closable: false,
           title: Enums.values.EMPTY_STRING,
           content: <BatchTransactions />
@@ -82,7 +82,7 @@ const DeSoLoginForm = () => {
           <div>
             <center>
               <h1 style={{ color: '#7d7e81' }}>WELCOME TO</h1>
-              <img src={DeSoOpsBanner} alt='DeSo Ops' style={{ width: 300 }} />
+              <img src={DeSoOpsBanner} alt={process.env.REACT_APP_NAME} style={{ width: 300 }} />
             </center>
           </div>
           <br />

@@ -5,12 +5,13 @@ import Theme from './resources/theme'
 // Components
 import DeSoLoginForm from '../custom/deso/components/deso-login-form'
 import DesoToolbar from '../custom/deso/components/deso-toolbar'
+import Enums from '../utils/enums'
 
 const state = {
   tabNavigation: {
     enabled: false,
     rootTabKey: 'home',
-    rootTabTitle: 'Batch Transactions',
+    rootTabTitle: Enums.moduleTitles.BATCH_PAYMENTS,
     activeKey: 'home',
     tabs: [],
     animated: false,
