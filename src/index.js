@@ -19,7 +19,7 @@ if (process.env.REACT_APP_FIREBASE_ENABLED === Enums.values.YES) {
     storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
     messagingSenderId: process.env.REACT_APP_FIREBASE_MSG_SENDER_ID,
     appId: process.env.REACT_APP_FIREBASE_APP_ID,
-    measurementId: process.env.REACT_APP_FIREBASE_APP_ID
+    measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
   }
 
   // Initialize Firebase
