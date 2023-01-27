@@ -143,3 +143,38 @@ export const payDaoHodler = (senderKey, receiverKey, amount, type) => {
     })()
   })
 }
+
+export const getFollowers = (Username, getEntriesFollowingUser) => {
+  return new Promise((resolve, reject) => {
+    ;(async () => {
+      let response = null
+      let errMsg = null
+      let request = null
+
+      try {
+        request = {
+          Username,
+          GetEntriesFollowingUserName: getEntriesFollowingUser
+        }
+
+        // First get # of followers
+        response = await getDeSo().social.getFollowsStateless(request)
+
+        // Get Followers based on amount
+        request.NumToFetch = response.NumFollowers
+        response = await getDeSo().social.getFollowsStateless(request)
+
+        resolve(response.PublicKeyToProfileEntry)
+      } catch (e) {
+        if (e.response?.data?.message) {
+          errMsg = e.response.data.message
+        } else {
+          errMsg = Enums.messages.UNKNOWN_ERROR
+        }
+
+        console.error(e)
+        reject(errMsg)
+      }
+    })()
+  })
+}

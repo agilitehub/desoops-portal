@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useState } from 'react'
-import { Row, Col, Card, Select, Button, Popconfirm, Input, message, Table, Popover, Divider } from 'antd'
+import { Row, Col, Card, Select, Button, Popconfirm, Input, message, Table, Popover, Divider, Modal } from 'antd'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
-import { getHodlers, payCeatorHodler, payDaoHodler } from '../controller'
+import { getFollowers, getHodlers, payCeatorHodler, payDaoHodler } from '../controller'
 import { useDispatch, useSelector } from 'react-redux'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { getDaoBalance, getNFTdetails, getNFTEntries, getSingleProfile, getUserStateless } from '../../deso/controller'
@@ -23,6 +23,7 @@ const _BatchTransactionsForm = () => {
   const [coinTotal, setCoinTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [isExecuting, setIsExecuting] = useState(false)
+  const [quickActionValue, setQuickActionValue] = useState('')
 
   const handleTransactionTypeChange = async (value) => {
     let tmpHodlers = []
@@ -111,20 +112,100 @@ const _BatchTransactionsForm = () => {
     setHodlers(tmpHodlers)
   }
 
-  const handleCopyUsernames = () => {
+  const handleCopyUsernames = (data, isFollowers) => {
     const tmpResult = []
     let result = null
 
-    switch (transactionType) {
-      case Enums.values.NFT:
-        for (const owner of nftOwners) tmpResult.push(`@${owner.username}`)
-        break
-      default:
-        for (const hodler of hodlers) tmpResult.push(`@${hodler.ProfileEntryResponse.Username}`)
+    if (isFollowers) {
+      for (const follower in data) tmpResult.push(`@${data[follower].Username}`)
+    } else {
+      switch (transactionType) {
+        case Enums.values.NFT:
+          for (const owner of nftOwners) tmpResult.push(`@${owner.username}`)
+          break
+        default:
+          for (const hodler of hodlers) tmpResult.push(`@${hodler.ProfileEntryResponse.Username}`)
+      }
     }
 
     result = tmpResult.length > 0 ? `${tmpResult.join(' ')} ` : 'No usernames to copy'
     return result
+  }
+
+  const handleRefresh = async () => {
+    let profile = null
+
+    setLoading(true)
+
+    try {
+      profile = await getSingleProfile(desoState.profile.Profile.PublicKeyBase58Check)
+      await getDoaBalance(desoState.profile.Profile.PublicKeyBase58Check)
+      dispatch({ type: AgiliteReactEnums.reducers.SET_PROFILE_DESO, payload: profile })
+    } catch (e) {
+      console.log(e)
+    }
+
+    setLoading(false)
+  }
+
+  const getDoaBalance = async (publicKey) => {
+    let daoData = null
+    let creatorCoinData = null
+    let creatorCoinBalance = 0
+
+    try {
+      daoData = await getDaoBalance(publicKey)
+      creatorCoinData = await getHodlers(desoState.profile.Profile.Username, false)
+
+      creatorCoinData.Hodlers.map((entry) => {
+        if (entry.HODLerPublicKeyBase58Check === desoState.profile.Profile.PublicKeyBase58Check) {
+          creatorCoinBalance = entry.BalanceNanos
+        }
+
+        return null
+      })
+
+      dispatch({
+        type: AgiliteReactEnums.reducers.SET_DESO_DATA,
+        payload: { desoPrice: daoData.desoPrice, daoBalance: daoData.daoBalance, creatorCoinBalance }
+      })
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  const handleQuickAction = async (value) => {
+    let response = null
+    setQuickActionValue(value)
+
+    switch (value) {
+      case 'reset':
+        Modal.confirm({
+          title: 'Confirm',
+          content: 'Are you sure you want to reset this Batch Payment?',
+          okText: 'Yes',
+          cancelText: 'No',
+          onOk: () => handleReset()
+        })
+        break
+      case 'coin':
+        break
+      case 'refresh':
+        handleRefresh()
+        break
+      case 'followers':
+      case 'following':
+        setLoading(true)
+        response = await getFollowers(desoState.profile.Profile.Username, value === 'followers' ? true : false)
+        navigator.clipboard.writeText(handleCopyUsernames(response, true))
+        message.info('Usernames copied to clipboard')
+        setLoading(false)
+        break
+      default:
+        break
+    }
+
+    setQuickActionValue('')
   }
 
   const generateActions = () => {
@@ -157,14 +238,29 @@ const _BatchTransactionsForm = () => {
           </Col>
           <Col xs={16} md={12} lg={10} xl={8}>
             <center>
-              <Popconfirm
-                title='Are you sure you want to reset this Batch Payment?'
-                okText={Enums.values.YES}
-                cancelText={Enums.values.NO}
-                onConfirm={() => handleReset()}
+              <Select
+                style={{ width: 250 }}
+                onChange={(value) => {
+                  handleQuickAction(value)
+                }}
+                value={quickActionValue}
               >
-                <Button style={{ color: theme.white, backgroundColor: theme.twitterBootstrap.danger }}>Reset</Button>
-              </Popconfirm>
+                <Select.Option disabled value=''>
+                  - Quick Actions -
+                </Select.Option>
+                <Select.Option value='reset'>Reset Session</Select.Option>
+                <Select.Option value='refresh'>Refresh Amounts and Pricing</Select.Option>
+                <Select.Option disabled={!transactionType} value='coin'>
+                  <CopyToClipboard
+                    text={handleCopyUsernames()}
+                    onCopy={() => message.info('Usernames copied to clipboard')}
+                  >
+                    <span>Copy Coin Holders to clipboard</span>
+                  </CopyToClipboard>
+                </Select.Option>
+                <Select.Option value='followers'>Copy Followers to clipboard</Select.Option>
+                <Select.Option value='following'>Copy Following to clipboard</Select.Option>
+              </Select>
             </center>
           </Col>
           <Col xs={16} md={12} lg={10} xl={8}>
@@ -704,23 +800,6 @@ const _BatchTransactionsForm = () => {
                       Execute Payment
                     </Button>
                   </Popconfirm>
-                </Col>
-              </Row>
-              <Row>
-                <Col span={24} style={{ marginTop: 10 }}>
-                  <center>
-                    <CopyToClipboard
-                      text={handleCopyUsernames()}
-                      onCopy={() => message.info('Usernames copied to clipboard')}
-                    >
-                      <Button
-                        disabled={isExecuting || validationMessage}
-                        style={{ color: theme.white, backgroundColor: theme.twitterBootstrap.info }}
-                      >
-                        Copy usernames to clipboard
-                      </Button>
-                    </CopyToClipboard>
-                  </center>
                 </Col>
               </Row>
             </>
