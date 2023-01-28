@@ -48,7 +48,7 @@ const _BatchTransactionsForm = () => {
         // Determine Coin Total and valid Hodlers
         tmpHodlers.Hodlers.map((entry) => {
           // Ignore entry if is current logged in user
-          if (entry.ProfileEntryResponse.Username !== desoState.profile.Profile.Username) {
+          if (entry.ProfileEntryResponse?.Username !== desoState.profile.Profile.Username) {
             // Set Defaults
             entry.status = Enums.values.EMPTY_STRING
 
@@ -124,7 +124,11 @@ const _BatchTransactionsForm = () => {
           for (const owner of nftOwners) tmpResult.push(`@${owner.username}`)
           break
         default:
-          for (const hodler of hodlers) tmpResult.push(`@${hodler.ProfileEntryResponse.Username}`)
+          for (const hodler of hodlers) {
+            if (hodler.ProfileEntryResponse?.Username) {
+              tmpResult.push(`@${hodler.ProfileEntryResponse.Username}`)
+            }
+          }
       }
     }
 
@@ -627,7 +631,7 @@ const _BatchTransactionsForm = () => {
 
       if (
         desoState.profile.Profile.PublicKeyBase58Check !==
-        response.NFTCollectionResponse.ProfileEntryResponse.PublicKeyBase58Check
+        response.NFTCollectionResponse.ProfileEntryResponse?.PublicKeyBase58Check
       ) {
         setValidationMessage(Enums.messages.NOT_NFT_CREATOR)
       } else {
