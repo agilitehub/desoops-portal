@@ -16,11 +16,13 @@ const _BatchTransactionsForm = () => {
   const [paymentType, setPaymentType] = useState(Enums.values.EMPTY_STRING)
   const [hodlers, setHodlers] = useState([])
   const [nftOwners, setNftOwners] = useState([])
+  const [selectedRowKeys, setSelectedRowKeys] = useState([])
+  const [selectedRows, setSelectedRows] = useState([])
   const [amount, setAmount] = useState('')
   const [nftUrl, setNftUrl] = useState('')
   const [nft, setNft] = useState(null)
   const [validationMessage, setValidationMessage] = useState('')
-  const [coinTotal, setCoinTotal] = useState(0)
+  const [originalCoinTotal, setOriginalCoinTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [isExecuting, setIsExecuting] = useState(false)
   const [quickActionValue, setQuickActionValue] = useState('')
@@ -31,8 +33,8 @@ const _BatchTransactionsForm = () => {
     let tmpCoinTotal = 0
     let isDAOCoin = null
     let noOfCoins = 0
+    let tmpRowKeys = []
 
-    // Make Requests
     try {
       if (value === transactionType) return
 
@@ -71,11 +73,14 @@ const _BatchTransactionsForm = () => {
           return null
         })
 
-        updateHolderAmounts(finalHodlers.concat(), tmpCoinTotal)
+        tmpRowKeys = finalHodlers.map((hodler) => hodler.ProfileEntryResponse.Username)
+        updateHolderAmounts(finalHodlers.concat(), tmpCoinTotal, 0, tmpRowKeys, tmpCoinTotal)
       }
 
       setHodlers(finalHodlers)
-      setCoinTotal(tmpCoinTotal)
+      setSelectedRows(finalHodlers)
+      setSelectedRowKeys(tmpRowKeys)
+      setOriginalCoinTotal(tmpCoinTotal)
     } catch (e) {
       message.error(e)
     }
@@ -84,27 +89,34 @@ const _BatchTransactionsForm = () => {
   }
 
   const handlePaymentTypeChange = (value) => {
+    const tmpCoinTotal = calculateCoinTotal(selectedRows)
     setPaymentType(value)
     setAmount('')
 
     if (transactionType === Enums.values.NFT) {
       handleGetNFT(nftUrl, '')
     } else {
-      updateHolderAmounts(hodlers.concat(), coinTotal, parseFloat(''))
+      updateHolderAmounts(hodlers.concat(), tmpCoinTotal, 0, selectedRowKeys, originalCoinTotal)
     }
   }
 
-  const updateHolderAmounts = (tmpHodlers, tmpCoinTotal, tmpAmount) => {
+  const updateHolderAmounts = (tmpHodlers, tmpCoinTotal, tmpAmount, selectedKeys, coinTotalOriginal) => {
     let estimatedPayment = 0
 
     // Determine % Ownership and Estimated Payment
     tmpHodlers.map((entry) => {
-      // Determine % Ownership
-      entry.percentOwnership = calculatePercOwnership(entry.noOfCoins, tmpCoinTotal)
+      if (selectedKeys.includes(entry.ProfileEntryResponse.Username)) {
+        // Determine % Ownership
+        entry.percentOwnership = calculatePercOwnership(entry.noOfCoins, coinTotalOriginal)
 
-      // Determine Estimated Payment
-      if (tmpAmount > 0) estimatedPayment = calculateEstimatePayment(entry.noOfCoins, tmpCoinTotal, tmpAmount)
-      entry.estimatedPayment = estimatedPayment
+        // Determine Estimated Payment
+        if (tmpAmount > 0) estimatedPayment = calculateEstimatePayment(entry.noOfCoins, tmpCoinTotal, tmpAmount)
+        entry.estimatedPayment = estimatedPayment
+      } else {
+        // Determine % Ownership
+        entry.percentOwnership = calculatePercOwnership(entry.noOfCoins, coinTotalOriginal)
+        entry.estimatedPayment = 0
+      }
 
       return null
     })
@@ -125,7 +137,10 @@ const _BatchTransactionsForm = () => {
           break
         default:
           for (const hodler of hodlers) {
-            if (hodler.ProfileEntryResponse?.Username) {
+            if (
+              hodler.ProfileEntryResponse?.Username &&
+              selectedRowKeys.includes(hodler.ProfileEntryResponse?.Username)
+            ) {
               tmpResult.push(`@${hodler.ProfileEntryResponse.Username}`)
             }
           }
@@ -292,22 +307,24 @@ const _BatchTransactionsForm = () => {
     setTransactionType(tmpTransactionType)
     setPaymentType(Enums.values.EMPTY_STRING)
     setHodlers([])
+    setSelectedRowKeys([])
     setAmount('')
     setNftUrl('')
     setNft(null)
     setNftOwners([])
     setValidationMessage('')
-    setCoinTotal(0)
+    setOriginalCoinTotal(0)
   }
 
   useEffect(() => {
+    const tmpCoinTotal = calculateCoinTotal(selectedRows)
     const delayDebounceFn = setTimeout(() => {
       switch (transactionType) {
         case Enums.values.NFT:
           handleGetNFT(nftUrl, amount)
           break
         default:
-          updateHolderAmounts(hodlers.concat(), coinTotal, parseFloat(amount))
+          updateHolderAmounts(hodlers.concat(), tmpCoinTotal, parseFloat(amount), selectedRowKeys, originalCoinTotal)
       }
     }, 1000)
 
@@ -320,6 +337,11 @@ const _BatchTransactionsForm = () => {
     const desoBalance = desoState.profile.Profile.DESOBalanceNanos / Enums.values.NANO_VALUE
     const daoBalance = desoState.daoBalance
     const creatorCoinBalance = desoState.creatorCoinBalance / Enums.values.NANO_VALUE
+
+    if (selectedRowKeys.length < 1) {
+      message.error('Please select at least one User')
+      return false
+    }
 
     if (!tmpAmount) {
       message.error('Please specify an Amount')
@@ -441,7 +463,12 @@ const _BatchTransactionsForm = () => {
     let status = Enums.values.EMPTY_STRING
 
     updatedHolders = updatedHolders.map((tmpHodler, tmpIndex) => {
-      if (tmpIndex === index) {
+      if (
+        tmpIndex === index &&
+        selectedRowKeys.includes(
+          transactionType !== Enums.values.NFT ? tmpHodler.ProfileEntryResponse.Username : tmpHodler.username
+        )
+      ) {
         if (transactionType === Enums.values.NFT) {
           publicKey = tmpHodler.key
         } else {
@@ -465,38 +492,53 @@ const _BatchTransactionsForm = () => {
       setHodlers(updatedHolders)
     }
 
-    functionToCall(desoState.profile.Profile.PublicKeyBase58Check, publicKey, estimatedPayment, paymentType)
-      .then(() => {
-        status = 'Paid'
-      })
-      .catch((e) => {
-        status = 'Error: ' + (e.message || e)
-      })
-      .finally(() => {
-        updatedHolders = updatedHolders.map((tmpHodler, tmpIndex) => {
-          if (tmpIndex === index) {
-            return {
-              ...tmpHodler,
-              status
+    if (estimatedPayment) {
+      functionToCall(desoState.profile.Profile.PublicKeyBase58Check, publicKey, estimatedPayment, paymentType)
+        .then(() => {
+          status = 'Paid'
+        })
+        .catch((e) => {
+          status = 'Error: ' + (e.message || e)
+        })
+        .finally(() => {
+          updatedHolders = updatedHolders.map((tmpHodler, tmpIndex) => {
+            if (
+              tmpIndex === index &&
+              selectedRowKeys.includes(
+                transactionType !== Enums.values.NFT ? tmpHodler.ProfileEntryResponse.Username : tmpHodler.username
+              )
+            ) {
+              return {
+                ...tmpHodler,
+                status
+              }
+            } else {
+              return tmpHodler
             }
+          })
+
+          if (transactionType === Enums.values.NFT) {
+            setNftOwners(updatedHolders)
           } else {
-            return tmpHodler
+            setHodlers(updatedHolders)
+          }
+          index++
+
+          if (index < updatedHolders.length) {
+            handleExecuteExtended(index, updatedHolders, functionToCall, callback)
+          } else {
+            callback()
           }
         })
+    } else {
+      index++
 
-        if (transactionType === Enums.values.NFT) {
-          setNftOwners(updatedHolders)
-        } else {
-          setHodlers(updatedHolders)
-        }
-        index++
-
-        if (index < updatedHolders.length) {
-          handleExecuteExtended(index, updatedHolders, functionToCall, callback)
-        } else {
-          callback()
-        }
-      })
+      if (index < updatedHolders.length) {
+        handleExecuteExtended(index, updatedHolders, functionToCall, callback)
+      } else {
+        callback()
+      }
+    }
   }
 
   const generatePaymentTypeTitle = () => {
@@ -668,6 +710,8 @@ const _BatchTransactionsForm = () => {
         })
 
         setNftOwners(tmpNftOwners)
+        setSelectedRows(tmpNftOwners)
+        setSelectedRowKeys(tmpNftOwners.map((entry) => entry.username))
       }
     } catch (e) {
       console.log(e)
@@ -695,6 +739,68 @@ const _BatchTransactionsForm = () => {
         }
       default:
         return true
+    }
+  }
+
+  const calculateCoinTotal = (records) => {
+    let tmpCoinTotal = 0
+    let noOfCoins = 0
+
+    records.map((entry) => {
+      if (transactionType === Enums.values.DAO) {
+        noOfCoins = entry.BalanceNanosUint256
+        noOfCoins = hexToInt(noOfCoins)
+        noOfCoins = noOfCoins / Enums.values.NANO_VALUE / Enums.values.NANO_VALUE
+      } else {
+        noOfCoins = entry.BalanceNanos
+        noOfCoins = noOfCoins / Enums.values.NANO_VALUE
+      }
+
+      tmpCoinTotal += noOfCoins
+
+      return null
+    })
+
+    return tmpCoinTotal
+  }
+
+  const calculateNFTPaymentEstimates = (selectedKeys, selectedRecords) => {
+    const tmpNftOwners = nftOwners.concat()
+    let baseValue = 0
+    let ownerEntryCount = 0
+
+    selectedRecords.map((owner) => {
+      ownerEntryCount += owner.owned
+
+      return null
+    })
+
+    baseValue = amount / ownerEntryCount
+
+    // Map through NFT owners and calculate estimated payment
+    tmpNftOwners.map((owner) => {
+      if (selectedKeys.includes(owner.username)) {
+        return (owner.estimatedPayment = baseValue * owner.owned)
+      } else {
+        return (owner.estimatedPayment = 0)
+      }
+    })
+
+    setNftOwners(tmpNftOwners)
+    setSelectedRows(selectedRecords)
+    setSelectedRowKeys(selectedKeys)
+  }
+
+  const handleSelectionChange = (selectedKeys, selectedRecords) => {
+    const tmpCoinTotal = calculateCoinTotal(selectedRecords)
+
+    setSelectedRows(selectedRecords)
+    setSelectedRowKeys(selectedKeys)
+
+    if (transactionType !== Enums.values.NFT) {
+      updateHolderAmounts(hodlers.concat(), tmpCoinTotal, parseFloat(amount), selectedKeys, originalCoinTotal)
+    } else {
+      calculateNFTPaymentEstimates(selectedKeys, selectedRecords)
     }
   }
 
@@ -810,6 +916,11 @@ const _BatchTransactionsForm = () => {
           ) : null}
           {transactionType !== Enums.values.NFT ? (
             <Table
+              rowKey={(hodler) => hodler.ProfileEntryResponse.Username}
+              rowSelection={{
+                selectedRowKeys,
+                onChange: (selectedKeys, selectedRecords) => handleSelectionChange(selectedKeys, selectedRecords)
+              }}
               dataSource={hodlers}
               loading={loading}
               style={{ marginTop: 20, marginLeft: 0 }}
@@ -861,6 +972,11 @@ const _BatchTransactionsForm = () => {
             />
           ) : (
             <Table
+              rowKey={(nftOwner) => nftOwner.username}
+              rowSelection={{
+                selectedRowKeys,
+                onChange: (selectedKeys, selectedRecords) => handleSelectionChange(selectedKeys, selectedRecords)
+              }}
               dataSource={nftOwners}
               loading={loading}
               style={{ marginTop: 20, marginLeft: 0 }}
