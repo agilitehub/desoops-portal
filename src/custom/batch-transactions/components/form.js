@@ -318,6 +318,9 @@ const _BatchTransactionsForm = () => {
 
   useEffect(() => {
     const tmpCoinTotal = calculateCoinTotal(selectedRows)
+
+    if (!amount) return
+
     const delayDebounceFn = setTimeout(() => {
       switch (transactionType) {
         case Enums.values.NFT:
