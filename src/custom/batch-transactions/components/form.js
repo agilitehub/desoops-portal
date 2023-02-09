@@ -49,8 +49,11 @@ const _BatchTransactionsForm = () => {
       if (tmpHodlers.Hodlers.length > 0) {
         // Determine Coin Total and valid Hodlers
         tmpHodlers.Hodlers.map((entry) => {
-          // Ignore entry if is current logged in user
-          if (entry.ProfileEntryResponse?.Username !== desoState.profile.Profile.Username) {
+          // Ignore entry if it does not have a Profile OR if it is the same as current logged in user
+          if (
+            entry.ProfileEntryResponse &&
+            entry.ProfileEntryResponse.Username !== desoState.profile.Profile.Username
+          ) {
             // Set Defaults
             entry.status = Enums.values.EMPTY_STRING
 
@@ -138,8 +141,8 @@ const _BatchTransactionsForm = () => {
         default:
           for (const hodler of hodlers) {
             if (
-              hodler.ProfileEntryResponse?.Username &&
-              selectedRowKeys.includes(hodler.ProfileEntryResponse?.Username)
+              hodler.ProfileEntryResponse.Username &&
+              selectedRowKeys.includes(hodler.ProfileEntryResponse.Username)
             ) {
               tmpResult.push(`@${hodler.ProfileEntryResponse.Username}`)
             }
