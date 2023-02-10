@@ -136,7 +136,11 @@ const _BatchTransactionsForm = () => {
     } else {
       switch (transactionType) {
         case Enums.values.NFT:
-          for (const owner of nftOwners) tmpResult.push(`@${owner.username}`)
+          for (const owner of nftOwners) {
+            if (selectedRowKeys.includes(owner.username)) {
+              tmpResult.push(`@${owner.username}`)
+            }
+          }
           break
         default:
           for (const hodler of hodlers) {
@@ -277,7 +281,7 @@ const _BatchTransactionsForm = () => {
                     text={handleCopyUsernames()}
                     onCopy={() => message.info('Usernames copied to clipboard')}
                   >
-                    <span>Copy Coin Holders to clipboard</span>
+                    <span>Copy Selected Users to clipboard</span>
                   </CopyToClipboard>
                 </Select.Option>
                 <Select.Option value='followers'>Copy Followers to clipboard</Select.Option>
