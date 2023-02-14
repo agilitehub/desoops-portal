@@ -19,6 +19,7 @@ const Enums = {
     DAO_TYPE: 'DAO',
     CREATOR_TYPE: 'Creator Coin',
     NFT: 'nft',
+    POST: 'post',
     HEX_PREFIX: '0x',
     YES: 'Yes',
     NO: 'No',

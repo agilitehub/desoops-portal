@@ -114,6 +114,29 @@ export const getNFTdetails = (postHashHex) => {
   })
 }
 
+export const getPostDetails = (postHashHex) => {
+  return new Promise((resolve, reject) => {
+    ;(async () => {
+      let request = null
+      let response = null
+
+      try {
+        request = {
+          PostHashHex: postHashHex,
+          CommentLimit: 1000
+        }
+
+        response = await deso.posts.getSinglePost(request)
+
+        resolve(response)
+      } catch (e) {
+        console.log(e)
+        reject(Enums.messages.UNKNOWN_ERROR)
+      }
+    })()
+  })
+}
+
 export const getNFTEntries = (postHashHex) => {
   return new Promise((resolve, reject) => {
     ;(async () => {

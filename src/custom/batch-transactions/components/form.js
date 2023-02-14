@@ -4,7 +4,15 @@ import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { getFollowers, getHodlers, payCeatorHodler, payDaoHodler } from '../controller'
 import { useDispatch, useSelector } from 'react-redux'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
-import { getDaoBalance, getNFTdetails, getNFTEntries, getSingleProfile, getUserStateless } from '../../deso/controller'
+import {
+  getDaoBalance,
+  getNFTdetails,
+  getNFTEntries,
+  getPostDetails,
+  getSingleProfile,
+  getUserStateless
+} from '../../deso/controller'
+import { v1 } from 'agilite-utils/uuid'
 import AgiliteReactEnums from '../../../agilite-react/resources/enums'
 import theme from '../../../agilite-react/resources/theme'
 import Enums from '../../../utils/enums'
@@ -19,8 +27,13 @@ const _BatchTransactionsForm = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const [selectedRows, setSelectedRows] = useState([])
   const [amount, setAmount] = useState('')
-  const [nftUrl, setNftUrl] = useState('')
+  const [post, setPost] = useState('')
+  const [postUrl, setPostUrl] = useState('')
+  const [commentEntries, setCommentEntries] = useState([])
+  const [originalCommentEntries, setOriginalCommentEntries] = useState([])
+  const [commentKeywords, setCommentKeywords] = useState('')
   const [nft, setNft] = useState(null)
+  const [nftUrl, setNftUrl] = useState('')
   const [validationMessage, setValidationMessage] = useState('')
   const [originalCoinTotal, setOriginalCoinTotal] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -40,7 +53,7 @@ const _BatchTransactionsForm = () => {
 
       handleReset(value)
 
-      if (!value || value === Enums.values.NFT) return
+      if (!value || value === Enums.values.NFT || value === Enums.values.POST) return
 
       setLoading(true)
       isDAOCoin = value === Enums.values.DAO
@@ -98,6 +111,8 @@ const _BatchTransactionsForm = () => {
 
     if (transactionType === Enums.values.NFT) {
       handleGetNFT(nftUrl, '')
+    } else if (transactionType === Enums.values.POST) {
+      handleGetPost(postUrl, '')
     } else {
       updateHolderAmounts(hodlers.concat(), tmpCoinTotal, 0, selectedRowKeys, originalCoinTotal)
     }
@@ -139,6 +154,13 @@ const _BatchTransactionsForm = () => {
           for (const owner of nftOwners) {
             if (selectedRowKeys.includes(owner.username)) {
               tmpResult.push(`@${owner.username}`)
+            }
+          }
+          break
+        case Enums.values.POST:
+          for (const entry of commentEntries) {
+            if (selectedRowKeys.includes(entry.id)) {
+              tmpResult.push(`@${entry.username}`)
             }
           }
           break
@@ -259,6 +281,7 @@ const _BatchTransactionsForm = () => {
                 <Select.Option value={Enums.values.CREATOR}>Pay Creator Coin Holders</Select.Option>
                 <Select.Option value={Enums.values.DAO}>Pay DAO Coin Holders</Select.Option>
                 <Select.Option value={Enums.values.NFT}>Pay NFT Owners</Select.Option>
+                <Select.Option value={Enums.values.POST}>Pay Desofy Poll Interactions</Select.Option>
               </Select>
             </center>
           </Col>
@@ -319,12 +342,18 @@ const _BatchTransactionsForm = () => {
     setNftUrl('')
     setNft(null)
     setNftOwners([])
+    setPost(null)
+    setPostUrl('')
+    setCommentEntries([])
+    setCommentKeywords('')
+    setOriginalCommentEntries([])
     setValidationMessage('')
     setOriginalCoinTotal(0)
   }
 
   useEffect(() => {
     const tmpCoinTotal = calculateCoinTotal(selectedRows)
+    let tmpArray
 
     if (!amount) return
 
@@ -332,6 +361,15 @@ const _BatchTransactionsForm = () => {
       switch (transactionType) {
         case Enums.values.NFT:
           handleGetNFT(nftUrl, amount)
+          break
+        case Enums.values.POST:
+          tmpArray = commentEntries.concat()
+
+          tmpArray.map((entry) => {
+            return (entry.estimatedPayment = amount / commentEntries.length)
+          })
+
+          setCommentEntries(tmpArray)
           break
         default:
           updateHolderAmounts(hodlers.concat(), tmpCoinTotal, parseFloat(amount), selectedRowKeys, originalCoinTotal)
@@ -424,6 +462,16 @@ const _BatchTransactionsForm = () => {
 
         setNftOwners(tmpHodlers)
         break
+      case Enums.values.POST:
+        tmpHodlers = commentEntries.map((entry) => {
+          return {
+            ...entry,
+            status: Enums.values.EMPTY_STRING
+          }
+        })
+
+        setCommentEntries(tmpHodlers)
+        break
       default:
         tmpHodlers = hodlers.map((tmpHodler) => {
           return {
@@ -476,10 +524,14 @@ const _BatchTransactionsForm = () => {
       if (
         tmpIndex === index &&
         selectedRowKeys.includes(
-          transactionType !== Enums.values.NFT ? tmpHodler.ProfileEntryResponse.Username : tmpHodler.username
+          transactionType === Enums.values.NFT
+            ? tmpHodler.username
+            : transactionType === Enums.values.POST
+            ? tmpHodler.id
+            : tmpHodler.ProfileEntryResponse.Username
         )
       ) {
-        if (transactionType === Enums.values.NFT) {
+        if (transactionType === Enums.values.NFT || transactionType === Enums.values.POST) {
           publicKey = tmpHodler.key
         } else {
           publicKey = tmpHodler.HODLerPublicKeyBase58Check
@@ -498,6 +550,8 @@ const _BatchTransactionsForm = () => {
 
     if (transactionType === Enums.values.NFT) {
       setNftOwners(updatedHolders)
+    } else if (transactionType === Enums.values.POST) {
+      setCommentEntries(updatedHolders)
     } else {
       setHodlers(updatedHolders)
     }
@@ -515,7 +569,11 @@ const _BatchTransactionsForm = () => {
             if (
               tmpIndex === index &&
               selectedRowKeys.includes(
-                transactionType !== Enums.values.NFT ? tmpHodler.ProfileEntryResponse.Username : tmpHodler.username
+                transactionType === Enums.values.NFT
+                  ? tmpHodler.username
+                  : transactionType === Enums.values.POST
+                  ? tmpHodler.id
+                  : tmpHodler.ProfileEntryResponse.Username
               )
             ) {
               return {
@@ -529,9 +587,12 @@ const _BatchTransactionsForm = () => {
 
           if (transactionType === Enums.values.NFT) {
             setNftOwners(updatedHolders)
+          } else if (transactionType === Enums.values.POST) {
+            setCommentEntries(updatedHolders)
           } else {
             setHodlers(updatedHolders)
           }
+
           index++
 
           if (index < updatedHolders.length) {
@@ -732,10 +793,114 @@ const _BatchTransactionsForm = () => {
     setIsExecuting(false)
   }
 
+  const handleGetPost = async (url, amountValue) => {
+    const urlArray = url.split('/')
+    let hex = null
+    let response = null
+    let tmpCommentEntries = []
+    let baseValue = 0
+
+    setValidationMessage('')
+    setNft(null)
+
+    if (!url) return
+
+    setLoading(true)
+    setIsExecuting(true)
+
+    urlArray.find((value) => {
+      if (value.length === 64) {
+        return (hex = value.substring(0, 64))
+      }
+
+      return null
+    })
+
+    if (!hex) {
+      urlArray.find((value, index) => {
+        if (value === 'posts') {
+          hex = urlArray[index + 1].substring(0, 64)
+        }
+
+        return null
+      })
+    }
+
+    try {
+      response = await getPostDetails(hex)
+      setPost(response)
+
+      if (!response.PostFound.PostExtraData.isDesofyPoll || response.PostFound.PostExtraData.Node !== '4') {
+        setLoading(false)
+        setIsExecuting(false)
+        return message.error('This is not a valid Desofy Poll. Please revise')
+      }
+
+      if (response.PostFound.Comments) {
+        baseValue = amountValue / response.PostFound.Comments.length
+
+        for (const entry of response.PostFound.Comments) {
+          const user = await getUserStateless(entry.PosterPublicKeyBase58Check)
+
+          tmpCommentEntries.push({
+            ...entry,
+            id: v1(),
+            key: user.Profile.PublicKeyBase58Check,
+            status: '',
+            username: user.Profile.Username,
+            estimatedPayment: baseValue
+          })
+        }
+
+        setCommentEntries(tmpCommentEntries)
+        setOriginalCommentEntries(tmpCommentEntries)
+        setSelectedRows(tmpCommentEntries)
+        setSelectedRowKeys(tmpCommentEntries.map((entry) => entry.id))
+      }
+    } catch (e) {
+      console.log(e)
+      message.error('Please validate Post URL')
+    }
+
+    setLoading(false)
+    setIsExecuting(false)
+  }
+
+  useEffect(() => {
+    const tmpCommentEntries = []
+
+    const delayDebounceFn = setTimeout(() => {
+      if (commentKeywords !== '') {
+        for (const entry of originalCommentEntries) {
+          if (entry.Body.toLowerCase().search(commentKeywords.toLowerCase()) !== -1) {
+            tmpCommentEntries.push(entry)
+          }
+        }
+
+        tmpCommentEntries.map((entry) => {
+          return (entry.estimatedPayment = amount / tmpCommentEntries.length)
+        })
+
+        setCommentEntries(tmpCommentEntries)
+      } else {
+        setCommentEntries(originalCommentEntries)
+      }
+    }, 1000)
+
+    return () => clearTimeout(delayDebounceFn)
+    // eslint-disable-next-line
+  }, [commentKeywords])
+
   const validateExecution = () => {
     switch (transactionType) {
       case Enums.values.NFT:
         if (nftUrl && nftOwners.length > 0) {
+          return false
+        } else {
+          return true
+        }
+      case Enums.values.POST:
+        if (postUrl && commentEntries.length > 0) {
           return false
         } else {
           return true
@@ -801,16 +966,38 @@ const _BatchTransactionsForm = () => {
     setSelectedRowKeys(selectedKeys)
   }
 
+  const calculatePostPaymentEstimates = (selectedKeys, selectedRecords) => {
+    const tmpCommentEntries = commentEntries.concat()
+    let baseValue = 0
+
+    baseValue = amount / selectedRecords.length
+
+    tmpCommentEntries.map((entry) => {
+      if (selectedKeys.includes(entry.id)) {
+        return (entry.estimatedPayment = baseValue)
+      } else {
+        return (entry.estimatedPayment = 0)
+      }
+    })
+
+    setCommentEntries(tmpCommentEntries)
+    setSelectedRows(selectedRecords)
+    setSelectedRowKeys(selectedKeys)
+  }
+
   const handleSelectionChange = (selectedKeys, selectedRecords) => {
     const tmpCoinTotal = calculateCoinTotal(selectedRecords)
 
     setSelectedRows(selectedRecords)
     setSelectedRowKeys(selectedKeys)
 
-    if (transactionType !== Enums.values.NFT) {
-      updateHolderAmounts(hodlers.concat(), tmpCoinTotal, parseFloat(amount), selectedKeys, originalCoinTotal)
-    } else {
+    if (transactionType === Enums.values.NFT) {
       calculateNFTPaymentEstimates(selectedKeys, selectedRecords)
+    } else if (transactionType === Enums.values.POST) {
+      // Calculate Estimates here
+      calculatePostPaymentEstimates(selectedKeys, selectedRecords)
+    } else {
+      updateHolderAmounts(hodlers.concat(), tmpCoinTotal, parseFloat(amount), selectedKeys, originalCoinTotal)
     }
   }
 
@@ -827,7 +1014,7 @@ const _BatchTransactionsForm = () => {
           <Row justify='center'>
             <Col style={{ cursor: 'auto', marginLeft: 10 }}>{getBalanceMain()}</Col>
           </Row>
-          <Row justify='space-around'>
+          <Row justify='space-around' style={{ marginTop: 10 }}>
             <Col xs={16} md={12} lg={10} xl={8}>
               <center>
                 <span style={{ fontSize: 15 }}>
@@ -866,6 +1053,47 @@ const _BatchTransactionsForm = () => {
                 <span style={{ color: theme.twitterBootstrap.danger }}>{validationMessage}</span>
               </Col>
             ) : null}
+            {transactionType === Enums.values.POST ? (
+              <Col xs={15} md={11} lg={9} xl={7}>
+                <center>
+                  <span style={{ fontSize: 15 }}>
+                    <p style={{ color: theme.twitterBootstrap.primary }}>Step 4</p>
+                    <b>Link To Post</b>
+                  </span>
+                </center>
+                <Input.TextArea
+                  disabled={transactionType && paymentType && !isExecuting ? false : true}
+                  placeholder='Post URL'
+                  value={postUrl}
+                  onChange={(e) => {
+                    setPostUrl(e.target.value)
+                    handleGetPost(e.target.value, amount)
+                  }}
+                  rows={3}
+                />
+                <span style={{ color: theme.twitterBootstrap.danger }}>{validationMessage}</span>
+              </Col>
+            ) : null}
+            {transactionType === Enums.values.POST ? (
+              <Col xs={15} md={11} lg={9} xl={7}>
+                <center>
+                  <span style={{ fontSize: 15 }}>
+                    <p style={{ color: theme.twitterBootstrap.primary }}>Step 5</p>
+                    <b>Comment Keywords</b>
+                  </span>
+                </center>
+                <Input.TextArea
+                  disabled={transactionType && paymentType && !isExecuting ? false : true}
+                  placeholder='Comment Keywords'
+                  value={commentKeywords}
+                  onChange={(e) => {
+                    setCommentKeywords(e.target.value)
+                  }}
+                  rows={3}
+                />
+                <span style={{ color: theme.twitterBootstrap.danger }}>{validationMessage}</span>
+              </Col>
+            ) : null}
           </Row>
           {nft ? (
             <Row justify='center' align='middle' style={{ marginTop: 20, marginBottom: 20 }}>
@@ -882,7 +1110,19 @@ const _BatchTransactionsForm = () => {
                 <center>{nft.NFTCollectionResponse.PostEntryResponse.Body}</center>
               </Col>
             </Row>
-          ) : null}
+          ) : undefined}
+          {post ? (
+            <Row justify='center' align='middle' style={{ marginTop: 20, marginBottom: 20 }}>
+              {post.PostFound.ImageURLs && post.PostFound.ImageURLs.length > 0 ? (
+                <Col>
+                  <img style={{ width: 300 }} alt='post_image' src={post.PostFound.ImageURLs[0]} />
+                </Col>
+              ) : null}
+              <Col span={24} style={{ marginLeft: 20 }}>
+                <center>{post.PostFound.Body}</center>
+              </Col>
+            </Row>
+          ) : undefined}
           {transactionType ? (
             <>
               <Row style={{ marginTop: 20 }} justify='center'>
@@ -924,7 +1164,7 @@ const _BatchTransactionsForm = () => {
               </Row>
             </>
           ) : null}
-          {transactionType !== Enums.values.NFT ? (
+          {transactionType === Enums.values.CREATOR || transactionType === Enums.values.DAO ? (
             <Table
               rowKey={(hodler) => hodler.ProfileEntryResponse.Username}
               rowSelection={{
@@ -980,7 +1220,8 @@ const _BatchTransactionsForm = () => {
               ]}
               pagination={false}
             />
-          ) : (
+          ) : undefined}
+          {transactionType === Enums.values.NFT ? (
             <Table
               rowKey={(nftOwner) => nftOwner.username}
               rowSelection={{
@@ -1035,7 +1276,58 @@ const _BatchTransactionsForm = () => {
               ]}
               pagination={false}
             />
-          )}
+          ) : undefined}
+          {transactionType === Enums.values.POST ? (
+            <Table
+              rowKey={(commentEntry) => commentEntry.id}
+              rowSelection={{
+                selectedRowKeys,
+                onChange: (selectedKeys, selectedRecords) => handleSelectionChange(selectedKeys, selectedRecords)
+              }}
+              dataSource={commentEntries}
+              loading={loading}
+              style={{ marginTop: 20, marginLeft: 0 }}
+              columns={[
+                {
+                  title: 'Username',
+                  dataIndex: 'username',
+                  key: 'username'
+                },
+                {
+                  title: generatePaymentTypeTitle(),
+                  dataIndex: 'estimatedPayment',
+                  key: 'estimatedPayment',
+                  render: (value) => {
+                    return (
+                      <span style={{ color: theme.twitterBootstrap.primary }}>
+                        {value}{' '}
+                        {paymentType === Enums.values.DESO ? `(~$${(value * desoState.desoPrice).toFixed(2)})` : null}
+                      </span>
+                    )
+                  }
+                },
+                {
+                  title: 'Status',
+                  dataIndex: 'status',
+                  key: 'status',
+                  render: (value) => {
+                    if (value === 'Paid') {
+                      return <CheckCircleOutlined style={{ fontSize: 20, color: theme.twitterBootstrap.success }} />
+                    } else if (value.indexOf('Error:') > -1) {
+                      return (
+                        <Popover content={<p>{value}</p>} title='DeSo Error'>
+                          <CloseCircleOutlined style={{ fontSize: 20, color: theme.twitterBootstrap.danger }} />
+                        </Popover>
+                      )
+                    } else {
+                      return <span style={{ color: theme.twitterBootstrap.info }}>{value}</span>
+                    }
+                  }
+                }
+              ]}
+              pagination={false}
+            />
+          ) : undefined}
         </Card>
       </Col>
     </Row>
