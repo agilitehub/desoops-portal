@@ -1,5 +1,19 @@
 import React, { memo, useEffect, useState } from 'react'
-import { Row, Col, Card, Select, Button, Popconfirm, Input, message, Table, Popover, Divider, Modal } from 'antd'
+import {
+  Row,
+  Col,
+  Card,
+  Select,
+  Button,
+  Popconfirm,
+  Input,
+  message,
+  Table,
+  Popover,
+  Divider,
+  Modal,
+  Switch
+} from 'antd'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { getFollowers, getHodlers, payCeatorHodler, payDaoHodler } from '../controller'
 import { useDispatch, useSelector } from 'react-redux'
@@ -23,6 +37,7 @@ const _BatchTransactionsForm = () => {
   const [transactionType, setTransactionType] = useState(Enums.values.EMPTY_STRING)
   const [paymentType, setPaymentType] = useState(Enums.values.EMPTY_STRING)
   const [hodlers, setHodlers] = useState([])
+  const [originalHodlers, setOriginalHodlers] = useState([])
   const [nftOwners, setNftOwners] = useState([])
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const [selectedRows, setSelectedRows] = useState([])
@@ -94,6 +109,7 @@ const _BatchTransactionsForm = () => {
       }
 
       setHodlers(finalHodlers)
+      setOriginalHodlers(finalHodlers)
       setSelectedRows(finalHodlers)
       setSelectedRowKeys(tmpRowKeys)
       setOriginalCoinTotal(tmpCoinTotal)
@@ -281,7 +297,7 @@ const _BatchTransactionsForm = () => {
                 <Select.Option value={Enums.values.CREATOR}>Pay Creator Coin Holders</Select.Option>
                 <Select.Option value={Enums.values.DAO}>Pay DAO Coin Holders</Select.Option>
                 <Select.Option value={Enums.values.NFT}>Pay NFT Owners</Select.Option>
-                <Select.Option value={Enums.values.POST}>Pay Desofy Poll Interactions</Select.Option>
+                {/* <Select.Option value={Enums.values.POST}>Pay Desofy Poll Interactions</Select.Option> */}
               </Select>
             </center>
           </Col>
@@ -337,6 +353,7 @@ const _BatchTransactionsForm = () => {
     setTransactionType(tmpTransactionType)
     setPaymentType(Enums.values.EMPTY_STRING)
     setHodlers([])
+    setOriginalHodlers([])
     setSelectedRowKeys([])
     setAmount('')
     setNftUrl('')
@@ -349,6 +366,9 @@ const _BatchTransactionsForm = () => {
     setOriginalCommentEntries([])
     setValidationMessage('')
     setOriginalCoinTotal(0)
+    setFilterCoin(false)
+    setFilterCoinValue('')
+    setFilterCoinType('')
   }
 
   useEffect(() => {
@@ -1001,11 +1021,65 @@ const _BatchTransactionsForm = () => {
     }
   }
 
+  const handleCoinValueChange = (value, filterType) => {
+    let newData = []
+
+    setFilterCoinValue(value)
+
+    if (!value || !filterType) {
+      return setHodlers(originalHodlers)
+    }
+
+    const handleFilter = (data) => {
+      let tmpData = []
+
+      for (const entry of data) {
+        switch (filterType) {
+          case '1':
+            if (entry.noOfCoins > parseFloat(value)) {
+              tmpData.push(entry)
+            }
+            break
+          case '2':
+            if (entry.noOfCoins >= parseFloat(value)) {
+              tmpData.push(entry)
+            }
+            break
+          case '3':
+            if (entry.noOfCoins < parseFloat(value)) {
+              tmpData.push(entry)
+            }
+            break
+          case '4':
+            if (entry.noOfCoins <= parseFloat(value)) {
+              tmpData.push(entry)
+            }
+            break
+        }
+      }
+
+      return tmpData
+    }
+
+    switch (transactionType) {
+      case Enums.values.CREATOR:
+      case Enums.values.DAO:
+        newData = handleFilter(originalHodlers.concat())
+        setHodlers(newData)
+        break
+    }
+  }
+
   // eslint-disable-next-line
   Number.prototype.countDecimals = function () {
     if (Math.floor(this.valueOf()) === this.valueOf()) return 0
     return this.toString().split('.')[1].length || 0
   }
+
+  // Filter States
+  const [filterCoin, setFilterCoin] = useState(false)
+  const [filterCoinValue, setFilterCoinValue] = useState('')
+  const [filterCoinType, setFilterCoinType] = useState('')
 
   return (
     <Row justify='center'>
@@ -1123,6 +1197,57 @@ const _BatchTransactionsForm = () => {
               </Col>
             </Row>
           ) : undefined}
+          {amount && (transactionType === Enums.values.CREATOR || transactionType === Enums.values.DAO) ? (
+            <Row justify='center' style={{ marginTop: 20 }}>
+              <Col>
+                <Row justify='center'>
+                  <Col>Filter Users based on Coins Owned</Col>
+                </Row>
+                <Row justify='center' style={{ marginTop: 10 }}>
+                  <Col>
+                    <Switch checked={filterCoin} style={{ width: 50 }} onChange={(checked) => setFilterCoin(checked)} />
+                  </Col>
+                </Row>
+                {filterCoin ? (
+                  <>
+                    <Row justify='center' style={{ marginTop: 20 }}>
+                      <Col>
+                        <Select
+                          onChange={(value) => {
+                            setFilterCoinType(value)
+                            handleCoinValueChange(filterCoinValue, value)
+                          }}
+                          style={{ width: 200 }}
+                          value={filterCoinType}
+                        >
+                          <Select.Option value=''>- Select Filter Type -</Select.Option>
+                          <Select.Option value='1'>Greater than</Select.Option>
+                          <Select.Option value='2'>Greater than or equal to</Select.Option>
+                          <Select.Option value='3'>Less than</Select.Option>
+                          <Select.Option value='4'>Less than or equal to</Select.Option>
+                        </Select>
+                      </Col>
+                    </Row>
+                    <Row justify='center' style={{ marginTop: 20 }}>
+                      <Col>
+                        <Input
+                          type='number'
+                          value={filterCoinValue}
+                          min={0}
+                          onChange={(e) => {
+                            if (e.target.value > -1) {
+                              handleCoinValueChange(e.target.value, filterCoinType)
+                            }
+                          }}
+                          placeholder='Coin Amount'
+                        />
+                      </Col>
+                    </Row>
+                  </>
+                ) : undefined}
+              </Col>
+            </Row>
+          ) : undefined}
           {transactionType ? (
             <>
               <Row style={{ marginTop: 20 }} justify='center'>
@@ -1144,7 +1269,12 @@ const _BatchTransactionsForm = () => {
                     }
                   >
                     <p style={{ color: theme.twitterBootstrap.primary }}>
-                      Step {transactionType !== Enums.values.NFT ? '4' : '5'}
+                      Step{' '}
+                      {transactionType !== Enums.values.NFT && transactionType !== Enums.values.POST
+                        ? '4'
+                        : transactionType === Enums.values.NFT
+                        ? '5'
+                        : '6'}
                     </p>
                     <Button
                       disabled={
