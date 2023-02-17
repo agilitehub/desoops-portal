@@ -1017,17 +1017,32 @@ const _BatchTransactionsForm = () => {
       // Calculate Estimates here
       calculatePostPaymentEstimates(selectedKeys, selectedRecords)
     } else {
-      updateHolderAmounts(hodlers.concat(), tmpCoinTotal, parseFloat(amount), selectedKeys, originalCoinTotal)
+      updateHolderAmounts(
+        hodlers.concat(),
+        tmpCoinTotal,
+        parseFloat(amount),
+        selectedKeys,
+        originalCoinTotal,
+        selectedKeys
+      )
     }
   }
 
   const handleCoinValueChange = (value, filterType) => {
+    let tmpCoinTotal = null
+    let tmpRowKeys = []
     let newData = []
 
     setFilterCoinValue(value)
 
     if (!value || !filterType) {
-      return setHodlers(originalHodlers)
+      tmpCoinTotal = calculateCoinTotal(originalHodlers)
+      tmpRowKeys = originalHodlers.map((entry) => entry.ProfileEntryResponse.Username)
+
+      setSelectedRows(originalHodlers)
+      setSelectedRowKeys(tmpRowKeys)
+
+      return updateHolderAmounts(originalHodlers, tmpCoinTotal, parseFloat(amount), tmpRowKeys, originalCoinTotal)
     }
 
     const handleFilter = (data) => {
@@ -1065,7 +1080,13 @@ const _BatchTransactionsForm = () => {
       case Enums.values.CREATOR:
       case Enums.values.DAO:
         newData = handleFilter(originalHodlers.concat())
-        setHodlers(newData)
+        tmpCoinTotal = calculateCoinTotal(newData)
+        tmpRowKeys = newData.map((entry) => entry.ProfileEntryResponse.Username)
+
+        setSelectedRows(newData)
+        setSelectedRowKeys(tmpRowKeys)
+
+        updateHolderAmounts(newData, tmpCoinTotal, parseFloat(amount), tmpRowKeys, originalCoinTotal)
         break
     }
   }
@@ -1197,21 +1218,28 @@ const _BatchTransactionsForm = () => {
               </Col>
             </Row>
           ) : undefined}
-          {amount && (transactionType === Enums.values.CREATOR || transactionType === Enums.values.DAO) ? (
+          {transactionType === Enums.values.CREATOR || transactionType === Enums.values.DAO ? (
             <Row justify='center' style={{ marginTop: 20 }}>
               <Col>
                 <Row justify='center'>
-                  <Col>Filter Users based on Coins Owned</Col>
-                </Row>
-                <Row justify='center' style={{ marginTop: 10 }}>
                   <Col>
-                    <Switch checked={filterCoin} style={{ width: 50 }} onChange={(checked) => setFilterCoin(checked)} />
+                    <Switch
+                      checked={filterCoin}
+                      style={{ width: 50 }}
+                      onChange={(checked) => {
+                        setFilterCoin(checked)
+                        setFilterCoinType('')
+                        handleCoinValueChange('', '')
+                      }}
+                    />{' '}
+                    Filter Users based on Coins Owned
                   </Col>
                 </Row>
                 {filterCoin ? (
                   <>
                     <Row justify='center' style={{ marginTop: 20 }}>
                       <Col>
+                        Where Coin Amount is{' '}
                         <Select
                           onChange={(value) => {
                             setFilterCoinType(value)
@@ -1227,8 +1255,6 @@ const _BatchTransactionsForm = () => {
                           <Select.Option value='4'>Less than or equal to</Select.Option>
                         </Select>
                       </Col>
-                    </Row>
-                    <Row justify='center' style={{ marginTop: 20 }}>
                       <Col>
                         <Input
                           type='number'
