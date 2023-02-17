@@ -1248,7 +1248,7 @@ const _BatchTransactionsForm = () => {
                           style={{ width: 200 }}
                           value={filterCoinType}
                         >
-                          <Select.Option value=''>- Select Filter Type -</Select.Option>
+                          <Select.Option value=''>- Select -</Select.Option>
                           <Select.Option value='1'>Greater than</Select.Option>
                           <Select.Option value='2'>Greater than or equal to</Select.Option>
                           <Select.Option value='3'>Less than</Select.Option>
