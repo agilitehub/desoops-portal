@@ -1,7 +1,7 @@
 {
   "name": "desoops-portal",
   "description": "DeSo Ops: An Admin Portal for DeSo Creators to manage various tasks related to their Projects, Coin Holders, and Supporters.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

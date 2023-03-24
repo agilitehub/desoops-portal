@@ -2,7 +2,7 @@ import Axios from 'agilite-utils/axios'
 import Enums from '../../utils/enums'
 import { getDeSo } from '../deso/controller'
 
-export const getHodlers = (Username, IsDAOCoin) => {
+export const getHodlers = (Username, IsDAOCoin, fetchHodlings) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       let response = null
@@ -13,7 +13,7 @@ export const getHodlers = (Username, IsDAOCoin) => {
           PublicKeyBase58Check: Enums.values.EMPTY_STRING,
           Username,
           LastPublicKeyBase58Check: Enums.values.EMPTY_STRING,
-          FetchHodlings: false,
+          FetchHodlings: fetchHodlings,
           FetchAll: true,
           IsDAOCoin
         })
@@ -32,7 +32,7 @@ export const getHodlers = (Username, IsDAOCoin) => {
   })
 }
 
-export const payCeatorHodler = (senderKey, receiverKey, amount, type) => {
+export const payCeatorHodler = (senderKey, receiverKey, creatorKey, amount, type) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       let request = null
@@ -68,7 +68,7 @@ export const payCeatorHodler = (senderKey, receiverKey, amount, type) => {
           case Enums.values.CREATOR:
             request = {
               SenderPublicKeyBase58Check: senderKey,
-              CreatorPublicKeyBase58Check: senderKey,
+              CreatorPublicKeyBase58Check: creatorKey ? creatorKey : senderKey,
               CreatorCoinToTransferNanos: parseInt((amount * Enums.values.NANO_VALUE).toFixed(0)),
               ReceiverUsernameOrPublicKeyBase58Check: receiverKey,
               MinFeeRateNanosPerKB: 1000
@@ -88,7 +88,7 @@ export const payCeatorHodler = (senderKey, receiverKey, amount, type) => {
   })
 }
 
-export const payDaoHodler = (senderKey, receiverKey, amount, type) => {
+export const payDaoHodler = (senderKey, receiverKey, creatorKey, amount, type) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       let request = null
@@ -124,7 +124,7 @@ export const payDaoHodler = (senderKey, receiverKey, amount, type) => {
           case Enums.values.CREATOR:
             request = {
               SenderPublicKeyBase58Check: senderKey,
-              CreatorPublicKeyBase58Check: senderKey,
+              CreatorPublicKeyBase58Check: creatorKey ? creatorKey : senderKey,
               CreatorCoinToTransferNanos: parseInt((amount * Enums.values.NANO_VALUE).toFixed(0)),
               ReceiverUsernameOrPublicKeyBase58Check: receiverKey,
               MinFeeRateNanosPerKB: 1000

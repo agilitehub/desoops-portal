@@ -36,6 +36,7 @@ const _BatchTransactionsForm = () => {
   const desoState = useSelector((state) => state.agiliteReact.deso)
   const [transactionType, setTransactionType] = useState(Enums.values.EMPTY_STRING)
   const [paymentType, setPaymentType] = useState(Enums.values.EMPTY_STRING)
+  const [creatorCoinPaymentType, setCreatorCoinPaymentType] = useState('default')
   const [hodlers, setHodlers] = useState([])
   const [originalHodlers, setOriginalHodlers] = useState([])
   const [nftOwners, setNftOwners] = useState([])
@@ -216,10 +217,15 @@ const _BatchTransactionsForm = () => {
     let daoData = null
     let creatorCoinData = null
     let creatorCoinBalance = 0
+    let holdingData = null
 
     try {
       daoData = await getDaoBalance(publicKey)
       creatorCoinData = await getHodlers(desoState.profile.Profile.Username, false)
+      holdingData = await getHodlers(desoState.profile.Profile.Username, false, true)
+      holdingData = holdingData.Hodlers.filter(
+        (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== desoState.profile.Profile.PublicKeyBase58Check
+      )
 
       creatorCoinData.Hodlers.map((entry) => {
         if (entry.HODLerPublicKeyBase58Check === desoState.profile.Profile.PublicKeyBase58Check) {
@@ -231,7 +237,12 @@ const _BatchTransactionsForm = () => {
 
       dispatch({
         type: AgiliteReactEnums.reducers.SET_DESO_DATA,
-        payload: { desoPrice: daoData.desoPrice, daoBalance: daoData.daoBalance, creatorCoinBalance }
+        payload: {
+          desoPrice: daoData.desoPrice,
+          daoBalance: daoData.daoBalance,
+          creatorCoinBalance,
+          creatorCoinHoldings: holdingData
+        }
       })
     } catch (e) {
       console.log(e)
@@ -369,6 +380,7 @@ const _BatchTransactionsForm = () => {
     setFilterCoin(false)
     setFilterCoinValue('')
     setFilterCoinType('')
+    setCreatorCoinPaymentType('default')
   }
 
   useEffect(() => {
@@ -404,7 +416,21 @@ const _BatchTransactionsForm = () => {
     const tmpAmount = parseFloat(amount)
     const desoBalance = desoState.profile.Profile.DESOBalanceNanos / Enums.values.NANO_VALUE
     const daoBalance = desoState.daoBalance
-    const creatorCoinBalance = desoState.creatorCoinBalance / Enums.values.NANO_VALUE
+    let creatorCoinBalance = 0
+
+    switch (creatorCoinPaymentType) {
+      case 'default':
+        creatorCoinBalance = desoState.creatorCoinBalance / Enums.values.NANO_VALUE
+        break
+      default:
+        creatorCoinBalance =
+          desoState.creatorCoinHoldings[
+            desoState.creatorCoinHoldings.findIndex(
+              (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check === creatorCoinPaymentType
+            )
+          ].BalanceNanos / Enums.values.NANO_VALUE
+        break
+    }
 
     if (selectedRowKeys.length < 1) {
       message.error('Please select at least one User')
@@ -459,6 +485,7 @@ const _BatchTransactionsForm = () => {
     let tmpHodlers = null
     let daoData = null
     let creatorCoinData = null
+    let holdingData = null
     let creatorCoinBalance = 0
     let profile = null
     let functionToCall = null
@@ -515,6 +542,10 @@ const _BatchTransactionsForm = () => {
       profile = await getSingleProfile(desoState.profile.Profile.PublicKeyBase58Check)
       daoData = await getDaoBalance(desoState.profile.Profile.PublicKeyBase58Check)
       creatorCoinData = await getHodlers(desoState.profile.Profile.Username, false)
+      holdingData = await getHodlers(profile.Profile.Username, false, true)
+      holdingData = holdingData.Hodlers.filter(
+        (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== profile.Profile.PublicKeyBase58Check
+      )
 
       creatorCoinData.Hodlers.map((entry) => {
         if (entry.HODLerPublicKeyBase58Check === desoState.profile.Profile.PublicKeyBase58Check) {
@@ -527,7 +558,12 @@ const _BatchTransactionsForm = () => {
       dispatch({ type: AgiliteReactEnums.reducers.SET_PROFILE_DESO, payload: profile })
       dispatch({
         type: AgiliteReactEnums.reducers.SET_DESO_DATA,
-        payload: { desoPrice: daoData.desoPrice, daoBalance: daoData.daoBalance, creatorCoinBalance }
+        payload: {
+          desoPrice: daoData.desoPrice,
+          daoBalance: daoData.daoBalance,
+          creatorCoinBalance,
+          creatorCoinHoldings: holdingData
+        }
       })
 
       setLoading(false)
@@ -539,6 +575,11 @@ const _BatchTransactionsForm = () => {
     let publicKey = null
     let estimatedPayment = null
     let status = Enums.values.EMPTY_STRING
+    let creatorKey = null
+
+    if (creatorCoinPaymentType !== 'default') {
+      creatorKey = creatorCoinPaymentType
+    }
 
     updatedHolders = updatedHolders.map((tmpHodler, tmpIndex) => {
       if (
@@ -577,7 +618,13 @@ const _BatchTransactionsForm = () => {
     }
 
     if (estimatedPayment) {
-      functionToCall(desoState.profile.Profile.PublicKeyBase58Check, publicKey, estimatedPayment, paymentType)
+      functionToCall(
+        desoState.profile.Profile.PublicKeyBase58Check,
+        publicKey,
+        creatorKey,
+        estimatedPayment,
+        paymentType
+      )
         .then(() => {
           status = 'Paid'
         })
@@ -705,7 +752,18 @@ const _BatchTransactionsForm = () => {
     return (
       <>
         <span style={{ fontSize: 15 }}>
-          <b>Creator Coin Balance: {desoState.creatorCoinBalance / Enums.values.NANO_VALUE}</b>
+          {creatorCoinPaymentType === 'default' ? (
+            <b>Creator Coin Balance: {desoState.creatorCoinBalance / Enums.values.NANO_VALUE}</b>
+          ) : (
+            <b>
+              Creator Coin Balance:{' '}
+              {desoState.creatorCoinHoldings[
+                desoState.creatorCoinHoldings.findIndex(
+                  (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check === creatorCoinPaymentType
+                )
+              ].BalanceNanos / Enums.values.NANO_VALUE}
+            </b>
+          )}
         </span>
       </>
     )
@@ -1107,13 +1165,44 @@ const _BatchTransactionsForm = () => {
       <Col xs={24} sm={22} md={20} lg={18} xl={16}>
         <Card type='inner' title={generateActions()} style={{ marginTop: 20, padding: '16px 5px' }}>
           <Row justify='center'>
+            <Col>
+              {paymentType === Enums.values.CREATOR ? (
+                <>
+                  <center style={{ fontSize: 15 }}>
+                    <p style={{ color: theme.twitterBootstrap.primary }}>Step 3</p>
+                    <span style={{ fontWeight: 'bold' }}>Coin To Pay With</span>
+                  </center>
+                  <Select
+                    disabled={!desoState.loggedIn || isExecuting}
+                    onChange={(value) => setCreatorCoinPaymentType(value)}
+                    value={creatorCoinPaymentType}
+                    style={{ width: 250, marginBottom: 20 }}
+                  >
+                    <Select.Option value={'default'}>My Coin ({desoState.profile.Profile.Username})</Select.Option>
+                    {desoState.creatorCoinHoldings
+                      .sort((a, b) => a.ProfileEntryResponse.Username.localeCompare(b.ProfileEntryResponse.Username))
+                      .map((entry, index) => {
+                        return (
+                          <Select.Option key={index} value={entry.ProfileEntryResponse.PublicKeyBase58Check}>
+                            {entry.ProfileEntryResponse.Username} Coin
+                          </Select.Option>
+                        )
+                      })}
+                  </Select>
+                </>
+              ) : undefined}
+            </Col>
+          </Row>
+          <Row justify='center'>
             <Col style={{ cursor: 'auto', marginLeft: 10 }}>{getBalanceMain()}</Col>
           </Row>
           <Row justify='space-around' style={{ marginTop: 10 }}>
             <Col xs={16} md={12} lg={10} xl={8}>
               <center>
                 <span style={{ fontSize: 15 }}>
-                  <p style={{ color: theme.twitterBootstrap.primary }}>Step 3</p>
+                  <p style={{ color: theme.twitterBootstrap.primary }}>
+                    {paymentType === Enums.values.CREATOR ? 'Step 4' : 'Step 3'}
+                  </p>
                   <b>Amount To Pay</b>
                 </span>
               </center>
@@ -1131,7 +1220,9 @@ const _BatchTransactionsForm = () => {
               <Col xs={16} md={12} lg={10} xl={8}>
                 <center>
                   <span style={{ fontSize: 15 }}>
-                    <p style={{ color: theme.twitterBootstrap.primary }}>Step 4</p>
+                    <p style={{ color: theme.twitterBootstrap.primary }}>
+                      {paymentType === Enums.values.CREATOR ? 'Step 5' : 'Step 4'}
+                    </p>
                     <b>Link To NFT</b>
                   </span>
                 </center>
@@ -1294,14 +1385,7 @@ const _BatchTransactionsForm = () => {
                       validateExecution()
                     }
                   >
-                    <p style={{ color: theme.twitterBootstrap.primary }}>
-                      Step{' '}
-                      {transactionType !== Enums.values.NFT && transactionType !== Enums.values.POST
-                        ? '4'
-                        : transactionType === Enums.values.NFT
-                        ? '5'
-                        : '6'}
-                    </p>
+                    <p style={{ color: theme.twitterBootstrap.primary, fontSize: 15 }}>Final Step</p>
                     <Button
                       disabled={
                         isExecuting ||

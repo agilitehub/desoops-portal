@@ -52,11 +52,16 @@ const DeSoLoginForm = () => {
   const handleGetDoaBalance = async (profile) => {
     let daoData = null
     let creatorCoinData = null
+    let holdingData = null
     let creatorCoinBalance = 0
 
     try {
       daoData = await getDaoBalance(profile.Profile.PublicKeyBase58Check)
       creatorCoinData = await getHodlers(profile.Profile.Username, false)
+      holdingData = await getHodlers(profile.Profile.Username, false, true)
+      holdingData = holdingData.Hodlers.filter(
+        (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== profile.Profile.PublicKeyBase58Check
+      )
 
       creatorCoinData.Hodlers.map((entry) => {
         if (entry.HODLerPublicKeyBase58Check === profile.Profile.PublicKeyBase58Check) {
@@ -68,7 +73,12 @@ const DeSoLoginForm = () => {
 
       dispatch({
         type: AgiliteReactEnums.reducers.SET_DESO_DATA,
-        payload: { desoPrice: daoData.desoPrice, daoBalance: daoData.daoBalance, creatorCoinBalance }
+        payload: {
+          desoPrice: daoData.desoPrice,
+          daoBalance: daoData.daoBalance,
+          creatorCoinBalance,
+          creatorCoinHoldings: holdingData
+        }
       })
     } catch (e) {
       console.log(e)
