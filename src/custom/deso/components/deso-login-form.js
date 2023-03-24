@@ -52,14 +52,20 @@ const DeSoLoginForm = () => {
   const handleGetDoaBalance = async (profile) => {
     let daoData = null
     let creatorCoinData = null
-    let holdingData = null
+    let holdingCreatorData = null
+    let holdingDaoData = null
     let creatorCoinBalance = 0
 
     try {
       daoData = await getDaoBalance(profile.Profile.PublicKeyBase58Check)
       creatorCoinData = await getHodlers(profile.Profile.Username, false)
-      holdingData = await getHodlers(profile.Profile.Username, false, true)
-      holdingData = holdingData.Hodlers.filter(
+      holdingCreatorData = await getHodlers(profile.Profile.Username, false, true)
+      holdingCreatorData = holdingCreatorData.Hodlers.filter(
+        (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== profile.Profile.PublicKeyBase58Check
+      )
+
+      holdingDaoData = await getHodlers(profile.Profile.Username, true, true)
+      holdingDaoData = holdingDaoData.Hodlers.filter(
         (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== profile.Profile.PublicKeyBase58Check
       )
 
@@ -77,7 +83,8 @@ const DeSoLoginForm = () => {
           desoPrice: daoData.desoPrice,
           daoBalance: daoData.daoBalance,
           creatorCoinBalance,
-          creatorCoinHoldings: holdingData
+          creatorCoinHoldings: holdingCreatorData,
+          daoCoinHoldings: holdingDaoData
         }
       })
     } catch (e) {

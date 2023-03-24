@@ -42,7 +42,8 @@ const state = {
     desoPrice: 0,
     daoBalance: 0,
     creatorCoinBalance: 0,
-    creatorCoinHoldings: []
+    creatorCoinHoldings: [],
+    daoCoinHoldings: []
   }
 }
 

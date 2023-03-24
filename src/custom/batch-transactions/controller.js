@@ -54,7 +54,7 @@ export const payCeatorHodler = (senderKey, receiverKey, creatorKey, amount, type
           case Enums.values.DAO:
             request = {
               SenderPublicKeyBase58Check: senderKey,
-              ProfilePublicKeyBase58CheckOrUsername: senderKey,
+              ProfilePublicKeyBase58CheckOrUsername: creatorKey ? creatorKey : senderKey,
               ReceiverPublicKeyBase58CheckOrUsername: receiverKey,
               // Hex String
               DAOCoinToTransferNanos:
@@ -110,7 +110,7 @@ export const payDaoHodler = (senderKey, receiverKey, creatorKey, amount, type) =
           case Enums.values.DAO:
             request = {
               SenderPublicKeyBase58Check: senderKey,
-              ProfilePublicKeyBase58CheckOrUsername: senderKey,
+              ProfilePublicKeyBase58CheckOrUsername: creatorKey ? creatorKey : senderKey,
               ReceiverPublicKeyBase58CheckOrUsername: receiverKey,
               // Hex String
               DAOCoinToTransferNanos:

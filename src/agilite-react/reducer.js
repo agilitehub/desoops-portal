@@ -82,7 +82,8 @@ const reducer = (state = State, action) => {
           desoPrice: action.payload.desoPrice,
           daoBalance: action.payload.daoBalance,
           creatorCoinBalance: action.payload.creatorCoinBalance,
-          creatorCoinHoldings: action.payload.creatorCoinHoldings
+          creatorCoinHoldings: action.payload.creatorCoinHoldings,
+          daoCoinHoldings: action.payload.daoCoinHoldings
         }
       }
     default:
