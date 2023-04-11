@@ -12,7 +12,8 @@ import {
   Popover,
   Divider,
   Modal,
-  Switch
+  Switch,
+  Radio
 } from 'antd'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { getFollowers, getHodlers, payCeatorHodler, payDaoHodler } from '../controller'
@@ -56,6 +57,7 @@ const _BatchTransactionsForm = () => {
   const [loading, setLoading] = useState(false)
   const [isExecuting, setIsExecuting] = useState(false)
   const [quickActionValue, setQuickActionValue] = useState('')
+  const [amountSpread, setAmountSpread] = useState('percentage')
 
   const handleTransactionTypeChange = async (value) => {
     let tmpHodlers = []
@@ -138,6 +140,13 @@ const _BatchTransactionsForm = () => {
 
   const updateHolderAmounts = (tmpHodlers, tmpCoinTotal, tmpAmount, selectedKeys, coinTotalOriginal) => {
     let estimatedPayment = 0
+    let totalHodlers = 0
+
+    // Determine the no of hodlers that has been selected
+    tmpHodlers.map((entry) => {
+      if (selectedKeys.includes(entry.ProfileEntryResponse.Username)) totalHodlers += 1
+      return null
+    })
 
     // Determine % Ownership and Estimated Payment
     tmpHodlers.map((entry) => {
@@ -146,8 +155,14 @@ const _BatchTransactionsForm = () => {
         entry.percentOwnership = calculatePercOwnership(entry.noOfCoins, coinTotalOriginal)
 
         // Determine Estimated Payment
-        if (tmpAmount > 0) estimatedPayment = calculateEstimatePayment(entry.noOfCoins, tmpCoinTotal, tmpAmount)
-        entry.estimatedPayment = estimatedPayment
+        switch (amountSpread) {
+          case 'equal':
+            entry.estimatedPayment = tmpAmount / totalHodlers
+            break
+          default:
+            if (tmpAmount > 0) estimatedPayment = calculateEstimatePayment(entry.noOfCoins, tmpCoinTotal, tmpAmount)
+            entry.estimatedPayment = estimatedPayment
+        }
       } else {
         // Determine % Ownership
         entry.percentOwnership = calculatePercOwnership(entry.noOfCoins, coinTotalOriginal)
@@ -394,7 +409,7 @@ const _BatchTransactionsForm = () => {
 
   useEffect(() => {
     const tmpCoinTotal = calculateCoinTotal(selectedRows)
-    let tmpArray
+    let tmpArray = null
 
     if (!amount) return
 
@@ -420,6 +435,20 @@ const _BatchTransactionsForm = () => {
     return () => clearTimeout(delayDebounceFn)
     // eslint-disable-next-line
   }, [amount])
+
+  useEffect(() => {
+    const tmpCoinTotal = calculateCoinTotal(selectedRows)
+
+    switch (transactionType) {
+      case Enums.values.NFT:
+        handleGetNFT(nftUrl, amount)
+        break
+      // TODO: We need to handle the post case here
+      default:
+        updateHolderAmounts(hodlers.concat(), tmpCoinTotal, parseFloat(amount), selectedRowKeys, originalCoinTotal)
+    }
+    // eslint-disable-next-line
+  }, [amountSpread])
 
   const handleValidateAmount = (e) => {
     const tmpAmount = parseFloat(amount)
@@ -923,10 +952,19 @@ const _BatchTransactionsForm = () => {
         // Set base value of estimated payment
         baseValue = amountValue / ownerEntryCount
 
-        // Map through NFT owners and calculate estimated payment
-        tmpNftOwners.map((owner) => {
-          return (owner.estimatedPayment = baseValue * owner.owned)
-        })
+        switch (amountSpread) {
+          case 'equal':
+            // Map through NFT owners and calculate estimated payment
+            tmpNftOwners.map((owner) => {
+              return (owner.estimatedPayment = amountValue / tmpNftOwners.length)
+            })
+            break
+          default:
+            // Map through NFT owners and calculate estimated payment
+            tmpNftOwners.map((owner) => {
+              return (owner.estimatedPayment = baseValue * owner.owned)
+            })
+        }
 
         setNftOwners(tmpNftOwners)
         setSelectedRows(tmpNftOwners)
@@ -1296,7 +1334,7 @@ const _BatchTransactionsForm = () => {
               <center>
                 <span style={{ fontSize: 15 }}>
                   <p style={{ color: theme.twitterBootstrap.primary }}>
-                    {paymentType === Enums.values.CREATOR ? 'Step 4' : 'Step 3'}
+                    {paymentType === Enums.values.CREATOR || paymentType === Enums.values.DAO ? 'Step 4' : 'Step 3'}
                   </p>
                   <b>Amount To Pay</b>
                 </span>
@@ -1310,13 +1348,23 @@ const _BatchTransactionsForm = () => {
                   setAmount(e.target.value)
                 }}
               />
+              <center style={{ marginTop: 20 }}>
+                <span style={{ fontSize: 15 }}>
+                  <b>Spread amount based on:</b>
+                  <br />
+                </span>
+                <Radio.Group value={amountSpread} onChange={(e) => setAmountSpread(e.target.value)}>
+                  <Radio value={'percentage'}>% Ownership</Radio>
+                  <Radio value={'equal'}>Equal Spread</Radio>
+                </Radio.Group>
+              </center>
             </Col>
             {transactionType === Enums.values.NFT ? (
               <Col xs={16} md={12} lg={10} xl={8}>
                 <center>
                   <span style={{ fontSize: 15 }}>
                     <p style={{ color: theme.twitterBootstrap.primary }}>
-                      {paymentType === Enums.values.CREATOR ? 'Step 5' : 'Step 4'}
+                      {paymentType === Enums.values.CREATOR || paymentType === Enums.values.DAO ? 'Step 5' : 'Step 4'}
                     </p>
                     <b>Link To NFT</b>
                   </span>
