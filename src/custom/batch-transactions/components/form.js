@@ -28,8 +28,8 @@ import {
   getUserStateless
 } from '../../deso/controller'
 import { v1 } from 'agilite-utils/uuid'
-import AgiliteReactEnums from '../../../agilite-react/resources/enums'
-import theme from '../../../agilite-react/resources/theme'
+import AgiliteReactEnums from '../../../core/utils/enums'
+import theme from '../../../core/utils/theme'
 import Enums from '../../../utils/enums'
 
 const _BatchTransactionsForm = () => {

@@ -1,0 +1,138 @@
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  letter-spacing: 2px;
+}
+p,
+button,
+li,
+a {
+  letter-spacing: 1.25px;
+}
+tbody:hover {
+  cursor: pointer;
+}
+.ant-table-row.dark {
+  background: #333333 !important;
+}
+.ant-table-row.light {
+  background: #ffffff !important;
+}
+.css-167rjg-control {
+  box-shadow: none !important;
+}
+.css-167rjg-control:hover {
+  box-shadow: none !important;
+  border: none !important;
+}
+.ant-table-wrapper.dark > * > * > * > * > *::-webkit-scrollbar {
+  width: auto !important;
+}
+
+.ant-table-wrapper.dark > * > * > * > * > *::-webkit-scrollbar-track {
+  background-color: #1b1b1b !important;
+}
+
+.ant-table-wrapper.dark > * > * > * > * > *::-webkit-scrollbar-thumb {
+  background-color: rgba(252, 0, 101, 0.5) !important;
+  border: 3px solid #1b1b1b !important;
+  border-radius: 5px;
+}
+.ant-table-wrapper.light > * > * > * > * > *::-webkit-scrollbar {
+  width: auto !important;
+}
+
+.ant-table-wrapper.light > * > * > * > * > *::-webkit-scrollbar-track {
+  background-color: #ffffff !important;
+}
+
+.ant-table-wrapper.light > * > * > * > * > *::-webkit-scrollbar-thumb {
+  background-color: rgba(17, 173, 214, 0.35) !important;
+  border-radius: 5px !important;
+  border: 3px solid #ffffff !important;
+}
+
+.shortcut-icon {
+  font-size: 36px !important;
+  transition: 250ms ease;
+  cursor: pointer;
+}
+.shortcut-icon:hover {
+  transform: scale(1.2);
+}
+
+.hide-table-column {
+  display: none;
+}
+
+.landing-graphic {
+  min-height: 100vh;
+  height: 100%;
+  min-width: 100%;
+  background-size: auto 100%;
+  color: white;
+}
+.landing-graphic > *:first-child {
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5vw;
+  flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    -135deg,
+    rgba(55, 87, 206, 0.7),
+    rgba(37, 102, 209, 0.7),
+    rgba(30, 115, 209, 0.7),
+    rgba(40, 127, 207, 0.7),
+    rgba(59, 138, 204, 0.7),
+    rgba(86, 139, 208, 0.7),
+    rgba(109, 139, 211, 0.7),
+    rgba(109, 139, 211, 0.7),
+    rgba(129, 139, 212, 0.7),
+    rgba(174, 122, 204, 0.7),
+    rgba(215, 101, 177, 0.7),
+    rgba(241, 82, 133, 0.8),
+    rgba(235, 20, 99, 0.8)
+  );
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e6b975b1', endColorstr='#e6292765', GradientType=1 );
+  height: 100vh;
+  max-width: 100%;
+  overflow-y: hidden;
+  text-align: center;
+}
+
+.agilite_message-custom-content {
+  padding: 10px 20px;
+  font-size: 18px;
+}
+
+.sign-register-button {
+  display: flex !important;
+  justify-content: left !important;
+  align-items: center;
+  padding: 0 !important;
+  gap: 12px;
+  padding-right: 12px !important;
+  width: 300px;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 2px 0 rgba(243, 243, 243, 0.01);
+  border: 1px rgba(0, 0, 0, 0) solid;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+}
+.sign-register-button > *:first-child {
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #cccccc52;
+}

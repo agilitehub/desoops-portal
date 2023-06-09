@@ -3,10 +3,13 @@ import ReactDOM from 'react-dom'
 import { Provider, useSelector } from 'react-redux'
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
-import AgiliteReact from 'agilite-react'
+import { DeSoIdentityProvider } from 'react-deso-protocol'
 
 import Store from './store'
+import Core from './core/components/core'
 import Enums from './utils/enums'
+
+import './index.css'
 
 // VARIABLES
 let tmpAnalytics = null
@@ -29,13 +32,15 @@ if (process.env.REACT_APP_FIREBASE_ENABLED === Enums.values.YES) {
 
 // Initialize App
 const App = () => {
-  const state = useSelector((state) => state.agiliteReact)
-  return <AgiliteReact state={state} />
+  const state = useSelector((state) => state.core)
+  return <Core state={state} />
 }
 
 ReactDOM.render(
   <Provider store={Store}>
-    <App />
+    <DeSoIdentityProvider>
+      <App />
+    </DeSoIdentityProvider>
   </Provider>,
   document.getElementById(Enums.values.DIV_ROOT)
 )

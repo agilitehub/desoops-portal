@@ -1,0 +1,61 @@
+const lightTheme = {
+  colorPrimary: '#1565C0',
+  colorSecondary: '#4DB6AC',
+  colorSecondaryLight: '#4db6ac80',
+  colorSuccess: '#29A745',
+  colorWarning: '#FFC20E',
+  colorError: '#DC3645',
+  colorInfo: '#17A2B8',
+  colorTextBase: '#333333',
+  colorTextBaseAlt: '#333333',
+  colorBgBase: '#F3F3F3',
+  colorPrimaryBg: '#F3F3F3',
+  colorPrimaryText: '#11add6',
+  colorTextSubdued: '#9B9B9B',
+  colorBgMask: 'rgba(0, 0, 0, 0.5)',
+  colorCardBg: '#EDEDED',
+  colorInputBg: '#EDEDED',
+  colorWhite: '#ffffff',
+  colorTextPlaceholder: '#cccccc',
+  themeControl: 'light',
+  linearGradient1: `linear-gradient(
+    -135deg,
+    rgba(55, 87, 206, 0.7),
+    rgba(37, 102, 209, 0.7),
+    rgba(30, 115, 209, 0.7),
+    rgba(40, 127, 207, 0.7),
+    rgba(59, 138, 204, 0.7),
+    rgba(86, 139, 208, 0.7),
+    rgba(109, 139, 211, 0.7),
+    rgba(109, 139, 211, 0.7),
+    rgba(129, 139, 212, 0.7),
+    rgba(174, 122, 204, 0.7),
+    rgba(215, 101, 177, 0.7),
+    rgba(241, 82, 133, 0.8),
+    rgba(235, 20, 99, 0.8)
+  )`
+}
+
+const darkTheme = {
+  colorPrimary: '#fc0065',
+  colorSecondary: '#fc0065',
+  colorSecondaryLight: 'rgba(252, 0, 101, 0.5)',
+  colorSuccess: '#29A745',
+  colorWarning: '#FFC20E',
+  colorError: '#DC3645',
+  colorInfo: '#17A2B8',
+  colorTextBase: '#f5f5f5',
+  colorTextBaseAlt: '#f5f5f5',
+  colorBgBase: '#1b1b1b',
+  colorPrimaryBg: '#1b1b1b',
+  colorPrimaryText: '#11add6',
+  colorBgMask: 'rgba(0, 0, 0, 0.5)',
+  colorCardBg: '#242424',
+  colorInputBg: '#333333',
+  colorWhite: '#ffffff',
+  colorBgContainer: '#333333',
+  colorTextPlaceholder: '#808080',
+  themeControl: 'dark'
+}
+
+export { lightTheme, darkTheme }

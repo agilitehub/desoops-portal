@@ -1,15 +1,12 @@
 import Axios from 'agilite-utils/axios'
-import Deso from 'deso-protocol'
+import { identity, getNFTCollectionSummary, getSinglePost, getNFTEntriesForPost } from 'deso-protocol'
 import Enums from '../../utils/enums'
-
-const deso = new Deso()
 
 export const desoLogin = () => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       try {
-        const request = 4
-        const response = await deso.identity.login(request)
+        const response = await identity.login()
         resolve(response)
       } catch (e) {
         reject(e)
@@ -19,13 +16,13 @@ export const desoLogin = () => {
   })
 }
 
-export const desoLogout = (publicKey) => {
+export const desoLogout = () => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       let response = null
 
       try {
-        response = await deso.identity.logout(publicKey)
+        response = await identity.logout()
         resolve(response)
       } catch (e) {
         reject(e)
@@ -46,7 +43,7 @@ export const getSingleProfile = (key) => {
           PublicKeyBase58Check: key
         }
 
-        response = await deso.user.getSingleProfile(request)
+        response = await getSingleProfile(request)
         resolve(response)
       } catch (e) {
         reject(e)
@@ -103,7 +100,7 @@ export const getNFTdetails = (postHashHex) => {
           PostHashHex: postHashHex
         }
 
-        response = await deso.nft.getNftCollectionSummary(request)
+        response = await getNFTCollectionSummary(request)
 
         resolve(response)
       } catch (e) {
@@ -126,7 +123,7 @@ export const getPostDetails = (postHashHex) => {
           CommentLimit: 1000
         }
 
-        response = await deso.posts.getSinglePost(request)
+        response = await getSinglePost(request)
 
         resolve(response)
       } catch (e) {
@@ -148,7 +145,7 @@ export const getNFTEntries = (postHashHex) => {
           PostHashHex: postHashHex
         }
 
-        response = await deso.nft.getNftEntriesForPostHash(request)
+        response = await getNFTEntriesForPost(request)
 
         resolve(response)
       } catch (e) {
@@ -170,7 +167,7 @@ export const getUserStateless = (key) => {
           PublicKeyBase58Check: key
         }
 
-        response = await deso.user.getSingleProfile(request)
+        response = await getSingleProfile(request)
 
         resolve(response)
       } catch (e) {
@@ -182,5 +179,5 @@ export const getUserStateless = (key) => {
 }
 
 export const getDeSo = () => {
-  return deso
+  return {}
 }

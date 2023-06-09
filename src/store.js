@@ -5,7 +5,7 @@ import { initCustomReducers } from './agilite-react-setup'
 import { composeWithDevTools } from 'redux-devtools-extension'
 
 // Reducers
-import agiliteReact from './agilite-react/reducer'
+import coreReducer from './core/utils/reducer'
 
 const customReducers = initCustomReducers()
 
@@ -16,7 +16,7 @@ const devTools =
 
 export const store = createStore(
   combineReducers({
-    agiliteReact,
+    core: coreReducer.reducer,
     ...customReducers
   }),
   {},

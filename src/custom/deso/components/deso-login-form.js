@@ -4,9 +4,9 @@ import { Form, Button, Row, Col, Spin } from 'antd'
 
 import { desoLogin, getSingleProfile, getDaoBalance } from '../controller'
 import BatchTransactions from '../../batch-transactions/components/app-wrapper'
-import DeSoOpsBanner from '../../../agilite-react/resources/deso-ops-logo-transparent.png'
-import AgiliteReactEnums from '../../../agilite-react/resources/enums'
-import theme from '../../../agilite-react/resources/theme'
+import DeSoOpsBanner from '../../assets/deso-ops-logo-transparent.png'
+import AgiliteReactEnums from '../../../core/utils/enums'
+import theme from '../../../core/utils/theme'
 import Enums from '../../../utils/enums'
 import { getHodlers } from '../../batch-transactions/controller'
 

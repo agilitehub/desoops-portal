@@ -33,6 +33,13 @@ const Enums = {
   tabKeys: {
     BATCH_PAYMENTS: 'batch_payments',
     DESO_LOGIN: 'deso-login'
+  },
+  facets: {
+    OPTIONS: 'options',
+    EMAIL_LINK: 'emailLink',
+    EMAIL_LINK_SUCCESS: 'emailLinkSuccess',
+    PHONE: 'phone',
+    CODE_CONFIRM: 'codeConfirm'
   }
 }
 
