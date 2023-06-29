@@ -4,7 +4,7 @@ import { Form, Button, Row, Col, Spin } from 'antd'
 
 import { desoLogin, getSingleProfile, getDaoBalance } from '../controller'
 import BatchTransactions from '../../batch-transactions/components/app-wrapper'
-import DeSoOpsBanner from '../../assets/deso-ops-logo-transparent.png'
+import DeSoOpsBanner from '../../assets/deso-ops-logo-full-v2.png'
 import AgiliteReactEnums from '../../../core/utils/enums'
 import theme from '../../../core/utils/theme'
 import Enums from '../../../utils/enums'

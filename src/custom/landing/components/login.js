@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Col, Row, message, Spin, theme } from 'antd'
-import logo from '../../assets/deso-ops-logo-transparent.png'
+import logo from '../../assets/deso-ops-logo-full-v2.png'
 
 // Utils
 import Enums from '../../../utils/enums'
@@ -8,7 +8,7 @@ import Enums from '../../../utils/enums'
 // Components
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
-import { MailOutlined } from '@ant-design/icons'
+import { LoginOutlined, MailOutlined } from '@ant-design/icons'
 import { deviceDetect } from 'react-device-detect'
 
 const Login = () => {
@@ -32,11 +32,11 @@ const Login = () => {
   }
 
   return (
-    <Row justify='center' style={{ marginTop: 10 }}>
+    <Row justify='center' style={{ marginTop: -100 }}>
       <Col
         style={{
-          paddingTop: 50,
-          paddingBottom: 50,
+          paddingTop: 20,
+          paddingBottom: 20,
           borderRadius: deviceDetect().isMobile ? 12 : 30,
           background: 'rgba(255,255,255, 0.95',
           overflow: 'hidden'
@@ -49,16 +49,18 @@ const Login = () => {
         {facet === Enums.facets.OPTIONS ? (
           <>
             <center>
-              <img src={logo} alt='DeSo Ops Portal' style={{ width: 100 }} />
-              <h1>DESO OPS PORTAL</h1>
-              <h2 style={{ marginBottom: 0 }}> SIGN-IN</h2>
+              <img src={logo} alt='DeSo Ops Portal' style={{ width: 300 }} />
+              <h1 style={{ marginTop: -20 }}> PORTAL SIGN-IN</h1>
             </center>
             {!loading ? (
               <Row justify='center' style={{ marginBottom: 20 }}>
                 <Col>
                   <span onClick={() => {}}>
-                    Don't have an account yet?
-                    <span style={{ cursor: 'pointer', color: token.colorPrimary, fontSize: 17 }}> Register here</span>
+                    New to DeSo?
+                    <span style={{ cursor: 'pointer', color: token.colorPrimary, fontSize: 17 }}>
+                      {' '}
+                      Watch Introduction
+                    </span>
                   </span>
                 </Col>
               </Row>
@@ -71,10 +73,10 @@ const Login = () => {
                     className='sign-register-button'
                     disabled={loading}
                     onClick={handleLogin}
-                    style={loading ? {} : { background: token.colorSecondary }}
+                    style={loading ? {} : { background: '#188EFF', width: 'auto' }}
                   >
                     <div>
-                      <MailOutlined style={{ fontSize: 20 }} />
+                      <LoginOutlined style={{ fontSize: 20 }} />
                     </div>
                     <span>SIGN IN WITH DESO</span>
                   </button>
@@ -84,13 +86,15 @@ const Login = () => {
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                   <div>
                     <p>
-                      <FontAwesomeIcon color={token.colorSuccess} icon={faCheckCircle} /> In-Clinic Services
+                      <FontAwesomeIcon color='#FF7F50' icon={faCheckCircle} /> Payment Distributions
                     </p>
                     <p>
-                      <FontAwesomeIcon color={token.colorSuccess} icon={faCheckCircle} /> Home Visits
+                      <FontAwesomeIcon color='#FF7F50' icon={faCheckCircle} /> Distribute to DAO Token, Creator Coin,
+                      and NFT Holders
                     </p>
                     <p>
-                      <FontAwesomeIcon color={token.colorSuccess} icon={faCheckCircle} /> Virtual/Tele Consultations
+                      <FontAwesomeIcon color='#FF7F50' icon={faCheckCircle} /> Distribute $DESO, DAO Tokens, and Creator
+                      Coins
                     </p>
                   </div>
                 </div>
