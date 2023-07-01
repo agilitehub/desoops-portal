@@ -1,19 +1,9 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Row, Col, Card } from 'antd'
 import '../index.css'
 import Login from './login'
 
 const Landing = () => {
-  const [classControl, setClassControl] = useState()
-
-  setTimeout(() => {
-    if (classControl === 'change') {
-      setClassControl('')
-    } else {
-      setClassControl('change')
-    }
-  }, 3000)
-
   return (
     <Row
       className='background-test'

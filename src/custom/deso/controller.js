@@ -1,5 +1,12 @@
-import Axios from 'agilite-utils/axios'
-import { identity, getNFTCollectionSummary, getSinglePost, getNFTEntriesForPost } from 'deso-protocol'
+import {
+  identity,
+  getNFTCollectionSummary,
+  getSinglePost,
+  getNFTEntriesForPost,
+  getHodlersForUser,
+  getExchangeRates,
+  getSingleProfile
+} from 'deso-protocol'
 import Enums from '../../utils/enums'
 
 export const desoLogin = () => {
@@ -32,47 +39,43 @@ export const desoLogout = () => {
   })
 }
 
-export const getSingleProfile = (key) => {
+export const getDeSoData = (publicKey) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
-      let request = null
-      let response = null
-
-      try {
-        request = {
-          PublicKeyBase58Check: key
-        }
-
-        response = await getSingleProfile(request)
-        resolve(response)
-      } catch (e) {
-        reject(e)
-        console.log(e)
-      }
-    })()
-  })
-}
-
-export const getDaoBalance = (publicKey) => {
-  return new Promise((resolve, reject) => {
-    ;(async () => {
-      let hodlerObject = null
-      let exchangeObject = null
+      let daoData = null
+      let daoHodlers = null
+      let creatorCoinData = null
+      let creatorCoinHodlers = null
+      let profile = null
+      let desoPrice = null
+      let tmpData = null
       let daoBalance = 0
+      let creatorCoinBalance = 0
 
       try {
-        hodlerObject = await Axios.post(Enums.desoUrls.DAO_BALANCE, {
+        // Get User Profile
+        profile = await getSingleProfile({
+          PublicKeyBase58Check: publicKey
+        })
+        profile = profile.Profile
+
+        // Get DeSo Price
+        desoPrice = await getExchangeRates()
+        desoPrice = desoPrice.data.USDCentsPerDeSoExchangeRate / 100
+
+        // Get DAO Balance and Hodlers
+        daoData = await getHodlersForUser({
           FetchAll: true,
           FetchHodlings: true,
           IsDAOCoin: true,
           PublicKeyBase58Check: publicKey
         })
 
-        exchangeObject = await Axios.get(Enums.desoUrls.EXCHANGE_RATE)
+        tmpData = daoData.Hodlers.find((entry) => entry.ProfileEntryResponse.PublicKeyBase58Check === publicKey)
 
-        if (hodlerObject.data.Hodlers.length > 0) {
+        if (tmpData) {
           daoBalance = (
-            parseInt(hodlerObject.data.Hodlers[0].BalanceNanosUint256) /
+            parseInt(daoData.data.Hodlers[0].BalanceNanosUint256) /
             Enums.values.NANO_VALUE /
             Enums.values.NANO_VALUE
           ).toFixed(0)
@@ -80,7 +83,26 @@ export const getDaoBalance = (publicKey) => {
           if (daoBalance < 1) daoBalance = 0
         }
 
-        resolve({ daoBalance, desoPrice: exchangeObject.data.USDCentsPerDeSoExchangeRate / 100, creatorCoinBalance: 0 })
+        daoHodlers = daoData.Hodlers.filter(
+          (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== profile.Profile.PublicKeyBase58Check
+        )
+
+        // Get Creator Coin Balance and Hodlers
+        creatorCoinData = await getHodlersForUser({
+          PublicKeyBase58Check: publicKey,
+          FetchHodlings: true,
+          FetchAll: true,
+          IsDAOCoin: false
+        })
+
+        tmpData = creatorCoinData.Hodlers.find((entry) => entry.ProfileEntryResponse.PublicKeyBase58Check === publicKey)
+        if (tmpData) creatorCoinBalance = tmpData.BalanceNanos
+
+        creatorCoinHodlers = creatorCoinData.Hodlers.filter(
+          (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== publicKey
+        )
+
+        resolve({ profile, desoPrice, daoBalance, daoHodlers, creatorCoinBalance, creatorCoinHodlers })
       } catch (e) {
         reject(e)
         console.log(e)

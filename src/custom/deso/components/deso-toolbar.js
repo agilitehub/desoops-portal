@@ -1,5 +1,7 @@
 import { Button, Col, Row } from 'antd'
+import { useContext } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { DeSoIdentityContext } from 'react-deso-protocol'
 
 import { desoLogout } from '../controller'
 import AgiliteReactEnums from '../../../agilite-react/resources/enums'
@@ -9,13 +11,13 @@ import Enums from '../../../utils/enums'
 import DeSoLoginForm from './deso-login-form'
 
 const DesoToolbar = () => {
-  const desoState = useSelector((state) => state.agiliteReact.deso)
-  const loggedIn = useSelector((state) => state.agiliteReact.deso.loggedIn)
   const dispatch = useDispatch()
+  const { currentUser } = useContext(DeSoIdentityContext)
+  const userData = useSelector((state) => state.custom.userData)
 
   const handleDesoLogout = async () => {
     try {
-      await desoLogout(desoState.profile.Profile.PublicKeyBase58Check)
+      await desoLogout(userData.profile.PublicKeyBase58Check)
       dispatch({ type: AgiliteReactEnums.reducers.SIGN_OUT_DESO })
 
       dispatch({
@@ -35,10 +37,10 @@ const DesoToolbar = () => {
   return (
     <div>
       <div>
-        {loggedIn ? (
+        {currentUser ? (
           <Row justify='space-between'>
             <Col style={{ marginRight: 20, cursor: 'auto' }}>
-              <div>@{desoState?.profile?.Profile?.Username}</div>
+              <div>@{userData?.profile?.Username}</div>
             </Col>
             <Col style={{ marginRight: 20 }}>
               <Button type='primary' onClick={handleDesoLogout}>

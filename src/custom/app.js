@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react'
+import { useContext } from 'react'
 import { Row, Spin } from 'antd'
 import { DeSoIdentityContext } from 'react-deso-protocol'
 import BatchTransactionsForm from './batch-transactions/components/form'
@@ -7,7 +7,9 @@ import Landing from './landing/components/landing'
 const App = () => {
   const { currentUser, isLoading } = useContext(DeSoIdentityContext)
 
-  useEffect(() => {}, [currentUser, isLoading])
+  // useEffect(() => {
+  //   if (currentUser) desoLogout()
+  // }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>

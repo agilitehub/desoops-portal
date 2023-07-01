@@ -1,13 +1,11 @@
 import Thunk from 'redux-thunk'
 import Enums from './utils/enums'
 import { legacy_createStore as createStore, combineReducers, applyMiddleware } from 'redux'
-import { initCustomReducers } from './agilite-react-setup'
 import { composeWithDevTools } from 'redux-devtools-extension'
 
 // Reducers
 import coreReducer from './core/utils/reducer'
-
-const customReducers = initCustomReducers()
+import customReducer from './custom/reducer'
 
 const devTools =
   process.env.NODE_ENV === Enums.values.ENV_PRODUCTION
@@ -17,7 +15,7 @@ const devTools =
 export const store = createStore(
   combineReducers({
     core: coreReducer.reducer,
-    ...customReducers
+    custom: customReducer
   }),
   {},
   devTools

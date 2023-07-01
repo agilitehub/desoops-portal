@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from 'react'
+import React, { memo, useEffect, useState, useContext } from 'react'
 import {
   Row,
   Col,
@@ -16,25 +16,21 @@ import {
   Radio
 } from 'antd'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
+import { DeSoIdentityContext } from 'react-deso-protocol'
 import { getFollowers, getHodlers, payCeatorHodler, payDaoHodler } from '../controller'
 import { useDispatch, useSelector } from 'react-redux'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
-import {
-  getDaoBalance,
-  getNFTdetails,
-  getNFTEntries,
-  getPostDetails,
-  getSingleProfile,
-  getUserStateless
-} from '../../deso/controller'
+import { getDeSoData, getNFTdetails, getNFTEntries, getPostDetails, getUserStateless } from '../../deso/controller'
+import { setDeSoData } from '../../reducer'
+
 import { v1 } from 'agilite-utils/uuid'
-import AgiliteReactEnums from '../../../core/utils/enums'
 import theme from '../../../core/utils/theme'
 import Enums from '../../../utils/enums'
 
 const _BatchTransactionsForm = () => {
   const dispatch = useDispatch()
-  const desoState = useSelector((state) => state.agiliteReact.deso)
+  const { currentUser } = useContext(DeSoIdentityContext)
+  const desoData = useSelector((state) => state.custom.desoData)
   const [transactionType, setTransactionType] = useState(Enums.values.EMPTY_STRING)
   const [paymentType, setPaymentType] = useState(Enums.values.EMPTY_STRING)
   const [creatorCoinPaymentType, setCreatorCoinPaymentType] = useState('default')
@@ -76,16 +72,13 @@ const _BatchTransactionsForm = () => {
 
       setLoading(true)
       isDAOCoin = value === Enums.values.DAO
-      tmpHodlers = await getHodlers(desoState.profile.Profile.Username, isDAOCoin)
+      tmpHodlers = await getHodlers(desoData.profile.Username, isDAOCoin)
 
       if (tmpHodlers.Hodlers.length > 0) {
         // Determine Coin Total and valid Hodlers
         tmpHodlers.Hodlers.map((entry) => {
           // Ignore entry if it does not have a Profile OR if it is the same as current logged in user
-          if (
-            entry.ProfileEntryResponse &&
-            entry.ProfileEntryResponse.Username !== desoState.profile.Profile.Username
-          ) {
+          if (entry.ProfileEntryResponse && entry.ProfileEntryResponse.Username !== desoData.profile.Username) {
             // Set Defaults
             entry.status = Enums.values.EMPTY_STRING
 
@@ -214,62 +207,17 @@ const _BatchTransactionsForm = () => {
   }
 
   const handleRefresh = async () => {
-    let profile = null
-
-    setLoading(true)
+    let userData = null
 
     try {
-      profile = await getSingleProfile(desoState.profile.Profile.PublicKeyBase58Check)
-      await getDoaBalance(desoState.profile.Profile.PublicKeyBase58Check)
-      dispatch({ type: AgiliteReactEnums.reducers.SET_PROFILE_DESO, payload: profile })
+      setLoading(true)
+      userData = await getDeSoData(desoData.profile.PublicKeyBase58Check)
+      dispatch(setDeSoData(userData))
     } catch (e) {
       console.log(e)
     }
 
     setLoading(false)
-  }
-
-  const getDoaBalance = async (publicKey) => {
-    let daoData = null
-    let creatorCoinData = null
-    let creatorCoinBalance = 0
-    let holdingCreatorData = null
-    let holdingDaoData = null
-
-    try {
-      daoData = await getDaoBalance(publicKey)
-      creatorCoinData = await getHodlers(desoState.profile.Profile.Username, false)
-      holdingCreatorData = await getHodlers(desoState.profile.Profile.Username, false, true)
-      holdingCreatorData = holdingCreatorData.Hodlers.filter(
-        (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== desoState.profile.Profile.PublicKeyBase58Check
-      )
-
-      holdingDaoData = await getHodlers(desoState.profile.Profile.Username, true, true)
-      holdingDaoData = holdingDaoData.Hodlers.filter(
-        (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== desoState.profile.Profile.PublicKeyBase58Check
-      )
-
-      creatorCoinData.Hodlers.map((entry) => {
-        if (entry.HODLerPublicKeyBase58Check === desoState.profile.Profile.PublicKeyBase58Check) {
-          creatorCoinBalance = entry.BalanceNanos
-        }
-
-        return null
-      })
-
-      dispatch({
-        type: AgiliteReactEnums.reducers.SET_DESO_DATA,
-        payload: {
-          desoPrice: daoData.desoPrice,
-          daoBalance: daoData.daoBalance,
-          creatorCoinBalance,
-          creatorCoinHoldings: holdingCreatorData,
-          daoCoinHoldings: holdingDaoData
-        }
-      })
-    } catch (e) {
-      console.log(e)
-    }
   }
 
   const handleQuickAction = async (value) => {
@@ -294,7 +242,7 @@ const _BatchTransactionsForm = () => {
       case 'followers':
       case 'following':
         setLoading(true)
-        response = await getFollowers(desoState.profile.Profile.Username, value === 'followers' ? true : false)
+        response = await getFollowers(desoData.profile.Username, value === 'followers' ? true : false)
         navigator.clipboard.writeText(handleCopyUsernames(response, true))
         message.info('Usernames copied to clipboard')
         setLoading(false)
@@ -322,7 +270,7 @@ const _BatchTransactionsForm = () => {
             <center>
               <p style={{ color: theme.twitterBootstrap.primary }}>Step 1</p>
               <Select
-                disabled={!desoState.loggedIn || isExecuting}
+                disabled={!currentUser || isExecuting}
                 onChange={(value) => handleTransactionTypeChange(value)}
                 value={transactionType}
                 style={{ width: 250 }}
@@ -366,7 +314,7 @@ const _BatchTransactionsForm = () => {
             <center>
               <p style={{ color: theme.twitterBootstrap.primary }}>Step 2</p>
               <Select
-                disabled={!desoState.loggedIn || isExecuting}
+                disabled={!currentUser || isExecuting}
                 onChange={(value) => handlePaymentTypeChange(value)}
                 value={paymentType}
                 style={{ width: 250 }}
@@ -452,7 +400,7 @@ const _BatchTransactionsForm = () => {
 
   const handleValidateAmount = (e) => {
     const tmpAmount = parseFloat(amount)
-    const desoBalance = desoState.profile.Profile.DESOBalanceNanos / Enums.values.NANO_VALUE
+    const desoBalance = desoData.profile.DESOBalanceNanos / Enums.values.NANO_VALUE
     let daoBalance = 0
     let creatorCoinBalance = 0
 
@@ -460,12 +408,12 @@ const _BatchTransactionsForm = () => {
       case Enums.values.CREATOR:
         switch (creatorCoinPaymentType) {
           case 'default':
-            creatorCoinBalance = desoState.creatorCoinBalance / Enums.values.NANO_VALUE
+            creatorCoinBalance = desoData.creatorCoinBalance / Enums.values.NANO_VALUE
             break
           default:
             creatorCoinBalance =
-              desoState.creatorCoinHoldings[
-                desoState.creatorCoinHoldings.findIndex(
+              desoData.creatorCoinHodlers[
+                desoData.creatorCoinHodlers.findIndex(
                   (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check === creatorCoinPaymentType
                 )
               ].BalanceNanos / Enums.values.NANO_VALUE
@@ -476,13 +424,13 @@ const _BatchTransactionsForm = () => {
       case Enums.values.DAO:
         switch (daoCoinPaymentType) {
           case 'default':
-            daoBalance = desoState.daoBalance
+            daoBalance = desoData.daoBalance
             break
           default:
             daoBalance =
               hexToInt(
-                desoState.daoCoinHoldings[
-                  desoState.daoCoinHoldings.findIndex(
+                desoData.daoHodlers[
+                  desoData.daoHodlers.findIndex(
                     (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check === daoCoinPaymentType
                   )
                 ].BalanceNanosUint256
@@ -547,12 +495,6 @@ const _BatchTransactionsForm = () => {
 
   const handleExecute = async () => {
     let tmpHodlers = null
-    let daoData = null
-    let creatorCoinData = null
-    let holdingCreatorData = null
-    let holdingDaoData = null
-    let creatorCoinBalance = 0
-    let profile = null
     let functionToCall = null
 
     if (!handleValidateAmount()) {
@@ -604,39 +546,8 @@ const _BatchTransactionsForm = () => {
     handleExecuteExtended(0, tmpHodlers, functionToCall, async (err) => {
       if (err) return message.error(err.message)
 
-      profile = await getSingleProfile(desoState.profile.Profile.PublicKeyBase58Check)
-      daoData = await getDaoBalance(desoState.profile.Profile.PublicKeyBase58Check)
-      creatorCoinData = await getHodlers(desoState.profile.Profile.Username, false)
-      holdingCreatorData = await getHodlers(profile.Profile.Username, false, true)
-      holdingCreatorData = holdingCreatorData.Hodlers.filter(
-        (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== profile.Profile.PublicKeyBase58Check
-      )
-
-      holdingDaoData = await getHodlers(desoState.profile.Profile.Username, true, true)
-      holdingDaoData = holdingDaoData.Hodlers.filter(
-        (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== desoState.profile.Profile.PublicKeyBase58Check
-      )
-
-      creatorCoinData.Hodlers.map((entry) => {
-        if (entry.HODLerPublicKeyBase58Check === desoState.profile.Profile.PublicKeyBase58Check) {
-          creatorCoinBalance = entry.BalanceNanos
-        }
-
-        return null
-      })
-
-      dispatch({ type: AgiliteReactEnums.reducers.SET_PROFILE_DESO, payload: profile })
-      dispatch({
-        type: AgiliteReactEnums.reducers.SET_DESO_DATA,
-        payload: {
-          desoPrice: daoData.desoPrice,
-          daoBalance: daoData.daoBalance,
-          creatorCoinBalance,
-          creatorCoinHoldings: holdingCreatorData,
-          daoCoinHoldings: holdingDaoData
-        }
-      })
-
+      const tmpDeSoData = await getDeSoData(desoData.profile.PublicKeyBase58Check)
+      dispatch(setDeSoData(tmpDeSoData))
       setLoading(false)
       setIsExecuting(false)
     })
@@ -700,13 +611,7 @@ const _BatchTransactionsForm = () => {
     }
 
     if (estimatedPayment) {
-      functionToCall(
-        desoState.profile.Profile.PublicKeyBase58Check,
-        publicKey,
-        creatorKey,
-        estimatedPayment,
-        paymentType
-      )
+      functionToCall(desoData.profile.PublicKeyBase58Check, publicKey, creatorKey, estimatedPayment, paymentType)
         .then(() => {
           status = 'Paid'
         })
@@ -810,11 +715,11 @@ const _BatchTransactionsForm = () => {
         <span style={{ fontSize: 15 }}>
           <b>DeSo Balance: </b>
         </span>
-        {(desoState?.profile?.Profile?.DESOBalanceNanos / Enums.values.NANO_VALUE).toFixed(2) +
+        {(desoData?.profile?.Profile?.DESOBalanceNanos / Enums.values.NANO_VALUE).toFixed(2) +
           ' (~$' +
-          Math.floor((desoState?.profile?.Profile?.DESOBalanceNanos / Enums.values.NANO_VALUE) * desoState.desoPrice) +
+          Math.floor((desoData?.profile?.DESOBalanceNanos / Enums.values.NANO_VALUE) * desoData.desoPrice) +
           ') - $' +
-          desoState.desoPrice +
+          desoData.desoPrice +
           ' Per $DESO'}
       </>
     )
@@ -825,14 +730,14 @@ const _BatchTransactionsForm = () => {
       <>
         <span style={{ fontSize: 15 }}>
           {daoCoinPaymentType === 'default' ? (
-            <b>DAO Balance: {desoState.daoBalance}</b>
+            <b>DAO Balance: {desoData.daoBalance}</b>
           ) : (
             <b>
               DAO Balance:{' '}
               {(
                 hexToInt(
-                  desoState.daoCoinHoldings[
-                    desoState.daoCoinHoldings.findIndex(
+                  desoData.daoHodlers[
+                    desoData.daoHodlers.findIndex(
                       (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check === daoCoinPaymentType
                     )
                   ].BalanceNanosUint256
@@ -852,12 +757,12 @@ const _BatchTransactionsForm = () => {
       <>
         <span style={{ fontSize: 15 }}>
           {creatorCoinPaymentType === 'default' ? (
-            <b>Creator Coin Balance: {desoState.creatorCoinBalance / Enums.values.NANO_VALUE}</b>
+            <b>Creator Coin Balance: {desoData.creatorCoinBalance / Enums.values.NANO_VALUE}</b>
           ) : (
             <b>
               Creator Coin Balance:{' '}
-              {desoState.creatorCoinHoldings[
-                desoState.creatorCoinHoldings.findIndex(
+              {desoData.creatorCoinHodlers[
+                desoData.creatorCoinHodlers.findIndex(
                   (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check === creatorCoinPaymentType
                 )
               ].BalanceNanos / Enums.values.NANO_VALUE}
@@ -920,7 +825,7 @@ const _BatchTransactionsForm = () => {
       setNft(response)
 
       if (
-        desoState.profile.Profile.PublicKeyBase58Check !==
+        desoData.profile.PublicKeyBase58Check !==
         response.NFTCollectionResponse.ProfileEntryResponse?.PublicKeyBase58Check
       ) {
         setValidationMessage(Enums.messages.NOT_NFT_CREATOR)
@@ -929,7 +834,7 @@ const _BatchTransactionsForm = () => {
           const user = await getUserStateless(entry.OwnerPublicKeyBase58Check)
 
           // Exclude logged in User's NFT entries
-          if (entry.OwnerPublicKeyBase58Check !== desoState.profile.Profile.PublicKeyBase58Check) {
+          if (entry.OwnerPublicKeyBase58Check !== desoData.profile.PublicKeyBase58Check) {
             ownerEntryCount++
 
             tmpIndex = tmpNftOwners.findIndex((entry) => entry.username === user.Profile.Username)
@@ -1281,13 +1186,13 @@ const _BatchTransactionsForm = () => {
                     <span style={{ fontWeight: 'bold' }}>Coin To Pay With</span>
                   </center>
                   <Select
-                    disabled={!desoState.loggedIn || isExecuting}
+                    disabled={!currentUser || isExecuting}
                     onChange={(value) => setCreatorCoinPaymentType(value)}
                     value={creatorCoinPaymentType}
                     style={{ width: 250, marginBottom: 20 }}
                   >
-                    <Select.Option value={'default'}>My Coin ({desoState.profile.Profile.Username})</Select.Option>
-                    {desoState.creatorCoinHoldings
+                    <Select.Option value={'default'}>My Coin ({desoData.profile.Username})</Select.Option>
+                    {desoData.creatorCoinHodlers
                       .sort((a, b) => a.ProfileEntryResponse.Username.localeCompare(b.ProfileEntryResponse.Username))
                       .map((entry, index) => {
                         return (
@@ -1306,13 +1211,13 @@ const _BatchTransactionsForm = () => {
                     <span style={{ fontWeight: 'bold' }}>DAO To Pay With</span>
                   </center>
                   <Select
-                    disabled={!desoState.loggedIn || isExecuting}
+                    disabled={!currentUser || isExecuting}
                     onChange={(value) => setDaoCoinPaymentType(value)}
                     value={daoCoinPaymentType}
                     style={{ width: 250, marginBottom: 20 }}
                   >
-                    <Select.Option value={'default'}>My DAO ({desoState.profile.Profile.Username})</Select.Option>
-                    {desoState.daoCoinHoldings
+                    <Select.Option value={'default'}>My DAO ({desoData.profile.Username})</Select.Option>
+                    {desoData.daoHodlers
                       .sort((a, b) => a.ProfileEntryResponse.Username.localeCompare(b.ProfileEntryResponse.Username))
                       .map((entry, index) => {
                         return (
@@ -1577,7 +1482,7 @@ const _BatchTransactionsForm = () => {
                     return (
                       <span style={{ color: theme.twitterBootstrap.primary }}>
                         {value}{' '}
-                        {paymentType === Enums.values.DESO ? `(~$${(value * desoState.desoPrice).toFixed(2)})` : null}
+                        {paymentType === Enums.values.DESO ? `(~$${(value * desoData.desoPrice).toFixed(2)})` : null}
                       </span>
                     )
                   }
@@ -1633,7 +1538,7 @@ const _BatchTransactionsForm = () => {
                     return (
                       <span style={{ color: theme.twitterBootstrap.primary }}>
                         {value}{' '}
-                        {paymentType === Enums.values.DESO ? `(~$${(value * desoState.desoPrice).toFixed(2)})` : null}
+                        {paymentType === Enums.values.DESO ? `(~$${(value * desoData.desoPrice).toFixed(2)})` : null}
                       </span>
                     )
                   }
@@ -1684,7 +1589,7 @@ const _BatchTransactionsForm = () => {
                     return (
                       <span style={{ color: theme.twitterBootstrap.primary }}>
                         {value}{' '}
-                        {paymentType === Enums.values.DESO ? `(~$${(value * desoState.desoPrice).toFixed(2)})` : null}
+                        {paymentType === Enums.values.DESO ? `(~$${(value * desoData.desoPrice).toFixed(2)})` : null}
                       </span>
                     )
                   }
