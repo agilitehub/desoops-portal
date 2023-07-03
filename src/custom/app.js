@@ -2,7 +2,8 @@ import { useContext } from 'react'
 import { Row, Spin } from 'antd'
 import { DeSoIdentityContext } from 'react-deso-protocol'
 import BatchTransactionsForm from './batch-transactions/components/form'
-import Landing from './landing/components/landing'
+import Login from './Login'
+// import { desoLogout } from './deso/controller'
 
 const App = () => {
   const { currentUser, isLoading } = useContext(DeSoIdentityContext)
@@ -20,7 +21,7 @@ const App = () => {
       ) : currentUser ? (
         <BatchTransactionsForm />
       ) : (
-        <Landing />
+        <Login />
       )}
     </>
   )
