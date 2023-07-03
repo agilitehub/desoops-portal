@@ -3,14 +3,14 @@ import { useDispatch } from 'react-redux'
 import { DeSoIdentityContext } from 'react-deso-protocol'
 
 // App Components
-import BatchTransactionsForm from './batch-transactions/components/form'
+import DistributionDashboard from './modules/DistributionDashboard'
 import Login from './modules/Login'
 
 // Utils
 // import { desoLogout } from './deso/controller'
 import { setDeSoData, resetState } from './reducer'
 import { getDeSoData } from './deso/controller'
-import Enums from '../utils/enums'
+import Enums from './utils/enums'
 import Spinner from './reusables/components/Spinner'
 
 const App = () => {
@@ -56,7 +56,7 @@ const App = () => {
       ) : currentUser && !initCompleted ? (
         <Spinner tip='Fetching DeSo Data...' />
       ) : currentUser ? (
-        <BatchTransactionsForm />
+        <DistributionDashboard />
       ) : (
         <Login />
       )}

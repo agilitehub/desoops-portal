@@ -16,7 +16,7 @@ import {
   Radio
 } from 'antd'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
-import { getFollowers, getHodlers, payCeatorHodler, payDaoHodler } from '../controller'
+import { getFollowers, getHodlers, payCeatorHodler, payDaoHodler } from './controller'
 import { useDispatch, useSelector } from 'react-redux'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { getDeSoData, getNFTdetails, getNFTEntries, getPostDetails, getUserStateless } from '../../deso/controller'
@@ -24,7 +24,7 @@ import { setDeSoData } from '../../reducer'
 
 import { v1 } from 'agilite-utils/uuid'
 import theme from '../../../core/utils/theme'
-import Enums from '../../../utils/enums'
+import Enums from '../../utils/enums'
 
 const _BatchTransactionsForm = () => {
   const dispatch = useDispatch()

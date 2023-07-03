@@ -7,7 +7,7 @@ import { DeSoIdentityProvider } from 'react-deso-protocol'
 
 import Store from './store'
 import Core from './core/components/core'
-import Enums from './utils/enums'
+import Enums from './custom/utils/enums'
 
 import './index.css'
 

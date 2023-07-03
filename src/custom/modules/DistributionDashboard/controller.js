@@ -1,6 +1,8 @@
 import Axios from 'agilite-utils/axios'
+
+// Utils
 import Enums from '../../utils/enums'
-import { getDeSo } from '../deso/controller'
+import { getDeSo } from '../../deso/controller'
 
 export const getHodlers = (Username, IsDAOCoin, fetchHodlings) => {
   return new Promise((resolve, reject) => {

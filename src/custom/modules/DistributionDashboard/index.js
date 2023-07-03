@@ -1,10 +1,9 @@
 import React, { lazy, Suspense, memo } from 'react'
 import { Spin } from 'antd'
 
-// Components Lazy Import
 const BatchTransactionsForm = lazy(() => import('./form'))
 
-const _AppWrapper = () => {
+const _DistributionDashboard = () => {
   return (
     <Suspense fallback={<Spin />}>
       <BatchTransactionsForm />
@@ -12,6 +11,6 @@ const _AppWrapper = () => {
   )
 }
 
-const AppWrapper = memo(_AppWrapper)
+const DistributionDashboard = memo(_DistributionDashboard)
 
-export default AppWrapper
+export default DistributionDashboard
