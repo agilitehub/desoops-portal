@@ -12,13 +12,12 @@ const devTools =
     ? applyMiddleware(Thunk)
     : composeWithDevTools(applyMiddleware(Thunk))
 
-export const store = createStore(
-  combineReducers({
-    core: coreReducer.reducer,
-    custom: customReducer
-  }),
-  {},
-  devTools
-)
+const reducers = {
+  core: coreReducer.reducer,
+  custom: customReducer
+}
 
+const store = createStore(combineReducers(reducers), {}, devTools)
+
+export { reducers }
 export default store

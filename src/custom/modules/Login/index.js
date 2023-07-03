@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { identity } from 'deso-protocol'
 import { Col, Row, message, Spin, theme, Card } from 'antd'
 import { deviceDetect } from 'react-device-detect'
@@ -8,26 +7,17 @@ import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import { LoginOutlined } from '@ant-design/icons'
 
 // Utils
-import { setDeSoData } from '../reducer'
-import { getDeSoData } from '../deso/controller'
 import styles from './style.module.sass'
-import logo from '../assets/deso-ops-logo-full-v2.png'
+import logo from '../../assets/deso-ops-logo-full-v2.png'
 
 const Login = () => {
-  const dispatch = useDispatch()
   const [loading, setLoading] = useState(false)
   const { token } = theme.useToken()
 
   const handleLogin = async () => {
-    let loginResult = null
-    let desoData = null
-
     try {
       setLoading(true)
-      loginResult = await identity.login()
-      desoData = await getDeSoData(loginResult.publicKeyBase58Check)
-      console.log('desoData', desoData)
-      dispatch(setDeSoData(desoData))
+      await identity.login()
     } catch (e) {
       setLoading(false)
       message.error(e)

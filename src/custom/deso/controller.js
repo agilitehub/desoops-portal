@@ -46,22 +46,15 @@ export const getDeSoData = (publicKey) => {
       let daoHodlers = null
       let creatorCoinData = null
       let creatorCoinHodlers = null
-      let profile = null
       let desoPrice = null
       let tmpData = null
       let daoBalance = 0
       let creatorCoinBalance = 0
 
       try {
-        // Get User Profile
-        profile = await getSingleProfile({
-          PublicKeyBase58Check: publicKey
-        })
-        profile = profile.Profile
-
         // Get DeSo Price
         desoPrice = await getExchangeRates()
-        desoPrice = desoPrice.data.USDCentsPerDeSoExchangeRate / 100
+        desoPrice = desoPrice.USDCentsPerDeSoExchangeRate / 100
 
         // Get DAO Balance and Hodlers
         daoData = await getHodlersForUser({
@@ -74,18 +67,14 @@ export const getDeSoData = (publicKey) => {
         tmpData = daoData.Hodlers.find((entry) => entry.ProfileEntryResponse.PublicKeyBase58Check === publicKey)
 
         if (tmpData) {
-          daoBalance = (
-            parseInt(daoData.data.Hodlers[0].BalanceNanosUint256) /
-            Enums.values.NANO_VALUE /
-            Enums.values.NANO_VALUE
-          ).toFixed(0)
+          daoBalance =
+            parseInt(daoData.Hodlers[0].BalanceNanosUint256) / Enums.values.NANO_VALUE / Enums.values.NANO_VALUE
 
-          if (daoBalance < 1) daoBalance = 0
+          // Format daoBalance to be rounded to 4 decimal places
+          daoBalance = Math.floor(daoBalance * 10000) / 10000
         }
 
-        daoHodlers = daoData.Hodlers.filter(
-          (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== profile.Profile.PublicKeyBase58Check
-        )
+        daoHodlers = daoData.Hodlers.filter((entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== publicKey)
 
         // Get Creator Coin Balance and Hodlers
         creatorCoinData = await getHodlersForUser({
@@ -102,7 +91,7 @@ export const getDeSoData = (publicKey) => {
           (entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== publicKey
         )
 
-        resolve({ profile, desoPrice, daoBalance, daoHodlers, creatorCoinBalance, creatorCoinHodlers })
+        resolve({ desoPrice, daoBalance, daoHodlers, creatorCoinBalance, creatorCoinHodlers })
       } catch (e) {
         reject(e)
         console.log(e)

@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState, useContext } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import {
   Row,
   Col,
@@ -16,7 +16,6 @@ import {
   Radio
 } from 'antd'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
-import { DeSoIdentityContext } from 'react-deso-protocol'
 import { getFollowers, getHodlers, payCeatorHodler, payDaoHodler } from '../controller'
 import { useDispatch, useSelector } from 'react-redux'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
@@ -29,7 +28,6 @@ import Enums from '../../../utils/enums'
 
 const _BatchTransactionsForm = () => {
   const dispatch = useDispatch()
-  const { currentUser } = useContext(DeSoIdentityContext)
   const desoData = useSelector((state) => state.custom.desoData)
   const [transactionType, setTransactionType] = useState(Enums.values.EMPTY_STRING)
   const [paymentType, setPaymentType] = useState(Enums.values.EMPTY_STRING)
@@ -72,13 +70,13 @@ const _BatchTransactionsForm = () => {
 
       setLoading(true)
       isDAOCoin = value === Enums.values.DAO
-      tmpHodlers = await getHodlers(desoData.profile.Username, isDAOCoin)
+      tmpHodlers = await getHodlers(desoData.profile.username, isDAOCoin)
 
       if (tmpHodlers.Hodlers.length > 0) {
         // Determine Coin Total and valid Hodlers
         tmpHodlers.Hodlers.map((entry) => {
           // Ignore entry if it does not have a Profile OR if it is the same as current logged in user
-          if (entry.ProfileEntryResponse && entry.ProfileEntryResponse.Username !== desoData.profile.Username) {
+          if (entry.ProfileEntryResponse && entry.ProfileEntryResponse.Username !== desoData.profile.username) {
             // Set Defaults
             entry.status = Enums.values.EMPTY_STRING
 
@@ -211,7 +209,7 @@ const _BatchTransactionsForm = () => {
 
     try {
       setLoading(true)
-      userData = await getDeSoData(desoData.profile.PublicKeyBase58Check)
+      userData = await getDeSoData(desoData.profile.publicKey)
       dispatch(setDeSoData(userData))
     } catch (e) {
       console.log(e)
@@ -242,7 +240,7 @@ const _BatchTransactionsForm = () => {
       case 'followers':
       case 'following':
         setLoading(true)
-        response = await getFollowers(desoData.profile.Username, value === 'followers' ? true : false)
+        response = await getFollowers(desoData.profile.username, value === 'followers' ? true : false)
         navigator.clipboard.writeText(handleCopyUsernames(response, true))
         message.info('Usernames copied to clipboard')
         setLoading(false)
@@ -270,7 +268,7 @@ const _BatchTransactionsForm = () => {
             <center>
               <p style={{ color: theme.twitterBootstrap.primary }}>Step 1</p>
               <Select
-                disabled={!currentUser || isExecuting}
+                disabled={isExecuting}
                 onChange={(value) => handleTransactionTypeChange(value)}
                 value={transactionType}
                 style={{ width: 250 }}
@@ -314,7 +312,7 @@ const _BatchTransactionsForm = () => {
             <center>
               <p style={{ color: theme.twitterBootstrap.primary }}>Step 2</p>
               <Select
-                disabled={!currentUser || isExecuting}
+                disabled={isExecuting}
                 onChange={(value) => handlePaymentTypeChange(value)}
                 value={paymentType}
                 style={{ width: 250 }}
@@ -400,7 +398,7 @@ const _BatchTransactionsForm = () => {
 
   const handleValidateAmount = (e) => {
     const tmpAmount = parseFloat(amount)
-    const desoBalance = desoData.profile.DESOBalanceNanos / Enums.values.NANO_VALUE
+    const desoBalance = desoData.profile.desoBalance
     let daoBalance = 0
     let creatorCoinBalance = 0
 
@@ -546,7 +544,7 @@ const _BatchTransactionsForm = () => {
     handleExecuteExtended(0, tmpHodlers, functionToCall, async (err) => {
       if (err) return message.error(err.message)
 
-      const tmpDeSoData = await getDeSoData(desoData.profile.PublicKeyBase58Check)
+      const tmpDeSoData = await getDeSoData(desoData.profile.publicKey)
       dispatch(setDeSoData(tmpDeSoData))
       setLoading(false)
       setIsExecuting(false)
@@ -611,7 +609,7 @@ const _BatchTransactionsForm = () => {
     }
 
     if (estimatedPayment) {
-      functionToCall(desoData.profile.PublicKeyBase58Check, publicKey, creatorKey, estimatedPayment, paymentType)
+      functionToCall(desoData.profile.publicKey, publicKey, creatorKey, estimatedPayment, paymentType)
         .then(() => {
           status = 'Paid'
         })
@@ -824,17 +822,14 @@ const _BatchTransactionsForm = () => {
       nftEntries = await getNFTEntries(hex)
       setNft(response)
 
-      if (
-        desoData.profile.PublicKeyBase58Check !==
-        response.NFTCollectionResponse.ProfileEntryResponse?.PublicKeyBase58Check
-      ) {
+      if (desoData.profile.publicKey !== response.NFTCollectionResponse.ProfileEntryResponse?.PublicKeyBase58Check) {
         setValidationMessage(Enums.messages.NOT_NFT_CREATOR)
       } else {
         for (const entry of nftEntries.NFTEntryResponses) {
           const user = await getUserStateless(entry.OwnerPublicKeyBase58Check)
 
           // Exclude logged in User's NFT entries
-          if (entry.OwnerPublicKeyBase58Check !== desoData.profile.PublicKeyBase58Check) {
+          if (entry.OwnerPublicKeyBase58Check !== desoData.profile.publicKey) {
             ownerEntryCount++
 
             tmpIndex = tmpNftOwners.findIndex((entry) => entry.username === user.Profile.Username)
@@ -1186,12 +1181,12 @@ const _BatchTransactionsForm = () => {
                     <span style={{ fontWeight: 'bold' }}>Coin To Pay With</span>
                   </center>
                   <Select
-                    disabled={!currentUser || isExecuting}
+                    disabled={isExecuting}
                     onChange={(value) => setCreatorCoinPaymentType(value)}
                     value={creatorCoinPaymentType}
                     style={{ width: 250, marginBottom: 20 }}
                   >
-                    <Select.Option value={'default'}>My Coin ({desoData.profile.Username})</Select.Option>
+                    <Select.Option value={'default'}>My Coin ({desoData.profile.username})</Select.Option>
                     {desoData.creatorCoinHodlers
                       .sort((a, b) => a.ProfileEntryResponse.Username.localeCompare(b.ProfileEntryResponse.Username))
                       .map((entry, index) => {
@@ -1211,12 +1206,12 @@ const _BatchTransactionsForm = () => {
                     <span style={{ fontWeight: 'bold' }}>DAO To Pay With</span>
                   </center>
                   <Select
-                    disabled={!currentUser || isExecuting}
+                    disabled={isExecuting}
                     onChange={(value) => setDaoCoinPaymentType(value)}
                     value={daoCoinPaymentType}
                     style={{ width: 250, marginBottom: 20 }}
                   >
-                    <Select.Option value={'default'}>My DAO ({desoData.profile.Username})</Select.Option>
+                    <Select.Option value={'default'}>My DAO ({desoData.profile.username})</Select.Option>
                     {desoData.daoHodlers
                       .sort((a, b) => a.ProfileEntryResponse.Username.localeCompare(b.ProfileEntryResponse.Username))
                       .map((entry, index) => {
