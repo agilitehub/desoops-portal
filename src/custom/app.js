@@ -12,6 +12,7 @@ import { setDeSoData, resetState } from './reducer'
 import { getDeSoData } from './deso/controller'
 import Enums from './utils/enums'
 import Spinner from './reusables/components/Spinner'
+import Toolbar from './modules/Toolbar'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -56,7 +57,10 @@ const App = () => {
       ) : currentUser && !initCompleted ? (
         <Spinner tip='Fetching DeSo Data...' />
       ) : currentUser ? (
-        <DistributionDashboard />
+        <>
+          <Toolbar />
+          <DistributionDashboard />
+        </>
       ) : (
         <Login />
       )}
