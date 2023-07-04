@@ -1,5 +1,5 @@
 import Thunk from 'redux-thunk'
-import Enums from './custom/utils/enums'
+import Enums from './custom/lib/enums'
 import { legacy_createStore as createStore, combineReducers, applyMiddleware } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
 

@@ -1,38 +1,19 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
-import { Dropdown, Modal, Space, theme } from 'antd'
+import { Dropdown, Space } from 'antd'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown, faUser } from '@fortawesome/free-solid-svg-icons'
 
-const ToolbarDropDown = () => {
-  const state = useSelector((state) => state.auth)
-  const { token } = theme.useToken()
+import { desoLogout } from '../../../lib/deso-controller'
 
+const ToolbarDropDown = () => {
   const handleGetItems = () => {
     const dropDownItems = {
-      personalDetails: {
-        key: 'Personal Details',
-        label: 'Personal Details'
-      },
       signOut: {
         danger: true,
         key: 'Sign Out',
         label: 'Sign Out',
-        onClick: () => {
-          Modal.confirm({
-            title: 'Confirmation',
-            content: 'Are you sure you want to Sign Out of the Meta-Clinic Portal',
-            okButtonProps: { style: { background: token.colorSuccess, color: 'white' } },
-            cancelButtonProps: { style: { background: token.colorError, color: 'white' } },
-            okText: 'Yes',
-            cancelText: 'No'
-          })
-        }
-      },
-      dependants: {
-        key: 'Dependants',
-        label: 'Dependants'
+        onClick: desoLogout
       },
       version: {
         key: 'version',
@@ -41,7 +22,7 @@ const ToolbarDropDown = () => {
       }
     }
 
-    return [dropDownItems.personalDetails, dropDownItems.dependants, dropDownItems.signOut, dropDownItems.version]
+    return [dropDownItems.signOut, dropDownItems.version]
   }
 
   return (
@@ -56,7 +37,7 @@ const ToolbarDropDown = () => {
         <Space style={{ cursor: 'pointer' }}>
           <FontAwesomeIcon icon={faChevronDown} style={{ cursor: 'pointer' }} />
           <FontAwesomeIcon icon={faUser} style={{ cursor: 'pointer' }} />
-          <span>John Jardin</span>
+          <span>DeSo Username</span>
         </Space>
       </Dropdown>
     </>

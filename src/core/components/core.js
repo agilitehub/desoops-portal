@@ -10,8 +10,6 @@ import CoreEnums from '../utils/enums'
 import { coreState } from '../utils/core-state'
 
 // Components
-import LeftMenu from './LeftMenu'
-import RightMenu from './RightMenu'
 import TabNavigation from './TabNavigation'
 import Toolbar from './Toolbar'
 import App from '../../custom/app'
@@ -142,10 +140,8 @@ const Core = (customProps) => {
             {...props.state.theme}
           />
         ) : null}
-        {props.state.leftMenu.leftMenuEnabled ? <LeftMenu {...props.state.leftMenu} {...props.state.theme} /> : null}
-        {props.state.rightMenu.rightMenuEnabled ? (
-          <RightMenu {...props.state.rightMenu} {...props.state.theme} />
-        ) : null}
+        {props.state.leftMenu.leftMenuEnabled ? null : null}
+        {props.state.rightMenu.rightMenuEnabled ? null : null}
         {props.state.tabNavigation.enabled ? (
           <TabNavigation {...props.state.tabNavigation} {...props} />
         ) : (

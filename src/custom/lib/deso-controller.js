@@ -7,7 +7,7 @@ import {
   getExchangeRates,
   getSingleProfile
 } from 'deso-protocol'
-import Enums from '../utils/enums'
+import Enums from './enums'
 
 export const desoLogin = () => {
   return new Promise((resolve, reject) => {

@@ -1,7 +1,4 @@
 import Theme from './theme'
-
-import { handleMenuAction, handleTabAction } from './controller'
-import CoreEnums from './enums'
 import App from '../../custom/app'
 
 export const coreState = () => {
@@ -10,21 +7,21 @@ export const coreState = () => {
     rootContent: App,
     theme: Theme,
     leftMenu: {
-      leftMenuTitle: CoreEnums.menuTitles.LEFT_MENU,
+      leftMenuTitle: '',
       leftMenuEnabled: false,
       menuItems: () => null,
       visible: false,
-      onLeftMenuOpen: () => handleMenuAction(CoreEnums.menuActions.LEFT),
-      onLeftMenuClose: () => handleMenuAction(CoreEnums.menuActions.LEFT),
+      onLeftMenuOpen: () => {},
+      onLeftMenuClose: () => {},
       expandedMenuItems: []
     },
     rightMenu: {
-      rightMenuTitle: CoreEnums.menuTitles.RIGHT_MENU,
+      rightMenuTitle: '',
       rightMenuEnabled: false,
       menuItems: () => null,
       visible: false,
-      onRightMenuOpen: () => handleMenuAction(CoreEnums.menuActions.RIGHT),
-      onRightMenuClose: () => handleMenuAction(CoreEnums.menuActions.RIGHT),
+      onRightMenuOpen: () => {},
+      onRightMenuClose: () => {},
       expandedMenuItems: []
     },
     toolbar: {
@@ -43,8 +40,8 @@ export const coreState = () => {
       lastActiveKey: [],
       animated: true,
       tabs: [],
-      onTabChange: (key) => handleTabAction(CoreEnums.tabActions.CHANGE, key),
-      onTabClose: (key) => handleTabAction(CoreEnums.tabActions.CLOSE, key)
+      onTabChange: (key) => {},
+      onTabClose: (key) => {}
     },
     breadcrumbs: [],
     editedTabs: []

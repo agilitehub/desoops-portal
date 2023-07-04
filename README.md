@@ -1,4 +1,4 @@
-<center><img src="./assets/deso-ops-logo-transparent.png" width="200" /></center>
+<center><img src="./src/custom/assets/deso-ops-logo-full-v2.png" width="200" /></center>
 
 # DeSo Ops
 
