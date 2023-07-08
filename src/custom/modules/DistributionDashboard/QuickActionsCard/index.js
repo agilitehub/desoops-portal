@@ -1,6 +1,6 @@
 import React, { useReducer } from 'react'
 import { Card, Button, Dropdown, message, Modal, Space, Row, Col, Divider } from 'antd'
-import { DownOutlined, UserOutlined, ReloadOutlined } from '@ant-design/icons'
+import { DownOutlined, UserOutlined, ReloadOutlined, CopyOutlined } from '@ant-design/icons'
 import { copyTextToClipboard } from '../../../lib/utils'
 import RandomizeDialogContent from './RandomizeDialog'
 import Enums from '../../../lib/enums'
@@ -169,6 +169,7 @@ const QuickActionsCard = ({ desoData }) => {
         <Col xs={24} md={10}>
           <Button
             danger
+            style={{ backgroundColor: 'white' }}
             icon={<ReloadOutlined />}
             loading={state.resetLoading}
             disabled={state.resetLoading}
@@ -179,6 +180,7 @@ const QuickActionsCard = ({ desoData }) => {
         </Col>
         <Col xs={24} md={14}>
           <Button
+            style={{ color: 'green', borderColor: 'green', backgroundColor: 'white' }}
             icon={<ReloadOutlined />}
             loading={state.refreshLoading}
             disabled={state.refreshLoading}
@@ -197,7 +199,17 @@ const QuickActionsCard = ({ desoData }) => {
             loading={state.ctcLoading}
             disabled={state.ctcLoading}
           >
-            <Button>
+            <Button
+              type='primary'
+              loading={state.ctcLoading}
+              icon={
+                state.ctcLoading ? (
+                  <ReloadOutlined style={{ marginRight: 10 }} />
+                ) : (
+                  <CopyOutlined style={{ marginRight: 10 }} />
+                )
+              }
+            >
               <Space>
                 Copy To Clipboard
                 <DownOutlined />

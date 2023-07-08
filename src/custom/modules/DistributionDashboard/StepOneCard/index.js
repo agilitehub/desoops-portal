@@ -1,4 +1,4 @@
-// Create a ReactJS Functional Component called StartHereCard
+// Create a ReactJS Functional Component called StepOneCard
 // Use Ant Design's Card Component, with a title of 'Start Here' and size of 'small'
 // Use Ant Design's Row and Col Components to create a 2x2 grid
 
@@ -30,7 +30,7 @@ const styleParams = {
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
-const ConditionsCard = ({ desoData }) => {
+const StepOneCard = ({ desoData }) => {
   const { token } = theme.useToken()
   const [state, setState] = useReducer(reducer, initialState)
 
@@ -135,7 +135,7 @@ const ConditionsCard = ({ desoData }) => {
   }
 
   return (
-    <Card title='Start Here' size='small'>
+    <Card title='Step 1: Start Here' size='small'>
       <Row>
         <Col
           xs={styleParams.labelColXS}
@@ -210,4 +210,4 @@ const ConditionsCard = ({ desoData }) => {
   )
 }
 
-export default ConditionsCard
+export default StepOneCard

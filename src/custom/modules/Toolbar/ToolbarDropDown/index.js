@@ -1,12 +1,16 @@
 import React from 'react'
-import { Dropdown, Space } from 'antd'
+import { Button, Dropdown, Image, Space } from 'antd'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown, faUser } from '@fortawesome/free-solid-svg-icons'
 
 import { desoLogout } from '../../../lib/deso-controller'
+import { useSelector } from 'react-redux'
+import { DownOutlined } from '@ant-design/icons'
 
 const ToolbarDropDown = () => {
+  const profile = useSelector((state) => state.custom.desoData.profile)
+
   const handleGetItems = () => {
     const dropDownItems = {
       signOut: {
@@ -34,11 +38,23 @@ const ToolbarDropDown = () => {
           items: handleGetItems()
         }}
       >
-        <Space style={{ cursor: 'pointer' }}>
-          <FontAwesomeIcon icon={faChevronDown} style={{ cursor: 'pointer' }} />
-          <FontAwesomeIcon icon={faUser} style={{ cursor: 'pointer' }} />
-          <span>DeSo Username</span>
-        </Space>
+        <Button
+          style={{ height: 50, marginTop: 5, backgroundColor: 'transparent', color: 'white', border: 'none' }}
+          icon={
+            <Image
+              src={profile.profilePicUrl}
+              width={35}
+              height={35}
+              style={{ borderRadius: 8, marginLeft: -10 }}
+              preview={false}
+            />
+          }
+        >
+          <Space>
+            {profile.username}
+            <DownOutlined />
+          </Space>
+        </Button>
       </Dropdown>
     </>
   )

@@ -30,6 +30,7 @@ const App = () => {
         tmpDeSoData.profile = {
           ...tmpDeSoData.profile,
           username: currentUser.ProfileEntryResponse.Username,
+          profilePicUrl: currentUser.ProfileEntryResponse.ExtraData.LargeProfilePicURL,
           desoBalance: currentUser.ProfileEntryResponse.DESOBalanceNanos / Enums.values.NANO_VALUE,
           totalFollowing: currentUser.PublicKeysBase58CheckFollowedByUser.length
         }
@@ -43,6 +44,7 @@ const App = () => {
     }
 
     if (currentUser) {
+      console.log('currentUser', currentUser)
       if (!userReturned) {
         setUserReturned(true)
         getDeSoDataHook()

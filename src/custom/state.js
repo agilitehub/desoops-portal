@@ -1,7 +1,8 @@
 const desoData = {
   profile: {
-    username: '',
     publicKey: '',
+    username: '',
+    profilePicUrl: '',
     desoBalance: 0,
     daoBalance: 0,
     ccBalance: 0,

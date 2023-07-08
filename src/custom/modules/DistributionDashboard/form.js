@@ -11,9 +11,9 @@ import QuickActionsCard from './QuickActionsCard'
 // Custom Utils
 import { deviceDetect } from 'react-device-detect'
 import Enums from '../../lib/enums'
-import StartHereCard from './StartHereCard'
-import ConditionsCard from './ConditionsCard'
-import TransactionInfoCard from './TransactionInfoCard'
+import StepOneCard from './StepOneCard'
+import StepTwoCard from './StepTwoCard'
+import StepThreeCard from './StepThreeCard'
 
 const styleParams = {
   dividerStyle: { margin: '5px 0', borderBlockStart: 0 }
@@ -36,13 +36,13 @@ const _BatchTransactionsForm = () => {
             <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12}>
               <Row>
                 <Col span={24}>
-                  <StartHereCard />
+                  <StepOneCard />
                 </Col>
               </Row>
               <Divider style={styleParams.dividerStyle} />
               <Row>
                 <Col span={24}>
-                  <ConditionsCard desoData={desoData} />
+                  <StepTwoCard desoData={desoData} />
                 </Col>
               </Row>
             </Col>
@@ -55,7 +55,7 @@ const _BatchTransactionsForm = () => {
               <Divider style={styleParams.dividerStyle} />
               <Row>
                 <Col span={24}>
-                  <TransactionInfoCard desoData={desoData} />
+                  <StepThreeCard desoData={desoData} />
                 </Col>
               </Row>
             </Col>
