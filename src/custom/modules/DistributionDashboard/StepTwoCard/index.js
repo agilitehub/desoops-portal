@@ -3,7 +3,7 @@
 // Use Ant Design's Row and Col Components to create a 2x2 grid
 
 import React, { useReducer } from 'react'
-import { Card, Row, Col, theme, Select, message, Divider, InputNumber } from 'antd'
+import { Card, Row, Col, theme, Select, message, Divider, InputNumber, Typography, Radio, Switch } from 'antd'
 import Enums from '../../../lib/enums'
 import { hexToInt } from '../../../lib/utils'
 
@@ -17,7 +17,7 @@ const initialState = {
 }
 
 const styleParams = {
-  labelColXS: 24,
+  col1XS: 24,
   labelColSM: 12,
   labelColMD: 9,
   valueColXS: 24,
@@ -28,6 +28,7 @@ const styleParams = {
   dividerStyle: { margin: '7px 0' }
 }
 
+const { Title } = Typography
 const reducer = (state, newState) => ({ ...state, ...newState })
 
 const StepTwoCard = ({ desoData }) => {
@@ -137,73 +138,55 @@ const StepTwoCard = ({ desoData }) => {
   return (
     <Card title='Step 2: Conditions' size='small'>
       <Row>
-        <Col
-          xs={styleParams.labelColXS}
-          sm={styleParams.labelColSM}
-          md={styleParams.labelColMD}
-          style={styleParams.labelColStyle}
-        >
-          <span style={{ fontWeight: 'bold' }}>Distribute to:</span>
+        <Col xs={styleParams.col1XS} style={{ marginBottom: 5 }}>
+          <span style={{ fontSize: 16 }}>
+            <b>Spread amount based on:</b>
+          </span>
         </Col>
-        <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
-          <Select
-            disabled={state.isExecuting}
-            onChange={(value) => handleDistributeToChange(value)}
-            value={state.distributeTo}
-            style={{ width: 250 }}
-          >
-            <Select.Option value={Enums.values.EMPTY_STRING}>- Select -</Select.Option>
-            <Select.Option value={Enums.values.CREATOR}>Creator Coin Holders</Select.Option>
-            <Select.Option value={Enums.values.DAO}>DAO Coin Holders</Select.Option>
-            <Select.Option value={Enums.values.NFT}>NFT Owners</Select.Option>
-          </Select>
+        <Col xs={styleParams.col1XS}>
+          <Radio.Group value={'percentage'} buttonStyle='solid'>
+            <Radio.Button value={'percentage'}>% Ownership</Radio.Button>
+            <Radio.Button value={'equal'}>Equal Spread</Radio.Button>
+          </Radio.Group>
         </Col>
       </Row>
       <Divider style={styleParams.dividerStyle} />
       <Row>
-        <Col
-          xs={styleParams.labelColXS}
-          sm={styleParams.labelColSM}
-          md={styleParams.labelColMD}
-          style={styleParams.labelColStyle}
-        >
-          <span style={{ fontWeight: 'bold' }}>Type of distribution:</span>
+        <Col xs={styleParams.col1XS} style={{ marginBottom: 5 }}>
+          <span style={{ fontSize: 16 }}>
+            <b>Filter users based on Coins/Tokens owned?</b>
+          </span>
         </Col>
-        <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
-          <Select
-            disabled={state.isExecuting}
-            onChange={(value) => handleDistributionTypeChange(value)}
-            value={state.distributionType}
-            style={{ width: 250 }}
-          >
-            <Select.Option value={Enums.values.EMPTY_STRING}>- Select -</Select.Option>
-            <Select.Option value={Enums.values.DESO}>$DESO</Select.Option>
-            <Select.Option value={Enums.values.DAO}>DAO Token</Select.Option>
-            <Select.Option value={Enums.values.CREATOR}>Creator Coin</Select.Option>
-          </Select>
-        </Col>
-      </Row>
-      <Divider style={styleParams.dividerStyle} />
-      <Row>
-        <Col
-          xs={styleParams.labelColXS}
-          sm={styleParams.labelColSM}
-          md={styleParams.labelColMD}
-          style={styleParams.labelColStyle}
-        >
-          <span style={{ fontWeight: 'bold' }}>Amount to distribute:</span>
-        </Col>
-        <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
-          <InputNumber
-            addonBefore={state.inputAmountLabel}
-            // disabled={state.distributeTo && state.distributionType && !state.isExecuting ? false : true}
-            placeholder='Enter amount'
-            value={state.distributionAmount}
-            style={{ width: 250 }}
-            onChange={(distributionAmount) => {
-              setState({ distributionAmount })
-            }}
+        <Col xs={styleParams.col1XS}>
+          <Switch
+            style={{ width: 65 }}
+            checkedChildren='Yes'
+            unCheckedChildren='No'
+            // onChange={(checked) => {
+            //   setFilterCoin(checked)
+            //   setFilterCoinType('')
+            //   handleCoinValueChange('', '')
+            // }}
           />
+        </Col>
+      </Row>
+      <Divider style={styleParams.dividerStyle} />
+      <Row>
+        <Col xs={24} sm={7} md={5} lg={24} style={{ paddingTop: 3, paddingBottom: 3 }}>
+          <span style={{ fontSize: 16 }}>
+            <b>Where amount is</b>
+          </span>
+        </Col>
+        <Col xs={5} sm={4} md={3} lg={5}>
+          <Select style={{ width: 70 }} defaultValue={'1'}>
+            <Select.Option value={'1'}>{'>'}</Select.Option>
+            <Select.Option value={'2'}>{'>='}</Select.Option>
+            <Select.Option value={'3'}>{'<'}</Select.Option>
+            <Select.Option value={'4'}>{'<='}</Select.Option>
+          </Select>
+        </Col>
+        <Col>
+          <InputNumber addonBefore='$DESO' min={0} placeholder='Enter amount' style={{ width: 225 }} />
         </Col>
       </Row>
     </Card>
