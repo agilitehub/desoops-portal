@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { DeSoIdentityContext } from 'react-deso-protocol'
 
 // App Components
@@ -15,23 +15,27 @@ import Toolbar from './modules/Toolbar'
 
 const App = () => {
   const dispatch = useDispatch()
+  const desoData = useSelector((state) => state.custom.desoData)
   const { currentUser, isLoading } = useContext(DeSoIdentityContext)
   const [initCompleted, setInitCompleted] = useState(false)
   const [userReturned, setUserReturned] = useState(false)
 
   useEffect(() => {
     const getDeSoDataHook = async () => {
-      let desoData = null
-      console.log('getDeSoDataHook')
+      let tmpDeSoData = null
+
       try {
-        desoData = await getDeSoData(currentUser.PublicKeyBase58Check)
-        desoData.profile = {
-          publicKey: currentUser.PublicKeyBase58Check,
+        tmpDeSoData = await getDeSoData(currentUser.PublicKeyBase58Check, desoData)
+
+        tmpDeSoData.profile = {
+          ...tmpDeSoData.profile,
           username: currentUser.ProfileEntryResponse.Username,
-          desoBalance: currentUser.ProfileEntryResponse.DESOBalanceNanos / Enums.values.NANO_VALUE
+          desoBalance: currentUser.ProfileEntryResponse.DESOBalanceNanos / Enums.values.NANO_VALUE,
+          totalFollowing: currentUser.PublicKeysBase58CheckFollowedByUser.length
         }
-        console.log('desoData', desoData)
-        dispatch(setDeSoData(desoData))
+
+        console.log('tmpDeSoData', tmpDeSoData)
+        dispatch(setDeSoData(tmpDeSoData))
         setInitCompleted(true)
       } catch (e) {
         console.error(e)
@@ -44,7 +48,6 @@ const App = () => {
         getDeSoDataHook()
       }
     } else if (!currentUser) {
-      console.log('resetState')
       resetState()
       setInitCompleted(false)
       setUserReturned(false)

@@ -9,7 +9,7 @@ const slice = createSlice({
       state = customState()
     },
     setDeSoData: (state, data) => {
-      state.desoData = data
+      state.desoData = data.payload
     }
   }
 })

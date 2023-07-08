@@ -2,13 +2,21 @@ const desoData = {
   profile: {
     username: '',
     publicKey: '',
-    desoBalance: 0
+    desoBalance: 0,
+    daoBalance: 0,
+    ccBalance: 0,
+    totalFollowers: 0,
+    totalFollowing: 0,
+    totalDAOHodlers: 0,
+    totalCCHodlers: 0,
+    followers: [],
+    following: [],
+    daoHodlers: [],
+    ccHodlers: []
   },
-  desoPrice: 0,
-  daoBalance: 0,
-  daoHodlers: [],
-  creatorCoinBalance: 0,
-  creatorCoinHodlers: []
+  fetchedFollowers: false,
+  fetchedFollowing: false,
+  desoPrice: 0
 }
 
 export const customState = () => {

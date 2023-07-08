@@ -16,7 +16,10 @@ const Enums = {
     YES: 'Yes',
     NO: 'No',
     EMPTY_STRING: '',
-    DIV_ROOT: 'root'
+    DIV_ROOT: 'root',
+    FOLLOWERS: 'Followers',
+    FOLLOWING: 'Following',
+    SELECTED_USERS: 'Selected Users'
   },
   messages: {
     UNKNOWN_ERROR: 'Unknown Error Occured. Please check console',
