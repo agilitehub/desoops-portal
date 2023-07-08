@@ -10,9 +10,17 @@ const slice = createSlice({
     },
     setDeSoData: (state, data) => {
       state.desoData = data.payload
+    },
+    updateFollowers: (state, data) => {
+      state.desoData.profile.followers = data.payload.data
+      state.desoData.fetchedFollowers = true
+    },
+    updateFollowing: (state, data) => {
+      state.desoData.profile.following = data.payload.data
+      state.desoData.fetchedFollowing = true
     }
   }
 })
 
-export const { resetState, setDeSoData } = slice.actions
+export const { resetState, setDeSoData, updateFollowers, updateFollowing } = slice.actions
 export default slice.reducer
