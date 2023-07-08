@@ -25,3 +25,7 @@ export const copyTextToClipboard = (text) => {
       .catch(reject) // If an error occurs, reject the promise with the error.
   })
 }
+
+export const hexToInt = (hex) => {
+  return parseInt(hex, 16)
+}

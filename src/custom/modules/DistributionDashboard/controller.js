@@ -1,8 +1,8 @@
 import Axios from 'agilite-utils/axios'
 
 // Utils
-import Enums from '../../utils/enums'
-import { getDeSo } from '../../deso/controller'
+import Enums from '../../lib/enums'
+import { getDeSo } from '../../lib/deso-controller'
 
 export const getHodlers = (Username, IsDAOCoin, fetchHodlings) => {
   return new Promise((resolve, reject) => {
@@ -146,36 +146,41 @@ export const payDaoHodler = (senderKey, receiverKey, creatorKey, amount, type) =
   })
 }
 
-export const getFollowers = (Username, getEntriesFollowingUser) => {
+export const prepUsersForClipboard = (userList, transactionType) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
-      let response = null
-      let errMsg = null
-      let request = null
+      const tmpResult = []
+      let result = null
 
       try {
-        request = {
-          Username,
-          GetEntriesFollowingUserName: getEntriesFollowingUser
+        switch (transactionType) {
+          case Enums.values.FOLLOWERS:
+          case Enums.values.FOLLOWING:
+            for (const username of userList) {
+              tmpResult.push(`@${username}`)
+            }
+
+            break
+          case Enums.values.NFT:
+          case Enums.values.POST:
+            for (const user of userList) {
+              tmpResult.push(`@${user.username}`)
+            }
+
+            break
+          default:
+            for (const user of userList) {
+              tmpResult.push(`@${user.ProfileEntryResponse.Username}`)
+            }
         }
 
-        // First get # of followers
-        response = await getDeSo().social.getFollowsStateless(request)
-
-        // Get Followers based on amount
-        request.NumToFetch = response.NumFollowers
-        response = await getDeSo().social.getFollowsStateless(request)
-
-        resolve(response.PublicKeyToProfileEntry)
+        result = {
+          length: tmpResult.length,
+          data: `${tmpResult.join(' ')} `
+        }
+        resolve(result)
       } catch (e) {
-        if (e.response?.data?.message) {
-          errMsg = e.response.data.message
-        } else {
-          errMsg = Enums.messages.UNKNOWN_ERROR
-        }
-
-        console.error(e)
-        reject(errMsg)
+        reject(e)
       }
     })()
   })

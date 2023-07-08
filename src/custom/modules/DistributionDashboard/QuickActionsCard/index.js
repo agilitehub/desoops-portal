@@ -1,5 +1,5 @@
 import React, { useReducer } from 'react'
-import { Card, Button, Dropdown, message, Modal, Space } from 'antd'
+import { Card, Button, Dropdown, message, Modal, Space, Row, Col, Divider } from 'antd'
 import { DownOutlined, UserOutlined, ReloadOutlined } from '@ant-design/icons'
 import { copyTextToClipboard } from '../../../lib/utils'
 import RandomizeDialogContent from './RandomizeDialog'
@@ -18,6 +18,11 @@ const initialState = {
   randomUserKey: null,
   randomizeInProgress: false,
   randomUsers: 0
+}
+
+const styleParams = {
+  labelColStyle: { marginTop: 4 },
+  dividerStyle: { margin: '7px 0' }
 }
 
 const reducer = (state, newState) => ({ ...state, ...newState })
@@ -142,67 +147,88 @@ const QuickActionsCard = ({ desoData }) => {
 
   const dropdownItems = [
     {
-      label: 'Selected Users In Table',
-      key: 'Selected Users In Table',
+      label: Enums.values.SELECTED_USERS,
+      key: Enums.values.SELECTED_USERS,
       icon: <UserOutlined />
     },
     {
-      label: 'Followers',
-      key: 'Followers',
+      label: Enums.values.FOLLOWERS,
+      key: Enums.values.FOLLOWERS,
       icon: <UserOutlined />
     },
     {
-      label: 'Following',
-      key: 'Following',
+      label: Enums.values.FOLLOWING,
+      key: Enums.values.FOLLOWING,
       icon: <UserOutlined />
     }
   ]
 
   return (
-    <Card title='Quick Actions'>
-      <Button
-        danger
-        icon={<ReloadOutlined />}
-        loading={state.resetLoading}
-        disabled={state.resetLoading}
-        onClick={handleResetDashboard}
-      >
-        Reset Dashboard
-      </Button>
-      <Button
-        icon={<ReloadOutlined />}
-        loading={state.refreshLoading}
-        disabled={state.refreshLoading}
-        onClick={handleRefreshDashboardValues}
-      >
-        Refresh Dashboard Values
-      </Button>
-      <Dropdown
-        menu={{ items: dropdownItems, onClick: handleCopyToClipboard }}
-        icon={<DownOutlined />}
-        loading={state.ctcLoading}
-        disabled={state.ctcLoading}
-      >
-        <Button>
-          <Space>
-            Copy To Clipboard
-            <DownOutlined />
-          </Space>
-        </Button>
-      </Dropdown>
-      <Dropdown
-        menu={{ items: dropdownItems, onClick: handleLoadRandomizeDialog }}
-        icon={<DownOutlined />}
-        loading={state.returnLoading}
-        disabled={state.returnLoading}
-      >
-        <Button>
-          <Space>
-            Return Random Users From...
-            <DownOutlined />
-          </Space>
-        </Button>
-      </Dropdown>
+    <Card title='Quick Actions' size='small'>
+      <Row>
+        <Col xs={24} md={10}>
+          <Button
+            danger
+            icon={<ReloadOutlined />}
+            loading={state.resetLoading}
+            disabled={state.resetLoading}
+            onClick={handleResetDashboard}
+          >
+            Reset Dashboard
+          </Button>
+        </Col>
+        <Col xs={24} md={14}>
+          <Button
+            icon={<ReloadOutlined />}
+            loading={state.refreshLoading}
+            disabled={state.refreshLoading}
+            onClick={handleRefreshDashboardValues}
+          >
+            Refresh Dashboard Values
+          </Button>
+        </Col>
+      </Row>
+      <Divider style={styleParams.dividerStyle} />
+      <Row>
+        <Col xs={24}>
+          <Dropdown
+            menu={{ items: dropdownItems, onClick: handleCopyToClipboard }}
+            icon={<DownOutlined />}
+            loading={state.ctcLoading}
+            disabled={state.ctcLoading}
+          >
+            <Button>
+              <Space>
+                Copy To Clipboard
+                <DownOutlined />
+              </Space>
+            </Button>
+          </Dropdown>
+        </Col>
+      </Row>
+      {/* <Divider style={styleParams.dividerStyle} />
+      <Row>
+        <Col
+          xs={styleParams.labelColXS}
+          sm={styleParams.labelColSM}
+          md={styleParams.labelColMD}
+          style={styleParams.labelColStyle}
+        >
+          <Dropdown
+            menu={{ items: dropdownItems, onClick: handleLoadRandomizeDialog }}
+            icon={<DownOutlined />}
+            loading={state.returnLoading}
+            disabled={state.returnLoading}
+          >
+            <Button>
+              <Space>
+                Return Random Users From...
+                <DownOutlined />
+              </Space>
+            </Button>
+          </Dropdown>
+        </Col>
+      </Row> */}
       <Modal
         title={`Return Random Users From - ${state.randomUserKey}`}
         open={state.loadRandomizeModal}

@@ -19,7 +19,7 @@ const Enums = {
     DIV_ROOT: 'root',
     FOLLOWERS: 'Followers',
     FOLLOWING: 'Following',
-    SELECTED_USERS: 'Selected Users'
+    SELECTED_USERS: 'Selected Users in Table'
   },
   messages: {
     UNKNOWN_ERROR: 'Unknown Error Occured. Please check console',
