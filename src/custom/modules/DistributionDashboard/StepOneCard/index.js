@@ -59,38 +59,38 @@ const StepOneCard = ({ desoData }) => {
       setState({ loading: true })
 
       // If user selects DAO or Creator Coin Hodlers, we need to get the relevant users
-      isDAOCoin = value === Enums.values.DAO
-      tmpHodlers = desoData.profile.daoHolders
+      // isDAOCoin = value === Enums.values.DAO
+      // tmpHodlers = desoData.profile.daoHolders
 
-      if (tmpHodlers.Hodlers.length > 0) {
-        // Determine Coin Total and valid Hodlers
-        tmpHodlers.Hodlers.map((entry) => {
-          // Ignore entry if it does not have a Profile OR if it is the same as current logged in user
-          if (entry.ProfileEntryResponse && entry.ProfileEntryResponse.Username !== desoData.profile.username) {
-            // Set Defaults
-            entry.status = Enums.values.EMPTY_STRING
+      // if (tmpHodlers.Hodlers.length > 0) {
+      //   // Determine Coin Total and valid Hodlers
+      //   tmpHodlers.Hodlers.map((entry) => {
+      //     // Ignore entry if it does not have a Profile OR if it is the same as current logged in user
+      //     if (entry.ProfileEntryResponse && entry.ProfileEntryResponse.Username !== desoData.profile.username) {
+      //       // Set Defaults
+      //       entry.status = Enums.values.EMPTY_STRING
 
-            // Determine Number of Coins
-            if (isDAOCoin) {
-              noOfCoins = entry.BalanceNanosUint256
-              noOfCoins = hexToInt(noOfCoins)
-              noOfCoins = noOfCoins / Enums.values.NANO_VALUE / Enums.values.NANO_VALUE
-            } else {
-              noOfCoins = entry.BalanceNanos
-              noOfCoins = noOfCoins / Enums.values.NANO_VALUE
-            }
+      //       // Determine Number of Coins
+      //       if (isDAOCoin) {
+      //         noOfCoins = entry.BalanceNanosUint256
+      //         noOfCoins = hexToInt(noOfCoins)
+      //         noOfCoins = noOfCoins / Enums.values.NANO_VALUE / Enums.values.NANO_VALUE
+      //       } else {
+      //         noOfCoins = entry.BalanceNanos
+      //         noOfCoins = noOfCoins / Enums.values.NANO_VALUE
+      //       }
 
-            entry.noOfCoins = noOfCoins
-            tmpCoinTotal += noOfCoins
-            finalHodlers.push(entry)
-          }
+      //       entry.noOfCoins = noOfCoins
+      //       tmpCoinTotal += noOfCoins
+      //       finalHodlers.push(entry)
+      //     }
 
-          return null
-        })
+      //     return null
+      //   })
 
-        tmpRowKeys = finalHodlers.map((hodler) => hodler.ProfileEntryResponse.Username)
-        // updateHolderAmounts(finalHodlers.concat(), tmpCoinTotal, 0, tmpRowKeys, tmpCoinTotal)
-      }
+      //   tmpRowKeys = finalHodlers.map((hodler) => hodler.ProfileEntryResponse.Username)
+      //   // updateHolderAmounts(finalHodlers.concat(), tmpCoinTotal, 0, tmpRowKeys, tmpCoinTotal)
+      // }
 
       // Update State
       setState({ distributeTo: value })
@@ -132,6 +132,9 @@ const StepOneCard = ({ desoData }) => {
     //       break
     //   }
     // }
+
+    // Update State
+    setState({ distributionType: value })
   }
 
   return (

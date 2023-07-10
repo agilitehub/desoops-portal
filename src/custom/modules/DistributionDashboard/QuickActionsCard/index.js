@@ -180,13 +180,13 @@ const QuickActionsCard = ({ desoData }) => {
         </Col>
         <Col xs={24} md={14}>
           <Button
-            style={{ color: 'green', borderColor: 'green', backgroundColor: 'white' }}
+            style={{ color: 'orange', borderColor: 'orange', backgroundColor: 'white' }}
             icon={<ReloadOutlined />}
             loading={state.refreshLoading}
             disabled={state.refreshLoading}
             onClick={handleRefreshDashboardValues}
           >
-            Refresh Dashboard Values
+            Refresh Dashboard
           </Button>
         </Col>
       </Row>
@@ -200,7 +200,7 @@ const QuickActionsCard = ({ desoData }) => {
             disabled={state.ctcLoading}
           >
             <Button
-              type='primary'
+              style={{ color: 'purple', borderColor: 'purple', backgroundColor: 'white' }}
               loading={state.ctcLoading}
               icon={
                 state.ctcLoading ? (

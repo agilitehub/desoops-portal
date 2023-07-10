@@ -186,7 +186,7 @@ const StepTwoCard = ({ desoData }) => {
           </Select>
         </Col>
         <Col>
-          <InputNumber addonBefore='$DESO' min={0} placeholder='Enter amount' style={{ width: 225 }} />
+          <InputNumber addonBefore='CC' min={0} placeholder='Enter amount' style={{ width: 225 }} />
         </Col>
       </Row>
     </Card>

@@ -177,19 +177,6 @@ const StepThreeCard = ({ desoData }) => {
           <span>$0.02 (~0.02 $DESO)</span>
         </Col>
       </Row>
-      <Row>
-        <Col
-          xs={styleParams.labelColXS}
-          sm={styleParams.labelColSM}
-          md={styleParams.labelColMD}
-          style={styleParams.labelColStyle}
-        >
-          <span style={{ fontWeight: 'bold' }}>Slippage:</span>
-        </Col>
-        <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
-          <span>0.0001 $DESO</span>
-        </Col>
-      </Row>
       <Divider style={{ margin: '10px 0' }} />
       <Row justify='center'>
         <Col>
