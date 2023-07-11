@@ -7,9 +7,6 @@ const Enums = {
     DESO: 'deso',
     DAO: 'dao',
     CREATOR: 'creator',
-    DESO_TYPE: '$DESO',
-    DAO_TYPE: 'DAO',
-    CREATOR_TYPE: 'Creator Coin',
     NFT: 'nft',
     POST: 'post',
     HEX_PREFIX: '0x',
@@ -20,6 +17,11 @@ const Enums = {
     FOLLOWERS: 'Followers',
     FOLLOWING: 'Following',
     SELECTED_USERS: 'Selected Users in Table'
+  },
+  paymentTypes: {
+    DESO: '$DESO',
+    DAO: 'DAO',
+    CREATOR: 'CC'
   },
   messages: {
     UNKNOWN_ERROR: 'Unknown Error Occured. Please check console',
