@@ -62,7 +62,7 @@ const StepThreeCard = ({ desoData }) => {
 
       // If user selects DAO or Creator Coin Hodlers, we need to get the relevant users
       isDAOCoin = value === Enums.values.DAO
-      tmpHodlers = desoData.profile.daoHolders
+      tmpHodlers = desoData.profile.daoHodlers
 
       if (tmpHodlers.Hodlers.length > 0) {
         // Determine Coin Total and valid Hodlers

@@ -36,7 +36,7 @@ const _BatchTransactionsForm = () => {
             <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12}>
               <Row>
                 <Col span={24}>
-                  <StepOneCard />
+                  <StepOneCard desoData={desoData} />
                 </Col>
               </Row>
               <Divider style={styleParams.dividerStyle} />

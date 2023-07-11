@@ -75,7 +75,6 @@ const QuickActionsCard = ({ desoData }) => {
     let alreadyFetched = false
 
     try {
-      console.log(desoData)
       setState({ ctcLoading: true })
 
       switch (item.key) {

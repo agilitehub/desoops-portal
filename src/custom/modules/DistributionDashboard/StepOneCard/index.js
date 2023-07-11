@@ -1,11 +1,7 @@
-// Create a ReactJS Functional Component called StepOneCard
-// Use Ant Design's Card Component, with a title of 'Start Here' and size of 'small'
-// Use Ant Design's Row and Col Components to create a 2x2 grid
-
 import React, { useReducer } from 'react'
 import { Card, Row, Col, theme, Select, message, Divider, InputNumber } from 'antd'
 import Enums from '../../../lib/enums'
-import { hexToInt } from '../../../lib/utils'
+import { setupHodlers } from '../controller'
 
 const initialState = {
   loading: false,
@@ -13,7 +9,9 @@ const initialState = {
   distributeTo: Enums.values.EMPTY_STRING,
   distributionType: Enums.values.EMPTY_STRING,
   distributionAmount: Enums.values.EMPTY_STRING,
-  inputAmountLabel: '$DESO'
+  inputAmountLabel: '$DESO',
+  allHodlers: [],
+  finalHodlers: []
 }
 
 const styleParams = {
@@ -38,68 +36,29 @@ const StepOneCard = ({ desoData }) => {
     setState(initialState)
   }
 
-  const handleDistributeToChange = async (value) => {
-    let tmpHodlers = []
-    let finalHodlers = []
-    let tmpCoinTotal = 0
-    let isDAOCoin = null
-    let noOfCoins = 0
-    let tmpRowKeys = []
+  const handleDistributeToChange = async (distributeTo) => {
+    let tmpResult = []
+    let allHodlers = []
+    let coinTotal = 0
 
     try {
       // If user selects the current value, do nothing
-      if (value === state.distributeTo) return
+      if (distributeTo === state.distributeTo) return
 
-      // First Reset Dashboard State
+      // First Reset Dashboard State, as all values depend on this selection
       resetState()
 
       // Then, if user selects NFT or Post, no extra work is needed
-      if (!value || value === Enums.values.NFT || value === Enums.values.POST) return
+      if (!distributeTo || distributeTo === Enums.values.NFT || distributeTo === Enums.values.POST) return
 
       setState({ loading: true })
+      tmpResult = await setupHodlers(desoData.profile, distributeTo)
 
-      // If user selects DAO or Creator Coin Hodlers, we need to get the relevant users
-      // isDAOCoin = value === Enums.values.DAO
-      // tmpHodlers = desoData.profile.daoHolders
-
-      // if (tmpHodlers.Hodlers.length > 0) {
-      //   // Determine Coin Total and valid Hodlers
-      //   tmpHodlers.Hodlers.map((entry) => {
-      //     // Ignore entry if it does not have a Profile OR if it is the same as current logged in user
-      //     if (entry.ProfileEntryResponse && entry.ProfileEntryResponse.Username !== desoData.profile.username) {
-      //       // Set Defaults
-      //       entry.status = Enums.values.EMPTY_STRING
-
-      //       // Determine Number of Coins
-      //       if (isDAOCoin) {
-      //         noOfCoins = entry.BalanceNanosUint256
-      //         noOfCoins = hexToInt(noOfCoins)
-      //         noOfCoins = noOfCoins / Enums.values.NANO_VALUE / Enums.values.NANO_VALUE
-      //       } else {
-      //         noOfCoins = entry.BalanceNanos
-      //         noOfCoins = noOfCoins / Enums.values.NANO_VALUE
-      //       }
-
-      //       entry.noOfCoins = noOfCoins
-      //       tmpCoinTotal += noOfCoins
-      //       finalHodlers.push(entry)
-      //     }
-
-      //     return null
-      //   })
-
-      //   tmpRowKeys = finalHodlers.map((hodler) => hodler.ProfileEntryResponse.Username)
-      //   // updateHolderAmounts(finalHodlers.concat(), tmpCoinTotal, 0, tmpRowKeys, tmpCoinTotal)
-      // }
+      allHodlers = tmpResult.allHodlers
+      coinTotal = tmpResult.coinTotal
 
       // Update State
-      setState({ distributeTo: value })
-
-      // setHodlers(finalHodlers)
-      // setOriginalHodlers(finalHodlers)
-      // setSelectedRows(finalHodlers)
-      // setSelectedRowKeys(tmpRowKeys)
-      // setOriginalCoinTotal(tmpCoinTotal)
+      setState({ distributeTo, allHodlers, finalHodlers: allHodlers, coinTotal })
     } catch (e) {
       message.error(e)
     }
@@ -162,53 +121,57 @@ const StepOneCard = ({ desoData }) => {
           </Select>
         </Col>
       </Row>
-      <Divider style={styleParams.dividerStyle} />
-      <Row>
-        <Col
-          xs={styleParams.labelColXS}
-          sm={styleParams.labelColSM}
-          md={styleParams.labelColMD}
-          style={styleParams.labelColStyle}
-        >
-          <span style={{ fontWeight: 'bold' }}>Type of distribution:</span>
-        </Col>
-        <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
-          <Select
-            disabled={state.isExecuting}
-            onChange={(value) => handleDistributionTypeChange(value)}
-            value={state.distributionType}
-            style={{ width: 250 }}
-          >
-            <Select.Option value={Enums.values.EMPTY_STRING}>- Select -</Select.Option>
-            <Select.Option value={Enums.values.DESO}>$DESO</Select.Option>
-            <Select.Option value={Enums.values.DAO}>DAO Token</Select.Option>
-            <Select.Option value={Enums.values.CREATOR}>Creator Coin</Select.Option>
-          </Select>
-        </Col>
-      </Row>
-      <Divider style={styleParams.dividerStyle} />
-      <Row>
-        <Col
-          xs={styleParams.labelColXS}
-          sm={styleParams.labelColSM}
-          md={styleParams.labelColMD}
-          style={styleParams.labelColStyle}
-        >
-          <span style={{ fontWeight: 'bold' }}>Amount to distribute:</span>
-        </Col>
-        <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
-          <InputNumber
-            addonBefore={state.inputAmountLabel}
-            // disabled={state.distributeTo && state.distributionType && !state.isExecuting ? false : true}
-            placeholder='Enter amount'
-            value={state.distributionAmount}
-            style={{ width: 250 }}
-            onChange={(distributionAmount) => {
-              setState({ distributionAmount })
-            }}
-          />
-        </Col>
-      </Row>
+      {state.distributeTo !== Enums.values.EMPTY_STRING ? (
+        <>
+          <Divider style={styleParams.dividerStyle} />
+          <Row>
+            <Col
+              xs={styleParams.labelColXS}
+              sm={styleParams.labelColSM}
+              md={styleParams.labelColMD}
+              style={styleParams.labelColStyle}
+            >
+              <span style={{ fontWeight: 'bold' }}>Type of distribution:</span>
+            </Col>
+            <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
+              <Select
+                disabled={state.isExecuting}
+                onChange={(value) => handleDistributionTypeChange(value)}
+                value={state.distributionType}
+                style={{ width: 250 }}
+              >
+                <Select.Option value={Enums.values.EMPTY_STRING}>- Select -</Select.Option>
+                <Select.Option value={Enums.values.DESO}>$DESO</Select.Option>
+                <Select.Option value={Enums.values.DAO}>DAO Token</Select.Option>
+                <Select.Option value={Enums.values.CREATOR}>Creator Coin</Select.Option>
+              </Select>
+            </Col>
+          </Row>
+          <Divider style={styleParams.dividerStyle} />
+          <Row>
+            <Col
+              xs={styleParams.labelColXS}
+              sm={styleParams.labelColSM}
+              md={styleParams.labelColMD}
+              style={styleParams.labelColStyle}
+            >
+              <span style={{ fontWeight: 'bold' }}>Amount to distribute:</span>
+            </Col>
+            <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
+              <InputNumber
+                addonBefore={state.inputAmountLabel}
+                // disabled={state.distributeTo && state.distributionType && !state.isExecuting ? false : true}
+                placeholder='Enter amount'
+                value={state.distributionAmount}
+                style={{ width: 250 }}
+                onChange={(distributionAmount) => {
+                  setState({ distributionAmount })
+                }}
+              />
+            </Col>
+          </Row>
+        </>
+      ) : null}
     </Card>
   )
 }
