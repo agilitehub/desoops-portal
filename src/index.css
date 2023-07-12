@@ -19,6 +19,12 @@ a {
 tbody:hover {
   cursor: pointer;
 }
+
+.ant-tabs-tab-active {
+  background-color: #188eff;
+  color: white;
+}
+
 .ant-table-row.dark {
   background: #333333 !important;
 }

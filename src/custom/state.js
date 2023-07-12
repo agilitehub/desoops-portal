@@ -14,7 +14,9 @@ const desoData = {
     followers: [],
     following: [],
     daoHodlers: [],
-    ccHodlers: []
+    ccHodlers: [],
+    daoHodlings: [],
+    ccHodlings: []
   },
   fetchedFollowers: false,
   fetchedFollowing: false,

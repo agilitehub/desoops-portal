@@ -6,11 +6,10 @@ import { Row, Col, Card, Space, Tag, Button, Dropdown, theme, message, Divider }
 
 // Custom Components
 import ContainerCard from '../../reusables/components/ContainerCard'
-import QuickActionsCard from './QuickActionsCard'
-import StepOneCard from './StepOneCard'
-import StepTwoCard from './StepTwoCard'
-import StepThreeCard from './StepThreeCard'
 import WalletOverviewCard from './WalletOverviewCard'
+import SetupCard from './SetupCard'
+import QuickActionsCard from './QuickActionsCard'
+import StepThreeCard from './StepThreeCard'
 
 // Custom Utils
 import Enums from '../../lib/enums'
@@ -26,6 +25,7 @@ const initialState = {
   distributeTo: Enums.values.EMPTY_STRING,
   distributionType: Enums.values.EMPTY_STRING,
   distributionAmount: Enums.values.EMPTY_STRING,
+  tokenToUse: Enums.values.EMPTY_STRING,
   allHodlers: [],
   finalHodlers: []
 }
@@ -79,7 +79,11 @@ const _BatchTransactionsForm = () => {
   }
 
   const handleDistributionType = (distributionType) => {
-    setState({ distributionType, distributionAmount: Enums.values.EMPTY_STRING })
+    setState({ distributionType, tokenToUse: Enums.values.EMPTY_STRING, distributionAmount: Enums.values.EMPTY_STRING })
+  }
+
+  const handleTokenToUse = (tokenToUse) => {
+    setState({ tokenToUse, distributionAmount: Enums.values.EMPTY_STRING })
   }
 
   return (
@@ -96,19 +100,14 @@ const _BatchTransactionsForm = () => {
               <Divider style={styleParams.dividerStyle} />
               <Row>
                 <Col span={24}>
-                  <StepOneCard
+                  <SetupCard
                     desoData={desoData}
                     state={state}
                     onDistributeTo={handleDistributeTo}
                     onDistributionType={handleDistributionType}
+                    onTokenToUse={handleTokenToUse}
                     onSetState={setState}
                   />
-                </Col>
-              </Row>
-              <Divider style={styleParams.dividerStyle} />
-              <Row>
-                <Col span={24}>
-                  <StepTwoCard desoData={desoData} />
                 </Col>
               </Row>
             </Col>

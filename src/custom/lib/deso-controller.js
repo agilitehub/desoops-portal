@@ -45,8 +45,10 @@ export const getDeSoData = (publicKey, currentState) => {
     ;(async () => {
       let daoData = null
       let daoHodlers = null
+      let daoHodlings = null
       let ccData = null
       let ccHodlers = null
+      let ccHodlings = null
       let desoPrice = null
       let tmpData = null
       let daoBalance = 0
@@ -81,6 +83,16 @@ export const getDeSoData = (publicKey, currentState) => {
 
         daoHodlers = daoData.Hodlers.filter((entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== publicKey)
 
+        // Get DAO Hodlings
+        daoData = await getHodlersForUser({
+          FetchAll: true,
+          FetchHodlings: true,
+          IsDAOCoin: true,
+          PublicKeyBase58Check: publicKey
+        })
+
+        daoHodlings = daoData.Hodlers.filter((entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== publicKey)
+
         // Get Creator Coin Balance and Hodlers
         ccData = await getHodlersForUser({
           PublicKeyBase58Check: publicKey,
@@ -91,8 +103,19 @@ export const getDeSoData = (publicKey, currentState) => {
 
         tmpData = ccData.Hodlers.find((entry) => entry.ProfileEntryResponse.PublicKeyBase58Check === publicKey)
         if (tmpData) ccBalance = tmpData.BalanceNanos / Enums.values.NANO_VALUE
+        ccBalance = Math.floor(ccBalance * 10000) / 10000
 
         ccHodlers = ccData.Hodlers.filter((entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== publicKey)
+
+        // Get Creator Coin Hodlings
+        ccData = await getHodlersForUser({
+          PublicKeyBase58Check: publicKey,
+          FetchHodlings: true,
+          FetchAll: true,
+          IsDAOCoin: false
+        })
+
+        ccHodlings = ccData.Hodlers.filter((entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== publicKey)
 
         // We know how many the user is following, but we don't know how many are following the user
         followers = await getTotalFollowersOrFollowing(publicKey, Enums.values.FOLLOWERS)
@@ -105,7 +128,9 @@ export const getDeSoData = (publicKey, currentState) => {
         result.profile.totalDAOHodlers = daoHodlers.length
         result.profile.totalCCHodlers = ccHodlers.length
         result.profile.daoHodlers = daoHodlers
+        result.profile.daoHodlings = daoHodlings
         result.profile.ccHodlers = ccHodlers
+        result.profile.ccHodlings = ccHodlings
 
         resolve(result)
       } catch (e) {

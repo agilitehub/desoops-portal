@@ -4,8 +4,8 @@
 
 import React, { useReducer } from 'react'
 import { Card, Row, Col, theme, Select, message, Divider, InputNumber, Typography, Radio, Switch } from 'antd'
-import Enums from '../../../lib/enums'
-import { hexToInt } from '../../../lib/utils'
+import Enums from '../../../../lib/enums'
+import { hexToInt } from '../../../../lib/utils'
 
 const initialState = {
   loading: false,
@@ -31,7 +31,7 @@ const styleParams = {
 const { Title } = Typography
 const reducer = (state, newState) => ({ ...state, ...newState })
 
-const StepTwoCard = ({ desoData }) => {
+const RulesTab = ({ desoData }) => {
   const { token } = theme.useToken()
   const [state, setState] = useReducer(reducer, initialState)
 
@@ -193,4 +193,4 @@ const StepTwoCard = ({ desoData }) => {
   )
 }
 
-export default StepTwoCard
+export default RulesTab

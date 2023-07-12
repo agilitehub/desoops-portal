@@ -29,12 +29,13 @@ const App = () => {
       try {
         tmpDeSoData = await getDeSoData(currentUser.PublicKeyBase58Check, desoData)
         desoBalance = currentUser.ProfileEntryResponse.DESOBalanceNanos / Enums.values.NANO_VALUE
-        desoBalanceUSD = desoBalance * tmpDeSoData.desoPrice
+        desoBalanceUSD = Math.floor(desoBalance * tmpDeSoData.desoPrice * 100) / 100
+        desoBalance = Math.floor(desoBalance * 10000) / 10000
 
         tmpDeSoData.profile = {
           ...tmpDeSoData.profile,
           username: currentUser.ProfileEntryResponse.Username,
-          profilePicUrl: currentUser.ProfileEntryResponse.ExtraData.LargeProfilePicURL,
+          profilePicUrl: `https://blockproducer.deso.org/api/v0/get-single-profile-picture/${tmpDeSoData.profile.publicKey}`,
           desoBalance,
           desoBalanceUSD,
           totalFollowing: currentUser.PublicKeysBase58CheckFollowedByUser.length

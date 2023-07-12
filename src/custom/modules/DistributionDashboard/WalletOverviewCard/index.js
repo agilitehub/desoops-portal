@@ -5,10 +5,7 @@ const WalletOverviewCard = ({ desoProfile }) => {
   const { desoBalance, desoBalanceUSD, daoBalance, ccBalance } = desoProfile
 
   // Format Values
-  const formattedDesoBalance = Math.floor(desoBalance * 10000) / 10000
-  const formattedDesoBalanceUSD = Math.floor(desoBalanceUSD * 100) / 100
-  const formattedDaoBalance = (Math.floor(daoBalance * 10000) / 10000).toLocaleString('en-US', { useGrouping: true })
-  const formattedCCBalance = Math.floor(ccBalance * 10000) / 10000
+  const formattedDaoBalance = daoBalance.toLocaleString('en-US', { useGrouping: true })
 
   return (
     <Card title='Wallet Overview' size='small' bodyStyle={{ height: 75 }}>
@@ -19,9 +16,7 @@ const WalletOverviewCard = ({ desoProfile }) => {
               style={{ backgroundColor: '#FFA07A', paddingTop: 2, paddingBottom: 2, borderRadius: '5px', fontSize: 14 }}
             >
               <div style={{ color: '#F3F3F3', fontWeight: 'bold' }}>$DESO</div>
-              <div
-                style={{ color: '#F3F3F3', marginTop: -5 }}
-              >{`${formattedDesoBalance} (~${formattedDesoBalanceUSD})`}</div>
+              <div style={{ color: '#F3F3F3', marginTop: -5 }}>{`${desoBalance} (~${desoBalanceUSD})`}</div>
             </div>
           </Col>
         </Col>
@@ -41,7 +36,7 @@ const WalletOverviewCard = ({ desoProfile }) => {
               style={{ backgroundColor: '#FFA07A', paddingTop: 2, paddingBottom: 2, borderRadius: '5px', fontSize: 14 }}
             >
               <div style={{ color: '#F3F3F3', fontWeight: 'bold' }}>Creator Coin</div>
-              <div style={{ color: '#F3F3F3', marginTop: -5 }}>{formattedCCBalance}</div>
+              <div style={{ color: '#F3F3F3', marginTop: -5 }}>{ccBalance}</div>
             </div>
           </Col>
         </Col>
