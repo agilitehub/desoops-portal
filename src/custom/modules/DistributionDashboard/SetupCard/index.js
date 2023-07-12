@@ -30,7 +30,7 @@ const SetupCard = ({ desoData, state, onDistributeTo, onDistributionType, onToke
         </TabPane>
         {state.rulesEnabled ? (
           <TabPane tab='Rules' key='2'>
-            <RulesTab desoData={desoData} />
+            <RulesTab desoData={desoData} state={state} onSetState={onSetState} />
           </TabPane>
         ) : null}
       </Tabs>

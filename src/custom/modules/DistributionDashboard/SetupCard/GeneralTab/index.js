@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Card, Row, Col, theme, Select, message, Divider, InputNumber, Space, Image } from 'antd'
+import { Row, Col, Select, Divider, Space, Image } from 'antd'
 import Enums from '../../../../lib/enums'
 
 const styleParams = {
@@ -15,7 +15,6 @@ const styleParams = {
 }
 
 const GenenralTab = ({ state, onDistributeTo, onDistributionType, onTokenToUse, onSetState, desoProfile }) => {
-  const { token } = theme.useToken()
   const [tokenOwnerList, setTokenOwnerList] = useState([])
 
   useEffect(() => {

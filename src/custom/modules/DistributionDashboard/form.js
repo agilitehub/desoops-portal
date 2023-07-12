@@ -27,6 +27,10 @@ const initialState = {
   distributionAmount: Enums.values.EMPTY_STRING,
   rulesEnabled: false,
   tokenToUse: Enums.values.EMPTY_STRING,
+  spreadAmountBasedOn: 'Ownership',
+  filterUsers: false,
+  filterAmountIs: '>',
+  filterAmount: '',
   allHodlers: [],
   finalHodlers: []
 }

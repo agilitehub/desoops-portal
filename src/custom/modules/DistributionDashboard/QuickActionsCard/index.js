@@ -209,7 +209,7 @@ const QuickActionsCard = ({ desoData }) => {
                 <Button
                   shape='circle'
                   style={{ color: '#800080', borderColor: '#800080' }}
-                  icon={<ReloadOutlined />}
+                  icon={<CopyOutlined />}
                   loading={state.ctcLoading}
                 />
               </Dropdown>

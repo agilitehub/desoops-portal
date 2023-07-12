@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { StrictMode } from 'react'
 import ReactDOM from 'react-dom'
 import { Provider, useSelector } from 'react-redux'
 import { initializeApp } from 'firebase/app'
@@ -39,7 +39,9 @@ const App = () => {
 ReactDOM.render(
   <Provider store={Store}>
     <DeSoIdentityProvider>
-      <App />
+      <StrictMode>
+        <App />
+      </StrictMode>
     </DeSoIdentityProvider>
   </Provider>,
   document.getElementById(Enums.values.DIV_ROOT)

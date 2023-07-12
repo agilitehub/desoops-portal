@@ -61,7 +61,8 @@ export const getDeSoData = (publicKey, currentState) => {
 
         // Get DeSo Price
         desoPrice = await getExchangeRates()
-        desoPrice = desoPrice.USDCentsPerDeSoExchangeRate / 100
+        console.log('desoPrice', desoPrice)
+        desoPrice = desoPrice.USDCentsPerDeSoCoinbase / 100
 
         // Get DAO Balance and Hodlers
         daoData = await getHodlersForUser({
