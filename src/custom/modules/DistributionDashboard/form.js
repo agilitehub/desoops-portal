@@ -1,8 +1,8 @@
 import React, { memo, useEffect, useReducer } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 // UI Components
-import { Row, Col, Card, Space, Tag, Button, Dropdown, theme, message, Divider } from 'antd'
+import { Row, Col, message, Divider } from 'antd'
 
 // Custom Components
 import ContainerCard from '../../reusables/components/ContainerCard'
@@ -10,43 +10,25 @@ import WalletOverviewCard from './WalletOverviewCard'
 import SetupCard from './SetupCard'
 import QuickActionsCard from './QuickActionsCard'
 import StepThreeCard from './StepThreeCard'
+import TableData from './TableData'
 
 // Custom Utils
 import Enums from '../../lib/enums'
 import { setupHodlers } from './controller'
+import { initDistributionDashboardState } from '../../lib/templates'
 
 const styleParams = {
   dividerStyle: { margin: '5px 0', borderBlockStart: 0 }
 }
 
-const initialState = {
-  loading: false,
-  isExecuting: false,
-  distributeTo: Enums.values.EMPTY_STRING,
-  distributionType: Enums.values.EMPTY_STRING,
-  distributionAmount: Enums.values.EMPTY_STRING,
-  rulesEnabled: false,
-  tokenToUse: Enums.values.EMPTY_STRING,
-  spreadAmountBasedOn: 'Ownership',
-  filterUsers: false,
-  filterAmountIs: '>',
-  filterAmount: '',
-  allHodlers: [],
-  finalHodlers: []
-}
-
 const reducer = (state, newState) => ({ ...state, ...newState })
 
 const _BatchTransactionsForm = () => {
-  const { token } = theme.useToken()
-  const dispatch = useDispatch()
   const desoData = useSelector((state) => state.custom.desoData)
-  const distDashboardState = useSelector((state) => state.custom.distDashboard)
-
-  const [state, setState] = useReducer(reducer, initialState)
+  const [state, setState] = useReducer(reducer, initDistributionDashboardState())
 
   const resetState = () => {
-    setState(initialState)
+    setState(initDistributionDashboardState())
   }
 
   // Use a useEffect hook to determine if state.rulesEnabled should be True or False
@@ -56,10 +38,8 @@ const _BatchTransactionsForm = () => {
 
     if (state.distributeTo && state.distributionType) {
       if (state.distributionType === Enums.paymentTypes.DAO || state.distributionType === Enums.paymentTypes.CREATOR) {
-        console.log('1', state.tokenToUse)
         if (state.tokenToUse) rulesEnabled = true
       } else {
-        console.log('2', state.distributionType)
         rulesEnabled = true
       }
     }
@@ -68,9 +48,10 @@ const _BatchTransactionsForm = () => {
   }, [state.distributeTo, state.distributionType, state.tokenToUse]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDistributeTo = async (distributeTo) => {
-    let tmpResult = []
-    let allHodlers = []
-    let coinTotal = 0
+    let tmpResult = null
+    let finalHodlers = null
+    let selectedTableKeys = null
+    let tokenTotal = 0
 
     try {
       // If user selects the current value, do nothing
@@ -89,11 +70,13 @@ const _BatchTransactionsForm = () => {
       setState({ loading: true })
       tmpResult = await setupHodlers(desoData.profile, distributeTo)
 
-      allHodlers = tmpResult.allHodlers
-      coinTotal = tmpResult.coinTotal
+      finalHodlers = tmpResult.finalHodlers
+      tokenTotal = tmpResult.tokenTotal
+      selectedTableKeys = tmpResult.selectedTableKeys
 
       // Update State
-      setState({ distributeTo, allHodlers, finalHodlers: allHodlers, coinTotal })
+      console.log('handleDistributeTo', distributeTo, finalHodlers, tokenTotal, selectedTableKeys)
+      setState({ distributeTo, finalHodlers, tokenTotal, selectedTableKeys })
     } catch (e) {
       message.error(e)
     }
@@ -148,6 +131,11 @@ const _BatchTransactionsForm = () => {
               </Row>
             </Col>
           </Row>
+          {state.distributeTo ? (
+            <Row>
+              <TableData desoData={desoData} state={state} onSetState={setState} />
+            </Row>
+          ) : null}
         </ContainerCard>
       </Col>
     </Row>

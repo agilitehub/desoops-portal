@@ -8,7 +8,7 @@ import Login from './modules/Login'
 
 // Utils
 import { setDeSoData, resetState } from './reducer'
-import { getDeSoData } from './lib/deso-controller'
+import { generateProfilePicUrl, getDeSoData } from './lib/deso-controller'
 import Enums from './lib/enums'
 import Spinner from './reusables/components/Spinner'
 import Toolbar from './modules/Toolbar'
@@ -35,7 +35,7 @@ const App = () => {
         tmpDeSoData.profile = {
           ...tmpDeSoData.profile,
           username: currentUser.ProfileEntryResponse.Username,
-          profilePicUrl: `https://blockproducer.deso.org/api/v0/get-single-profile-picture/${tmpDeSoData.profile.publicKey}`,
+          profilePicUrl: generateProfilePicUrl(currentUser.PublicKeyBase58Check),
           desoBalance,
           desoBalanceUSD,
           totalFollowing: currentUser.PublicKeysBase58CheckFollowedByUser.length
@@ -50,7 +50,6 @@ const App = () => {
     }
 
     if (currentUser) {
-      console.log('currentUser', currentUser)
       if (!userReturned) {
         setUserReturned(true)
         getDeSoDataHook()

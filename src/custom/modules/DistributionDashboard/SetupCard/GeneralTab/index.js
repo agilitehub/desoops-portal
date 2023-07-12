@@ -36,16 +36,14 @@ const GenenralTab = ({ state, onDistributeTo, onDistributionType, onTokenToUse, 
 
         for (const entry of desoProfile.daoHodlings) {
           index++
-          tmpDAOBalance = parseInt(entry.BalanceNanosUint256) / Enums.values.NANO_VALUE / Enums.values.NANO_VALUE
-          tmpDAOBalance = Math.floor(tmpDAOBalance)
 
           tmpTokenOwnerList.push({
             index: index.toString(),
-            key: entry.ProfileEntryResponse.PublicKeyBase58Check,
-            value: entry.ProfileEntryResponse.PublicKeyBase58Check,
-            username: entry.ProfileEntryResponse.Username,
-            imageUrl: `https://blockproducer.deso.org/api/v0/get-single-profile-picture/${entry.ProfileEntryResponse.PublicKeyBase58Check}`,
-            balance: tmpDAOBalance
+            key: entry.publicKey,
+            value: entry.publicKey,
+            username: entry.username,
+            imageUrl: entry.profilePicUrl,
+            balance: entry.tokenBalance
           })
         }
 
@@ -62,16 +60,14 @@ const GenenralTab = ({ state, onDistributeTo, onDistributionType, onTokenToUse, 
 
         for (const entry of desoProfile.ccHodlings) {
           index++
-          tmpCCBalance = entry.BalanceNanos / Enums.values.NANO_VALUE
-          tmpCCBalance = Math.floor(tmpCCBalance * 10000) / 10000
 
           tmpTokenOwnerList.push({
             index: index.toString(),
-            key: entry.ProfileEntryResponse.PublicKeyBase58Check,
-            value: entry.ProfileEntryResponse.PublicKeyBase58Check,
-            username: entry.ProfileEntryResponse.Username,
-            imageUrl: `https://blockproducer.deso.org/api/v0/get-single-profile-picture/${entry.ProfileEntryResponse.PublicKeyBase58Check}`,
-            balance: tmpCCBalance
+            key: entry.publicKey,
+            value: entry.publicKey,
+            username: entry.username,
+            imageUrl: entry.profilePicUrl,
+            balance: entry.tokenBalance
           })
         }
 

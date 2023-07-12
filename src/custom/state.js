@@ -9,8 +9,6 @@ const desoData = {
     ccBalance: 0,
     totalFollowers: 0,
     totalFollowing: 0,
-    totalDAOHodlers: 0,
-    totalCCHodlers: 0,
     followers: [],
     following: [],
     daoHodlers: [],

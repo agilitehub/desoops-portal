@@ -3,14 +3,11 @@ import Axios from 'agilite-utils/axios'
 // Utils
 import Enums from '../../lib/enums'
 import { getDeSo } from '../../lib/deso-controller'
-import { hexToInt } from '../../lib/utils'
 
 export const setupHodlers = (desoProfile, distributeTo) => {
   return new Promise((resolve, reject) => {
-    let allHodlers = []
+    const selectedTableKeys = []
     let tmpHodlers = null
-    let coinAmount = 0
-    let coinTotal = 0
 
     try {
       // If user selects DAO or Creator Coin Hodlers, we need to get the relevant users
@@ -23,35 +20,14 @@ export const setupHodlers = (desoProfile, distributeTo) => {
           break
       }
 
-      // Calculate Coin Total and valid Hodlers
-      tmpHodlers.map((entry) => {
-        // Ignore entry if it does not have a Profile OR if it is the same as current logged in user
-        if (entry.ProfileEntryResponse && entry.ProfileEntryResponse.Username !== desoProfile.username) {
-          // Set Defaults
-          entry.status = Enums.values.EMPTY_STRING
+      // Default all entries in Table to be selected
+      for (let i = 0; i < tmpHodlers.length; i++) {
+        selectedTableKeys.push(tmpHodlers[i].username)
+      }
 
-          // Determine Number of Coins based on the Coin Type (value)
-          if (distributeTo === Enums.values.DAO) {
-            coinAmount = entry.BalanceNanosUint256
-            coinAmount = hexToInt(coinAmount)
-            coinAmount = coinAmount / Enums.values.NANO_VALUE / Enums.values.NANO_VALUE
-          } else {
-            coinAmount = entry.BalanceNanos
-            coinAmount = coinAmount / Enums.values.NANO_VALUE
-          }
-
-          entry.coinAmount = coinAmount
-          entry.percentOwnership = coinTotal += coinAmount
-          allHodlers.push(entry)
-        }
-
-        return null
-      })
-
-      calculatePercentages(allHodlers, coinTotal, 'desc', 3)
+      calculatePercentages(tmpHodlers)
         .then((result) => {
-          allHodlers = result
-          resolve({ allHodlers, coinTotal })
+          resolve({ finalHodlers: result.hodlers, selectedTableKeys, tokenTotal: result.tokenTotal })
         })
         .catch((e) => {
           reject(e)
@@ -62,12 +38,61 @@ export const setupHodlers = (desoProfile, distributeTo) => {
   })
 }
 
-const calculatePercentages = (hodlers, coinTotal, sortOrder = 'desc', decimalPlaces) => {
+export const updateHodlers = (hodlers, selectedTableKeys, conditions = {}) => {
   return new Promise((resolve, reject) => {
+    let tmpHodlers = null
+    let isActive = true
+
+    try {
+      // If the length of `selectedTableKeys` is less than the length of the `hodlers` array,
+      // disable entries from the `hodlers` array where there's no match in the `selectedTableKeys` array.
+      tmpHodlers = hodlers.map((entry) => {
+        if (!selectedTableKeys.includes(entry.username)) {
+          isActive = false
+        } else {
+          isActive = true
+        }
+
+        return { ...entry, isActive }
+      })
+
+      calculatePercentages(tmpHodlers)
+        .then((result) => {
+          resolve({ finalHodlers: result.hodlers, selectedTableKeys, tokenTotal: result.tokenTotal })
+        })
+        .catch((e) => {
+          reject(e)
+        })
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+export const calculatePercentages = (hodlers, sortOrder = 'desc') => {
+  return new Promise((resolve, reject) => {
+    let percentOwnership = 0
+    let percentOwnershipLabel = ''
+    let tokenBalanceLabel = ''
+
+    const tokenTotal = hodlers.reduce((total, entry) => {
+      // We only want to calculate the percentage for active entries
+      if (!entry.isActive) return total
+      return total + entry.tokenBalance
+    }, 0)
+
     const result = hodlers.map((entry) => {
-      const percentage = (entry.coinAmount / coinTotal) * 100
-      const formattedCoinAmount = decimalPlaces != null ? entry.coinAmount.toFixed(decimalPlaces) : entry.coinAmount
-      return { ...entry, percentage, coinAmount: formattedCoinAmount }
+      if (entry.isActive) {
+        percentOwnership = (entry.tokenBalance / tokenTotal) * 100
+        percentOwnershipLabel = (Math.ceil(percentOwnership * 1000) / 1000).toString()
+        tokenBalanceLabel = entry.tokenBalance.toString()
+      } else {
+        percentOwnership = 0
+        percentOwnershipLabel = '0'
+        tokenBalanceLabel = '0'
+      }
+
+      return { ...entry, percentOwnership, percentOwnershipLabel, tokenBalanceLabel }
     })
 
     if (sortOrder === 'asc') {
@@ -76,7 +101,7 @@ const calculatePercentages = (hodlers, coinTotal, sortOrder = 'desc', decimalPla
       result.sort((a, b) => b.percentage - a.percentage)
     }
 
-    resolve(result)
+    resolve({ hodlers: result, tokenTotal })
   })
 }
 
