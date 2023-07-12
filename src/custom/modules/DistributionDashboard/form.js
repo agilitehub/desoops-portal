@@ -10,7 +10,7 @@ import QuickActionsCard from './QuickActionsCard'
 import StepOneCard from './StepOneCard'
 import StepTwoCard from './StepTwoCard'
 import StepThreeCard from './StepThreeCard'
-import WalletOverview from './WalletOverview'
+import WalletOverviewCard from './WalletOverviewCard'
 
 // Custom Utils
 import Enums from '../../lib/enums'
@@ -90,7 +90,7 @@ const _BatchTransactionsForm = () => {
             <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12}>
               <Row>
                 <Col span={24}>
-                  <WalletOverview desoProfile={desoData.profile} />
+                  <WalletOverviewCard desoProfile={desoData.profile} />
                 </Col>
               </Row>
               <Divider style={styleParams.dividerStyle} />

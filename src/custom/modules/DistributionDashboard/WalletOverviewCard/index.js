@@ -1,7 +1,7 @@
 import React from 'react'
 import { Card, Row, Col } from 'antd'
 
-const WalletOverview = ({ desoProfile }) => {
+const WalletOverviewCard = ({ desoProfile }) => {
   const { desoBalance, desoBalanceUSD, daoBalance, ccBalance } = desoProfile
 
   // Format Values
@@ -50,4 +50,4 @@ const WalletOverview = ({ desoProfile }) => {
   )
 }
 
-export default WalletOverview
+export default WalletOverviewCard
