@@ -1,5 +1,5 @@
 import React, { useReducer } from 'react'
-import { Card, Button, Dropdown, message, Modal, Space, Row, Col, Divider } from 'antd'
+import { Card, Button, Dropdown, message, Modal, Space, Row, Col, Divider, Tooltip } from 'antd'
 import { DownOutlined, UserOutlined, ReloadOutlined, CopyOutlined } from '@ant-design/icons'
 import { copyTextToClipboard } from '../../../lib/utils'
 import RandomizeDialogContent from './RandomizeDialog'
@@ -163,58 +163,59 @@ const QuickActionsCard = ({ desoData }) => {
   ]
 
   return (
-    <Card title='Quick Actions' size='small'>
-      <Row>
-        <Col xs={24} md={10}>
-          <Button
-            danger
-            style={{ backgroundColor: 'white' }}
-            icon={<ReloadOutlined />}
-            loading={state.resetLoading}
-            disabled={state.resetLoading}
-            onClick={handleResetDashboard}
-          >
-            Reset Dashboard
-          </Button>
+    <Card title='Quick Actions' size='small' bodyStyle={{ height: 75 }}>
+      <Row gutter={[16, 16]} style={{ textAlign: 'center' }}>
+        <Col span={8}>
+          <Col span={24}>
+            <Tooltip title='Reset the Distribution Dashboard to start from the beginning.'>
+              <Button
+                shape='circle'
+                danger
+                style={{ backgroundColor: 'white' }}
+                icon={<ReloadOutlined />}
+                loading={state.resetLoading}
+                disabled={state.resetLoading}
+                onClick={handleResetDashboard}
+              />
+              <div style={{ color: '#DC3847' }}>Reset</div>
+            </Tooltip>
+          </Col>
         </Col>
-        <Col xs={24} md={14}>
-          <Button
-            style={{ color: 'orange', borderColor: 'orange', backgroundColor: 'white' }}
-            icon={<ReloadOutlined />}
-            loading={state.refreshLoading}
-            disabled={state.refreshLoading}
-            onClick={handleRefreshDashboardValues}
-          >
-            Refresh Dashboard
-          </Button>
+        <Col span={8}>
+          <Col span={24}>
+            <Tooltip title='Refresh all values being used in Distribution Dashboard, including token amounts, holders, etc.'>
+              <Button
+                shape='circle'
+                style={{ color: '#FFC20E', borderColor: '#FFC20E', backgroundColor: 'white' }}
+                icon={<ReloadOutlined />}
+                loading={state.refreshLoading}
+                disabled={state.refreshLoading}
+                onClick={handleRefreshDashboardValues}
+              />
+              <div style={{ color: '#FFC20E' }}>Refresh</div>
+            </Tooltip>
+          </Col>
         </Col>
-      </Row>
-      <Divider style={styleParams.dividerStyle} />
-      <Row>
-        <Col xs={24}>
-          <Dropdown
-            menu={{ items: dropdownItems, onClick: handleCopyToClipboard }}
-            icon={<DownOutlined />}
-            loading={state.ctcLoading}
-            disabled={state.ctcLoading}
-          >
-            <Button
-              style={{ color: 'purple', borderColor: 'purple', backgroundColor: 'white' }}
-              loading={state.ctcLoading}
-              icon={
-                state.ctcLoading ? (
-                  <ReloadOutlined style={{ marginRight: 10 }} />
-                ) : (
-                  <CopyOutlined style={{ marginRight: 10 }} />
-                )
-              }
-            >
-              <Space>
-                Copy To Clipboard
-                <DownOutlined />
-              </Space>
-            </Button>
-          </Dropdown>
+        <Col span={8}>
+          <Col span={24}>
+            <Tooltip title='Copy various user groups to your Clipboard'>
+              <Dropdown
+                menu={{ items: dropdownItems, onClick: handleCopyToClipboard }}
+                icon={<DownOutlined />}
+                loading={state.ctcLoading}
+                disabled={state.ctcLoading}
+                trigger={['click']}
+              >
+                <Button
+                  shape='circle'
+                  style={{ color: '#800080', borderColor: '#800080' }}
+                  icon={<ReloadOutlined />}
+                  loading={state.ctcLoading}
+                />
+              </Dropdown>
+              <div style={{ color: '#800080' }}>Copy</div>
+            </Tooltip>
+          </Col>
         </Col>
       </Row>
       {/* <Divider style={styleParams.dividerStyle} />

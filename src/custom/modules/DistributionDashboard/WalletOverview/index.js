@@ -11,7 +11,7 @@ const WalletOverview = ({ desoProfile }) => {
   const formattedCCBalance = Math.floor(ccBalance * 10000) / 10000
 
   return (
-    <Card title='Wallet Overview' size='small'>
+    <Card title='Wallet Overview' size='small' bodyStyle={{ height: 75 }}>
       <Row gutter={[16, 16]} style={{ textAlign: 'center' }}>
         <Col span={8}>
           <Col span={24}>
