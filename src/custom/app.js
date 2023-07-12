@@ -23,15 +23,20 @@ const App = () => {
   useEffect(() => {
     const getDeSoDataHook = async () => {
       let tmpDeSoData = null
+      let desoBalance = 0
+      let desoBalanceUSD = 0
 
       try {
         tmpDeSoData = await getDeSoData(currentUser.PublicKeyBase58Check, desoData)
+        desoBalance = currentUser.ProfileEntryResponse.DESOBalanceNanos / Enums.values.NANO_VALUE
+        desoBalanceUSD = desoBalance * tmpDeSoData.desoPrice
 
         tmpDeSoData.profile = {
           ...tmpDeSoData.profile,
           username: currentUser.ProfileEntryResponse.Username,
           profilePicUrl: currentUser.ProfileEntryResponse.ExtraData.LargeProfilePicURL,
-          desoBalance: currentUser.ProfileEntryResponse.DESOBalanceNanos / Enums.values.NANO_VALUE,
+          desoBalance,
+          desoBalanceUSD,
           totalFollowing: currentUser.PublicKeysBase58CheckFollowedByUser.length
         }
 

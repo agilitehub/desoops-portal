@@ -10,6 +10,7 @@ import QuickActionsCard from './QuickActionsCard'
 import StepOneCard from './StepOneCard'
 import StepTwoCard from './StepTwoCard'
 import StepThreeCard from './StepThreeCard'
+import WalletOverview from './WalletOverview'
 
 // Custom Utils
 import Enums from '../../lib/enums'
@@ -78,7 +79,7 @@ const _BatchTransactionsForm = () => {
   }
 
   const handleDistributionType = (distributionType) => {
-    setState({ distributionType })
+    setState({ distributionType, distributionAmount: Enums.values.EMPTY_STRING })
   }
 
   return (
@@ -87,6 +88,12 @@ const _BatchTransactionsForm = () => {
         <ContainerCard title={'Distribution Dashboard'}>
           <Row gutter={12}>
             <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12}>
+              <Row>
+                <Col span={24}>
+                  <WalletOverview desoProfile={desoData.profile} />
+                </Col>
+              </Row>
+              <Divider style={styleParams.dividerStyle} />
               <Row>
                 <Col span={24}>
                   <StepOneCard

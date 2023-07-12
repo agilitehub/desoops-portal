@@ -4,6 +4,7 @@ const desoData = {
     username: '',
     profilePicUrl: '',
     desoBalance: 0,
+    desoBalanceUSD: 0,
     daoBalance: 0,
     ccBalance: 0,
     totalFollowers: 0,

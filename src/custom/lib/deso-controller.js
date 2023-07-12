@@ -90,7 +90,7 @@ export const getDeSoData = (publicKey, currentState) => {
         })
 
         tmpData = ccData.Hodlers.find((entry) => entry.ProfileEntryResponse.PublicKeyBase58Check === publicKey)
-        if (tmpData) ccBalance = tmpData.BalanceNanos
+        if (tmpData) ccBalance = tmpData.BalanceNanos / Enums.values.NANO_VALUE
 
         ccHodlers = ccData.Hodlers.filter((entry) => entry.ProfileEntryResponse.PublicKeyBase58Check !== publicKey)
 
