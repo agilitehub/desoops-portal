@@ -9,15 +9,6 @@ import { hexToInt } from '../../../lib/utils'
 import { RightCircleOutlined, SendOutlined } from '@ant-design/icons'
 import { size } from 'lodash'
 
-const initialState = {
-  loading: false,
-  isExecuting: false,
-  distributeTo: Enums.values.EMPTY_STRING,
-  distributionType: Enums.values.EMPTY_STRING,
-  distributionAmount: Enums.values.EMPTY_STRING,
-  inputAmountLabel: '$DESO'
-}
-
 const styleParams = {
   labelColXS: 12,
   labelColSM: 12,
@@ -30,111 +21,8 @@ const styleParams = {
   dividerStyle: { margin: '7px 0' }
 }
 
-const reducer = (state, newState) => ({ ...state, ...newState })
-
-const StepThreeCard = ({ desoData }) => {
+const StepThreeCard = ({ desoData, state, onSetState }) => {
   const { token } = theme.useToken()
-  const [state, setState] = useReducer(reducer, initialState)
-
-  const resetState = () => {
-    setState(initialState)
-  }
-
-  const handleDistributeToChange = async (value) => {
-    let tmpHodlers = []
-    let finalHodlers = []
-    let tmpCoinTotal = 0
-    let isDAOCoin = null
-    let noOfCoins = 0
-    let tmpRowKeys = []
-
-    try {
-      // If user selects the current value, do nothing
-      if (value === state.distributeTo) return
-
-      // First Reset Dashboard State
-      resetState()
-
-      // Then, if user selects NFT or Post, no extra work is needed
-      if (!value || value === Enums.values.NFT || value === Enums.values.POST) return
-
-      setState({ loading: true })
-
-      // If user selects DAO or Creator Coin Hodlers, we need to get the relevant users
-      isDAOCoin = value === Enums.values.DAO
-      tmpHodlers = desoData.profile.daoHodlers
-
-      if (tmpHodlers.Hodlers.length > 0) {
-        // Determine Coin Total and valid Hodlers
-        tmpHodlers.Hodlers.map((entry) => {
-          // Ignore entry if it does not have a Profile OR if it is the same as current logged in user
-          if (entry.ProfileEntryResponse && entry.ProfileEntryResponse.Username !== desoData.profile.username) {
-            // Set Defaults
-            entry.status = Enums.values.EMPTY_STRING
-
-            // Determine Number of Coins
-            if (isDAOCoin) {
-              noOfCoins = entry.BalanceNanosUint256
-              noOfCoins = hexToInt(noOfCoins)
-              noOfCoins = noOfCoins / Enums.values.NANO_VALUE / Enums.values.NANO_VALUE
-            } else {
-              noOfCoins = entry.BalanceNanos
-              noOfCoins = noOfCoins / Enums.values.NANO_VALUE
-            }
-
-            entry.noOfCoins = noOfCoins
-            tmpCoinTotal += noOfCoins
-            finalHodlers.push(entry)
-          }
-
-          return null
-        })
-
-        tmpRowKeys = finalHodlers.map((hodler) => hodler.ProfileEntryResponse.Username)
-        // updateHolderAmounts(finalHodlers.concat(), tmpCoinTotal, 0, tmpRowKeys, tmpCoinTotal)
-      }
-
-      // Update State
-      setState({ distributeTo: value })
-
-      // setHodlers(finalHodlers)
-      // setOriginalHodlers(finalHodlers)
-      // setSelectedRows(finalHodlers)
-      // setSelectedRowKeys(tmpRowKeys)
-      // setOriginalCoinTotal(tmpCoinTotal)
-    } catch (e) {
-      message.error(e)
-    }
-
-    setState({ loading: false })
-  }
-
-  const handleDistributionTypeChange = (value) => {
-    // const tmpCoinTotal = calculateCoinTotal(selectedRows)
-    // setPaymentType(value)
-    // setAmount('')
-    // if (state.distributeTo === Enums.values.NFT) {
-    //   handleGetNFT(nftUrl, '')
-    // } else if (state.distributeTo === Enums.values.POST) {
-    //   handleGetPost(postUrl, '')
-    // } else {
-    //   updateHolderAmounts(hodlers.concat(), tmpCoinTotal, 0, selectedRowKeys, originalCoinTotal)
-    // }
-    // const generatePaymentTypeFieldTitle = () => {
-    //   switch (paymentType) {
-    //     case Enums.values.EMPTY_STRING:
-    //       return ''
-    //     case Enums.values.DESO:
-    //       return '$DESO'
-    //     case Enums.values.DAO:
-    //       return 'DAO'
-    //     case Enums.values.CREATOR:
-    //       return 'Creator Coin'
-    //     default:
-    //       break
-    //   }
-    // }
-  }
 
   return (
     <Card title='Step 3: Distribution Summary' size='small'>
@@ -177,6 +65,33 @@ const StepThreeCard = ({ desoData }) => {
           <span>$0.02 (~0.02 $DESO)</span>
         </Col>
       </Row>
+      {state.distributionType !== Enums.values.EMPTY_STRING ? (
+        <>
+          <Divider style={styleParams.dividerStyle} />
+          <Row>
+            <Col
+              xs={styleParams.labelColXS}
+              sm={styleParams.labelColSM}
+              md={styleParams.labelColMD}
+              style={styleParams.labelColStyle}
+            >
+              <span style={{ fontWeight: 'bold' }}>Amount to distribute:</span>
+            </Col>
+            <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
+              <InputNumber
+                addonBefore={state.distributionType}
+                // disabled={state.distributeTo && state.distributionType && !state.isExecuting ? false : true}
+                placeholder='Enter amount'
+                value={state.distributionAmount}
+                style={{ width: 250 }}
+                onChange={(distributionAmount) => {
+                  onSetState({ distributionAmount })
+                }}
+              />
+            </Col>
+          </Row>
+        </>
+      ) : null}
       <Divider style={{ margin: '10px 0' }} />
       <Row justify='center'>
         <Col>

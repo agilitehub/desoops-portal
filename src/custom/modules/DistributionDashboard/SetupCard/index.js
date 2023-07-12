@@ -2,6 +2,7 @@ import React from 'react'
 import { Card, Tabs, Button } from 'antd'
 import GeneralTab from './GeneralTab'
 import RulesTab from './RulesTab'
+import Enums from '../../../lib/enums'
 
 const { TabPane } = Tabs
 
@@ -12,7 +13,9 @@ const SetupCard = ({ desoData, state, onDistributeTo, onDistributionType, onToke
         defaultActiveKey='1'
         size='small'
         tabBarExtraContent={
-          <Button style={{ color: '#188EFF', borderColor: '#188EFF', backgroundColor: 'white' }}>Select NFT</Button>
+          state.distributeTo === Enums.values.NFT ? (
+            <Button style={{ color: '#188EFF', borderColor: '#188EFF', backgroundColor: 'white' }}>Select NFT</Button>
+          ) : null
         }
       >
         <TabPane tab='General' key='1'>
@@ -25,9 +28,11 @@ const SetupCard = ({ desoData, state, onDistributeTo, onDistributionType, onToke
             onTokenToUse={onTokenToUse}
           />
         </TabPane>
-        <TabPane tab='Rules' key='2'>
-          <RulesTab desoData={desoData} />
-        </TabPane>
+        {state.rulesEnabled ? (
+          <TabPane tab='Rules' key='2'>
+            <RulesTab desoData={desoData} />
+          </TabPane>
+        ) : null}
       </Tabs>
     </Card>
   )

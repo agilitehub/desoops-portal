@@ -38,7 +38,7 @@ const GenenralTab = ({ state, onDistributeTo, onDistributionType, onTokenToUse, 
         for (const entry of desoProfile.daoHodlings) {
           index++
           tmpDAOBalance = parseInt(entry.BalanceNanosUint256) / Enums.values.NANO_VALUE / Enums.values.NANO_VALUE
-          tmpDAOBalance = Math.floor(tmpDAOBalance * 10000) / 10000
+          tmpDAOBalance = Math.floor(tmpDAOBalance)
 
           tmpTokenOwnerList.push({
             index: index.toString(),
@@ -167,43 +167,16 @@ const GenenralTab = ({ state, onDistributeTo, onDistributionType, onTokenToUse, 
                             src={entry.imageUrl}
                             width={20}
                             height={20}
-                            style={{ borderRadius: '50%' }}
+                            style={{ borderRadius: '50%', marginTop: -3 }}
                             fallback='https://openfund.com/images/ghost-profile-image.svg'
                             preview={false}
                           />
-                          {entry.username}
+                          {`${entry.username} (~${entry.balance})`}
                         </Space>
                       </Select.Option>
                     )
                   })}
               </Select>
-            </Col>
-          </Row>
-        </>
-      ) : null}
-      {state.distributionType !== Enums.values.EMPTY_STRING ? (
-        <>
-          <Divider style={styleParams.dividerStyle} />
-          <Row>
-            <Col
-              xs={styleParams.labelColXS}
-              sm={styleParams.labelColSM}
-              md={styleParams.labelColMD}
-              style={styleParams.labelColStyle}
-            >
-              <span style={{ fontWeight: 'bold' }}>Amount to distribute:</span>
-            </Col>
-            <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
-              <InputNumber
-                addonBefore={state.distributionType}
-                // disabled={state.distributeTo && state.distributionType && !state.isExecuting ? false : true}
-                placeholder='Enter amount'
-                value={state.distributionAmount}
-                style={{ width: 250 }}
-                onChange={(distributionAmount) => {
-                  onSetState({ distributionAmount })
-                }}
-              />
             </Col>
           </Row>
         </>

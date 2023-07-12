@@ -1,4 +1,4 @@
-import React, { memo, useReducer } from 'react'
+import React, { memo, useEffect, useReducer } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 // UI Components
@@ -25,6 +25,7 @@ const initialState = {
   distributeTo: Enums.values.EMPTY_STRING,
   distributionType: Enums.values.EMPTY_STRING,
   distributionAmount: Enums.values.EMPTY_STRING,
+  rulesEnabled: false,
   tokenToUse: Enums.values.EMPTY_STRING,
   allHodlers: [],
   finalHodlers: []
@@ -43,6 +44,24 @@ const _BatchTransactionsForm = () => {
   const resetState = () => {
     setState(initialState)
   }
+
+  // Use a useEffect hook to determine if state.rulesEnabled should be True or False
+  // rulesEnabled state is dependent on state.distributeTo, state.distributionType, and state.tokenToUse having values
+  useEffect(() => {
+    let rulesEnabled = false
+
+    if (state.distributeTo && state.distributionType) {
+      if (state.distributionType === Enums.paymentTypes.DAO || state.distributionType === Enums.paymentTypes.CREATOR) {
+        console.log('1', state.tokenToUse)
+        if (state.tokenToUse) rulesEnabled = true
+      } else {
+        console.log('2', state.distributionType)
+        rulesEnabled = true
+      }
+    }
+
+    if (state.rulesEnabled !== rulesEnabled) setState({ rulesEnabled })
+  }, [state.distributeTo, state.distributionType, state.tokenToUse]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDistributeTo = async (distributeTo) => {
     let tmpResult = []
@@ -120,7 +139,7 @@ const _BatchTransactionsForm = () => {
               <Divider style={styleParams.dividerStyle} />
               <Row>
                 <Col span={24}>
-                  <StepThreeCard desoData={desoData} />
+                  <StepThreeCard desoData={desoData} state={state} onSetState={setState} />
                 </Col>
               </Row>
             </Col>
