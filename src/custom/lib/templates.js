@@ -2,6 +2,7 @@
 export const initDeSoUserModel = () => {
   return {
     isActive: true,
+    isVisible: true,
     publicKey: '',
     username: '',
     profilePicUrl: '',
@@ -12,7 +13,7 @@ export const initDeSoUserModel = () => {
     estimatedPaymentUSD: 0,
     estimatedPaymentLabel: '0',
     percentOwnership: 0,
-    perceOwnershipLabel: ''
+    percentOwnershipLabel: ''
   }
 }
 

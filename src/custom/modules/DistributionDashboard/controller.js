@@ -38,31 +38,34 @@ export const setupHodlers = (desoProfile, distributeTo) => {
   })
 }
 
-export const updateHodlers = (hodlers, selectedTableKeys, conditions = {}) => {
-  return new Promise((resolve, reject) => {
-    let tmpHodlers = null
-    let isActive = true
+export const updateHodlers = (hodlers, selectedTableKeys, conditions) => {
+  return new Promise(async (resolve, reject) => {
+    let result = null
 
     try {
-      // If the length of `selectedTableKeys` is less than the length of the `hodlers` array,
-      // disable entries from the `hodlers` array where there's no match in the `selectedTableKeys` array.
-      tmpHodlers = hodlers.map((entry) => {
+      // If conditions are passed in, either as an empty Object or a populated Object, we need to first process the `hodlers` array
+      // If conditions is an empty object, we need to set all entries to be visible by populating the `isVisible` property
+      // If conditions is a populated object, we need to set all entries to be inactive by populating the `isVisible` property...
+      // ...by using conditions.filterAmountIs to check if the tokenBalance in each entry is >, <, >=, or <= conditions.filterAmount
+      if (conditions) {
+        result = await processHodlerConditions(hodlers, conditions)
+        // Hodlers does not need to be set here as it is already set in processHodlerConditions
+        selectedTableKeys = result.selectedTableKeys
+      }
+
+      // Disable entries from the `hodlers` array where there's no match in the `selectedTableKeys` array.
+      hodlers = hodlers.map((entry) => {
         if (!selectedTableKeys.includes(entry.username)) {
-          isActive = false
+          entry.isActive = false
         } else {
-          isActive = true
+          entry.isActive = true
         }
 
-        return { ...entry, isActive }
+        return entry
       })
 
-      calculatePercentages(tmpHodlers)
-        .then((result) => {
-          resolve({ finalHodlers: result.hodlers, selectedTableKeys, tokenTotal: result.tokenTotal })
-        })
-        .catch((e) => {
-          reject(e)
-        })
+      result = await calculatePercentages(hodlers)
+      resolve({ finalHodlers: hodlers, selectedTableKeys, tokenTotal: result.tokenTotal })
     } catch (e) {
       reject(e)
     }
@@ -81,8 +84,8 @@ export const calculatePercentages = (hodlers, sortOrder = 'desc') => {
       return total + entry.tokenBalance
     }, 0)
 
-    const result = hodlers.map((entry) => {
-      if (entry.isActive) {
+    hodlers.map((entry) => {
+      if (entry.isActive && entry.tokenBalance > 0) {
         percentOwnership = (entry.tokenBalance / tokenTotal) * 100
         percentOwnershipLabel = (Math.ceil(percentOwnership * 1000) / 1000).toString()
         tokenBalanceLabel = entry.tokenBalance.toString()
@@ -92,16 +95,70 @@ export const calculatePercentages = (hodlers, sortOrder = 'desc') => {
         tokenBalanceLabel = '0'
       }
 
-      return { ...entry, percentOwnership, percentOwnershipLabel, tokenBalanceLabel }
+      entry.percentOwnership = percentOwnership
+      entry.percentOwnershipLabel = percentOwnershipLabel
+      entry.tokenBalanceLabel = tokenBalanceLabel
+
+      return null
     })
 
     if (sortOrder === 'asc') {
-      result.sort((a, b) => a.percentage - b.percentage)
+      hodlers.sort((a, b) => a.percentage - b.percentage)
     } else if (sortOrder === 'desc') {
-      result.sort((a, b) => b.percentage - a.percentage)
+      hodlers.sort((a, b) => b.percentage - a.percentage)
     }
 
-    resolve({ hodlers: result, tokenTotal })
+    resolve({ hodlers, tokenTotal })
+  })
+}
+
+const processHodlerConditions = (hodlers, conditions) => {
+  return new Promise((resolve, reject) => {
+    let selectedTableKeys = []
+
+    try {
+      console.log('processHodlerConditions', conditions)
+      if (!conditions.filterUsers || conditions.filterAmount === '') {
+        // Step 2: If `conditions` is an empty object, set the `isVisible` property of all entries in the `hodlers` array to `true`.
+        hodlers.forEach((hodler) => {
+          hodler.isVisible = true
+        })
+
+        // Reset the `selectedTableKeys` array to include all entries in the `hodlers` array
+        selectedTableKeys = hodlers.map((hodler) => hodler.username)
+      } else {
+        // Step 3: If filterUsers is true, first default the `isVisible` property of all entries in the `hodlers` array to `false`.
+        hodlers.forEach((hodler) => {
+          hodler.isVisible = false
+        })
+
+        // Step 4: Set the `isVisible` property of each entry in the `hodlers` array based on whether the `tokenBalance` property is greater than, less than, equal to, or not equal to `conditions.filterAmount`.
+        hodlers.forEach((hodler) => {
+          switch (conditions.filterAmountIs) {
+            case '>':
+              hodler.isVisible = hodler.tokenBalance > conditions.filterAmount
+              break
+            case '<':
+              hodler.isVisible = hodler.tokenBalance < conditions.filterAmount
+              break
+            case '>=':
+              hodler.isVisible = hodler.tokenBalance >= conditions.filterAmount
+              break
+            case '<=':
+              hodler.isVisible = hodler.tokenBalance <= conditions.filterAmount
+              break
+          }
+
+          if (hodler.isVisible) {
+            selectedTableKeys.push(hodler.username)
+          }
+        })
+      }
+      console.log(hodlers, selectedTableKeys)
+      resolve({ hodlers, selectedTableKeys })
+    } catch (e) {
+      reject(e)
+    }
   })
 }
 

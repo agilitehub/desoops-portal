@@ -39,9 +39,7 @@ const App = () => {
 ReactDOM.render(
   <Provider store={Store}>
     <DeSoIdentityProvider>
-      <StrictMode>
-        <App />
-      </StrictMode>
+      <App />
     </DeSoIdentityProvider>
   </Provider>,
   document.getElementById(Enums.values.DIV_ROOT)

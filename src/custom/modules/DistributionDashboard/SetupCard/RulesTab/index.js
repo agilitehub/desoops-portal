@@ -3,7 +3,8 @@
 // Use Ant Design's Row and Col Components to create a 2x2 grid
 
 import React from 'react'
-import { Row, Col, Select, Divider, InputNumber, Radio, Switch } from 'antd'
+import { Row, Col, Select, Divider, InputNumber, Radio, Switch, message } from 'antd'
+import { updateHodlers } from '../../controller'
 
 const styleParams = {
   col1XS: 24,
@@ -17,7 +18,68 @@ const styleParams = {
   dividerStyle: { margin: '7px 0' }
 }
 
-const RulesTab = ({ desoData, state, onSetState }) => {
+const RulesTab = ({ state, onSetState }) => {
+  const handleFilterUsers = async (propType, propValue) => {
+    // propType could be either 'filterUsers' or 'filterAmountIs' or 'filterAmount'
+    // propValue could be either true/false or '>'/'<' or a number based on propType
+    // if filterUsers is true, filterAmount is a valid number, and filterAmountIs is not empty, then we can run the updateHolders function
+    // if filterUsers is false, then we can run the updateHolders function
+    // The final step is to update the state with with either the current state values or the new values from updateHolders and propType/propValue
+
+    let newState = {}
+    let runUpdateHolders = false
+    let tmpHodlers = null
+    let tmpSelectedTableKeys = null
+
+    try {
+      if (propType === 'filterUsers') {
+        newState.filterUsers = propValue
+      } else {
+        newState.filterUsers = state.filterUsers
+      }
+
+      if (propType === 'filterAmountIs') {
+        newState.filterAmountIs = propValue
+      } else {
+        newState.filterAmountIs = state.filterAmountIs
+      }
+
+      if (propType === 'filterAmount') {
+        newState.filterAmount = propValue
+      } else {
+        newState.filterAmount = state.filterAmount
+      }
+
+      // If state.filterUsers is true and newState.filterUsers is set to false, then we can run updateHolders
+      if (state.filterUsers && !newState.filterUsers) {
+        runUpdateHolders = true
+        newState.filterAmount = ''
+        newState.filterAmountIs = '>'
+      } else if (newState.filterUsers) {
+        runUpdateHolders = true
+      }
+
+      if (runUpdateHolders) {
+        tmpHodlers = Array.from(state.finalHodlers)
+        tmpSelectedTableKeys = Array.from(state.selectedTableKeys)
+
+        const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(
+          tmpHodlers,
+          tmpSelectedTableKeys,
+          newState
+        )
+
+        newState.finalHodlers = finalHodlers
+        newState.selectedTableKeys = selectedTableKeys
+        newState.tokenTotal = tokenTotal
+      }
+
+      onSetState(newState)
+    } catch (e) {
+      message.error(e.message)
+    }
+  }
+
   return (
     <>
       <Row>
@@ -41,7 +103,7 @@ const RulesTab = ({ desoData, state, onSetState }) => {
       <Row>
         <Col xs={styleParams.col1XS} style={{ marginBottom: 5 }}>
           <span style={{ fontSize: 16 }}>
-            <b>Filter users based on Coins/Tokens owned?</b>
+            <b>Filter users based on Tokens owned?</b>
           </span>
         </Col>
         <Col xs={styleParams.col1XS}>
@@ -50,7 +112,7 @@ const RulesTab = ({ desoData, state, onSetState }) => {
             checkedChildren='Yes'
             unCheckedChildren='No'
             onChange={(checked) => {
-              onSetState({ filterUsers: checked })
+              handleFilterUsers('filterUsers', checked)
             }}
           />
         </Col>
@@ -61,7 +123,7 @@ const RulesTab = ({ desoData, state, onSetState }) => {
           <Row>
             <Col xs={24} sm={7} md={5} lg={24} style={{ paddingTop: 3, paddingBottom: 3 }}>
               <span style={{ fontSize: 16 }}>
-                <b>Where amount is</b>
+                <b>Where Token Balance is</b>
               </span>
             </Col>
             <Col xs={5} sm={4} md={3} lg={5}>
@@ -69,7 +131,7 @@ const RulesTab = ({ desoData, state, onSetState }) => {
                 style={{ width: 70 }}
                 value={state.filterAmountIs}
                 onChange={(filterAmountIs) => {
-                  onSetState({ filterAmountIs })
+                  handleFilterUsers('filterAmountIs', filterAmountIs)
                 }}
               >
                 <Select.Option value={'>'}>{'>'}</Select.Option>
@@ -80,12 +142,11 @@ const RulesTab = ({ desoData, state, onSetState }) => {
             </Col>
             <Col>
               <InputNumber
-                addonBefore={state.distributionType}
                 min={0}
-                placeholder='Enter amount'
-                style={{ width: 225 }}
+                placeholder='amount'
+                style={{ width: 150 }}
                 onChange={(filterAmount) => {
-                  onSetState({ filterAmount })
+                  handleFilterUsers('filterAmount', filterAmount)
                 }}
               />
             </Col>

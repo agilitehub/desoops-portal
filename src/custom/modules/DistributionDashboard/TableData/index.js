@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Table, Popover } from 'antd'
 import Enums from '../../../lib/enums'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
@@ -8,11 +8,22 @@ import { updateHodlers } from '../controller'
 
 const TableData = (props) => {
   const { desoData, state, onSetState } = props
+  const [tableData, setTableData] = React.useState([])
 
-  const handleSelectionChange = async (selectedTableKeys) => {
-    const { finalHodlers } = await updateHodlers(state.finalHodlers, selectedTableKeys)
-    onSetState({ selectedTableKeys, finalHodlers })
+  const handleSelectionChange = async (changedSelectedTableKeys) => {
+    const tmpHodlers = Array.from(state.finalHodlers)
+    const tmpSelectedTableKeys = Array.from(changedSelectedTableKeys)
+
+    const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(tmpHodlers, tmpSelectedTableKeys)
+    onSetState({ selectedTableKeys, finalHodlers, tokenTotal })
   }
+
+  // Create a useState and useEffect hook to monitor state.finalHodlers and update the table data array...
+  // ...to only include hodlers that have an isVisible = true
+  useEffect(() => {
+    const filteredHodlers = state.finalHodlers.filter((hodler) => hodler.isVisible)
+    setTableData(filteredHodlers)
+  }, [state.finalHodlers]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Table
@@ -21,7 +32,7 @@ const TableData = (props) => {
         selectedRowKeys: state.selectedTableKeys,
         onChange: (selectedKeys) => handleSelectionChange(selectedKeys)
       }}
-      dataSource={state.finalHodlers}
+      dataSource={tableData}
       loading={state.loading}
       style={{ width: '100%' }}
       columns={[

@@ -75,7 +75,6 @@ const _BatchTransactionsForm = () => {
       selectedTableKeys = tmpResult.selectedTableKeys
 
       // Update State
-      console.log('handleDistributeTo', distributeTo, finalHodlers, tokenTotal, selectedTableKeys)
       setState({ distributeTo, finalHodlers, tokenTotal, selectedTableKeys })
     } catch (e) {
       message.error(e)

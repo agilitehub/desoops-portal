@@ -81,7 +81,7 @@ const StepThreeCard = ({ desoData, state, onSetState }) => {
               <InputNumber
                 addonBefore={state.distributionType}
                 // disabled={state.distributeTo && state.distributionType && !state.isExecuting ? false : true}
-                placeholder='Enter amount'
+                placeholder='amount'
                 value={state.distributionAmount}
                 style={{ width: 250 }}
                 onChange={(distributionAmount) => {
