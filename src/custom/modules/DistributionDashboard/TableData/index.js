@@ -48,7 +48,7 @@ const TableData = (props) => {
           key: 'username',
           render: (value, entry) => {
             return (
-              <span style={{ color: theme.twitterBootstrap.primary }}>{`${value}% (${entry.tokenBalanceLabel})`}</span>
+              <span style={{ color: theme.twitterBootstrap.primary }}>{`${value} (${entry.tokenBalanceLabel})`}</span>
             )
           }
         },

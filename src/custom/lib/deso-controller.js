@@ -272,7 +272,6 @@ export const getCCHodlings = (publicKey) => {
 
           newEntry = initDeSoUserModel()
 
-          newEntry.publicKey = entry.ProfileEntryResponse.PublicKeyBase58Check
           newEntry.publicKey = entry.ProfileEntryResponse?.PublicKeyBase58Check ?? ''
           newEntry.username = entry.ProfileEntryResponse.Username
           newEntry.profilePicUrl = generateProfilePicUrl(newEntry.publicKey)

@@ -3,7 +3,7 @@
 // Use Ant Design's Row and Col Components to create a 2x2 grid
 
 import React, { useEffect, useReducer } from 'react'
-import { Card, Row, Col, theme, Select, message, Divider, InputNumber, Popconfirm, Button } from 'antd'
+import { Card, Row, Col, theme, Select, message, Divider, InputNumber, Popconfirm, Button, Alert, List } from 'antd'
 import Enums from '../../../lib/enums'
 import { hexToInt } from '../../../lib/utils'
 import { RightCircleOutlined, SendOutlined } from '@ant-design/icons'
@@ -20,7 +20,9 @@ const styleParams = {
   valueColMD: 14,
   colRightXS: 24,
   labelColStyle: {},
-  dividerStyle: { margin: '7px 0' }
+  dividerStyle: { margin: '7px 0' },
+  btnExecuteActive: { color: 'green', borderColor: 'green', backgroundColor: 'white' },
+  btnExecuteInactive: { color: '#D5D5D5', borderColor: '#D5D5D5', backgroundColor: 'white' }
 }
 
 const reducer = (state, newState) => ({ ...state, ...newState })
@@ -28,22 +30,6 @@ const reducer = (state, newState) => ({ ...state, ...newState })
 const SummaryCard = ({ desoData, parentState, onSetState }) => {
   const [state, setState] = useReducer(reducer, initDistributionSummaryState())
 
-  const handleDistributionAmount = async (distributionAmount) => {
-    let tmpHodlers = null
-    let desoPrice = null
-
-    // We need to update the estimatedPaymentToken and estimatedPaymentUSD values
-    tmpHodlers = Array.from(parentState.finalHodlers)
-    if (parentState.distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
-    await calculateEstimatedPayment(tmpHodlers, distributionAmount, parentState.spreadAmountBasedOn, desoPrice)
-    onSetState({ distributionAmount })
-  }
-
-  // create a useEffect hook that monitors parentState.finalHodlers and desoData.desoPrice
-  // if either of these values change, we need to update noOfPaymentTransactions and the totalTransactionFee
-  // use the setNoOfPaymentTransactions and setTotalTransactionFee functions to update these values
-  // setNoOfPaymentTransactions = parentState.finalHodlers.length where isActive and isVisible are true
-  // setTotalTransactionFee = noOfPaymentTransactions * parentState.feePerTransactionUSD
   useEffect(() => {
     try {
       const noOfPaymentTransactions = parentState.finalHodlers.filter(
@@ -56,6 +42,11 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
       let amountExceeded = false
       let transactionFeeExceeded = false
       let selectedToken = null
+      let warningMessages = []
+      let isInFinalStage = false
+      let executeDisabled = false
+      let warningMsg = null
+      let tokenToDistribute = ''
 
       if (isNaN(totalFeeUSD)) totalFeeUSD = 0
       if (isNaN(distributionAmount)) distributionAmount = 0
@@ -68,9 +59,17 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
       if (totalFeeDESO >= desoData.profile.desoBalance) transactionFeeExceeded = true
 
       if (parentState.distributionType === Enums.paymentTypes.DESO) {
-        if (totalFeeDESO + distributionAmount > desoData.profile.desoBalance) amountExceeded = true
+        tokenToDistribute = `${Enums.paymentTypes.DESO} (~${desoData.profile.desoBalance})`
+        isInFinalStage = true
+
+        if (totalFeeDESO + distributionAmount > desoData.profile.desoBalance) {
+          amountExceeded = true
+          warningMsg = 'The Amount exceeds your DESO Balance.'
+        }
       } else {
         if (parentState.tokenToUse) {
+          isInFinalStage = true
+
           switch (parentState.distributionType) {
             case Enums.paymentTypes.CREATOR:
               selectedToken = desoData.profile.ccHodlings.find(
@@ -85,12 +84,46 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
           }
 
           if (selectedToken) {
-            if (distributionAmount > selectedToken.tokenBalance) amountExceeded = true
+            tokenToDistribute = `${selectedToken.username} (~${selectedToken.tokenBalance})`
+
+            if (distributionAmount > selectedToken.tokenBalance) {
+              amountExceeded = true
+              warningMsg = `The Amount exceeds your ${parentState.distributionType} Balance.`
+            }
           }
         }
       }
 
-      setState({ noOfPaymentTransactions, totalFeeUSD, totalFeeDESO, amountExceeded, transactionFeeExceeded })
+      // Check to see if we need to display any warning messages, but only if most of the setup has been provided
+      if (isInFinalStage) {
+        if (transactionFeeExceeded) {
+          warningMessages.push({ key: '1', value: 'The Transaction Fee exceeds your DESO Balance.' })
+        }
+
+        if (warningMsg) {
+          warningMessages.push({ key: '2', value: warningMsg })
+        }
+
+        if (noOfPaymentTransactions === 0) {
+          warningMessages.push({ key: '3', value: 'There are no users to distribute to.' })
+        }
+      }
+
+      if (!parentState.distributionAmount || (isInFinalStage && warningMessages.length > 0)) {
+        executeDisabled = true
+      }
+
+      setState({
+        noOfPaymentTransactions,
+        totalFeeUSD,
+        totalFeeDESO,
+        amountExceeded,
+        transactionFeeExceeded,
+        warningMessages,
+        isInFinalStage,
+        executeDisabled,
+        tokenToDistribute
+      })
     } catch (error) {
       console.error(error)
     }
@@ -106,6 +139,19 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
     desoData.desoPrice
   ])
 
+  const handleDistributionAmount = async (distributionAmount) => {
+    let tmpHodlers = null
+    let desoPrice = null
+
+    // We need to update the estimatedPaymentToken and estimatedPaymentUSD values
+    tmpHodlers = Array.from(parentState.finalHodlers)
+    if (parentState.distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
+    await calculateEstimatedPayment(tmpHodlers, distributionAmount, parentState.spreadAmountBasedOn, desoPrice)
+    onSetState({ distributionAmount })
+  }
+
+  const handleExecute = async () => {}
+
   return (
     <Card title='Step 3: Distribution Summary' size='small'>
       <Row>
@@ -115,7 +161,7 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
           md={styleParams.labelColMD}
           style={styleParams.labelColStyle}
         >
-          <span style={{ fontWeight: 'bold' }}>Total Transactions:</span>
+          <span style={{ fontWeight: 'bold' }}>Total transactions:</span>
         </Col>
         <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
           <span>{state.noOfPaymentTransactions}</span>
@@ -128,7 +174,7 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
           md={styleParams.labelColMD}
           style={styleParams.labelColStyle}
         >
-          <span style={{ fontWeight: 'bold' }}>DeSo Price:</span>
+          <span style={{ fontWeight: 'bold' }}>DeSo price:</span>
         </Col>
         <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
           <span>{`$${desoData.desoPrice}`}</span>
@@ -141,7 +187,7 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
           md={styleParams.labelColMD}
           style={styleParams.labelColStyle}
         >
-          <span style={{ fontWeight: 'bold' }}>Transaction Fee:</span>
+          <span style={{ fontWeight: 'bold' }}>Transaction fee:</span>
         </Col>
         <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
           <span>{`$${parentState.feePerTransactionUSD} per transaction`}</span>
@@ -154,12 +200,25 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
           md={styleParams.labelColMD}
           style={styleParams.labelColStyle}
         >
-          <span style={{ fontWeight: 'bold' }}>Transaction Fee Total:</span>
+          <span style={{ fontWeight: 'bold' }}>Distribution cost:</span>
         </Col>
         <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
           <span
             style={{ color: state.transactionFeeExceeded ? 'red' : '' }}
           >{`$${state.totalFeeUSD} (~${state.totalFeeDESO} $DESO)`}</span>
+        </Col>
+      </Row>
+      <Row>
+        <Col
+          xs={styleParams.labelColXS}
+          sm={styleParams.labelColSM}
+          md={styleParams.labelColMD}
+          style={styleParams.labelColStyle}
+        >
+          <span style={{ fontWeight: 'bold' }}>Token to distribute:</span>
+        </Col>
+        <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
+          <span>{state.tokenToDistribute}</span>
         </Col>
       </Row>
       {parentState.distributionAmountEnabled ? (
@@ -177,7 +236,7 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
             <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
               <InputNumber
                 status={state.amountExceeded ? 'error' : null}
-                prefix={parentState.distributionType}
+                addonBefore={parentState.distributionType}
                 placeholder='0'
                 value={parentState.distributionAmount}
                 style={{ width: 250 }}
@@ -194,26 +253,45 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
             title='Are you sure you want to execute payments to the below'
             okText='Yes'
             cancelText='No'
-            // onConfirm={handleExecute}
-            // disabled={
-            //   isExecuting ||
-            //   validationMessage ||
-            //   !transactionType ||
-            //   !paymentType ||
-            //   !amount ||
-            //   validateExecution()
-            // }
+            onConfirm={handleExecute}
+            disabled={state.isExecuting || state.executeDisabled}
           >
             <Button
-              style={{ color: 'green', borderColor: 'green', backgroundColor: 'white' }}
+              style={
+                state.isExecuting || state.executeDisabled
+                  ? styleParams.btnExecuteInactive
+                  : styleParams.btnExecuteActive
+              }
               icon={<RightCircleOutlined />}
               size='large'
+              disabled={state.isExecuting || state.executeDisabled}
             >
               Execute Distribution
             </Button>
           </Popconfirm>
         </Col>
       </Row>
+      {state.warningMessages.length > 0 ? (
+        <>
+          <Divider style={{ margin: '10px 0' }} />
+          <Row justify='center'>
+            <Col span={18}>
+              <Alert
+                message={<span style={{ fontWeight: 'bold', fontSize: 14 }}>Warning</span>}
+                description={
+                  <ul style={{ paddingInlineStart: 20, marginTop: -5, marginBottom: 0 }}>
+                    {state.warningMessages.map((entry) => (
+                      <li key={entry.key}>{entry.value}</li>
+                    ))}
+                  </ul>
+                }
+                type='warning'
+                style={{ fontSize: 13, paddingBlock: 3, paddingInline: 10 }}
+              />
+            </Col>
+          </Row>
+        </>
+      ) : null}
     </Card>
   )
 }

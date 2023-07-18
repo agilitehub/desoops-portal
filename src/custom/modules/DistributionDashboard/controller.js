@@ -180,7 +180,7 @@ const processHodlerConditions = (hodlers, conditions) => {
     let selectedTableKeys = []
 
     try {
-      if (!conditions.filterUsers || conditions.filterAmount === '') {
+      if (!conditions.filterUsers || conditions.filterAmount === null) {
         // Step 2: If `conditions` is an empty object, set the `isVisible` property of all entries in the `hodlers` array to `true`.
         hodlers.forEach((hodler) => {
           hodler.isVisible = true

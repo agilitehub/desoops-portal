@@ -102,7 +102,7 @@ const _BatchTransactionsForm = () => {
     const tmpConditions = {
       filterUsers: false,
       filterAmountIs: '>',
-      filterAmount: ''
+      filterAmount: null
     }
 
     const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(
@@ -119,7 +119,7 @@ const _BatchTransactionsForm = () => {
       tokenTotal,
       distributionType,
       tokenToUse: Enums.values.EMPTY_STRING,
-      distributionAmount: Enums.values.EMPTY_STRING,
+      distributionAmount: null,
       spreadAmountBasedOn: 'Ownership'
     })
   }
@@ -127,7 +127,7 @@ const _BatchTransactionsForm = () => {
   const handleTokenToUse = async (tokenToUse) => {
     const finalHodlers = Array.from(state.finalHodlers)
     await calculateEstimatedPayment(finalHodlers, '')
-    setState({ finalHodlers, tokenToUse, distributionAmount: '' })
+    setState({ finalHodlers, tokenToUse, distributionAmount: null })
   }
 
   return (

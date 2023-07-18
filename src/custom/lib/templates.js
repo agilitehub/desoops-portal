@@ -24,14 +24,14 @@ export const initDistributionDashboardState = () => {
     isExecuting: false,
     distributeTo: '',
     distributionType: '',
-    distributionAmount: '',
+    distributionAmount: null,
     distributionAmountEnabled: false,
     rulesEnabled: false,
     tokenToUse: '',
     spreadAmountBasedOn: 'Ownership',
     filterUsers: false,
     filterAmountIs: '>',
-    filterAmount: '',
+    filterAmount: null,
     finalHodlers: [],
     selectedTableKeys: [],
     tokenTotal: 0,
@@ -44,7 +44,12 @@ export const initDistributionSummaryState = () => {
     noOfPaymentTransactions: 0,
     totalFeeUSD: 0,
     totalFeeDESO: 0,
+    tokenToDistribute: '',
     transactionFeeExceeded: false,
-    amountExceeded: false
+    amountExceeded: false,
+    isExecuting: false,
+    warningMessages: [],
+    isInFinalStage: false,
+    executeDisabled: true
   }
 }

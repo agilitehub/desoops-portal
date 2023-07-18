@@ -54,7 +54,7 @@ const RulesTab = ({ desoData, state, onSetState }) => {
       // If state.filterUsers is true and newState.filterUsers is set to false, then we can run updateHolders
       if (state.filterUsers && !newState.filterUsers) {
         runUpdateHolders = true
-        newState.filterAmount = ''
+        newState.filterAmount = null
         newState.filterAmountIs = '>'
       } else if (newState.filterUsers) {
         runUpdateHolders = true
@@ -91,7 +91,7 @@ const RulesTab = ({ desoData, state, onSetState }) => {
 
     // If state.distributionAmount is not empty...
     //...we need to run calculateEstimatedPayment() to update the estimatedPaymentToken and estimatedPaymentUSD values
-    if (state.distributionAmount !== '') {
+    if (state.distributionAmount !== null) {
       tmpHodlers = Array.from(state.finalHodlers)
       if (state.distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
       await calculateEstimatedPayment(tmpHodlers, state.distributionAmount, spreadAmountBasedOn, desoPrice)
