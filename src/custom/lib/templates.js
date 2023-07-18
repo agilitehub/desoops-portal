@@ -34,6 +34,17 @@ export const initDistributionDashboardState = () => {
     filterAmount: '',
     finalHodlers: [],
     selectedTableKeys: [],
-    tokenTotal: 0
+    tokenTotal: 0,
+    feePerTransactionUSD: 0.001
+  }
+}
+
+export const initDistributionSummaryState = () => {
+  return {
+    noOfPaymentTransactions: 0,
+    totalFeeUSD: 0,
+    totalFeeDESO: 0,
+    transactionFeeExceeded: false,
+    amountExceeded: false
   }
 }

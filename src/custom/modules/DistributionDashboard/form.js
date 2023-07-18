@@ -9,7 +9,7 @@ import ContainerCard from '../../reusables/components/ContainerCard'
 import WalletOverviewCard from './WalletOverviewCard'
 import SetupCard from './SetupCard'
 import QuickActionsCard from './QuickActionsCard'
-import StepThreeCard from './StepThreeCard'
+import SummaryCard from './SummaryCard'
 import TableData from './TableData'
 
 // Custom Utils
@@ -164,7 +164,7 @@ const _BatchTransactionsForm = () => {
               <Divider style={styleParams.dividerStyle} />
               <Row>
                 <Col span={24}>
-                  <StepThreeCard desoData={desoData} state={state} onSetState={setState} />
+                  <SummaryCard desoData={desoData} parentState={state} onSetState={setState} />
                 </Col>
               </Row>
             </Col>

@@ -177,22 +177,19 @@ export const getDAOHodlings = (publicKey) => {
           // Skip if no ProfileEntryResponse
           if (!entry.ProfileEntryResponse) continue
 
-          // Don't add current user to hodlings list
-          if (entry.ProfileEntryResponse.PublicKeyBase58Check !== publicKey) {
-            tokenBalance = entry.BalanceNanosUint256
-            tokenBalance = hexToInt(tokenBalance)
-            tokenBalance = tokenBalance / Enums.values.NANO_VALUE / Enums.values.NANO_VALUE
-            tokenBalance = Math.floor(tokenBalance * 10000) / 10000
+          tokenBalance = entry.BalanceNanosUint256
+          tokenBalance = hexToInt(tokenBalance)
+          tokenBalance = tokenBalance / Enums.values.NANO_VALUE / Enums.values.NANO_VALUE
+          tokenBalance = Math.floor(tokenBalance * 10000) / 10000
 
-            newEntry = initDeSoUserModel()
+          newEntry = initDeSoUserModel()
 
-            newEntry.publicKey = entry.ProfileEntryResponse.PublicKeyBase58Check
-            newEntry.username = entry.ProfileEntryResponse.Username
-            newEntry.profilePicUrl = generateProfilePicUrl(newEntry.publicKey)
-            newEntry.tokenBalance = tokenBalance
+          newEntry.publicKey = entry.ProfileEntryResponse.PublicKeyBase58Check
+          newEntry.username = entry.ProfileEntryResponse.Username
+          newEntry.profilePicUrl = generateProfilePicUrl(newEntry.publicKey)
+          newEntry.tokenBalance = tokenBalance
 
-            daoHodlings.push(newEntry)
-          }
+          daoHodlings.push(newEntry)
         }
 
         resolve(daoHodlings)
@@ -270,21 +267,18 @@ export const getCCHodlings = (publicKey) => {
           // Skip if no ProfileEntryResponse
           if (!entry.ProfileEntryResponse) continue
 
-          // Don't add current user to hodlings list
-          if (entry.ProfileEntryResponse.PublicKeyBase58Check !== publicKey) {
-            tokenBalance = entry.BalanceNanos / Enums.values.NANO_VALUE
-            tokenBalance = Math.floor(tokenBalance * 10000) / 10000
+          tokenBalance = entry.BalanceNanos / Enums.values.NANO_VALUE
+          tokenBalance = Math.floor(tokenBalance * 10000) / 10000
 
-            newEntry = initDeSoUserModel()
+          newEntry = initDeSoUserModel()
 
-            newEntry.publicKey = entry.ProfileEntryResponse.PublicKeyBase58Check
-            newEntry.publicKey = entry.ProfileEntryResponse?.PublicKeyBase58Check ?? ''
-            newEntry.username = entry.ProfileEntryResponse.Username
-            newEntry.profilePicUrl = generateProfilePicUrl(newEntry.publicKey)
-            newEntry.tokenBalance = tokenBalance
+          newEntry.publicKey = entry.ProfileEntryResponse.PublicKeyBase58Check
+          newEntry.publicKey = entry.ProfileEntryResponse?.PublicKeyBase58Check ?? ''
+          newEntry.username = entry.ProfileEntryResponse.Username
+          newEntry.profilePicUrl = generateProfilePicUrl(newEntry.publicKey)
+          newEntry.tokenBalance = tokenBalance
 
-            ccHodlings.push(newEntry)
-          }
+          ccHodlings.push(newEntry)
         }
 
         resolve(ccHodlings)

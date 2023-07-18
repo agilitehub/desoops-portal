@@ -25,18 +25,7 @@ const GenenralTab = ({ state, onDistributeTo, onDistributionType, onTokenToUse, 
 
     switch (state.distributionType) {
       case Enums.paymentTypes.DAO:
-        tmpTokenOwnerList.push({
-          index: index.toString(),
-          key: 'default',
-          value: 'default',
-          username: desoProfile.username,
-          imageUrl: desoProfile.profilePicUrl,
-          balance: desoProfile.daoBalance
-        })
-
         for (const entry of desoProfile.daoHodlings) {
-          index++
-
           tmpTokenOwnerList.push({
             index: index.toString(),
             key: entry.publicKey,
@@ -45,22 +34,13 @@ const GenenralTab = ({ state, onDistributeTo, onDistributionType, onTokenToUse, 
             imageUrl: entry.profilePicUrl,
             balance: entry.tokenBalance
           })
+
+          index++
         }
 
         break
       case Enums.paymentTypes.CREATOR:
-        tmpTokenOwnerList.push({
-          index: index.toString(),
-          key: 'default',
-          value: 'default',
-          username: desoProfile.username,
-          imageUrl: desoProfile.profilePicUrl,
-          balance: desoProfile.ccBalance
-        })
-
         for (const entry of desoProfile.ccHodlings) {
-          index++
-
           tmpTokenOwnerList.push({
             index: index.toString(),
             key: entry.publicKey,
@@ -69,6 +49,8 @@ const GenenralTab = ({ state, onDistributeTo, onDistributionType, onTokenToUse, 
             imageUrl: entry.profilePicUrl,
             balance: entry.tokenBalance
           })
+
+          index++
         }
 
         break
