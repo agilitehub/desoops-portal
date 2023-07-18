@@ -7,6 +7,29 @@ import Enums from '../../../lib/enums'
 const { TabPane } = Tabs
 
 const SetupCard = ({ desoData, state, onDistributeTo, onDistributionType, onTokenToUse, onSetState }) => {
+  const tabItems = [
+    {
+      key: '1',
+      label: 'General',
+      children: (
+        <GeneralTab
+          desoProfile={desoData.profile}
+          state={state}
+          onDistributeTo={onDistributeTo}
+          onDistributionType={onDistributionType}
+          onSetState={onSetState}
+          onTokenToUse={onTokenToUse}
+        />
+      )
+    },
+    {
+      key: '2',
+      label: 'Rules',
+      disabled: !state.rulesEnabled,
+      children: <RulesTab desoData={desoData} state={state} onSetState={onSetState} />
+    }
+  ]
+
   return (
     <Card title='👇 Start Here: Setup & Config' size='small'>
       <Tabs
@@ -17,23 +40,8 @@ const SetupCard = ({ desoData, state, onDistributeTo, onDistributionType, onToke
             <Button style={{ color: '#188EFF', borderColor: '#188EFF', backgroundColor: 'white' }}>Select NFT</Button>
           ) : null
         }
-      >
-        <TabPane tab='General' key='1'>
-          <GeneralTab
-            desoProfile={desoData.profile}
-            state={state}
-            onDistributeTo={onDistributeTo}
-            onDistributionType={onDistributionType}
-            onSetState={onSetState}
-            onTokenToUse={onTokenToUse}
-          />
-        </TabPane>
-        {state.rulesEnabled ? (
-          <TabPane tab='Rules' key='2'>
-            <RulesTab desoData={desoData} state={state} onSetState={onSetState} />
-          </TabPane>
-        ) : null}
-      </Tabs>
+        items={tabItems}
+      />
     </Card>
   )
 }

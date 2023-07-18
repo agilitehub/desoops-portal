@@ -5,9 +5,10 @@ import Enums from '../../lib/enums'
 import { getDeSo } from '../../lib/deso-controller'
 
 export const setupHodlers = (desoProfile, distributeTo) => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     const selectedTableKeys = []
     let tmpHodlers = null
+    let percentResult = null
 
     try {
       // If user selects DAO or Creator Coin Hodlers, we need to get the relevant users
@@ -25,20 +26,22 @@ export const setupHodlers = (desoProfile, distributeTo) => {
         selectedTableKeys.push(tmpHodlers[i].username)
       }
 
-      calculatePercentages(tmpHodlers)
-        .then((result) => {
-          resolve({ finalHodlers: result.hodlers, selectedTableKeys, tokenTotal: result.tokenTotal })
-        })
-        .catch((e) => {
-          reject(e)
-        })
+      percentResult = await calculatePercentages(tmpHodlers)
+      resolve({ finalHodlers: percentResult.hodlers, selectedTableKeys, tokenTotal: percentResult.tokenTotal })
     } catch (e) {
       reject(e)
     }
   })
 }
 
-export const updateHodlers = (hodlers, selectedTableKeys, conditions) => {
+export const updateHodlers = (
+  hodlers,
+  selectedTableKeys,
+  conditions,
+  distributionAmount,
+  spreadAmountBasedOn,
+  desoPrice
+) => {
   return new Promise(async (resolve, reject) => {
     let result = null
 
@@ -65,6 +68,8 @@ export const updateHodlers = (hodlers, selectedTableKeys, conditions) => {
       })
 
       result = await calculatePercentages(hodlers)
+      await calculateEstimatedPayment(hodlers, distributionAmount, spreadAmountBasedOn, desoPrice)
+
       resolve({ finalHodlers: hodlers, selectedTableKeys, tokenTotal: result.tokenTotal })
     } catch (e) {
       reject(e)
@@ -78,37 +83,95 @@ export const calculatePercentages = (hodlers, sortOrder = 'desc') => {
     let percentOwnershipLabel = ''
     let tokenBalanceLabel = ''
 
-    const tokenTotal = hodlers.reduce((total, entry) => {
-      // We only want to calculate the percentage for active entries
-      if (!entry.isActive) return total
-      return total + entry.tokenBalance
-    }, 0)
+    try {
+      const tokenTotal = hodlers.reduce((total, entry) => {
+        // We only want to calculate the percentage for active entries
+        if (!entry.isActive) return total
+        return total + entry.tokenBalance
+      }, 0)
 
-    hodlers.map((entry) => {
-      if (entry.isActive && entry.tokenBalance > 0) {
-        percentOwnership = (entry.tokenBalance / tokenTotal) * 100
-        percentOwnershipLabel = (Math.ceil(percentOwnership * 1000) / 1000).toString()
-        tokenBalanceLabel = entry.tokenBalance.toString()
-      } else {
-        percentOwnership = 0
-        percentOwnershipLabel = '0'
-        tokenBalanceLabel = '0'
+      hodlers.map((entry) => {
+        if (entry.isActive && entry.tokenBalance > 0) {
+          percentOwnership = (entry.tokenBalance / tokenTotal) * 100
+          percentOwnershipLabel = Math.floor(percentOwnership * 1000) / 1000
+          tokenBalanceLabel = entry.tokenBalance.toString()
+        } else {
+          percentOwnership = 0
+          percentOwnershipLabel = '0'
+          tokenBalanceLabel = '0'
+        }
+
+        entry.percentOwnership = percentOwnership
+        entry.percentOwnershipLabel = percentOwnershipLabel
+        entry.tokenBalanceLabel = tokenBalanceLabel
+
+        return null
+      })
+
+      if (sortOrder === 'asc') {
+        hodlers.sort((a, b) => a.percentage - b.percentage)
+      } else if (sortOrder === 'desc') {
+        hodlers.sort((a, b) => b.percentage - a.percentage)
       }
 
-      entry.percentOwnership = percentOwnership
-      entry.percentOwnershipLabel = percentOwnershipLabel
-      entry.tokenBalanceLabel = tokenBalanceLabel
-
-      return null
-    })
-
-    if (sortOrder === 'asc') {
-      hodlers.sort((a, b) => a.percentage - b.percentage)
-    } else if (sortOrder === 'desc') {
-      hodlers.sort((a, b) => b.percentage - a.percentage)
+      resolve({ hodlers, tokenTotal })
+    } catch (e) {
+      reject(e)
     }
+  })
+}
 
-    resolve({ hodlers, tokenTotal })
+export const calculateEstimatedPayment = (hodlers, amount, spreadAmountBasedOn, desoPrice) => {
+  return new Promise((resolve, reject) => {
+    let estimatedPaymentToken = null
+    let estimatedPaymentLabel = null
+    let estimatedPaymentUSD = null
+    let activeHodlers = 0
+
+    try {
+      // Count the number of active hodlers based on the `isActive` property being set to true
+      activeHodlers = hodlers.reduce((total, entry) => {
+        if (entry.isActive) return total + 1
+        return total
+      }, 0)
+
+      // Calculate the estimated payment for each hodler
+      hodlers.forEach((hodler) => {
+        estimatedPaymentToken = 0
+        estimatedPaymentLabel = ''
+
+        if (amount === '' || !hodler.isActive) {
+          estimatedPaymentToken = 0
+          estimatedPaymentUSD = 0
+        } else if (spreadAmountBasedOn === 'Equal Spread') {
+          // Calculate the estimated payment based on an equal distribution
+          estimatedPaymentToken = amount / activeHodlers
+        } else if (spreadAmountBasedOn === 'Ownership') {
+          // Calculate the estimated payment based on percentage ownership
+          estimatedPaymentToken = (amount * hodler.percentOwnership) / 100
+        }
+
+        // Update the estimated payment in tokens
+        hodler.estimatedPaymentToken = estimatedPaymentToken
+
+        // Calculate the estimated payment in USD if desoPrice is provided
+        if (desoPrice !== null && amount !== '') {
+          estimatedPaymentUSD = estimatedPaymentToken * desoPrice
+        } else {
+          estimatedPaymentUSD = 0
+        }
+
+        hodler.estimatedPaymentUSD = estimatedPaymentUSD
+
+        // Round the estimated payment in tokens to 3 decimal places and stringify it
+        estimatedPaymentLabel = Math.floor(estimatedPaymentToken * 10000) / 10000
+        hodler.estimatedPaymentLabel = estimatedPaymentLabel
+      })
+
+      resolve(hodlers)
+    } catch (e) {
+      reject(e)
+    }
   })
 }
 
@@ -117,7 +180,6 @@ const processHodlerConditions = (hodlers, conditions) => {
     let selectedTableKeys = []
 
     try {
-      console.log('processHodlerConditions', conditions)
       if (!conditions.filterUsers || conditions.filterAmount === '') {
         // Step 2: If `conditions` is an empty object, set the `isVisible` property of all entries in the `hodlers` array to `true`.
         hodlers.forEach((hodler) => {
@@ -154,7 +216,7 @@ const processHodlerConditions = (hodlers, conditions) => {
           }
         })
       }
-      console.log(hodlers, selectedTableKeys)
+
       resolve({ hodlers, selectedTableKeys })
     } catch (e) {
       reject(e)

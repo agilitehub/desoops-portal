@@ -4,7 +4,8 @@
 
 import React from 'react'
 import { Row, Col, Select, Divider, InputNumber, Radio, Switch, message } from 'antd'
-import { updateHodlers } from '../../controller'
+import { calculateEstimatedPayment, updateHodlers } from '../../controller'
+import Enums from '../../../../lib/enums'
 
 const styleParams = {
   col1XS: 24,
@@ -18,7 +19,7 @@ const styleParams = {
   dividerStyle: { margin: '7px 0' }
 }
 
-const RulesTab = ({ state, onSetState }) => {
+const RulesTab = ({ desoData, state, onSetState }) => {
   const handleFilterUsers = async (propType, propValue) => {
     // propType could be either 'filterUsers' or 'filterAmountIs' or 'filterAmount'
     // propValue could be either true/false or '>'/'<' or a number based on propType
@@ -66,7 +67,10 @@ const RulesTab = ({ state, onSetState }) => {
         const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(
           tmpHodlers,
           tmpSelectedTableKeys,
-          newState
+          newState,
+          state.distributionAmount,
+          state.spreadAmountBasedOn,
+          desoData.desoPrice
         )
 
         newState.finalHodlers = finalHodlers
@@ -80,6 +84,27 @@ const RulesTab = ({ state, onSetState }) => {
     }
   }
 
+  const handleSpreadAmountBasedOn = async (e) => {
+    const spreadAmountBasedOn = e.target.value
+    let tmpHodlers = null
+    let desoPrice = null
+
+    // If state.distributionAmount is not empty...
+    //...we need to run calculateEstimatedPayment() to update the estimatedPaymentToken and estimatedPaymentUSD values
+    if (state.distributionAmount !== '') {
+      tmpHodlers = Array.from(state.finalHodlers)
+      if (state.distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
+      await calculateEstimatedPayment(tmpHodlers, state.distributionAmount, spreadAmountBasedOn, desoPrice)
+
+      onSetState({
+        spreadAmountBasedOn,
+        finalHodlers: tmpHodlers
+      })
+    } else {
+      onSetState({ spreadAmountBasedOn })
+    }
+  }
+
   return (
     <>
       <Row>
@@ -89,11 +114,7 @@ const RulesTab = ({ state, onSetState }) => {
           </span>
         </Col>
         <Col xs={styleParams.col1XS}>
-          <Radio.Group
-            value={state.spreadAmountBasedOn}
-            buttonStyle='solid'
-            onChange={(e) => onSetState({ spreadAmountBasedOn: e.target.value })}
-          >
+          <Radio.Group value={state.spreadAmountBasedOn} buttonStyle='solid' onChange={handleSpreadAmountBasedOn}>
             <Radio.Button value={'Ownership'}>% Ownership</Radio.Button>
             <Radio.Button value={'Equal Spread'}>Equal Spread</Radio.Button>
           </Radio.Group>
@@ -108,6 +129,7 @@ const RulesTab = ({ state, onSetState }) => {
         </Col>
         <Col xs={styleParams.col1XS}>
           <Switch
+            checked={state.filterUsers}
             style={{ width: 65 }}
             checkedChildren='Yes'
             unCheckedChildren='No'
@@ -142,9 +164,10 @@ const RulesTab = ({ state, onSetState }) => {
             </Col>
             <Col>
               <InputNumber
+                addonAfter='tokens'
                 min={0}
-                placeholder='amount'
-                style={{ width: 150 }}
+                placeholder='0'
+                style={{ width: 200 }}
                 onChange={(filterAmount) => {
                   handleFilterUsers('filterAmount', filterAmount)
                 }}

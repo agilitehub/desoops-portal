@@ -14,7 +14,7 @@ import TableData from './TableData'
 
 // Custom Utils
 import Enums from '../../lib/enums'
-import { setupHodlers } from './controller'
+import { calculateEstimatedPayment, setupHodlers, updateHodlers } from './controller'
 import { initDistributionDashboardState } from '../../lib/templates'
 
 const styleParams = {
@@ -31,20 +31,27 @@ const _BatchTransactionsForm = () => {
     setState(initDistributionDashboardState())
   }
 
-  // Use a useEffect hook to determine if state.rulesEnabled should be True or False
-  // rulesEnabled state is dependent on state.distributeTo, state.distributionType, and state.tokenToUse having values
+  // Use a useEffect hook to determine if state.rulesEnabled and state.distributionAmountEnabled should be True or False
+  // state.rulesEnabled is dependent on state.distributeTo, state.distributionType, and state.tokenToUse having values
+  // state.distributionAmountEnabled is dependent on state.distributeTo and state.distributionType having values, however...
+  // ...if state.distributionType is DAO or CREATOR, then state.tokenToUse must also have a value
   useEffect(() => {
     let rulesEnabled = false
+    let distributionAmountEnabled = false
 
     if (state.distributeTo && state.distributionType) {
-      if (state.distributionType === Enums.paymentTypes.DAO || state.distributionType === Enums.paymentTypes.CREATOR) {
-        if (state.tokenToUse) rulesEnabled = true
+      if ([Enums.paymentTypes.DAO, Enums.paymentTypes.CREATOR].includes(state.distributionType)) {
+        if (state.tokenToUse) {
+          rulesEnabled = true
+          distributionAmountEnabled = true
+        }
       } else {
         rulesEnabled = true
+        distributionAmountEnabled = true
       }
     }
 
-    if (state.rulesEnabled !== rulesEnabled) setState({ rulesEnabled })
+    setState({ rulesEnabled, distributionAmountEnabled })
   }, [state.distributeTo, state.distributionType, state.tokenToUse]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDistributeTo = async (distributeTo) => {
@@ -68,7 +75,13 @@ const _BatchTransactionsForm = () => {
       }
 
       setState({ loading: true })
-      tmpResult = await setupHodlers(desoData.profile, distributeTo)
+      tmpResult = await setupHodlers(
+        desoData.profile,
+        distributeTo,
+        state.distributionAmount,
+        state.spreadAmountBasedOn,
+        desoData.desoPrice
+      )
 
       finalHodlers = tmpResult.finalHodlers
       tokenTotal = tmpResult.tokenTotal
@@ -83,12 +96,38 @@ const _BatchTransactionsForm = () => {
     setState({ loading: false })
   }
 
-  const handleDistributionType = (distributionType) => {
-    setState({ distributionType, tokenToUse: Enums.values.EMPTY_STRING, distributionAmount: Enums.values.EMPTY_STRING })
+  const handleDistributionType = async (distributionType) => {
+    const tmpHodlers = Array.from(state.finalHodlers)
+    const tmpSelectedTableKeys = Array.from(state.selectedTableKeys)
+    const tmpConditions = {
+      filterUsers: false,
+      filterAmountIs: '>',
+      filterAmount: ''
+    }
+
+    const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(
+      tmpHodlers,
+      tmpSelectedTableKeys,
+      tmpConditions,
+      ''
+    )
+
+    setState({
+      ...tmpConditions,
+      finalHodlers,
+      selectedTableKeys,
+      tokenTotal,
+      distributionType,
+      tokenToUse: Enums.values.EMPTY_STRING,
+      distributionAmount: Enums.values.EMPTY_STRING,
+      spreadAmountBasedOn: 'Ownership'
+    })
   }
 
-  const handleTokenToUse = (tokenToUse) => {
-    setState({ tokenToUse, distributionAmount: Enums.values.EMPTY_STRING })
+  const handleTokenToUse = async (tokenToUse) => {
+    const finalHodlers = Array.from(state.finalHodlers)
+    await calculateEstimatedPayment(finalHodlers, '')
+    setState({ finalHodlers, tokenToUse, distributionAmount: '' })
   }
 
   return (

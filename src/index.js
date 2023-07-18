@@ -1,5 +1,5 @@
 import React, { StrictMode } from 'react'
-import ReactDOM from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { Provider, useSelector } from 'react-redux'
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
@@ -35,14 +35,14 @@ const App = () => {
   const state = useSelector((state) => state.core)
   return <Core state={state} />
 }
+const root = createRoot(document.getElementById(Enums.values.DIV_ROOT))
 
-ReactDOM.render(
+root.render(
   <Provider store={Store}>
     <DeSoIdentityProvider>
       <App />
     </DeSoIdentityProvider>
-  </Provider>,
-  document.getElementById(Enums.values.DIV_ROOT)
+  </Provider>
 )
 
 export const analytics = tmpAnalytics

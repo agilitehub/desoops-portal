@@ -8,6 +8,7 @@ import Enums from '../../../lib/enums'
 import { hexToInt } from '../../../lib/utils'
 import { RightCircleOutlined, SendOutlined } from '@ant-design/icons'
 import { size } from 'lodash'
+import { calculateEstimatedPayment } from '../controller'
 
 const styleParams = {
   labelColXS: 12,
@@ -22,7 +23,16 @@ const styleParams = {
 }
 
 const StepThreeCard = ({ desoData, state, onSetState }) => {
-  const { token } = theme.useToken()
+  const handleDistributionAmount = async (distributionAmount) => {
+    let tmpHodlers = null
+    let desoPrice = null
+
+    // We need to update the estimatedPaymentToken and estimatedPaymentUSD values
+    tmpHodlers = Array.from(state.finalHodlers)
+    if (state.distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
+    await calculateEstimatedPayment(tmpHodlers, distributionAmount, state.spreadAmountBasedOn, desoPrice)
+    onSetState({ distributionAmount })
+  }
 
   return (
     <Card title='Step 3: Distribution Summary' size='small'>
@@ -65,7 +75,7 @@ const StepThreeCard = ({ desoData, state, onSetState }) => {
           <span>$0.02 (~0.02 $DESO)</span>
         </Col>
       </Row>
-      {state.distributionType !== Enums.values.EMPTY_STRING ? (
+      {state.distributionAmountEnabled ? (
         <>
           <Divider style={styleParams.dividerStyle} />
           <Row>
@@ -84,9 +94,7 @@ const StepThreeCard = ({ desoData, state, onSetState }) => {
                 placeholder='amount'
                 value={state.distributionAmount}
                 style={{ width: 250 }}
-                onChange={(distributionAmount) => {
-                  onSetState({ distributionAmount })
-                }}
+                onChange={handleDistributionAmount}
               />
             </Col>
           </Row>

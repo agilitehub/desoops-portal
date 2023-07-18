@@ -25,6 +25,7 @@ export const initDistributionDashboardState = () => {
     distributeTo: '',
     distributionType: '',
     distributionAmount: '',
+    distributionAmountEnabled: false,
     rulesEnabled: false,
     tokenToUse: '',
     spreadAmountBasedOn: 'Ownership',

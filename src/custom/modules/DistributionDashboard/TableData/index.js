@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react'
 import { Table, Popover } from 'antd'
-import Enums from '../../../lib/enums'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 
 import theme from '../../../../core/utils/theme'
@@ -14,7 +13,14 @@ const TableData = (props) => {
     const tmpHodlers = Array.from(state.finalHodlers)
     const tmpSelectedTableKeys = Array.from(changedSelectedTableKeys)
 
-    const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(tmpHodlers, tmpSelectedTableKeys)
+    const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(
+      tmpHodlers,
+      tmpSelectedTableKeys,
+      null,
+      state.distributionAmount,
+      state.spreadAmountBasedOn,
+      desoData.desoPrice
+    )
     onSetState({ selectedTableKeys, finalHodlers, tokenTotal })
   }
 
