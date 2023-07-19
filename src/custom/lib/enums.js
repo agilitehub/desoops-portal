@@ -1,3 +1,5 @@
+// These are generic enums used throughout the app.
+
 const Enums = {
   values: {
     ENV_PRODUCTION: 'production',

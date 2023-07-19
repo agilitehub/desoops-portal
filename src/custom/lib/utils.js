@@ -26,6 +26,12 @@ export const copyTextToClipboard = (text) => {
   })
 }
 
+/**
+ * Converts a hex string to an integer.
+ *
+ * @param {string} hex - The hex string to be converted to an integer.
+ * @returns {integer} The resulting integer.
+ */
 export const hexToInt = (hex) => {
   return parseInt(hex, 16)
 }

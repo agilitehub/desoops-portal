@@ -1,3 +1,5 @@
+// This library provide a set of functions that can be used to interact with the DeSo blockchain.
+
 import {
   identity,
   getNFTCollectionSummary,
@@ -5,13 +7,17 @@ import {
   getNFTEntriesForPost,
   getHodlersForUser,
   getExchangeRates,
-  getSingleProfile,
   getFollowersForUser
 } from 'deso-protocol'
 import Enums from './enums'
 import { desoUserModel } from './data-models'
 import { hexToInt } from './utils'
 
+/**
+ * Logs the user into the DeSo blockchain.
+ *
+ * @returns {Promise} A promise that resolves a user object, or rejects when an error occurs.
+ */
 export const desoLogin = () => {
   return new Promise((resolve, reject) => {
     ;(async () => {
@@ -26,14 +32,17 @@ export const desoLogin = () => {
   })
 }
 
+/**
+ * Logs the user out of DeSo blockchain.
+ *
+ * @returns {Promise} A promise that resolves a void, or rejects when an error occurs.
+ */
 export const desoLogout = () => {
   return new Promise((resolve, reject) => {
     ;(async () => {
-      let response = null
-
       try {
-        response = await identity.logout()
-        resolve(response)
+        await identity.logout()
+        resolve()
       } catch (e) {
         reject(e)
         console.log(e)
@@ -42,26 +51,29 @@ export const desoLogout = () => {
   })
 }
 
-export const getDeSoData = (publicKey, currentState) => {
+/**
+ * Fetches various data sets from the DeSo blockchain based on the provided public key.
+ *
+ * @param {string} publicKey - The public key of the DeSo User.
+ * @param {object} desoDataState - The current desoData Redux state.
+ * @returns {object} A promise that resolves a new instance of the desoData Redux state, or rejects when an error occurs.
+ */
+export const getDeSoData = (publicKey, desoDataState) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
-      let daoHodlers = null
       let daoHodlings = null
-      let ccHodlers = null
       let ccHodlings = null
       let desoPrice = null
       let desoData = null
-      let daoBalance = 0
-      let ccBalance = 0
       let followers = 0
 
       try {
-        desoData = JSON.parse(JSON.stringify(currentState))
+        desoData = { ...desoDataState }
 
         desoPrice = await getDeSoPricing()
-        ;({ daoHodlers, daoBalance } = await getDAOHodlersAndBalance(publicKey))
+        const { daoHodlers, daoBalance } = await getDAOHodlersAndBalance(publicKey)
         daoHodlings = await getDAOHodlings(publicKey)
-        ;({ ccHodlers, ccBalance } = await getCCHodlersAndBalance(publicKey))
+        const { ccHodlers, ccBalance } = await getCCHodlersAndBalance(publicKey)
         ccHodlings = await getCCHodlings(publicKey)
 
         // We know how many the current User is following, but we don't know how many are following the current User
@@ -87,6 +99,11 @@ export const getDeSoData = (publicKey, currentState) => {
   })
 }
 
+/**
+ * Fetches the Exchange Rates for the $DESO token.
+ *
+ * @returns {Promise} A promise that resolves the Coinbase Exchange Rate, or rejects when an error occurs.
+ */
 export const getDeSoPricing = () => {
   return new Promise((resolve, reject) => {
     ;(async () => {
@@ -103,11 +120,23 @@ export const getDeSoPricing = () => {
   })
 }
 
+/**
+ * Uses the User's public key to generate a URL to their profile picture.
+ *
+ * @param {string} publicKey - The public key of the DeSo User.
+ * @returns {Promise} A promise that resolves the profile picture URL, or rejects when an error occurs.
+ */
 export const generateProfilePicUrl = (publicKey = '') => {
   const result = `https://blockproducer.deso.org/api/v0/get-single-profile-picture/${publicKey}`
   return result
 }
 
+/**
+ * Uses the User's public key to fetch all DeSo Users who own the User's DAO Tokens. The DAO Balance is also calculated and returned.
+ *
+ * @param {string} publicKey - The public key of the DeSo User.
+ * @returns {Promise} A promise that resolves an object that contains an array of DAO Hodlers and the DAO Balance, or rejects when an error occurs.
+ */
 export const getDAOHodlersAndBalance = (publicKey) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
@@ -157,6 +186,12 @@ export const getDAOHodlersAndBalance = (publicKey) => {
   })
 }
 
+/**
+ * Uses the User's public key to fetch all DeSo Users who the User owns DAO Tokens for.
+ *
+ * @param {string} publicKey - The public key of the DeSo User.
+ * @returns {Promise} A promise that resolves an array of DeSo Users, or rejects when an error occurs.
+ */
 export const getDAOHodlings = (publicKey) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
@@ -200,6 +235,12 @@ export const getDAOHodlings = (publicKey) => {
   })
 }
 
+/**
+ * Uses the User's public key to fetch all DeSo Users who own the User's Creator Coins. The Creator Coin Balance is also calculated and returned.
+ *
+ * @param {string} publicKey - The public key of the DeSo User.
+ * @returns {Promise} A promise that resolves an object that contains an array of Creator Coin Hodlers and the Creator Coin Balance, or rejects when an error occurs.
+ */
 export const getCCHodlersAndBalance = (publicKey) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
@@ -247,6 +288,12 @@ export const getCCHodlersAndBalance = (publicKey) => {
   })
 }
 
+/**
+ * Uses the User's public key to fetch all DeSo Users who the User owns Creator Coins for.
+ *
+ * @param {string} publicKey - The public key of the DeSo User.
+ * @returns {Promise} A promise that resolves an array of DeSo Users, or rejects when an error occurs.
+ */
 export const getCCHodlings = (publicKey) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
@@ -288,6 +335,14 @@ export const getCCHodlings = (publicKey) => {
   })
 }
 
+/**
+ * Uses the User's public key to either fetch the total count of DeSo Users who follow the User, or the total count of the DeSo Users who the User follows.
+ *
+ * @param {string} publicKey - The public key of the DeSo User.
+ * @param {string} followType - The type of follow to fetch. Either 'followers' or 'following'.
+ *
+ * @returns {Promise} A promise that resolves the total count of followers or following, or rejects when an error occurs.
+ */
 export const getTotalFollowersOrFollowing = (publicKey, followType) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
@@ -318,6 +373,15 @@ export const getTotalFollowersOrFollowing = (publicKey, followType) => {
   })
 }
 
+/**
+ * Uses the User's public key to either fetch the usernames of all DeSo Users who follow the User, or all DeSo Users who the User follows.
+ *
+ * @param {string} publicKey - The public key of the DeSo User.
+ * @param {string} followType - The type of follow to fetch. Either 'followers' or 'following'.
+ * @param {number} numberToFetch - The number of followers or following to fetch.
+ *
+ * @returns {Promise} A promise that resolves an array of DeSo Usernames, or rejects when an error occurs.
+ */
 export const getFollowersOrFollowing = (publicKey, followType, numberToFetch) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
@@ -356,6 +420,13 @@ export const getFollowersOrFollowing = (publicKey, followType, numberToFetch) =>
   })
 }
 
+/**
+ * Uses the hex value from an NFT URL link to fetch the NFT details.
+ *
+ * @param {string} postHashHex - The hex value from an NFT URL link.
+ *
+ * @returns {Promise} A promise that resolves an object containing the NFT details, or rejects when an error occurs.
+ */
 export const getNFTdetails = (postHashHex) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
@@ -368,39 +439,22 @@ export const getNFTdetails = (postHashHex) => {
         }
 
         response = await getNFTCollectionSummary(request)
-
         resolve(response)
       } catch (e) {
         console.log(e)
-        reject(Enums.messages.UNKNOWN_ERROR)
+        reject(e)
       }
     })()
   })
 }
 
-export const getPostDetails = (postHashHex) => {
-  return new Promise((resolve, reject) => {
-    ;(async () => {
-      let request = null
-      let response = null
-
-      try {
-        request = {
-          PostHashHex: postHashHex,
-          CommentLimit: 1000
-        }
-
-        response = await getSinglePost(request)
-
-        resolve(response)
-      } catch (e) {
-        console.log(e)
-        reject(Enums.messages.UNKNOWN_ERROR)
-      }
-    })()
-  })
-}
-
+/**
+ * Uses the hex value from an NFT URL link to fetch all NFT entries that exist for the NFT Collection
+ *
+ * @param {string} postHashHex - The hex value from an NFT URL link.
+ *
+ * @returns {Promise} A promise that resolves an object containing the NFT entries, or rejects when an error occurs.
+ */
 export const getNFTEntries = (postHashHex) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
@@ -423,7 +477,8 @@ export const getNFTEntries = (postHashHex) => {
   })
 }
 
-export const getUserStateless = (key) => {
+// TODO: Remove these functions from the app once the logic that uses it is refactored
+export const getPostDetails = (postHashHex) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       let request = null
@@ -431,10 +486,11 @@ export const getUserStateless = (key) => {
 
       try {
         request = {
-          PublicKeyBase58Check: key
+          PostHashHex: postHashHex,
+          CommentLimit: 1000
         }
 
-        response = await getSingleProfile(request)
+        response = await getSinglePost(request)
 
         resolve(response)
       } catch (e) {
