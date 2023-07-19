@@ -1,25 +1,55 @@
 <center><img src="./src/custom/assets/deso-ops-logo-full-v2.png" width="200" /></center>
 
-# DeSo Ops
+# DeSo Ops Portal
 
-> An Admin Portal for [DeSo](https://deso.com) Creators to manage various tasks related to their Projects, Coin Holders, and Supporters.
+DeSo Ops serves as a management hub for Content Creators on the [DeSo](https://deso.com) platform, simplifying numerous responsibilities associated with their projects, coin holders, and supporters. Primarily, it facilitates the distribution of $DESO, Creator Coins, and DAO Tokens to your holders and supporters.
 
 ## Table of Contents
 
-- [Installation Instructions](#installation-instructions)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Features](#features)
+- [Technologies](#technologies)
 - [Contributing](#contributing)
 - [Links](#links)
 - [License](#license)
 
-## Installation Instructions
+## Installation
 
-1. DeSo Ops is designed using [ReactJS](https://reactjs.org), based on the [Agilit-e](https://agilite.io) React Boilerplate, and [NodeJS](https://nodejs.org/en/) v16.13 and higher.
-2. Via Terminal or Command Prompt, within the root of this project, run - `npm ci`.
-3. Once everything has been installed, run - `npm start`.
+1. Via Terminal or Command Prompt, within the root of this project, execute `npm ci`.
+   - This will install all dependencies exactly as it's laid out in the package-lock.json
+2. Once everything has been installed, via Terminal or Command Prompt, execute - `npm start`.
+
+## Usage
+
+To access the DeSo Ops Portal, simply navigate to [desoopscom](https://desoops.com) and sign in using your DeSo account.
+
+## Features
+
+- Enable the distribution of $DESO, Creator Coins, and DAO Tokens to your respective holders of Creator Coins, DAO Tokens, or NFTs.
+- Tailor your distribution strategy based on the proportion of tokens or NFTs held by each user, or opt for an equal distribution across all holders.
+- Enjoy the flexibility to select or deselect specific holders for the distribution.
+- Apply conditions to your distribution strategy, for instance, only targeting holders who possess more or less than a specific amount of tokens.
+- Conveniently copy lists of your followers, those you're following, or users included in the distribution to your clipboard.
+
+## Technologies
+
+- [NodeJS](http://nodejs.org) Version 16
+- [ReactJS](https://www.npmjs.com/package/react) Version 18
+- [React DOM](https://www.npmjs.com/package/react-dom) Version 18
+- [React Redux](https://www.npmjs.com/package/react-redux) Version 8
+- [React Router DOM](https://www.npmjs.com/package/react-router-dom) Version 6
+- [React Scripts](https://www.npmjs.com/package/react-scripts) Version 5
+- [Redux](https://www.npmjs.com/package/redux) Version 4
+- [Recharts](https://www.npmjs.com/package/recharts) Version 2
+- [Ant Design](https://www.npmjs.com/package/antd) Version 5
+- [Font Awesome](http://fontawesome.com) Version 6
+- [DeSo Protocol](https://www.npmjs.com/package/deso-protocol) Version 2
+- [SASS](https://www.npmjs.com/package/sass) Version 1
 
 ## Contributing
 
-1. Fork it (<https://github.com/agilitehub/desoops-portal/fork>)
+1. Fork the repository (<https://github.com/agilitehub/desoops-portal/fork>)
 2. Create your feature branch (`git checkout -b feature/fooBar`)
 3. Commit your changes (`git commit -am 'Add some fooBar'`)
 4. Push to the branch (`git push origin feature/fooBar`)
@@ -28,7 +58,11 @@
 ## Links
 
 - DeSo Ops Portal: https://desoops.com
-- DeSo Ops DAO: https://openfund.com/d/DeSoOps
+- DeSo Ops Fundraising DAO: https://openfund.com/d/DeSoOps
+- Ant Design: https://ant.design
+- DeSo Platform: https://deso.com
+- React JS: http://reactjs.org
+- Redux JS: http://redux.js.org
 
 ## License
 

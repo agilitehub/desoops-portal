@@ -1,6 +1,6 @@
 {
   "name": "desoops-portal",
-  "description": "DeSoOps Portal",
+  "description": "A management hub for Content Creators on the DeSo platform",
   "version": "1.0.0",
   "scripts": {
     "start": "craco start",
@@ -8,9 +8,6 @@
     "test": "craco test",
     "eject": "craco eject",
     "deploy": "craco build && firebase deploy"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "browserslist": {
     "production": [
@@ -42,14 +39,14 @@
     "agilite": "7.5.0",
     "antd": "5.1.6",
     "dayjs": "1.11.7",
-    "deso-protocol": "^2.1.2",
+    "deso-protocol": "2.1.2",
     "firebase": "9.20.0",
     "immutability-helper": "3.1.1",
     "lodash": "4.17.21",
     "moment": "2.29.4",
     "react": "18.2.0",
-    "react-copy-to-clipboard": "^5.1.0",
-    "react-deso-protocol": "^0.0.3",
+    "react-copy-to-clipboard": "5.1.0",
+    "react-deso-protocol": "0.0.3",
     "react-device-detect": "2.2.3",
     "react-dom": "18.2.0",
     "react-moment": "1.1.3",
@@ -58,7 +55,7 @@
     "react-scripts": "5.0.1",
     "recharts": "2.4.3",
     "redux": "4.2.1",
-    "redux-devtools-extension": "^2.13.9",
+    "redux-devtools-extension": "2.13.9",
     "redux-thunk": "2.4.2",
     "sass": "1.57.1"
   }
