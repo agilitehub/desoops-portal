@@ -1,5 +1,5 @@
 // This library provide a set of functions that can be used to interact with the DeSo blockchain.
-
+import { cloneDeep } from 'lodash'
 import {
   identity,
   getNFTCollectionSummary,
@@ -11,7 +11,7 @@ import {
 } from 'deso-protocol'
 import Enums from './enums'
 import { desoUserModel } from './data-models'
-import { hexToInt } from './utils'
+import { cleanString, hexToInt } from './utils'
 
 /**
  * Logs the user into the DeSo blockchain.
@@ -68,7 +68,7 @@ export const getDeSoData = (publicKey, desoDataState) => {
       let followers = 0
 
       try {
-        desoData = { ...desoDataState }
+        desoData = cloneDeep(desoDataState)
 
         desoPrice = await getDeSoPricing()
         const { daoHodlers, daoBalance } = await getDAOHodlersAndBalance(publicKey)

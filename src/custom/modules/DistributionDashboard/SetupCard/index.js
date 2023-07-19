@@ -4,8 +4,6 @@ import GeneralTab from './GeneralTab'
 import RulesTab from './RulesTab'
 import Enums from '../../../lib/enums'
 
-const { TabPane } = Tabs
-
 const SetupCard = ({ desoData, state, onDistributeTo, onDistributionType, onTokenToUse, onSetState }) => {
   const tabItems = [
     {
