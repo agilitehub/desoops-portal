@@ -41,6 +41,7 @@ To access the DeSo Ops Portal, simply navigate to [desoopscom](https://desoops.c
 - [React Router DOM](https://www.npmjs.com/package/react-router-dom) Version 6
 - [React Scripts](https://www.npmjs.com/package/react-scripts) Version 5
 - [Redux](https://www.npmjs.com/package/redux) Version 4
+- [Redux Toolkit](https://www.npmjs.com/package/@reduxjs/toolkit) Version 1
 - [Recharts](https://www.npmjs.com/package/recharts) Version 2
 - [Ant Design](https://www.npmjs.com/package/antd) Version 5
 - [Font Awesome](http://fontawesome.com) Version 6
