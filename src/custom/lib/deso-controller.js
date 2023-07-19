@@ -7,7 +7,8 @@ import {
   getNFTEntriesForPost,
   getHodlersForUser,
   getExchangeRates,
-  getFollowersForUser
+  getFollowersForUser,
+  getSingleProfile
 } from 'deso-protocol'
 import Enums from './enums'
 import { desoUserModel } from './data-models'
@@ -423,55 +424,69 @@ export const getFollowersOrFollowing = (publicKey, followType, numberToFetch) =>
 /**
  * Uses the hex value from an NFT URL link to fetch the NFT details.
  *
- * @param {string} postHashHex - The hex value from an NFT URL link.
+ * @param {string} nftId - The hex value from an NFT URL link.
  *
  * @returns {Promise} A promise that resolves an object containing the NFT details, or rejects when an error occurs.
  */
-export const getNFTdetails = (postHashHex) => {
+export const getNFTDetails = (nftId, publicKey) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       let request = null
-      let response = null
+      let nftSummary = null
+      let nftItems = null
+      let nftMetaData = null
+      let nftHodlers = []
+      let nftUser = null
+      let newEntry = null
 
       try {
-        request = {
-          PostHashHex: postHashHex
+        request = { PostHashHex: nftId }
+
+        // Fetch the NFT Meta Data
+        nftSummary = await getNFTCollectionSummary(request)
+        nftSummary = nftSummary.NFTCollectionResponse.PostEntryResponse
+
+        nftMetaData = {
+          id: nftId,
+          imageUrl: nftSummary.ImageURLs.length > 0 ? nftSummary.ImageURLs[0] : '',
+          description: cleanString(nftSummary.Body, 100)
         }
 
-        response = await getNFTCollectionSummary(request)
-        resolve(response)
+        // Fetch the Users who own the NFTs
+        nftItems = await await getNFTEntriesForPost(request)
+
+        for (const nftItem of nftItems.NFTEntryResponses) {
+          // Don't add current user to hodlers list
+          if (nftItem.OwnerPublicKeyBase58Check === publicKey) continue
+
+          // Check if the user is already in the hodlers list
+          const userIndex = nftHodlers.findIndex((item) => item.publicKey === nftItem.OwnerPublicKeyBase58Check)
+
+          if (userIndex > -1) {
+            // User found. Increment token balance
+            nftHodlers[userIndex].tokenBalance++
+            continue
+          }
+
+          // User not found. Add to hodlers list
+          nftUser = await getSingleProfile({
+            PublicKeyBase58Check: nftItem.OwnerPublicKeyBase58Check
+          })
+
+          newEntry = desoUserModel()
+
+          newEntry.publicKey = nftItem.OwnerPublicKeyBase58Check
+          newEntry.username = nftUser.Profile.Username
+          newEntry.profilePicUrl = generateProfilePicUrl(newEntry.publicKey)
+          newEntry.tokenBalance = 1
+
+          nftHodlers.push(newEntry)
+        }
+
+        resolve({ nftMetaData, nftHodlers })
       } catch (e) {
         console.log(e)
         reject(e)
-      }
-    })()
-  })
-}
-
-/**
- * Uses the hex value from an NFT URL link to fetch all NFT entries that exist for the NFT Collection
- *
- * @param {string} postHashHex - The hex value from an NFT URL link.
- *
- * @returns {Promise} A promise that resolves an object containing the NFT entries, or rejects when an error occurs.
- */
-export const getNFTEntries = (postHashHex) => {
-  return new Promise((resolve, reject) => {
-    ;(async () => {
-      let request = null
-      let response = null
-
-      try {
-        request = {
-          PostHashHex: postHashHex
-        }
-
-        response = await getNFTEntriesForPost(request)
-
-        resolve(response)
-      } catch (e) {
-        console.log(e)
-        reject(Enums.messages.UNKNOWN_ERROR)
       }
     })()
   })

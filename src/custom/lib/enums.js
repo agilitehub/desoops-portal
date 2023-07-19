@@ -20,6 +20,9 @@ const Enums = {
     FOLLOWING: 'Following',
     SELECTED_USERS: 'Selected Users in Table'
   },
+  defaults: {
+    DEFAULT_FEE_PER_TRANSACTION_USD: 0.001
+  },
   paymentTypes: {
     DESO: '$DESO',
     DAO: 'DAO',

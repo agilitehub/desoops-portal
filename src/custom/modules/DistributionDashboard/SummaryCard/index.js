@@ -8,6 +8,7 @@ import Enums from '../../../lib/enums'
 import { RightCircleOutlined } from '@ant-design/icons'
 import { calculateEstimatedPayment } from '../controller'
 import { distributionSummaryState } from '../data-models'
+import { cloneDeep } from 'lodash'
 
 const styleParams = {
   labelColXS: 12,
@@ -142,7 +143,7 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
     let desoPrice = null
 
     // We need to update the estimatedPaymentToken and estimatedPaymentUSD values
-    tmpHodlers = Array.from(parentState.finalHodlers)
+    tmpHodlers = cloneDeep(parentState.finalHodlers)
     if (parentState.distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
     await calculateEstimatedPayment(tmpHodlers, distributionAmount, parentState.spreadAmountBasedOn, desoPrice)
     onSetState({ distributionAmount })

@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useReducer } from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 // UI Components
 import { Row, Col, message, Divider } from 'antd'
@@ -16,6 +16,8 @@ import TableData from './TableData'
 import Enums from '../../lib/enums'
 import { calculateEstimatedPayment, setupHodlers, updateHodlers } from './controller'
 import { distributionDashboardState } from './data-models'
+import { updateNFTHodlers } from '../../reducer'
+import { cloneDeep } from 'lodash'
 
 const styleParams = {
   dividerStyle: { margin: '5px 0', borderBlockStart: 0 }
@@ -24,6 +26,7 @@ const styleParams = {
 const reducer = (state, newState) => ({ ...state, ...newState })
 
 const _BatchTransactionsForm = () => {
+  const dispatch = useDispatch()
   const desoData = useSelector((state) => state.custom.desoData)
   const [state, setState] = useReducer(reducer, distributionDashboardState())
 
@@ -55,10 +58,7 @@ const _BatchTransactionsForm = () => {
   }, [state.distributeTo, state.distributionType, state.tokenToUse]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDistributeTo = async (distributeTo) => {
-    let tmpResult = null
-    let finalHodlers = null
-    let selectedTableKeys = null
-    let tokenTotal = 0
+    let tmpHodlers = null
 
     try {
       // If user selects the current value, do nothing
@@ -69,23 +69,24 @@ const _BatchTransactionsForm = () => {
       if (!distributeTo) return
 
       // Then, if user selects NFT or Post, no extra work is needed
-      if (distributeTo === Enums.values.NFT || distributeTo === Enums.values.POST) {
-        setState({ distributeTo })
+      if (distributeTo === Enums.values.NFT) {
+        setState({ distributeTo, nftUrl: '', nftMetaData: {}, nftHodlers: [], openNftSearch: true })
         return
       }
 
       setState({ loading: true })
-      tmpResult = await setupHodlers(
-        desoData.profile,
-        distributeTo,
-        state.distributionAmount,
-        state.spreadAmountBasedOn,
-        desoData.desoPrice
-      )
 
-      finalHodlers = tmpResult.finalHodlers
-      tokenTotal = tmpResult.tokenTotal
-      selectedTableKeys = tmpResult.selectedTableKeys
+      // Fetch Hodlers that need to be set up
+      switch (distributeTo) {
+        case Enums.values.DAO:
+          tmpHodlers = JSON.parse(JSON.stringify(desoData.profile.daoHodlers))
+          break
+        case Enums.values.CREATOR:
+          tmpHodlers = JSON.parse(JSON.stringify(desoData.profile.ccHodlers))
+          break
+      }
+
+      const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(tmpHodlers)
 
       // Update State
       setState({ distributeTo, finalHodlers, tokenTotal, selectedTableKeys })
@@ -97,8 +98,8 @@ const _BatchTransactionsForm = () => {
   }
 
   const handleDistributionType = async (distributionType) => {
-    const tmpHodlers = Array.from(state.finalHodlers)
-    const tmpSelectedTableKeys = Array.from(state.selectedTableKeys)
+    const tmpHodlers = cloneDeep(state.finalHodlers)
+    const tmpSelectedTableKeys = cloneDeep(state.selectedTableKeys)
     const tmpConditions = {
       filterUsers: false,
       filterAmountIs: '>',
@@ -125,9 +126,26 @@ const _BatchTransactionsForm = () => {
   }
 
   const handleTokenToUse = async (tokenToUse) => {
-    const finalHodlers = Array.from(state.finalHodlers)
+    const finalHodlers = cloneDeep(state.finalHodlers)
     await calculateEstimatedPayment(finalHodlers, '')
     setState({ finalHodlers, tokenToUse, distributionAmount: null })
+  }
+
+  const handleConfirmNFT = async (nftMetaData, nftHodlers, nftUrl) => {
+    try {
+      setState({ loading: true })
+
+      nftHodlers = cloneDeep(nftHodlers)
+      const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(nftHodlers)
+
+      // Update States
+      setState({ finalHodlers, tokenTotal, selectedTableKeys, nftMetaData, nftHodlers, nftUrl, openNftSearch: false })
+    } catch (e) {
+      console.error(e)
+      message.error(e.message)
+    }
+
+    setState({ loading: false })
   }
 
   return (
@@ -151,6 +169,7 @@ const _BatchTransactionsForm = () => {
                     onDistributionType={handleDistributionType}
                     onTokenToUse={handleTokenToUse}
                     onSetState={setState}
+                    onConfirmNFT={handleConfirmNFT}
                   />
                 </Col>
               </Row>

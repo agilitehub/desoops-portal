@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { Row, Col, Select, Divider, Space, Image } from 'antd'
 import Enums from '../../../../lib/enums'
 
+// App Components
+import DeSoNFTSearchModal from '../../../../reusables/components/DeSoNFTSearchModal'
+
 const styleParams = {
   labelColXS: 24,
   labelColSM: 12,
@@ -14,7 +17,16 @@ const styleParams = {
   dividerStyle: { margin: '7px 0' }
 }
 
-const GenenralTab = ({ state, onDistributeTo, onDistributionType, onTokenToUse, onSetState, desoProfile }) => {
+const GenenralTab = ({
+  state,
+  onDistributeTo,
+  onDistributionType,
+  onTokenToUse,
+  desoProfile,
+  onConfirmNFT,
+  onCancelNFT,
+  onSetState
+}) => {
   const [tokenOwnerList, setTokenOwnerList] = useState([])
 
   useEffect(() => {
@@ -158,6 +170,14 @@ const GenenralTab = ({ state, onDistributeTo, onDistributionType, onTokenToUse, 
           </Row>
         </>
       ) : null}
+      <DeSoNFTSearchModal
+        isOpen={state.openNftSearch}
+        publicKey={desoProfile.publicKey}
+        parentState={state}
+        onSetState={onSetState}
+        onConfirmNFT={onConfirmNFT}
+        onCancelNFT={onCancelNFT}
+      />
     </>
   )
 }

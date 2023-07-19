@@ -6,6 +6,7 @@ import React from 'react'
 import { Row, Col, Select, Divider, InputNumber, Radio, Switch, message } from 'antd'
 import { calculateEstimatedPayment, updateHodlers } from '../../controller'
 import Enums from '../../../../lib/enums'
+import { cloneDeep } from 'lodash'
 
 const styleParams = {
   col1XS: 24,
@@ -61,8 +62,8 @@ const RulesTab = ({ desoData, state, onSetState }) => {
       }
 
       if (runUpdateHolders) {
-        tmpHodlers = Array.from(state.finalHodlers)
-        tmpSelectedTableKeys = Array.from(state.selectedTableKeys)
+        tmpHodlers = cloneDeep(state.finalHodlers)
+        tmpSelectedTableKeys = cloneDeep(state.selectedTableKeys)
 
         const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(
           tmpHodlers,
@@ -92,7 +93,7 @@ const RulesTab = ({ desoData, state, onSetState }) => {
     // If state.distributionAmount is not empty...
     //...we need to run calculateEstimatedPayment() to update the estimatedPaymentToken and estimatedPaymentUSD values
     if (state.distributionAmount !== null) {
-      tmpHodlers = Array.from(state.finalHodlers)
+      tmpHodlers = cloneDeep(state.finalHodlers)
       if (state.distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
       await calculateEstimatedPayment(tmpHodlers, state.distributionAmount, spreadAmountBasedOn, desoPrice)
 

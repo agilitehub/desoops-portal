@@ -4,14 +4,15 @@ import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 
 import theme from '../../../../core/utils/theme'
 import { updateHodlers } from '../controller'
+import { cloneDeep } from 'lodash'
 
 const TableData = (props) => {
   const { desoData, state, onSetState } = props
   const [tableData, setTableData] = React.useState([])
 
   const handleSelectionChange = async (changedSelectedTableKeys) => {
-    const tmpHodlers = Array.from(state.finalHodlers)
-    const tmpSelectedTableKeys = Array.from(changedSelectedTableKeys)
+    const tmpHodlers = cloneDeep(state.finalHodlers)
+    const tmpSelectedTableKeys = cloneDeep(changedSelectedTableKeys)
 
     const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(
       tmpHodlers,

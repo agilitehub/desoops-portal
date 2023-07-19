@@ -4,29 +4,18 @@ import Axios from 'agilite-utils/axios'
 import Enums from '../../lib/enums'
 import { getDeSo } from '../../lib/deso-controller'
 
-export const setupHodlers = (desoProfile, distributeTo) => {
+export const setupHodlers = (hodlers) => {
   return new Promise(async (resolve, reject) => {
     const selectedTableKeys = []
-    let tmpHodlers = null
     let percentResult = null
 
     try {
-      // If user selects DAO or Creator Coin Hodlers, we need to get the relevant users
-      switch (distributeTo) {
-        case Enums.values.DAO:
-          tmpHodlers = JSON.parse(JSON.stringify(desoProfile.daoHodlers))
-          break
-        case Enums.values.CREATOR:
-          tmpHodlers = JSON.parse(JSON.stringify(desoProfile.ccHodlers))
-          break
-      }
-
       // Default all entries in Table to be selected
-      for (let i = 0; i < tmpHodlers.length; i++) {
-        selectedTableKeys.push(tmpHodlers[i].username)
+      for (let i = 0; i < hodlers.length; i++) {
+        selectedTableKeys.push(hodlers[i].username)
       }
 
-      percentResult = await calculatePercentages(tmpHodlers)
+      percentResult = await calculatePercentages(hodlers)
       resolve({ finalHodlers: percentResult.hodlers, selectedTableKeys, tokenTotal: percentResult.tokenTotal })
     } catch (e) {
       reject(e)
