@@ -1,5 +1,5 @@
 import React, { useReducer } from 'react'
-import { Card, Button, Dropdown, message, Modal, Space, Row, Col, Divider, Tooltip } from 'antd'
+import { App, Card, Button, Dropdown, Space, Modal, Row, Col, Divider, Tooltip } from 'antd'
 import { DownOutlined, UserOutlined, ReloadOutlined, CopyOutlined } from '@ant-design/icons'
 import { copyTextToClipboard } from '../../../lib/utils'
 import RandomizeDialogContent from './RandomizeDialog'
@@ -29,12 +29,13 @@ const reducer = (state, newState) => ({ ...state, ...newState })
 
 const QuickActionsCard = ({ desoData }) => {
   const dispatch = useDispatch()
+  const { modal, message } = App.useApp()
   const [state, setState] = useReducer(reducer, initialState)
 
   const handleResetDashboard = () => {
     setState({ resetLoading: true })
 
-    Modal.confirm({
+    modal.confirm({
       title: 'Reset Dashboard',
       content: 'Are you sure you want to reset the dashboard? This action cannot be undone.',
       okText: 'Confirm',
@@ -53,7 +54,7 @@ const QuickActionsCard = ({ desoData }) => {
   const handleRefreshDashboardValues = () => {
     setState({ refreshLoading: true })
 
-    Modal.confirm({
+    modal.confirm({
       title: 'Refresh Dashboard Values',
       content: 'Are you sure you want to refresh values in this Dashboard? This action cannot be undone.',
       okText: 'Confirm',
@@ -167,54 +168,48 @@ const QuickActionsCard = ({ desoData }) => {
       <Row gutter={[16, 16]} style={{ textAlign: 'center' }}>
         <Col span={8}>
           <Col span={24}>
-            <Tooltip title='Reset the Distribution Dashboard to start from the beginning.'>
-              <Button
-                shape='circle'
-                danger
-                style={{ backgroundColor: 'white' }}
-                icon={<ReloadOutlined />}
-                loading={state.resetLoading}
-                disabled={state.resetLoading}
-                onClick={handleResetDashboard}
-              />
-              <div style={{ color: '#DC3847' }}>Reset</div>
-            </Tooltip>
+            <Button
+              shape='circle'
+              danger
+              style={{ backgroundColor: 'white' }}
+              icon={<ReloadOutlined />}
+              loading={state.resetLoading}
+              disabled={state.resetLoading}
+              onClick={handleResetDashboard}
+            />
+            <div style={{ color: '#DC3847' }}>Reset</div>
           </Col>
         </Col>
         <Col span={8}>
           <Col span={24}>
-            <Tooltip title='Refresh all values being used in Distribution Dashboard, including token amounts, holders, etc.'>
-              <Button
-                shape='circle'
-                style={{ color: '#FFC20E', borderColor: '#FFC20E', backgroundColor: 'white' }}
-                icon={<ReloadOutlined />}
-                loading={state.refreshLoading}
-                disabled={state.refreshLoading}
-                onClick={handleRefreshDashboardValues}
-              />
-              <div style={{ color: '#FFC20E' }}>Refresh</div>
-            </Tooltip>
+            <Button
+              shape='circle'
+              style={{ color: '#FFC20E', borderColor: '#FFC20E', backgroundColor: 'white' }}
+              icon={<ReloadOutlined />}
+              loading={state.refreshLoading}
+              disabled={state.refreshLoading}
+              onClick={handleRefreshDashboardValues}
+            />
+            <div style={{ color: '#FFC20E' }}>Refresh</div>
           </Col>
         </Col>
         <Col span={8}>
           <Col span={24}>
-            <Tooltip title='Copy various user groups to your Clipboard'>
-              <Dropdown
-                menu={{ items: dropdownItems, onClick: handleCopyToClipboard }}
-                icon={<DownOutlined />}
+            <Dropdown
+              menu={{ items: dropdownItems, onClick: handleCopyToClipboard }}
+              icon={<DownOutlined />}
+              loading={state.ctcLoading}
+              disabled={state.ctcLoading}
+              trigger={['click']}
+            >
+              <Button
+                shape='circle'
+                style={{ color: '#800080', borderColor: '#800080' }}
+                icon={<CopyOutlined />}
                 loading={state.ctcLoading}
-                disabled={state.ctcLoading}
-                trigger={['click']}
-              >
-                <Button
-                  shape='circle'
-                  style={{ color: '#800080', borderColor: '#800080' }}
-                  icon={<CopyOutlined />}
-                  loading={state.ctcLoading}
-                />
-              </Dropdown>
-              <div style={{ color: '#800080' }}>Copy</div>
-            </Tooltip>
+              />
+            </Dropdown>
+            <div style={{ color: '#800080' }}>Copy</div>
           </Col>
         </Col>
       </Row>
@@ -268,4 +263,10 @@ const QuickActionsCard = ({ desoData }) => {
   )
 }
 
-export default QuickActionsCard
+const app = () => (
+  <App>
+    <QuickActionsCard />
+  </App>
+)
+
+export default app

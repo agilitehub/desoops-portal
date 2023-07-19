@@ -1,5 +1,6 @@
 {
-  "extends": ["react-app", "plugin:react/recommended"],
+  // "extends": ["react-app", "plugin:react/recommended"],
+  "extends": ["react-app"],
   "rules": {
     "default-case": 0,
     "no-tabs": ["error", { "allowIndentationTabs": true }],
