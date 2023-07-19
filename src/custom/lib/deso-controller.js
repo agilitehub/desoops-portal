@@ -9,7 +9,7 @@ import {
   getFollowersForUser
 } from 'deso-protocol'
 import Enums from './enums'
-import { initDeSoUserModel } from './templates'
+import { desoUserModel } from './data-models'
 import { hexToInt } from './utils'
 
 export const desoLogin = () => {
@@ -136,7 +136,7 @@ export const getDAOHodlersAndBalance = (publicKey) => {
 
           // Don't add current user to hodlers list, but rather fetch and format their balance
           if (entry.ProfileEntryResponse.PublicKeyBase58Check !== publicKey) {
-            newEntry = initDeSoUserModel()
+            newEntry = desoUserModel()
 
             newEntry.publicKey = entry.ProfileEntryResponse.PublicKeyBase58Check
             newEntry.username = entry.ProfileEntryResponse.Username
@@ -182,7 +182,7 @@ export const getDAOHodlings = (publicKey) => {
           tokenBalance = tokenBalance / Enums.values.NANO_VALUE / Enums.values.NANO_VALUE
           tokenBalance = Math.floor(tokenBalance * 10000) / 10000
 
-          newEntry = initDeSoUserModel()
+          newEntry = desoUserModel()
 
           newEntry.publicKey = entry.ProfileEntryResponse.PublicKeyBase58Check
           newEntry.username = entry.ProfileEntryResponse.Username
@@ -226,7 +226,7 @@ export const getCCHodlersAndBalance = (publicKey) => {
 
           // Don't add current user to hodlers list, but rather fetch and format their balance
           if (entry.ProfileEntryResponse.PublicKeyBase58Check !== publicKey) {
-            newEntry = initDeSoUserModel()
+            newEntry = desoUserModel()
 
             newEntry.publicKey = entry.ProfileEntryResponse.PublicKeyBase58Check
             newEntry.username = entry.ProfileEntryResponse.Username
@@ -270,7 +270,7 @@ export const getCCHodlings = (publicKey) => {
           tokenBalance = entry.BalanceNanos / Enums.values.NANO_VALUE
           tokenBalance = Math.floor(tokenBalance * 10000) / 10000
 
-          newEntry = initDeSoUserModel()
+          newEntry = desoUserModel()
 
           newEntry.publicKey = entry.ProfileEntryResponse?.PublicKeyBase58Check ?? ''
           newEntry.username = entry.ProfileEntryResponse.Username

@@ -15,7 +15,7 @@ import TableData from './TableData'
 // Custom Utils
 import Enums from '../../lib/enums'
 import { calculateEstimatedPayment, setupHodlers, updateHodlers } from './controller'
-import { initDistributionDashboardState } from '../../lib/templates'
+import { distributionDashboardState } from './data-models'
 
 const styleParams = {
   dividerStyle: { margin: '5px 0', borderBlockStart: 0 }
@@ -25,10 +25,10 @@ const reducer = (state, newState) => ({ ...state, ...newState })
 
 const _BatchTransactionsForm = () => {
   const desoData = useSelector((state) => state.custom.desoData)
-  const [state, setState] = useReducer(reducer, initDistributionDashboardState())
+  const [state, setState] = useReducer(reducer, distributionDashboardState())
 
   const resetState = () => {
-    setState(initDistributionDashboardState())
+    setState(distributionDashboardState())
   }
 
   // Use a useEffect hook to determine if state.rulesEnabled and state.distributionAmountEnabled should be True or False

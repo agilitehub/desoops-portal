@@ -9,7 +9,7 @@ import { hexToInt } from '../../../lib/utils'
 import { RightCircleOutlined, SendOutlined } from '@ant-design/icons'
 import { size } from 'lodash'
 import { calculateEstimatedPayment } from '../controller'
-import { initDistributionSummaryState } from '../../../lib/templates'
+import { distributionSummaryState } from '../data-models'
 
 const styleParams = {
   labelColXS: 12,
@@ -28,7 +28,7 @@ const styleParams = {
 const reducer = (state, newState) => ({ ...state, ...newState })
 
 const SummaryCard = ({ desoData, parentState, onSetState }) => {
-  const [state, setState] = useReducer(reducer, initDistributionSummaryState())
+  const [state, setState] = useReducer(reducer, distributionSummaryState())
 
   useEffect(() => {
     try {

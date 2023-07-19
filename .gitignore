@@ -100,7 +100,7 @@ dist
 .tern-port
 
 build
-hosting.YnVpbGQ.cache
+.firebase
 .vscode
 env-templates
 .firebaserc

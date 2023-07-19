@@ -1,24 +1,6 @@
-// DATA MODELS
-export const initDeSoUserModel = () => {
-  return {
-    isActive: true,
-    isVisible: true,
-    publicKey: '',
-    username: '',
-    profilePicUrl: '',
-    paymentStatus: '',
-    tokenBalance: 0,
-    tokenBalanceLabel: '',
-    estimatedPaymentToken: 0,
-    estimatedPaymentUSD: 0,
-    estimatedPaymentLabel: '0',
-    percentOwnership: 0,
-    percentOwnershipLabel: ''
-  }
-}
-
-// COMPONENT STATES
-export const initDistributionDashboardState = () => {
+// Data Models that get used for Redux States and React Components
+// Component States
+export const distributionDashboardState = () => {
   return {
     loading: false,
     isExecuting: false,
@@ -39,7 +21,7 @@ export const initDistributionDashboardState = () => {
   }
 }
 
-export const initDistributionSummaryState = () => {
+export const distributionSummaryState = () => {
   return {
     noOfPaymentTransactions: 0,
     totalFeeUSD: 0,

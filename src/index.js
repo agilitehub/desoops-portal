@@ -1,6 +1,6 @@
 import React from 'react'
-import { createRoot } from 'react-dom/client'
 import { Provider, useSelector } from 'react-redux'
+import { createRoot } from 'react-dom/client'
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
 import { DeSoIdentityProvider } from 'react-deso-protocol'
@@ -9,6 +9,7 @@ import Store from './store'
 import Core from './core/components/core'
 import Enums from './custom/lib/enums'
 
+// Import default Stylesheet for application
 import './index.css'
 
 // VARIABLES
