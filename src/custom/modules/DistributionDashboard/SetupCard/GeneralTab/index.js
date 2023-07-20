@@ -18,14 +18,14 @@ const styleParams = {
 }
 
 const GenenralTab = ({
-  state,
+  rootState,
   onDistributeTo,
   onDistributionType,
   onTokenToUse,
   desoProfile,
   onConfirmNFT,
   onCancelNFT,
-  onSetState
+  setRootState
 }) => {
   const [tokenOwnerList, setTokenOwnerList] = useState([])
 
@@ -35,7 +35,7 @@ const GenenralTab = ({
     let tmpCCBalance = 0
     let index = 0
 
-    switch (state.distributionType) {
+    switch (rootState.distributionType) {
       case Enums.paymentTypes.DAO:
         for (const entry of desoProfile.daoHodlings) {
           tmpTokenOwnerList.push({
@@ -71,7 +71,7 @@ const GenenralTab = ({
     }
 
     setTokenOwnerList(tmpTokenOwnerList)
-  }, [state.distributionType]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [rootState.distributionType]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
@@ -86,9 +86,9 @@ const GenenralTab = ({
         </Col>
         <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
           <Select
-            disabled={state.isExecuting}
+            disabled={rootState.isExecuting}
             onChange={(value) => onDistributeTo(value)}
-            value={state.distributeTo}
+            value={rootState.distributeTo}
             style={{ width: 250 }}
           >
             <Select.Option value={Enums.values.EMPTY_STRING}>- Select -</Select.Option>
@@ -98,7 +98,7 @@ const GenenralTab = ({
           </Select>
         </Col>
       </Row>
-      {state.distributeTo !== Enums.values.EMPTY_STRING ? (
+      {rootState.distributeTo !== Enums.values.EMPTY_STRING ? (
         <>
           <Divider style={styleParams.dividerStyle} />
           <Row>
@@ -112,9 +112,9 @@ const GenenralTab = ({
             </Col>
             <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
               <Select
-                disabled={state.isExecuting}
+                disabled={rootState.isExecuting}
                 onChange={(value) => onDistributionType(value)}
-                value={state.distributionType}
+                value={rootState.distributionType}
                 style={{ width: 250 }}
               >
                 <Select.Option value={Enums.values.EMPTY_STRING}>- Select -</Select.Option>
@@ -126,7 +126,8 @@ const GenenralTab = ({
           </Row>
         </>
       ) : null}
-      {state.distributionType === Enums.paymentTypes.DAO || state.distributionType === Enums.paymentTypes.CREATOR ? (
+      {rootState.distributionType === Enums.paymentTypes.DAO ||
+      rootState.distributionType === Enums.paymentTypes.CREATOR ? (
         <>
           <Divider style={styleParams.dividerStyle} />
           <Row>
@@ -136,13 +137,13 @@ const GenenralTab = ({
               md={styleParams.labelColMD}
               style={styleParams.labelColStyle}
             >
-              <span style={{ fontWeight: 'bold' }}>{`${state.distributionType} Token to use:`}</span>
+              <span style={{ fontWeight: 'bold' }}>{`${rootState.distributionType} Token to use:`}</span>
             </Col>
             <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
               <Select
-                disabled={state.isExecuting}
+                disabled={rootState.isExecuting}
                 onChange={(value) => onTokenToUse(value)}
-                value={state.tokenToUse}
+                value={rootState.tokenToUse}
                 style={{ width: 250 }}
               >
                 <Select.Option value={Enums.values.EMPTY_STRING}>- Select -</Select.Option>
@@ -171,10 +172,10 @@ const GenenralTab = ({
         </>
       ) : null}
       <DeSoNFTSearchModal
-        isOpen={state.openNftSearch}
+        isOpen={rootState.openNftSearch}
         publicKey={desoProfile.publicKey}
-        parentState={state}
-        onSetState={onSetState}
+        rootState={rootState}
+        setRootState={setRootState}
         onConfirmNFT={onConfirmNFT}
         onCancelNFT={onCancelNFT}
       />

@@ -1,47 +1,47 @@
 import React, { useEffect } from 'react'
 import { Table, Popover } from 'antd'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
+import { cloneDeep } from 'lodash'
 
 import theme from '../../../../core/utils/theme'
 import { updateHodlers } from '../controller'
-import { cloneDeep } from 'lodash'
 import Enums from '../../../lib/enums'
 
 const TableData = (props) => {
-  const { desoData, state, onSetState } = props
+  const { desoData, rootState, setRootState } = props
   const [tableData, setTableData] = React.useState([])
 
   const handleSelectionChange = async (changedSelectedTableKeys) => {
-    const tmpHodlers = cloneDeep(state.finalHodlers)
+    const tmpHodlers = cloneDeep(rootState.finalHodlers)
     const tmpSelectedTableKeys = cloneDeep(changedSelectedTableKeys)
 
     const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(
       tmpHodlers,
       tmpSelectedTableKeys,
       null,
-      state.distributionAmount,
-      state.spreadAmountBasedOn,
+      rootState.distributionAmount,
+      rootState.spreadAmountBasedOn,
       desoData.desoPrice
     )
-    onSetState({ selectedTableKeys, finalHodlers, tokenTotal })
+    setRootState({ selectedTableKeys, finalHodlers, tokenTotal })
   }
 
-  // Create a useState and useEffect hook to monitor state.finalHodlers and update the table data array...
+  // Create a useState and useEffect hook to monitor rootState.finalHodlers and update the table data array...
   // ...to only include hodlers that have an isVisible = true
   useEffect(() => {
-    const filteredHodlers = state.finalHodlers.filter((hodler) => hodler.isVisible)
+    const filteredHodlers = rootState.finalHodlers.filter((hodler) => hodler.isVisible)
     setTableData(filteredHodlers)
-  }, [state.finalHodlers]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [rootState.finalHodlers]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Table
       rowKey={(hodler) => hodler.username}
       rowSelection={{
-        selectedRowKeys: state.selectedTableKeys,
+        selectedRowKeys: rootState.selectedTableKeys,
         onChange: (selectedKeys) => handleSelectionChange(selectedKeys)
       }}
       dataSource={tableData}
-      loading={state.loading}
+      loading={rootState.loading}
       style={{ width: '100%' }}
       columns={[
         {
@@ -61,7 +61,7 @@ const TableData = (props) => {
           render: (value, entry) => {
             let estimatedPaymentLabel = entry.estimatedPaymentLabel
 
-            if (state.distributionType === Enums.paymentTypes.DESO) {
+            if (rootState.distributionType === Enums.paymentTypes.DESO) {
               if (entry.estimatedPaymentUSD >= 0.001) {
                 estimatedPaymentLabel += ` (~$${entry.estimatedPaymentUSD})`
               } else {

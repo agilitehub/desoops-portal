@@ -47,7 +47,7 @@ const App = () => {
         tmpDeSoData.profile = {
           ...tmpDeSoData.profile,
           username: currentUser.ProfileEntryResponse.Username,
-          profilePicUrl: generateProfilePicUrl(currentUser.PublicKeyBase58Check),
+          profilePicUrl: await generateProfilePicUrl(currentUser.PublicKeyBase58Check),
           desoBalance,
           desoBalanceUSD,
           totalFollowing: currentUser.PublicKeysBase58CheckFollowedByUser.length

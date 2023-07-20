@@ -1,14 +1,11 @@
-// Create a ReactJS Functional Component called StepOneCard
-// Use Ant Design's Card Component, with a title of 'Start Here' and size of 'small'
-// Use Ant Design's Row and Col Components to create a 2x2 grid
-
 import React, { useEffect, useReducer } from 'react'
 import { Card, Row, Col, Divider, InputNumber, Popconfirm, Button, Alert } from 'antd'
-import Enums from '../../../lib/enums'
+import { cloneDeep } from 'lodash'
 import { RightCircleOutlined } from '@ant-design/icons'
+
+import Enums from '../../../lib/enums'
 import { calculateEstimatedPayment } from '../controller'
 import { distributionSummaryState } from '../data-models'
-import { cloneDeep } from 'lodash'
 
 const styleParams = {
   labelColXS: 12,
@@ -26,18 +23,18 @@ const styleParams = {
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
-const SummaryCard = ({ desoData, parentState, onSetState }) => {
+const SummaryCard = ({ desoData, rootState, setRootState }) => {
   const [state, setState] = useReducer(reducer, distributionSummaryState())
 
   useEffect(() => {
     try {
-      const noOfPaymentTransactions = parentState.finalHodlers.filter(
+      const noOfPaymentTransactions = rootState.finalHodlers.filter(
         (hodler) => hodler.isActive && hodler.isVisible
       ).length
 
-      let totalFeeUSD = noOfPaymentTransactions * parentState.feePerTransactionUSD
+      let totalFeeUSD = noOfPaymentTransactions * rootState.feePerTransactionUSD
       let totalFeeDESO = totalFeeUSD / desoData.desoPrice
-      let distributionAmount = parentState.distributionAmount
+      let distributionAmount = rootState.distributionAmount
       let amountExceeded = false
       let transactionFeeExceeded = false
       let selectedToken = null
@@ -57,7 +54,7 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
 
       if (totalFeeDESO >= desoData.profile.desoBalance) transactionFeeExceeded = true
 
-      if (parentState.distributionType === Enums.paymentTypes.DESO) {
+      if (rootState.distributionType === Enums.paymentTypes.DESO) {
         tokenToDistribute = `${Enums.paymentTypes.DESO} (~${desoData.profile.desoBalance})`
         isInFinalStage = true
 
@@ -66,19 +63,15 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
           warningMsg = 'The Amount exceeds your DESO Balance.'
         }
       } else {
-        if (parentState.tokenToUse) {
+        if (rootState.tokenToUse) {
           isInFinalStage = true
 
-          switch (parentState.distributionType) {
+          switch (rootState.distributionType) {
             case Enums.paymentTypes.CREATOR:
-              selectedToken = desoData.profile.ccHodlings.find(
-                (hodling) => hodling.publicKey === parentState.tokenToUse
-              )
+              selectedToken = desoData.profile.ccHodlings.find((hodling) => hodling.publicKey === rootState.tokenToUse)
               break
             case Enums.paymentTypes.DAO:
-              selectedToken = desoData.profile.daoHodlings.find(
-                (hodling) => hodling.publicKey === parentState.tokenToUse
-              )
+              selectedToken = desoData.profile.daoHodlings.find((hodling) => hodling.publicKey === rootState.tokenToUse)
               break
           }
 
@@ -87,7 +80,7 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
 
             if (distributionAmount > selectedToken.tokenBalance) {
               amountExceeded = true
-              warningMsg = `The Amount exceeds your ${parentState.distributionType} Balance.`
+              warningMsg = `The Amount exceeds your ${rootState.distributionType} Balance.`
             }
           }
         }
@@ -108,7 +101,7 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
         }
       }
 
-      if (!parentState.distributionAmount || (isInFinalStage && warningMessages.length > 0)) {
+      if (!rootState.distributionAmount || (isInFinalStage && warningMessages.length > 0)) {
         executeDisabled = true
       }
 
@@ -127,11 +120,11 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
       console.error(error)
     }
   }, [
-    parentState.finalHodlers,
-    parentState.tokenToUse,
-    parentState.distributionType,
-    parentState.feePerTransactionUSD,
-    parentState.distributionAmount,
+    rootState.finalHodlers,
+    rootState.tokenToUse,
+    rootState.distributionType,
+    rootState.feePerTransactionUSD,
+    rootState.distributionAmount,
     desoData.profile.desoBalance,
     desoData.profile.daoHodlings,
     desoData.profile.ccHodlings,
@@ -143,10 +136,10 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
     let finalHodlers = null
 
     // We need to update the estimatedPaymentToken and estimatedPaymentUSD values
-    finalHodlers = cloneDeep(parentState.finalHodlers)
-    if (parentState.distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
-    await calculateEstimatedPayment(finalHodlers, distributionAmount, parentState.spreadAmountBasedOn, desoPrice)
-    onSetState({ distributionAmount, finalHodlers })
+    finalHodlers = cloneDeep(rootState.finalHodlers)
+    if (rootState.distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
+    await calculateEstimatedPayment(finalHodlers, distributionAmount, rootState.spreadAmountBasedOn, desoPrice)
+    setRootState({ distributionAmount, finalHodlers })
   }
 
   const handleExecute = async () => {}
@@ -189,7 +182,7 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
           <span style={{ fontWeight: 'bold' }}>Transaction fee:</span>
         </Col>
         <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
-          <span>{`$${parentState.feePerTransactionUSD} per transaction`}</span>
+          <span>{`$${rootState.feePerTransactionUSD} per transaction`}</span>
         </Col>
       </Row>
       <Row>
@@ -220,7 +213,7 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
           <span>{state.tokenToDistribute}</span>
         </Col>
       </Row>
-      {parentState.distributionAmountEnabled ? (
+      {rootState.distributionAmountEnabled ? (
         <>
           <Divider style={styleParams.dividerStyle} />
           <Row>
@@ -235,9 +228,10 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
             <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
               <InputNumber
                 status={state.amountExceeded ? 'error' : null}
-                addonBefore={parentState.distributionType}
+                addonBefore={rootState.distributionType}
                 placeholder='0'
-                value={parentState.distributionAmount}
+                disabled={rootState.isExecuting || state.isExecuting}
+                value={rootState.distributionAmount}
                 style={{ width: 250 }}
                 onChange={handleDistributionAmount}
               />

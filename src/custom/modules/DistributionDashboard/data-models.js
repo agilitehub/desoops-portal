@@ -7,6 +7,7 @@ export const distributionDashboardState = () => {
   return {
     loading: false,
     isExecuting: false,
+    activeRulesTab: '1',
     distributeTo: '',
     distributionType: '',
     distributionAmount: null,
@@ -40,5 +41,14 @@ export const distributionSummaryState = () => {
     warningMessages: [],
     isInFinalStage: false,
     executeDisabled: true
+  }
+}
+
+export const paymentModal = () => {
+  return {
+    successCount: 0,
+    failCount: 0,
+    remainingCount: 0,
+    progress: 0
   }
 }

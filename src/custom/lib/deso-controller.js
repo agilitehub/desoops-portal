@@ -59,7 +59,7 @@ export const desoLogout = () => {
  * @param {object} desoDataState - The current desoData Redux state.
  * @returns {object} A promise that resolves a new instance of the desoData Redux state, or rejects when an error occurs.
  */
-export const getDeSoData = (publicKey, desoDataState) => {
+export const getDeSoData = (publicKey, desoDataState, getFollowing = false) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       let daoHodlings = null
@@ -67,6 +67,7 @@ export const getDeSoData = (publicKey, desoDataState) => {
       let desoPrice = null
       let desoData = null
       let followers = 0
+      let following = 0
 
       try {
         desoData = cloneDeep(desoDataState)
@@ -80,12 +81,18 @@ export const getDeSoData = (publicKey, desoDataState) => {
         // We know how many the current User is following, but we don't know how many are following the current User
         followers = await getTotalFollowersOrFollowing(publicKey, Enums.values.FOLLOWERS)
 
+        // We might need to override the following count
+        if (getFollowing) {
+          following = await getTotalFollowersOrFollowing(publicKey, Enums.values.FOLLOWING)
+        }
+
         // Update the desoData object
         desoData.desoPrice = desoPrice
         desoData.profile.publicKey = publicKey
         desoData.profile.daoBalance = daoBalance
         desoData.profile.ccBalance = ccBalance
         desoData.profile.totalFollowers = followers
+        desoData.profile.totalFollowing = following
         desoData.profile.daoHodlers = daoHodlers
         desoData.profile.daoHodlings = daoHodlings
         desoData.profile.ccHodlers = ccHodlers
@@ -122,12 +129,32 @@ export const getDeSoPricing = () => {
 }
 
 /**
+ * Uses the User's public key to fetch their Profile data from the DeSo blockchain.
+ *
+ * @param {string} publicKey - The public key of the DeSo User.
+ * @returns {Promise} A promise that resolves the user's data as JSON, or rejects when an error occurs.
+ */
+export const getDeSoUser = async (publicKey = '') => {
+  let user = null
+
+  try {
+    user = await getSingleProfile({
+      PublicKeyBase58Check: publicKey
+    })
+
+    return user
+  } catch (e) {
+    throw new Error(e)
+  }
+}
+
+/**
  * Uses the User's public key to generate a URL to their profile picture.
  *
  * @param {string} publicKey - The public key of the DeSo User.
  * @returns {Promise} A promise that resolves the profile picture URL, or rejects when an error occurs.
  */
-export const generateProfilePicUrl = (publicKey = '') => {
+export const generateProfilePicUrl = async (publicKey = '') => {
   const result = `https://blockproducer.deso.org/api/v0/get-single-profile-picture/${publicKey}`
   return result
 }

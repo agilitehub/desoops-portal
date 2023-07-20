@@ -20,13 +20,13 @@ const styleParams = {
   dividerStyle: { margin: '7px 0' }
 }
 
-const RulesTab = ({ desoData, state, onSetState }) => {
+const RulesTab = ({ desoData, rootState, setRootState }) => {
   const handleFilterUsers = async (propType, propValue) => {
     // propType could be either 'filterUsers' or 'filterAmountIs' or 'filterAmount'
     // propValue could be either true/false or '>'/'<' or a number based on propType
     // if filterUsers is true, filterAmount is a valid number, and filterAmountIs is not empty, then we can run the updateHolders function
     // if filterUsers is false, then we can run the updateHolders function
-    // The final step is to update the state with with either the current state values or the new values from updateHolders and propType/propValue
+    // The final step is to update the rootState with with either the current rootState values or the new values from updateHolders and propType/propValue
 
     let newState = {}
     let runUpdateHolders = false
@@ -37,23 +37,23 @@ const RulesTab = ({ desoData, state, onSetState }) => {
       if (propType === 'filterUsers') {
         newState.filterUsers = propValue
       } else {
-        newState.filterUsers = state.filterUsers
+        newState.filterUsers = rootState.filterUsers
       }
 
       if (propType === 'filterAmountIs') {
         newState.filterAmountIs = propValue
       } else {
-        newState.filterAmountIs = state.filterAmountIs
+        newState.filterAmountIs = rootState.filterAmountIs
       }
 
       if (propType === 'filterAmount') {
         newState.filterAmount = propValue
       } else {
-        newState.filterAmount = state.filterAmount
+        newState.filterAmount = rootState.filterAmount
       }
 
-      // If state.filterUsers is true and newState.filterUsers is set to false, then we can run updateHolders
-      if (state.filterUsers && !newState.filterUsers) {
+      // If rootState.filterUsers is true and newState.filterUsers is set to false, then we can run updateHolders
+      if (rootState.filterUsers && !newState.filterUsers) {
         runUpdateHolders = true
         newState.filterAmount = null
         newState.filterAmountIs = '>'
@@ -62,15 +62,15 @@ const RulesTab = ({ desoData, state, onSetState }) => {
       }
 
       if (runUpdateHolders) {
-        tmpHodlers = cloneDeep(state.finalHodlers)
-        tmpSelectedTableKeys = cloneDeep(state.selectedTableKeys)
+        tmpHodlers = cloneDeep(rootState.finalHodlers)
+        tmpSelectedTableKeys = cloneDeep(rootState.selectedTableKeys)
 
         const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(
           tmpHodlers,
           tmpSelectedTableKeys,
           newState,
-          state.distributionAmount,
-          state.spreadAmountBasedOn,
+          rootState.distributionAmount,
+          rootState.spreadAmountBasedOn,
           desoData.desoPrice
         )
 
@@ -79,7 +79,7 @@ const RulesTab = ({ desoData, state, onSetState }) => {
         newState.tokenTotal = tokenTotal
       }
 
-      onSetState(newState)
+      setRootState(newState)
     } catch (e) {
       message.error(e.message)
     }
@@ -90,19 +90,19 @@ const RulesTab = ({ desoData, state, onSetState }) => {
     let tmpHodlers = null
     let desoPrice = null
 
-    // If state.distributionAmount is not empty...
+    // If rootState.distributionAmount is not empty...
     //...we need to run calculateEstimatedPayment() to update the estimatedPaymentToken and estimatedPaymentUSD values
-    if (state.distributionAmount !== null) {
-      tmpHodlers = cloneDeep(state.finalHodlers)
-      if (state.distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
-      await calculateEstimatedPayment(tmpHodlers, state.distributionAmount, spreadAmountBasedOn, desoPrice)
+    if (rootState.distributionAmount !== null) {
+      tmpHodlers = cloneDeep(rootState.finalHodlers)
+      if (rootState.distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
+      await calculateEstimatedPayment(tmpHodlers, rootState.distributionAmount, spreadAmountBasedOn, desoPrice)
 
-      onSetState({
+      setRootState({
         spreadAmountBasedOn,
         finalHodlers: tmpHodlers
       })
     } else {
-      onSetState({ spreadAmountBasedOn })
+      setRootState({ spreadAmountBasedOn })
     }
   }
 
@@ -115,7 +115,12 @@ const RulesTab = ({ desoData, state, onSetState }) => {
           </span>
         </Col>
         <Col xs={styleParams.col1XS}>
-          <Radio.Group value={state.spreadAmountBasedOn} buttonStyle='solid' onChange={handleSpreadAmountBasedOn}>
+          <Radio.Group
+            value={rootState.spreadAmountBasedOn}
+            buttonStyle='solid'
+            onChange={handleSpreadAmountBasedOn}
+            disabled={rootState.isExecuting}
+          >
             <Radio.Button value={'Ownership'}>% Ownership</Radio.Button>
             <Radio.Button value={'Equal Spread'}>Equal Spread</Radio.Button>
           </Radio.Group>
@@ -130,7 +135,8 @@ const RulesTab = ({ desoData, state, onSetState }) => {
         </Col>
         <Col xs={styleParams.col1XS}>
           <Switch
-            checked={state.filterUsers}
+            disabled={rootState.isExecuting}
+            checked={rootState.filterUsers}
             style={{ width: 65 }}
             checkedChildren='Yes'
             unCheckedChildren='No'
@@ -140,7 +146,7 @@ const RulesTab = ({ desoData, state, onSetState }) => {
           />
         </Col>
       </Row>
-      {state.filterUsers ? (
+      {rootState.filterUsers ? (
         <>
           <Divider style={styleParams.dividerStyle} />
           <Row>
@@ -151,8 +157,9 @@ const RulesTab = ({ desoData, state, onSetState }) => {
             </Col>
             <Col xs={5} sm={4} md={3} lg={5}>
               <Select
+                disabled={rootState.isExecuting}
                 style={{ width: 70 }}
-                value={state.filterAmountIs}
+                value={rootState.filterAmountIs}
                 onChange={(filterAmountIs) => {
                   handleFilterUsers('filterAmountIs', filterAmountIs)
                 }}
@@ -165,6 +172,7 @@ const RulesTab = ({ desoData, state, onSetState }) => {
             </Col>
             <Col>
               <InputNumber
+                disabled={rootState.isExecuting}
                 addonAfter='tokens'
                 min={0}
                 placeholder='0'

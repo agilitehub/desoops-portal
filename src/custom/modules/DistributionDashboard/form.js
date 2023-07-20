@@ -16,8 +16,9 @@ import TableData from './TableData'
 import Enums from '../../lib/enums'
 import { calculateEstimatedPayment, setupHodlers, updateHodlers } from './controller'
 import { distributionDashboardState } from './data-models'
-import { updateNFTHodlers } from '../../reducer'
+import { setDeSoData, updateNFTHodlers } from '../../reducer'
 import { cloneDeep } from 'lodash'
+import { generateProfilePicUrl, getDeSoData, getDeSoPricing, getDeSoUser } from '../../lib/deso-controller'
 
 const styleParams = {
   dividerStyle: { margin: '5px 0', borderBlockStart: 0 }
@@ -30,14 +31,6 @@ const _BatchTransactionsForm = () => {
   const desoData = useSelector((state) => state.custom.desoData)
   const [state, setState] = useReducer(reducer, distributionDashboardState())
 
-  const resetState = () => {
-    setState(distributionDashboardState())
-  }
-
-  // Use a useEffect hook to determine if state.rulesEnabled and state.distributionAmountEnabled should be True or False
-  // state.rulesEnabled is dependent on state.distributeTo, state.distributionType, and state.tokenToUse having values
-  // state.distributionAmountEnabled is dependent on state.distributeTo and state.distributionType having values, however...
-  // ...if state.distributionType is DAO or CREATOR, then state.tokenToUse must also have a value
   useEffect(() => {
     let rulesEnabled = false
     let distributionAmountEnabled = false
@@ -56,6 +49,48 @@ const _BatchTransactionsForm = () => {
 
     setState({ rulesEnabled, distributionAmountEnabled })
   }, [state.distributeTo, state.distributionType, state.tokenToUse]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const resetState = async () => {
+    setState(distributionDashboardState())
+  }
+
+  const handleRefreshWallet = async () => {
+    let desoBalance = 0
+    let desoBalanceUSD = 0
+
+    try {
+      setState({ isExecuting: true })
+
+      // Get User's DeSo Balance
+      const currentUser = await getDeSoUser(desoData.profile.publicKey)
+
+      // Get the rest of the DeSo Data TODO: This data is duplicated on app.js
+      const tmpDeSoData = await getDeSoData(desoData.profile.publicKey, desoData, true)
+
+      // Calculate the user's DeSo balance in DeSo and USD
+      desoBalance = currentUser.Profile.DESOBalanceNanos / Enums.values.NANO_VALUE
+      desoBalanceUSD = Math.floor(desoBalance * tmpDeSoData.desoPrice * 100) / 100
+      desoBalance = Math.floor(desoBalance * 10000) / 10000
+
+      // Add final pieces of user profile information to the DeSo data
+      tmpDeSoData.profile = {
+        ...tmpDeSoData.profile,
+        username: currentUser.Profile.Username,
+        profilePicUrl: await generateProfilePicUrl(currentUser.Profile.PublicKeyBase58Check),
+        desoBalance,
+        desoBalanceUSD
+      }
+
+      // Set the DeSo data in the redux store
+      dispatch(setDeSoData(tmpDeSoData))
+
+      // Update State
+      setState({ isExecuting: false })
+      return
+    } catch (e) {
+      message.error(e)
+    }
+  }
 
   const handleDistributeTo = async (distributeTo) => {
     let tmpHodlers = null
@@ -164,11 +199,11 @@ const _BatchTransactionsForm = () => {
                 <Col span={24}>
                   <SetupCard
                     desoData={desoData}
-                    state={state}
+                    rootState={state}
                     onDistributeTo={handleDistributeTo}
                     onDistributionType={handleDistributionType}
                     onTokenToUse={handleTokenToUse}
-                    onSetState={setState}
+                    setRootState={setState}
                     onConfirmNFT={handleConfirmNFT}
                   />
                 </Col>
@@ -177,20 +212,25 @@ const _BatchTransactionsForm = () => {
             <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12}>
               <Row>
                 <Col span={24}>
-                  <QuickActionsCard desoData={desoData} />
+                  <QuickActionsCard
+                    desoData={desoData}
+                    onResetDashboard={resetState}
+                    onRefreshWallet={handleRefreshWallet}
+                    rootState={state}
+                  />
                 </Col>
               </Row>
               <Divider style={styleParams.dividerStyle} />
               <Row>
                 <Col span={24}>
-                  <SummaryCard desoData={desoData} parentState={state} onSetState={setState} />
+                  <SummaryCard desoData={desoData} rootState={state} setRootState={setState} />
                 </Col>
               </Row>
             </Col>
           </Row>
           {state.distributeTo ? (
             <Row>
-              <TableData desoData={desoData} state={state} onSetState={setState} />
+              <TableData desoData={desoData} rootState={state} setRootState={setState} />
             </Row>
           ) : null}
         </ContainerCard>

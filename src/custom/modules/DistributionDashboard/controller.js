@@ -354,32 +354,15 @@ export const payDaoHodler = (senderKey, receiverKey, creatorKey, amount, type) =
   })
 }
 
-export const prepUsersForClipboard = (userList, transactionType) => {
+export const prepUsersForClipboard = (userList) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       const tmpResult = []
       let result = null
 
       try {
-        switch (transactionType) {
-          case Enums.values.FOLLOWERS:
-          case Enums.values.FOLLOWING:
-            for (const username of userList) {
-              tmpResult.push(`@${username}`)
-            }
-
-            break
-          case Enums.values.NFT:
-          case Enums.values.POST:
-            for (const user of userList) {
-              tmpResult.push(`@${user.username}`)
-            }
-
-            break
-          default:
-            for (const user of userList) {
-              tmpResult.push(`@${user.ProfileEntryResponse.Username}`)
-            }
+        for (const username of userList) {
+          tmpResult.push(`@${username}`)
         }
 
         result = {

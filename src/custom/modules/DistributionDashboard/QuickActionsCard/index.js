@@ -27,7 +27,7 @@ const styleParams = {
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
-const QuickActionsCard = ({ desoData }) => {
+const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootState }) => {
   const dispatch = useDispatch()
   const { modal, message } = App.useApp()
   const [state, setState] = useReducer(reducer, initialState)
@@ -40,13 +40,13 @@ const QuickActionsCard = ({ desoData }) => {
       content: 'Are you sure you want to reset the dashboard? This action cannot be undone.',
       okText: 'Confirm',
       okType: 'danger',
-      onOk: () => {
+      onOk: async () => {
+        await onResetDashboard()
         setState({ resetLoading: false })
         message.success('Reset Confirmed')
       },
       onCancel: () => {
         setState({ resetLoading: false })
-        message.warning('Reset Cancelled')
       }
     })
   }
@@ -56,18 +56,22 @@ const QuickActionsCard = ({ desoData }) => {
 
     modal.confirm({
       title: 'Refresh Dashboard Values',
-      content: 'Are you sure you want to refresh values in this Dashboard? This action cannot be undone.',
+      content: 'Are you sure you want to refresh the Dashboard values? This action cannot be undone.',
       okText: 'Confirm',
       okType: 'danger',
       onOk: () => {
-        setState({ refreshLoading: false })
-        message.success('Refresh Confirmed')
+        handleRefreshDashboardValuesExtended()
       },
       onCancel: () => {
         setState({ refreshLoading: false })
-        message.warning('Refresh Cancelled')
       }
     })
+  }
+
+  const handleRefreshDashboardValuesExtended = async () => {
+    await onRefreshWallet()
+    message.success('Refresh Confirmed')
+    setState({ refreshLoading: false })
   }
 
   const handleCopyToClipboard = async (item) => {
@@ -80,6 +84,12 @@ const QuickActionsCard = ({ desoData }) => {
 
       switch (item.key) {
         case Enums.values.SELECTED_USERS:
+          // Return a list of usernames from rootState.finalHodlers.username and only where isActive and isVisible are true
+          userList = rootState.finalHodlers
+            .filter((item) => item.isActive && item.isVisible)
+            .map((item) => item.username)
+
+          userList = await prepUsersForClipboard(userList)
           break
         case Enums.values.FOLLOWERS:
         case Enums.values.FOLLOWING:
@@ -104,16 +114,15 @@ const QuickActionsCard = ({ desoData }) => {
             }
           }
 
-          userList = await prepUsersForClipboard(userList, item.key)
-
-          if (userList.length > 0) {
-            await copyTextToClipboard(userList.data)
-            message.success(`${userList.length} ${item.key} copied to clipboard`)
-          } else {
-            message.warning(`No ${item.key} to copy to clipboard`)
-          }
-
+          userList = await prepUsersForClipboard(userList)
           break
+      }
+
+      if (userList.length > 0) {
+        await copyTextToClipboard(userList.data)
+        message.success(`${userList.length} ${item.key} copied to clipboard`)
+      } else {
+        message.warning(`No ${item.key} to copy to clipboard`)
       }
 
       setState({ ctcLoading: false })
@@ -174,7 +183,7 @@ const QuickActionsCard = ({ desoData }) => {
               style={{ backgroundColor: 'white' }}
               icon={<ReloadOutlined />}
               loading={state.resetLoading}
-              disabled={state.resetLoading}
+              disabled={state.resetLoading || rootState.isExecuting}
               onClick={handleResetDashboard}
             />
             <div style={{ color: '#DC3847' }}>Reset</div>
@@ -187,7 +196,7 @@ const QuickActionsCard = ({ desoData }) => {
               style={{ color: '#FFC20E', borderColor: '#FFC20E', backgroundColor: 'white' }}
               icon={<ReloadOutlined />}
               loading={state.refreshLoading}
-              disabled={state.refreshLoading}
+              disabled={state.refreshLoading || rootState.isExecuting}
               onClick={handleRefreshDashboardValues}
             />
             <div style={{ color: '#FFC20E' }}>Refresh</div>
@@ -199,7 +208,7 @@ const QuickActionsCard = ({ desoData }) => {
               menu={{ items: dropdownItems, onClick: handleCopyToClipboard }}
               icon={<DownOutlined />}
               loading={state.ctcLoading}
-              disabled={state.ctcLoading}
+              disabled={state.ctcLoading || rootState.isExecuting}
               trigger={['click']}
             >
               <Button
@@ -225,7 +234,7 @@ const QuickActionsCard = ({ desoData }) => {
             menu={{ items: dropdownItems, onClick: handleLoadRandomizeDialog }}
             icon={<DownOutlined />}
             loading={state.returnLoading}
-            disabled={state.returnLoading}
+            disabled={state.returnLoading || rootState.isExecuting}
           >
             <Button>
               <Space>
@@ -263,10 +272,17 @@ const QuickActionsCard = ({ desoData }) => {
   )
 }
 
-const app = () => (
-  <App>
-    <QuickActionsCard />
-  </App>
-)
+const app = ({ desoData, onResetDashboard, onRefreshWallet, rootState }) => {
+  return (
+    <App>
+      <QuickActionsCard
+        desoData={desoData}
+        onResetDashboard={onResetDashboard}
+        onRefreshWallet={onRefreshWallet}
+        rootState={rootState}
+      />
+    </App>
+  )
+}
 
 export default app

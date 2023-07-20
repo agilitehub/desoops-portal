@@ -4,26 +4,35 @@ import GeneralTab from './GeneralTab'
 import RulesTab from './RulesTab'
 import Enums from '../../../lib/enums'
 
-const SetupCard = ({ desoData, state, onDistributeTo, onDistributionType, onTokenToUse, onSetState, onConfirmNFT }) => {
+const SetupCard = ({
+  desoData,
+  rootState,
+  onDistributeTo,
+  onDistributionType,
+  onTokenToUse,
+  setRootState,
+  onConfirmNFT
+}) => {
   const handleSelectNFT = () => {
-    onSetState({ openNftSearch: true })
+    setRootState({ openNftSearch: true })
   }
 
   const handleCancelNFT = () => {
-    onSetState({ openNftSearch: false })
+    setRootState({ openNftSearch: false })
   }
 
   const tabItems = [
     {
       key: '1',
       label: 'General',
+      disabled: rootState.isExecuting,
       children: (
         <GeneralTab
           desoProfile={desoData.profile}
-          state={state}
+          rootState={rootState}
           onDistributeTo={onDistributeTo}
           onDistributionType={onDistributionType}
-          onSetState={onSetState}
+          setRootState={setRootState}
           onTokenToUse={onTokenToUse}
           onConfirmNFT={onConfirmNFT}
           onCancelNFT={handleCancelNFT}
@@ -33,25 +42,27 @@ const SetupCard = ({ desoData, state, onDistributeTo, onDistributionType, onToke
     {
       key: '2',
       label: 'Rules',
-      disabled: !state.rulesEnabled,
-      children: <RulesTab desoData={desoData} state={state} onSetState={onSetState} />
+      disabled: !rootState.rulesEnabled || rootState.isExecuting,
+      children: <RulesTab desoData={desoData} rootState={rootState} setRootState={setRootState} />
     }
   ]
 
   return (
     <Card title='👇 Start Here: Setup & Config' size='small'>
       <Tabs
-        defaultActiveKey='1'
+        disabled={true}
+        activeKey={rootState.activeRulesTab}
         size='small'
+        onTabClick={(key) => setRootState({ activeRulesTab: key })}
         tabBarExtraContent={
-          state.distributeTo === Enums.values.NFT ? (
+          rootState.distributeTo === Enums.values.NFT ? (
             <Button
               style={{ color: '#188EFF', borderColor: '#188EFF', backgroundColor: 'white' }}
               onClick={handleSelectNFT}
               icon={
-                !state.nftMetaData.id ? null : (
+                !rootState.nftMetaData.id ? null : (
                   <Image
-                    src={state.nftMetaData.imageUrl}
+                    src={rootState.nftMetaData.imageUrl}
                     width={25}
                     height={25}
                     style={{ borderRadius: 5, marginLeft: -15, marginTop: -3 }}
