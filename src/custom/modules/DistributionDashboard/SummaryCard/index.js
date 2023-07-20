@@ -139,14 +139,14 @@ const SummaryCard = ({ desoData, parentState, onSetState }) => {
   ])
 
   const handleDistributionAmount = async (distributionAmount) => {
-    let tmpHodlers = null
     let desoPrice = null
+    let finalHodlers = null
 
     // We need to update the estimatedPaymentToken and estimatedPaymentUSD values
-    tmpHodlers = cloneDeep(parentState.finalHodlers)
+    finalHodlers = cloneDeep(parentState.finalHodlers)
     if (parentState.distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
-    await calculateEstimatedPayment(tmpHodlers, distributionAmount, parentState.spreadAmountBasedOn, desoPrice)
-    onSetState({ distributionAmount })
+    await calculateEstimatedPayment(finalHodlers, distributionAmount, parentState.spreadAmountBasedOn, desoPrice)
+    onSetState({ distributionAmount, finalHodlers })
   }
 
   const handleExecute = async () => {}

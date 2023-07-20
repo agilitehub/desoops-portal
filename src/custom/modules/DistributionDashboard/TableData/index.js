@@ -5,6 +5,7 @@ import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import theme from '../../../../core/utils/theme'
 import { updateHodlers } from '../controller'
 import { cloneDeep } from 'lodash'
+import Enums from '../../../lib/enums'
 
 const TableData = (props) => {
   const { desoData, state, onSetState } = props
@@ -58,10 +59,18 @@ const TableData = (props) => {
           dataIndex: 'percentOwnershipLabel',
           key: 'percentOwnershipLabel',
           render: (value, entry) => {
+            let estimatedPaymentLabel = entry.estimatedPaymentLabel
+
+            if (state.distributionType === Enums.paymentTypes.DESO) {
+              if (entry.estimatedPaymentUSD >= 0.001) {
+                estimatedPaymentLabel += ` (~$${entry.estimatedPaymentUSD})`
+              } else {
+                estimatedPaymentLabel += '(<$0.001)'
+              }
+            }
+
             return (
-              <span style={{ color: theme.twitterBootstrap.primary }}>
-                {`${value}% -> ${entry.estimatedPaymentLabel}`}
-              </span>
+              <span style={{ color: theme.twitterBootstrap.primary }}>{`${value}% -> ${estimatedPaymentLabel}`}</span>
             )
           }
         },

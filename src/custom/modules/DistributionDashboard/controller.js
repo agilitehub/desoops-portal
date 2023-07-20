@@ -150,11 +150,10 @@ export const calculateEstimatedPayment = (hodlers, amount, spreadAmountBasedOn, 
           estimatedPaymentUSD = 0
         }
 
-        hodler.estimatedPaymentUSD = estimatedPaymentUSD
+        hodler.estimatedPaymentUSD = Math.floor(estimatedPaymentUSD * 1000) / 1000
 
-        // Round the estimated payment in tokens to 3 decimal places and stringify it
-        estimatedPaymentLabel = Math.floor(estimatedPaymentToken * 10000) / 10000
-        hodler.estimatedPaymentLabel = estimatedPaymentLabel
+        // Round the estimated payment in tokens to 3 decimal places
+        hodler.estimatedPaymentLabel = Math.floor(estimatedPaymentToken * 10000) / 10000
       })
 
       resolve(hodlers)

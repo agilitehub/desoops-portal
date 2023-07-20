@@ -11,7 +11,7 @@ export const desoUserModel = () => {
     tokenBalanceLabel: '',
     estimatedPaymentToken: 0,
     estimatedPaymentUSD: 0,
-    estimatedPaymentLabel: '0',
+    estimatedPaymentLabel: 0,
     percentOwnership: 0,
     percentOwnershipLabel: ''
   }
