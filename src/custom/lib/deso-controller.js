@@ -197,7 +197,7 @@ export const getDAOHodlersAndBalance = (publicKey) => {
 
             newEntry.publicKey = entry.ProfileEntryResponse.PublicKeyBase58Check
             newEntry.username = entry.ProfileEntryResponse.Username
-            newEntry.profilePicUrl = generateProfilePicUrl(newEntry.publicKey)
+            newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
             newEntry.tokenBalance = tokenBalance
 
             daoHodlers.push(newEntry)
@@ -249,7 +249,7 @@ export const getDAOHodlings = (publicKey) => {
 
           newEntry.publicKey = entry.ProfileEntryResponse.PublicKeyBase58Check
           newEntry.username = entry.ProfileEntryResponse.Username
-          newEntry.profilePicUrl = generateProfilePicUrl(newEntry.publicKey)
+          newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
           newEntry.tokenBalance = tokenBalance
 
           daoHodlings.push(newEntry)
@@ -299,7 +299,7 @@ export const getCCHodlersAndBalance = (publicKey) => {
 
             newEntry.publicKey = entry.ProfileEntryResponse.PublicKeyBase58Check
             newEntry.username = entry.ProfileEntryResponse.Username
-            newEntry.profilePicUrl = generateProfilePicUrl(newEntry.publicKey)
+            newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
             newEntry.tokenBalance = tokenBalance
 
             ccHodlers.push(newEntry)
@@ -349,7 +349,7 @@ export const getCCHodlings = (publicKey) => {
 
           newEntry.publicKey = entry.ProfileEntryResponse?.PublicKeyBase58Check ?? ''
           newEntry.username = entry.ProfileEntryResponse.Username
-          newEntry.profilePicUrl = generateProfilePicUrl(newEntry.publicKey)
+          newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
           newEntry.tokenBalance = tokenBalance
 
           ccHodlings.push(newEntry)
@@ -504,7 +504,7 @@ export const getNFTDetails = (nftId, publicKey) => {
 
           newEntry.publicKey = nftItem.OwnerPublicKeyBase58Check
           newEntry.username = nftUser.Profile.Username
-          newEntry.profilePicUrl = generateProfilePicUrl(newEntry.publicKey)
+          newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
           newEntry.tokenBalance = 1
 
           nftHodlers.push(newEntry)

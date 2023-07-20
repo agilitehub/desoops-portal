@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Table, Popover } from 'antd'
+import { Table, Popover, Image } from 'antd'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { cloneDeep } from 'lodash'
 
@@ -48,9 +48,22 @@ const TableData = (props) => {
           title: 'User (Token Balance)',
           dataIndex: 'username',
           key: 'username',
+          width: '40%',
           render: (value, entry) => {
             return (
-              <span style={{ color: theme.twitterBootstrap.primary }}>{`${value} (${entry.tokenBalanceLabel})`}</span>
+              <div>
+                <Image
+                  src={entry.profilePicUrl}
+                  width={20}
+                  height={20}
+                  style={{ borderRadius: '50%', marginTop: -3 }}
+                  fallback='https://openfund.com/images/ghost-profile-image.svg'
+                  preview={false}
+                />
+                <span
+                  style={{ color: theme.twitterBootstrap.primary, marginLeft: 5 }}
+                >{`${value} (${entry.tokenBalanceLabel})`}</span>
+              </div>
             )
           }
         },
@@ -58,6 +71,7 @@ const TableData = (props) => {
           title: '% Ownership -> Est Payment',
           dataIndex: 'percentOwnershipLabel',
           key: 'percentOwnershipLabel',
+          width: '40%',
           render: (value, entry) => {
             let estimatedPaymentLabel = entry.estimatedPaymentLabel
 
