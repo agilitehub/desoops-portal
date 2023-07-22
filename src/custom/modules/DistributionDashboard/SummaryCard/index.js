@@ -1,11 +1,11 @@
 import React, { useEffect, useReducer } from 'react'
 import { Card, Row, Col, Divider, InputNumber, Popconfirm, Button, Alert } from 'antd'
-import { cloneDeep, isError } from 'lodash'
+import { cloneDeep } from 'lodash'
 import { RightCircleOutlined } from '@ant-design/icons'
 
 import CoreEnums from '../../../lib/enums'
 import { calculateEstimatedPayment } from '../controller'
-import { distributionSummaryState, paymentModal } from '../data-models'
+import { distributionSummaryState } from '../data-models'
 import Enums from '../enums'
 import { sendCreatorCoins, sendDAOTokens, sendDESO } from '../../../lib/deso-controller'
 
@@ -30,8 +30,9 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
 
   useEffect(() => {
     try {
-      const hodlersToPay = rootState.finalHodlers.filter((hodler) => hodler.isActive && hodler.isVisible)
-      const noOfPaymentTransactions = hodlersToPay.length
+      const noOfPaymentTransactions = rootState.finalHodlers.filter(
+        (hodler) => hodler.isActive && hodler.isVisible
+      ).length
 
       let totalFeeUSD = noOfPaymentTransactions * rootState.feePerTransactionUSD
       let totalFeeDESO = totalFeeUSD / desoData.desoPrice
@@ -108,7 +109,6 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
       }
 
       setState({
-        hodlersToPay,
         noOfPaymentTransactions,
         totalFeeUSD,
         totalFeeDESO,
@@ -151,6 +151,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
     let tips = agiliteData.tips // TODO: Randomize Tips
     let progressPercent = 10
     let paymentModal = null
+    let finalHodlers = null
     let paymentCount = state.noOfPaymentTransactions
     let successCount = 0
     let failCount = 0
@@ -172,10 +173,20 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
         progressPercent
       }
 
-      // Load the Payment Modal
+      // Flag all hodlers setting paymentStatus = CoreEnums.paymentStatuses.QUEUED
+      finalHodlers = cloneDeep(rootState.finalHodlers)
+
+      for (const hodler of finalHodlers) {
+        if (hodler.isActive && hodler.isVisible) {
+          hodler.paymentStatus = CoreEnums.paymentStatuses.QUEUED
+        }
+      }
+
+      // Start execution and update Root State
       setRootState({
         isExecuting: true,
-        paymentModal
+        paymentModal,
+        finalHodlers
       })
 
       // Pay the DeSoOps Transaction Fee
@@ -187,9 +198,15 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
       setRootState({ paymentModal })
 
       // Loop through state.holdersToPay and for each one, distribute the tokens using a for-of loop
-      for (const hodler of state.hodlersToPay) {
+      for (const hodler of finalHodlers) {
         // Pay the hodler
         try {
+          // Ignore hodlers that are not active or visible
+          if (!hodler.isActive || !hodler.isVisible) continue
+
+          hodler.paymentStatus = CoreEnums.paymentStatuses.IN_PROGRESS
+          setRootState({ finalHodlers })
+
           switch (rootState.distributionType) {
             case CoreEnums.paymentTypes.DESO:
               await sendDESO(desoData.profile.publicKey, hodler.publicKey, hodler.estimatedPaymentToken)
@@ -223,15 +240,17 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
           remainingCount--
           paymentModal.successCount = successCount
           paymentModal.remainingCount = remainingCount
+          hodler.paymentStatus = CoreEnums.paymentStatuses.SUCCESS
         } else {
           failCount++
           remainingCount--
           paymentModal.failCount = failCount
           paymentModal.remainingCount = remainingCount
+          hodler.paymentStatus = CoreEnums.paymentStatuses.FAILED
         }
 
         paymentModal.progressPercent = Math.floor(20 + (70 * (successCount + failCount)) / paymentCount)
-        setRootState({ paymentModal })
+        setRootState({ paymentModal, finalHodlers })
       }
 
       // Payments Completed, refresh the wallet and balances
@@ -242,7 +261,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
       // If there were any errors, add them to errors array and change the payment status
       if (failCount > 0) {
         paymentModal.status = Enums.paymentStatuses.ERROR
-        paymentModal.errors = state.hodlersToPay.filter((hodler) => hodler.isError)
+        paymentModal.errors = finalHodlers.filter((hodler) => hodler.isError)
       } else {
         paymentModal.status = Enums.paymentStatuses.SUCCESS
       }

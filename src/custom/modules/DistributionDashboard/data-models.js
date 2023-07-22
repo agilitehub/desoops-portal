@@ -30,7 +30,6 @@ export const distributionDashboardState = (feePerTransactionUSD) => {
 
 export const distributionSummaryState = () => {
   return {
-    hodlersToPay: [],
     noOfPaymentTransactions: 0,
     totalFeeUSD: 0,
     totalFeeDESO: 0,

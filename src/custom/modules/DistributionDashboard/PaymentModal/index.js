@@ -113,7 +113,7 @@ const PaymentModal = ({ props, onPaymentDone }) => {
                           />
                         }
                         title={<a href='https://ant.design'>{entry.username}</a>}
-                        description={entry.errorDescription}
+                        description={entry.errorMessage}
                       />
                     </List.Item>
                   )}

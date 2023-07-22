@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { Table, Popover, Image } from 'antd'
-import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined, CloseCircleOutlined, ReloadOutlined } from '@ant-design/icons'
 import { cloneDeep } from 'lodash'
 
 import theme from '../../../../core/utils/theme'
@@ -92,15 +92,17 @@ const TableData = (props) => {
           title: 'Status',
           dataIndex: 'paymentStatus',
           key: 'paymentStatus',
-          render: (value) => {
-            if (value === 'Paid') {
+          render: (value, entry) => {
+            if (value === Enums.paymentStatuses.SUCCESS) {
               return <CheckCircleOutlined style={{ fontSize: 20, color: theme.twitterBootstrap.success }} />
-            } else if (value.indexOf('Error:') > -1) {
+            } else if (entry.isError) {
               return (
-                <Popover content={<p>{value}</p>} title='DeSo Error'>
+                <Popover content={<p>{entry.errorMessage}</p>} title='Payment Error'>
                   <CloseCircleOutlined style={{ fontSize: 20, color: theme.twitterBootstrap.danger }} />
                 </Popover>
               )
+            } else if (value === Enums.paymentStatuses.IN_PROGRESS) {
+              return <ReloadOutlined style={{ fontSize: 20, color: theme.twitterBootstrap.primary }} spin />
             } else {
               return <span style={{ color: theme.twitterBootstrap.info }}>{value}</span>
             }

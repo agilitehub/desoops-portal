@@ -26,6 +26,12 @@ const Enums = {
     DAO: 'DAO',
     CREATOR: 'CC'
   },
+  paymentStatuses: {
+    QUEUED: 'Queued',
+    IN_PROGRESS: 'In Progress',
+    SUCCESS: 'Success',
+    FAILED: 'Failed'
+  },
   messages: {
     UNKNOWN_ERROR: 'Unknown Error Occured. Please check console',
     NOT_NFT_CREATOR: 'You are not the creator of this NFT. Please revise'
