@@ -8,7 +8,10 @@ import {
   getHodlersForUser,
   getExchangeRates,
   getFollowersForUser,
-  getSingleProfile
+  getSingleProfile,
+  sendDeso,
+  transferDeSoToken,
+  transferCreatorCoin
 } from 'deso-protocol'
 import Enums from './enums'
 import { desoUserModel } from './data-models'
@@ -23,7 +26,7 @@ export const desoLogin = () => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       try {
-        const response = await identity.login()
+        const response = await identity.login({ accessLevelRequest: 4 })
         resolve(response)
       } catch (e) {
         reject(e)
@@ -517,6 +520,92 @@ export const getNFTDetails = (nftId, publicKey) => {
       }
     })()
   })
+}
+
+/**
+ * Sends DESO from one user to another.
+ * @async
+ * @function
+ * @param {string} sender - The public key of the sender.
+ * @param {string} recipient - The public key or username of the recipient.
+ * @param {number} amount - The amount of DESO to send, in nanos.
+ * @returns {Promise<Object>} - A Promise that resolves with the response from the identity.sendDeso call.
+ * @throws {Error} - Throws an error if the identity.sendDeso call fails.
+ */
+export const sendDESO = async (sender, recipient, amount) => {
+  let response = null
+
+  try {
+    response = await sendDeso({
+      SenderPublicKeyBase58Check: sender,
+      RecipientPublicKeyOrUsername: recipient,
+      AmountNanos: Math.round(amount * Enums.values.NANO_VALUE),
+      MinFeeRateNanosPerKB: 1000
+    })
+
+    return response
+  } catch (e) {
+    throw new Error(e)
+  }
+}
+
+/**
+ * Sends DAO tokens from one user to another.
+ * @async
+ * @function
+ * @param {string} sender - The public key of the sender.
+ * @param {string} recipient - The public key or username of the recipient.
+ * @param {string} token - The public key or username of the DAO token to be sent.
+ * @param {number} amount - The amount of DAO tokens to send, in nanos as a hex string.
+ * @returns {Promise<Object>} - A Promise that resolves with the response from the transferDeSoToken call.
+ * @throws {Error} - Throws an error if the transferDeSoToken call fails.
+ */
+export const sendDAOTokens = async (sender, recipient, token, amount) => {
+  let response = null
+
+  try {
+    response = await transferDeSoToken({
+      SenderPublicKeyBase58Check: sender,
+      ProfilePublicKeyBase58CheckOrUsername: token,
+      ReceiverPublicKeyBase58CheckOrUsername: recipient,
+      DAOCoinToTransferNanos:
+        Enums.values.HEX_PREFIX + (amount * Enums.values.NANO_VALUE * Enums.values.NANO_VALUE).toString(16),
+      MinFeeRateNanosPerKB: 1000
+    })
+
+    return response
+  } catch (e) {
+    throw new Error(e)
+  }
+}
+
+/**
+ * Sends Creator Coins from one user to another.
+ * @async
+ * @function
+ * @param {string} sender - The public key of the sender.
+ * @param {string} recipient - The public key or username of the recipient.
+ * @param {string} creatorCoin - The public key of the Creator Coin to be sent.
+ * @param {number} amount - The amount of Creator Coins to send, in nanos.
+ * @returns {Promise<Object>} - A Promise that resolves with the response from the sendCreatorCoins call.
+ * @throws {Error} - Throws an error if the sendCreatorCoins call fails.
+ */
+export const sendCreatorCoins = async (sender, recipient, creatorCoin, amount) => {
+  let response = null
+
+  try {
+    response = await transferCreatorCoin({
+      SenderPublicKeyBase58Check: sender,
+      CreatorPublicKeyBase58Check: creatorCoin,
+      ReceiverUsernameOrPublicKeyBase58Check: recipient,
+      CreatorCoinToTransferNanos: parseInt((amount * Enums.values.NANO_VALUE).toFixed(0)),
+      MinFeeRateNanosPerKB: 1000
+    })
+
+    return response
+  } catch (e) {
+    throw new Error(e)
+  }
 }
 
 // TODO: Remove these functions from the app once the logic that uses it is refactored

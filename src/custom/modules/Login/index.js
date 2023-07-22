@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { identity } from 'deso-protocol'
+import { identity, configure } from 'deso-protocol'
 import { Col, Row, message, Spin, theme, Card } from 'antd'
 import { deviceDetect } from 'react-device-detect'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -9,6 +9,31 @@ import { LoginOutlined } from '@ant-design/icons'
 // Utils
 import styles from './style.module.sass'
 import logo from '../../assets/deso-ops-logo-full-v2.png'
+
+configure({
+  appName: process.env.REACT_APP_NAME,
+  spendingLimitOptions: {
+    // IsUnlimited: true,
+    GlobalDESOLimit: 1 * 1e9, // 1 Deso
+    CreatorCoinOperationLimitMap: {
+      '': {
+        any: 'UNLIMITED'
+      }
+    },
+    DAOCoinOperationLimitMap: {
+      '': {
+        transfer: 'UNLIMITED'
+      }
+    },
+    TransactionCountLimitMap: {
+      BASIC_TRANSFER: 'UNLIMITED',
+      DAO_COIN: 'UNLIMITED',
+      DAO_COIN_TRANSFER: 'UNLIMITED',
+      CREATOR_COIN: 'UNLIMITED',
+      CREATOR_COIN_TRANSFER: 'UNLIMITED'
+    }
+  }
+})
 
 const Login = () => {
   const [loading, setLoading] = useState(false)

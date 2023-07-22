@@ -16,7 +16,7 @@ const WalletOverviewCard = ({ desoProfile }) => {
               style={{ backgroundColor: '#FFA07A', paddingTop: 2, paddingBottom: 2, borderRadius: '5px', fontSize: 14 }}
             >
               <div style={{ color: '#F3F3F3', fontWeight: 'bold' }}>$DESO</div>
-              <div style={{ color: '#F3F3F3', marginTop: -5 }}>{`${desoBalance} (~${desoBalanceUSD})`}</div>
+              <div style={{ color: '#F3F3F3', marginTop: -5 }}>{`${desoBalance} (~$${desoBalanceUSD})`}</div>
             </div>
           </Col>
         </Col>

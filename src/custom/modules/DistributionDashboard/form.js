@@ -15,10 +15,11 @@ import TableData from './TableData'
 // Custom Utils
 import Enums from '../../lib/enums'
 import { calculateEstimatedPayment, setupHodlers, updateHodlers } from './controller'
-import { distributionDashboardState } from './data-models'
+import { distributionDashboardState, paymentModal } from './data-models'
 import { setDeSoData, updateNFTHodlers } from '../../reducer'
 import { cloneDeep } from 'lodash'
 import { generateProfilePicUrl, getDeSoData, getDeSoPricing, getDeSoUser } from '../../lib/deso-controller'
+import PaymentModal from './PaymentModal'
 
 const styleParams = {
   dividerStyle: { margin: '5px 0', borderBlockStart: 0 }
@@ -183,59 +184,71 @@ const _BatchTransactionsForm = () => {
     setState({ loading: false })
   }
 
+  const handlePaymentDone = async () => {
+    setState({ paymentModal: paymentModal() })
+  }
+
   return (
-    <Row justify='center'>
-      <Col xs={22} xl={20} xxl={16}>
-        <ContainerCard title={'Distribution Dashboard'}>
-          <Row gutter={12}>
-            <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12}>
-              <Row>
-                <Col span={24}>
-                  <WalletOverviewCard desoProfile={desoData.profile} />
-                </Col>
-              </Row>
-              <Divider style={styleParams.dividerStyle} />
-              <Row>
-                <Col span={24}>
-                  <SetupCard
-                    desoData={desoData}
-                    rootState={state}
-                    onDistributeTo={handleDistributeTo}
-                    onDistributionType={handleDistributionType}
-                    onTokenToUse={handleTokenToUse}
-                    setRootState={setState}
-                    onConfirmNFT={handleConfirmNFT}
-                  />
-                </Col>
-              </Row>
-            </Col>
-            <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12}>
-              <Row>
-                <Col span={24}>
-                  <QuickActionsCard
-                    desoData={desoData}
-                    onResetDashboard={resetState}
-                    onRefreshWallet={handleRefreshWallet}
-                    rootState={state}
-                  />
-                </Col>
-              </Row>
-              <Divider style={styleParams.dividerStyle} />
-              <Row>
-                <Col span={24}>
-                  <SummaryCard desoData={desoData} rootState={state} setRootState={setState} />
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-          {state.distributeTo ? (
-            <Row>
-              <TableData desoData={desoData} rootState={state} setRootState={setState} />
+    <>
+      <Row justify='center'>
+        <Col xs={22} xl={20} xxl={16}>
+          <ContainerCard title={'Distribution Dashboard'}>
+            <Row gutter={12}>
+              <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12}>
+                <Row>
+                  <Col span={24}>
+                    <WalletOverviewCard desoProfile={desoData.profile} />
+                  </Col>
+                </Row>
+                <Divider style={styleParams.dividerStyle} />
+                <Row>
+                  <Col span={24}>
+                    <SetupCard
+                      desoData={desoData}
+                      rootState={state}
+                      onDistributeTo={handleDistributeTo}
+                      onDistributionType={handleDistributionType}
+                      onTokenToUse={handleTokenToUse}
+                      setRootState={setState}
+                      onConfirmNFT={handleConfirmNFT}
+                    />
+                  </Col>
+                </Row>
+              </Col>
+              <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12}>
+                <Row>
+                  <Col span={24}>
+                    <QuickActionsCard
+                      desoData={desoData}
+                      onResetDashboard={resetState}
+                      onRefreshWallet={handleRefreshWallet}
+                      rootState={state}
+                    />
+                  </Col>
+                </Row>
+                <Divider style={styleParams.dividerStyle} />
+                <Row>
+                  <Col span={24}>
+                    <SummaryCard
+                      desoData={desoData}
+                      rootState={state}
+                      setRootState={setState}
+                      onRefreshWallet={handleRefreshWallet}
+                    />
+                  </Col>
+                </Row>
+              </Col>
             </Row>
-          ) : null}
-        </ContainerCard>
-      </Col>
-    </Row>
+            {state.distributeTo ? (
+              <Row>
+                <TableData desoData={desoData} rootState={state} setRootState={setState} />
+              </Row>
+            ) : null}
+          </ContainerCard>
+        </Col>
+      </Row>
+      <PaymentModal props={state.paymentModal} onPaymentDone={handlePaymentDone} />
+    </>
   )
 }
 

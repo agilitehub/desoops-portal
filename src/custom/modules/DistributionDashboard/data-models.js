@@ -25,15 +25,18 @@ export const distributionDashboardState = () => {
     nftUrl: '',
     nftMetaData: {},
     nftHodlers: [],
-    openNftSearch: false
+    openNftSearch: false,
+    paymentModal: paymentModal()
   }
 }
 
 export const distributionSummaryState = () => {
   return {
+    hodlersToPay: [],
     noOfPaymentTransactions: 0,
     totalFeeUSD: 0,
     totalFeeDESO: 0,
+    totalFeeDESOLabel: 0,
     tokenToDistribute: '',
     transactionFeeExceeded: false,
     amountExceeded: false,
@@ -46,9 +49,14 @@ export const distributionSummaryState = () => {
 
 export const paymentModal = () => {
   return {
+    isOpen: false,
+    status: 'Preparing to execute payments...',
+    paymentCount: 0,
     successCount: 0,
     failCount: 0,
     remainingCount: 0,
-    progress: 0
+    progressPercent: 0,
+    tips: [],
+    errors: []
   }
 }

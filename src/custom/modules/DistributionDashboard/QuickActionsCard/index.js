@@ -1,6 +1,6 @@
 import React, { useReducer } from 'react'
 import { App, Card, Button, Dropdown, Space, Modal, Row, Col, Divider, Tooltip } from 'antd'
-import { DownOutlined, UserOutlined, ReloadOutlined, CopyOutlined } from '@ant-design/icons'
+import { DownOutlined, UserOutlined, ReloadOutlined, CopyOutlined, RollbackOutlined } from '@ant-design/icons'
 import { copyTextToClipboard } from '../../../lib/utils'
 import RandomizeDialogContent from './RandomizeDialog'
 import Enums from '../../../lib/enums'
@@ -181,7 +181,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
               shape='circle'
               danger
               style={{ backgroundColor: 'white' }}
-              icon={<ReloadOutlined />}
+              icon={<RollbackOutlined />}
               loading={state.resetLoading}
               disabled={state.resetLoading || rootState.isExecuting}
               onClick={handleResetDashboard}

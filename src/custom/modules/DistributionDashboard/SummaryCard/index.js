@@ -1,11 +1,13 @@
 import React, { useEffect, useReducer } from 'react'
 import { Card, Row, Col, Divider, InputNumber, Popconfirm, Button, Alert } from 'antd'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, isError } from 'lodash'
 import { RightCircleOutlined } from '@ant-design/icons'
 
-import Enums from '../../../lib/enums'
+import CoreEnums from '../../../lib/enums'
 import { calculateEstimatedPayment } from '../controller'
-import { distributionSummaryState } from '../data-models'
+import { distributionSummaryState, paymentModal } from '../data-models'
+import Enums from '../enums'
+import { sendCreatorCoins, sendDAOTokens, sendDESO } from '../../../lib/deso-controller'
 
 const styleParams = {
   labelColXS: 12,
@@ -23,17 +25,17 @@ const styleParams = {
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
-const SummaryCard = ({ desoData, rootState, setRootState }) => {
+const SummaryCard = ({ desoData, rootState, setRootState, onRefreshWallet }) => {
   const [state, setState] = useReducer(reducer, distributionSummaryState())
 
   useEffect(() => {
     try {
-      const noOfPaymentTransactions = rootState.finalHodlers.filter(
-        (hodler) => hodler.isActive && hodler.isVisible
-      ).length
+      const hodlersToPay = rootState.finalHodlers.filter((hodler) => hodler.isActive && hodler.isVisible)
+      const noOfPaymentTransactions = hodlersToPay.length
 
       let totalFeeUSD = noOfPaymentTransactions * rootState.feePerTransactionUSD
       let totalFeeDESO = totalFeeUSD / desoData.desoPrice
+      let totalFeeDESOLabel = 0
       let distributionAmount = rootState.distributionAmount
       let amountExceeded = false
       let transactionFeeExceeded = false
@@ -49,13 +51,13 @@ const SummaryCard = ({ desoData, rootState, setRootState }) => {
       if (isNaN(totalFeeDESO)) {
         totalFeeDESO = 0
       } else {
-        totalFeeDESO = Math.ceil(totalFeeDESO * 10000) / 10000
+        totalFeeDESOLabel = Math.floor(totalFeeDESO * 10000) / 10000
       }
 
       if (totalFeeDESO >= desoData.profile.desoBalance) transactionFeeExceeded = true
 
-      if (rootState.distributionType === Enums.paymentTypes.DESO) {
-        tokenToDistribute = `${Enums.paymentTypes.DESO} (~${desoData.profile.desoBalance})`
+      if (rootState.distributionType === CoreEnums.paymentTypes.DESO) {
+        tokenToDistribute = `${CoreEnums.paymentTypes.DESO} (~${desoData.profile.desoBalance})`
         isInFinalStage = true
 
         if (totalFeeDESO + distributionAmount > desoData.profile.desoBalance) {
@@ -67,10 +69,10 @@ const SummaryCard = ({ desoData, rootState, setRootState }) => {
           isInFinalStage = true
 
           switch (rootState.distributionType) {
-            case Enums.paymentTypes.CREATOR:
+            case CoreEnums.paymentTypes.CREATOR:
               selectedToken = desoData.profile.ccHodlings.find((hodling) => hodling.publicKey === rootState.tokenToUse)
               break
-            case Enums.paymentTypes.DAO:
+            case CoreEnums.paymentTypes.DAO:
               selectedToken = desoData.profile.daoHodlings.find((hodling) => hodling.publicKey === rootState.tokenToUse)
               break
           }
@@ -106,9 +108,11 @@ const SummaryCard = ({ desoData, rootState, setRootState }) => {
       }
 
       setState({
+        hodlersToPay,
         noOfPaymentTransactions,
         totalFeeUSD,
         totalFeeDESO,
+        totalFeeDESOLabel,
         amountExceeded,
         transactionFeeExceeded,
         warningMessages,
@@ -137,12 +141,118 @@ const SummaryCard = ({ desoData, rootState, setRootState }) => {
 
     // We need to update the estimatedPaymentToken and estimatedPaymentUSD values
     finalHodlers = cloneDeep(rootState.finalHodlers)
-    if (rootState.distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
+    if (rootState.distributionType === CoreEnums.paymentTypes.DESO) desoPrice = desoData.desoPrice
     await calculateEstimatedPayment(finalHodlers, distributionAmount, rootState.spreadAmountBasedOn, desoPrice)
     setRootState({ distributionAmount, finalHodlers })
   }
 
-  const handleExecute = async () => {}
+  const handleExecute = async () => {
+    let status = Enums.paymentStatuses.PREPARING
+    let tips = CoreEnums.tips
+    let progressPercent = 10
+    let paymentModal = null
+    let paymentCount = state.noOfPaymentTransactions
+    let successCount = 0
+    let failCount = 0
+    let remainingCount = paymentCount
+
+    try {
+      // Prep the Payment Modal
+      paymentModal = cloneDeep(rootState.paymentModal)
+
+      paymentModal = {
+        ...paymentModal,
+        paymentCount,
+        successCount,
+        failCount,
+        remainingCount,
+        isOpen: true,
+        status,
+        tips,
+        progressPercent
+      }
+
+      // Load the Payment Modal
+      setRootState({
+        isExecuting: true,
+        paymentModal
+      })
+
+      // Pay the DeSoOps Transaction Fee
+      await sendDESO(desoData.profile.publicKey, CoreEnums.values.DESO_OPS_PUBLIC_KEY, state.totalFeeDESO)
+
+      // Update the Payment Modal
+      paymentModal.status = Enums.paymentStatuses.EXECUTING
+      paymentModal.progressPercent = 20
+      setRootState({ paymentModal })
+
+      // Loop through state.holdersToPay and for each one, distribute the tokens using a for-of loop
+      for (const hodler of state.hodlersToPay) {
+        // Pay the hodler
+        try {
+          switch (rootState.distributionType) {
+            case CoreEnums.paymentTypes.DESO:
+              await sendDESO(desoData.profile.publicKey, hodler.publicKey, hodler.estimatedPaymentToken)
+              break
+            case CoreEnums.paymentTypes.DAO:
+              await sendDAOTokens(
+                desoData.profile.publicKey,
+                hodler.publicKey,
+                rootState.tokenToUse,
+                hodler.estimatedPaymentToken
+              )
+              break
+            case CoreEnums.paymentTypes.CREATOR:
+              await sendCreatorCoins(
+                desoData.profile.publicKey,
+                hodler.publicKey,
+                rootState.tokenToUse,
+                hodler.estimatedPaymentToken
+              )
+              break
+          }
+        } catch (e) {
+          hodler.isError = true
+          hodler.errorMessage = e.message
+          console.error('Error', hodler)
+        }
+
+        // Update the Payment Modal
+        if (!hodler.isError) {
+          successCount++
+          remainingCount--
+          paymentModal.successCount = successCount
+          paymentModal.remainingCount = remainingCount
+        } else {
+          failCount++
+          remainingCount--
+          paymentModal.failCount = failCount
+          paymentModal.remainingCount = remainingCount
+        }
+
+        paymentModal.progressPercent = Math.floor(20 + (70 * (successCount + failCount)) / paymentCount)
+        setRootState({ paymentModal })
+      }
+
+      // Payments Completed, refresh the wallet and balances
+      paymentModal.status = Enums.paymentStatuses.FINALIZING
+      setRootState({ paymentModal })
+      await onRefreshWallet()
+
+      // If there were any errors, add them to errors array and change the payment status
+      if (failCount > 0) {
+        paymentModal.status = Enums.paymentStatuses.ERROR
+        paymentModal.errors = state.hodlersToPay.filter((hodler) => hodler.isError)
+      } else {
+        paymentModal.status = Enums.paymentStatuses.SUCCESS
+      }
+
+      paymentModal.progressPercent = 100
+      setRootState({ paymentModal })
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   return (
     <Card title='Step 3: Distribution Summary' size='small'>
@@ -197,7 +307,7 @@ const SummaryCard = ({ desoData, rootState, setRootState }) => {
         <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
           <span
             style={{ color: state.transactionFeeExceeded ? 'red' : '' }}
-          >{`$${state.totalFeeUSD} (~${state.totalFeeDESO} $DESO)`}</span>
+          >{`$${state.totalFeeUSD} (~${state.totalFeeDESOLabel} $DESO)`}</span>
         </Col>
       </Row>
       <Row>
@@ -243,10 +353,10 @@ const SummaryCard = ({ desoData, rootState, setRootState }) => {
       <Row justify='center'>
         <Col>
           <Popconfirm
-            title='Are you sure you want to execute payments to the below'
-            okText='Yes'
-            cancelText='No'
-            onConfirm={handleExecute}
+            title='Please confirm you are ready to execute payments. This operation cannot be undone.'
+            okText='Confirm'
+            cancelText='Cancel'
+            onConfirm={() => setTimeout(() => handleExecute(), 0)}
             disabled={state.isExecuting || state.executeDisabled}
           >
             <Button

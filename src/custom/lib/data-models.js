@@ -3,6 +3,8 @@ export const desoUserModel = () => {
   return {
     isActive: true,
     isVisible: true,
+    isError: false,
+    errorMessage: '',
     publicKey: '',
     username: '',
     profilePicUrl: '',
