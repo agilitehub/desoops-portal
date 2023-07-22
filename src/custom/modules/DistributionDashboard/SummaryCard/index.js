@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer } from 'react'
-import { Card, Row, Col, Divider, InputNumber, Popconfirm, Button, Alert } from 'antd'
+import { Card, Row, Col, Divider, InputNumber, Popconfirm, Button, Alert, message } from 'antd'
 import { cloneDeep } from 'lodash'
 import { RightCircleOutlined } from '@ant-design/icons'
 
@@ -161,6 +161,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
     let distTransaction = null
     let slimState = null
     let agiliteResponse = null
+    let executeInCatch = false
 
     try {
       // Prep the Payment Modal
@@ -198,6 +199,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
       slimState = await slimRootState(rootState)
       distTransaction = await prepDistributionTransaction(desoData, slimState, state, finalHodlers, paymentModal)
       agiliteResponse = await createDistributionTransaction(distTransaction)
+      executeInCatch = true
 
       // Pay the DeSoOps Transaction Fee
       await sendDESO(desoData.profile.publicKey, CoreEnums.values.DESO_OPS_PUBLIC_KEY, state.totalFeeDESO)
@@ -272,7 +274,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
       // If there were any errors, add them to errors array and change the payment status
       paymentModal.progressPercent = 100
       if (failCount > 0) {
-        paymentModal.status = Enums.paymentStatuses.ERROR
+        paymentModal.status = Enums.paymentStatuses.ERROR_PAYMENT_TRANSACTION
         paymentModal.errors = finalHodlers.filter((hodler) => hodler.isError)
       } else {
         paymentModal.status = Enums.paymentStatuses.SUCCESS
@@ -292,6 +294,43 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
       setRootState({ paymentModal })
     } catch (e) {
       console.error(e)
+
+      // We need to post the error to Agilit-e and notify the user
+      paymentModal.status = Enums.paymentStatuses.ERROR
+      paymentModal.progressPercent = 100
+      paymentModal.isError = true
+
+      if (executeInCatch) {
+        try {
+          distTransaction = await prepDistributionTransaction(
+            desoData,
+            slimState,
+            state,
+            finalHodlers,
+            paymentModal,
+            true,
+            distTransaction.startedAt
+          )
+
+          distTransaction.isError = true
+          distTransaction.errorDetails = {
+            message: e.message,
+            stack: e.stack
+          }
+
+          await updateDistributionTransaction(agiliteResponse._id, distTransaction)
+        } catch (e) {
+          // If we get here, we have serious problems
+          console.error('We have serious problems if this error occurred')
+          console.error(e)
+        }
+      }
+
+      setRootState({
+        isExecuting: false,
+        paymentModal
+      })
+      message.error(e.message)
     }
   }
 

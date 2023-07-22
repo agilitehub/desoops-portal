@@ -27,7 +27,9 @@ const PaymentModal = ({ props, onPaymentDone }) => {
           <div style={{ display: 'flex', alignItems: 'center' }}>
             {props.status === Enums.paymentStatuses.SUCCESS ? (
               <CheckCircleOutlined style={{ color: '#29A745', marginRight: 8, marginTop: -5, fontSize: 18 }} size='' />
-            ) : props.status === Enums.paymentStatuses.ERROR ? (
+            ) : [Enums.paymentStatuses.ERROR, Enums.paymentStatuses.ERROR_PAYMENT_TRANSACTION].includes(
+                props.status
+              ) ? (
               <CloseOutlined style={{ color: '#DC3645', marginRight: 8, marginTop: -5, fontSize: 18 }} />
             ) : (
               <SyncOutlined style={{ color: '#188EFF', marginRight: 8, marginTop: -5, fontSize: 18 }} spin />
@@ -38,7 +40,9 @@ const PaymentModal = ({ props, onPaymentDone }) => {
               status={
                 props.status === Enums.paymentStatuses.SUCCESS
                   ? 'success'
-                  : props.status === Enums.paymentStatuses.ERROR
+                  : [Enums.paymentStatuses.ERROR, Enums.paymentStatuses.ERROR_PAYMENT_TRANSACTION].includes(
+                      props.status
+                    )
                   ? 'exception'
                   : 'active'
               }
@@ -96,6 +100,7 @@ const PaymentModal = ({ props, onPaymentDone }) => {
             {props.errors.length > 0 ? (
               <Col span={24}>
                 <List
+                  size='small'
                   itemLayout='horizontal'
                   header='Error Report'
                   dataSource={props.errors}
@@ -112,8 +117,12 @@ const PaymentModal = ({ props, onPaymentDone }) => {
                             preview={false}
                           />
                         }
-                        title={<a href='https://ant.design'>{entry.username}</a>}
-                        description={entry.errorMessage}
+                        description={
+                          <>
+                            <span style={{ fontSize: 12, fontWeight: 'bold' }}>{`${entry.username} - `}</span>{' '}
+                            <span style={{ fontSize: 12 }}>{entry.errorMessage}</span>
+                          </>
+                        }
                       />
                     </List.Item>
                   )}
