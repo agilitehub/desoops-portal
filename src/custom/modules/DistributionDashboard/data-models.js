@@ -1,9 +1,7 @@
 // Data Models that get used for Redux States and React Components
 
-import Enums from '../../lib/enums'
-
 // Component States
-export const distributionDashboardState = () => {
+export const distributionDashboardState = (feePerTransactionUSD) => {
   return {
     loading: false,
     isExecuting: false,
@@ -21,7 +19,7 @@ export const distributionDashboardState = () => {
     finalHodlers: [],
     selectedTableKeys: [],
     tokenTotal: 0,
-    feePerTransactionUSD: Enums.defaults.DEFAULT_FEE_PER_TRANSACTION_USD,
+    feePerTransactionUSD,
     nftUrl: '',
     nftMetaData: {},
     nftHodlers: [],

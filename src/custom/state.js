@@ -21,8 +21,14 @@ const desoData = {
   desoPrice: 0
 }
 
+const agiliteData = {
+  transactionFeeUSD: 0,
+  tips: []
+}
+
 export const customState = () => {
   return {
-    desoData
+    desoData,
+    agiliteData
   }
 }

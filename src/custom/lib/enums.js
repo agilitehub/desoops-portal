@@ -21,9 +21,6 @@ const Enums = {
     FOLLOWING: 'Following',
     SELECTED_USERS: 'Selected Users in Table'
   },
-  defaults: {
-    DEFAULT_FEE_PER_TRANSACTION_USD: 0.001
-  },
   paymentTypes: {
     DESO: '$DESO',
     DAO: 'DAO',
@@ -32,12 +29,7 @@ const Enums = {
   messages: {
     UNKNOWN_ERROR: 'Unknown Error Occured. Please check console',
     NOT_NFT_CREATOR: 'You are not the creator of this NFT. Please revise'
-  },
-  tips: [
-    'You can filter the list of users in the table based on their Token balance.',
-    'You can select / deselect users in the Table individually, or as a whole.',
-    'You can copy the list of selected users in the Table to your clipboard. Tap on the "Copy" icon in the Quick Actions section.'
-  ]
+  }
 }
 
 export default Enums

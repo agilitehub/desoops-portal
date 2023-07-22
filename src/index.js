@@ -5,12 +5,16 @@ import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
 import { DeSoIdentityProvider } from 'react-deso-protocol'
 
+import { initAgilite } from './custom/lib/agilite-controller'
 import Store from './store'
 import Core from './core/components/core'
 import Enums from './custom/lib/enums'
 
 // Import default Stylesheet for application
 import './index.css'
+
+// Initiate Agilite Controller
+initAgilite()
 
 // VARIABLES
 let tmpAnalytics = null

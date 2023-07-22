@@ -15,9 +15,10 @@ import Toolbar from './modules/Toolbar'
 import Spinner from './reusables/components/Spinner'
 
 // Utils
-import { setDeSoData, resetState } from './reducer'
+import { setDeSoData, setAgiliteData, resetState } from './reducer'
 import { generateProfilePicUrl, getDeSoData } from './lib/deso-controller'
 import Enums from './lib/enums'
+import { getAgiliteData } from './lib/agilite-controller'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -31,10 +32,15 @@ const App = () => {
     // and sets it in the store.
     const getDeSoDataHook = async () => {
       let tmpDeSoData = null
+      let tmpAgiliteData = null
       let desoBalance = 0
       let desoBalanceUSD = 0
 
       try {
+        // First we retrieve configurations from Agilit-e
+        tmpAgiliteData = await getAgiliteData()
+        dispatch(setAgiliteData(tmpAgiliteData))
+
         // Retrieve various data sets from the DeSo blockchain related to the user
         tmpDeSoData = await getDeSoData(currentUser.PublicKeyBase58Check, desoData)
 

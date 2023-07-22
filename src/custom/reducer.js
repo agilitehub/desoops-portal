@@ -11,6 +11,9 @@ const slice = createSlice({
     setDeSoData: (state, data) => {
       state.desoData = data.payload
     },
+    setAgiliteData: (state, data) => {
+      state.agiliteData = data.payload
+    },
     updateFollowers: (state, data) => {
       state.desoData.profile.followers = data.payload.data
       state.desoData.fetchedFollowers = true
@@ -22,5 +25,5 @@ const slice = createSlice({
   }
 })
 
-export const { resetState, setDeSoData, updateFollowers, updateFollowing } = slice.actions
+export const { resetState, setDeSoData, setAgiliteData, updateFollowers, updateFollowing } = slice.actions
 export default slice.reducer

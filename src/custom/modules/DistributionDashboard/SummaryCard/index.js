@@ -25,7 +25,7 @@ const styleParams = {
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
-const SummaryCard = ({ desoData, rootState, setRootState, onRefreshWallet }) => {
+const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefreshWallet }) => {
   const [state, setState] = useReducer(reducer, distributionSummaryState())
 
   useEffect(() => {
@@ -148,7 +148,7 @@ const SummaryCard = ({ desoData, rootState, setRootState, onRefreshWallet }) => 
 
   const handleExecute = async () => {
     let status = Enums.paymentStatuses.PREPARING
-    let tips = CoreEnums.tips
+    let tips = agiliteData.tips // TODO: Randomize Tips
     let progressPercent = 10
     let paymentModal = null
     let paymentCount = state.noOfPaymentTransactions

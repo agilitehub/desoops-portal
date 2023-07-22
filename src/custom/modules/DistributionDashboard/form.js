@@ -16,10 +16,11 @@ import TableData from './TableData'
 import Enums from '../../lib/enums'
 import { calculateEstimatedPayment, setupHodlers, updateHodlers } from './controller'
 import { distributionDashboardState, paymentModal } from './data-models'
-import { setDeSoData, updateNFTHodlers } from '../../reducer'
+import { setDeSoData, setAgiliteData, updateNFTHodlers } from '../../reducer'
 import { cloneDeep } from 'lodash'
 import { generateProfilePicUrl, getDeSoData, getDeSoPricing, getDeSoUser } from '../../lib/deso-controller'
 import PaymentModal from './PaymentModal'
+import { getAgiliteData } from '../../lib/agilite-controller'
 
 const styleParams = {
   dividerStyle: { margin: '5px 0', borderBlockStart: 0 }
@@ -30,7 +31,8 @@ const reducer = (state, newState) => ({ ...state, ...newState })
 const _BatchTransactionsForm = () => {
   const dispatch = useDispatch()
   const desoData = useSelector((state) => state.custom.desoData)
-  const [state, setState] = useReducer(reducer, distributionDashboardState())
+  const agiliteData = useSelector((state) => state.custom.agiliteData)
+  const [state, setState] = useReducer(reducer, distributionDashboardState(agiliteData.transactionFeeUSD))
 
   useEffect(() => {
     let rulesEnabled = false
@@ -52,7 +54,7 @@ const _BatchTransactionsForm = () => {
   }, [state.distributeTo, state.distributionType, state.tokenToUse]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const resetState = async () => {
-    setState(distributionDashboardState())
+    setState(distributionDashboardState(agiliteData.transactionFeeUSD))
   }
 
   const handleRefreshWallet = async () => {
@@ -61,6 +63,10 @@ const _BatchTransactionsForm = () => {
 
     try {
       setState({ isExecuting: true })
+
+      // First we retrieve configurations from Agilit-e
+      const tmpAgiliteData = await getAgiliteData()
+      dispatch(setAgiliteData(tmpAgiliteData))
 
       // Get User's DeSo Balance
       const currentUser = await getDeSoUser(desoData.profile.publicKey)
@@ -231,6 +237,7 @@ const _BatchTransactionsForm = () => {
                   <Col span={24}>
                     <SummaryCard
                       desoData={desoData}
+                      agiliteData={agiliteData}
                       rootState={state}
                       setRootState={setState}
                       onRefreshWallet={handleRefreshWallet}
