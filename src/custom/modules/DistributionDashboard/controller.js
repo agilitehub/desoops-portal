@@ -3,6 +3,8 @@ import Axios from 'agilite-utils/axios'
 // Utils
 import Enums from '../../lib/enums'
 import { getDeSo } from '../../lib/deso-controller'
+import { distributionTransactionModel } from '../../lib/data-models'
+import { cloneDeep } from 'lodash'
 
 export const setupHodlers = (hodlers) => {
   return new Promise(async (resolve, reject) => {
@@ -375,4 +377,88 @@ export const prepUsersForClipboard = (userList) => {
       }
     })()
   })
+}
+
+export const prepDistributionTransaction = async (
+  desoData,
+  rootState,
+  summaryState,
+  finalHodlers,
+  paymentModal,
+  isUpdate,
+  startedAt
+) => {
+  let distTransaction = null
+
+  try {
+    distTransaction = distributionTransactionModel()
+
+    distTransaction.startedAt = startedAt || new Date()
+    if (isUpdate) distTransaction.completedAt = new Date()
+
+    distTransaction.publicKey = desoData.profile.publicKey
+    distTransaction.desoPriceUSD = desoData.desoPrice
+    distTransaction.feePerTransactionUSD = rootState.feePerTransactionUSD
+    distTransaction.distributeTo = rootState.distributeTo
+    distTransaction.distributionType = rootState.distributionType
+    distTransaction.distributionAmount = rootState.distributionAmount
+    distTransaction.tokenToUse = rootState.tokenToUse
+    distTransaction.nftId = rootState.nftId
+
+    distTransaction.rules.spreadAmountBasedOn = rootState.spreadAmountBasedOn
+    distTransaction.rules.filterUsers = rootState.filterUsers
+    distTransaction.rules.filterAmountIs = rootState.filterAmountIs
+    distTransaction.rules.filterAmount = rootState.filterAmount || 0
+
+    distTransaction.totalFeeUSD = summaryState.totalFeeUSD
+    distTransaction.totalFeeDESO = summaryState.totalFeeDESO
+
+    distTransaction.paymentCount = paymentModal.paymentCount
+    distTransaction.successCount = paymentModal.successCount
+    distTransaction.failCount = paymentModal.failCount
+    distTransaction.remainingCount = paymentModal.remainingCount
+
+    // Loop through finalHodlers and add a subset of each entry to the recipients array
+    for (const hodler of finalHodlers) {
+      distTransaction.recipients.push({
+        publicKey: hodler.publicKey,
+        isActive: hodler.isActive,
+        isVisible: hodler.isVisible,
+        isError: hodler.isError,
+        errorMessage: hodler.errorMessage,
+        tokenBalance: hodler.tokenBalance,
+        estimatedPaymentToken: hodler.estimatedPaymentToken,
+        estimatedPaymentUSD: hodler.estimatedPaymentUSD,
+        percentOwnership: hodler.percentOwnership
+      })
+    }
+
+    return distTransaction
+  } catch (e) {
+    throw new Error(e)
+  }
+}
+
+export const slimRootState = async (rootState) => {
+  let slimRootState = cloneDeep(rootState)
+
+  // check if nftMetaData is empty, if no, set the nftId to metaData.id
+  if (Object.keys(slimRootState.nftMetaData).length > 0) {
+    slimRootState.nftId = slimRootState.nftMetaData.id
+  }
+
+  delete slimRootState.loading
+  delete slimRootState.isExecuting
+  delete slimRootState.activeRulesTab
+  delete slimRootState.distributionAmountEnabled
+  delete slimRootState.finalHodlers
+  delete slimRootState.selectedTableKeys
+  delete slimRootState.tokenTotal
+  delete slimRootState.nftUrl
+  delete slimRootState.nftMetaData
+  delete slimRootState.nftHodlers
+  delete slimRootState.openNftSearch
+  delete slimRootState.paymentModal
+
+  return slimRootState
 }

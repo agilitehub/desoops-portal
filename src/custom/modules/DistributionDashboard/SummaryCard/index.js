@@ -4,11 +4,12 @@ import { cloneDeep } from 'lodash'
 import { RightCircleOutlined } from '@ant-design/icons'
 
 import CoreEnums from '../../../lib/enums'
-import { calculateEstimatedPayment } from '../controller'
+import { calculateEstimatedPayment, prepDistributionTransaction, slimRootState } from '../controller'
 import { distributionSummaryState } from '../data-models'
 import Enums from '../enums'
 import { sendCreatorCoins, sendDAOTokens, sendDESO } from '../../../lib/deso-controller'
 import { randomize } from '../../../lib/utils'
+import { createDistributionTransaction, updateDistributionTransaction } from '../../../lib/agilite-controller'
 
 const styleParams = {
   labelColXS: 12,
@@ -157,6 +158,9 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
     let successCount = 0
     let failCount = 0
     let remainingCount = paymentCount
+    let distTransaction = null
+    let slimState = null
+    let agiliteResponse = null
 
     try {
       // Prep the Payment Modal
@@ -189,6 +193,11 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
         paymentModal,
         finalHodlers
       })
+
+      // Prep and send the Distribution Transaction
+      slimState = await slimRootState(rootState)
+      distTransaction = await prepDistributionTransaction(desoData, slimState, state, finalHodlers, paymentModal)
+      agiliteResponse = await createDistributionTransaction(distTransaction)
 
       // Pay the DeSoOps Transaction Fee
       await sendDESO(desoData.profile.publicKey, CoreEnums.values.DESO_OPS_PUBLIC_KEY, state.totalFeeDESO)
@@ -257,9 +266,11 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
       // Payments Completed, refresh the wallet and balances
       paymentModal.status = Enums.paymentStatuses.FINALIZING
       setRootState({ paymentModal })
+
       await onRefreshWallet()
 
       // If there were any errors, add them to errors array and change the payment status
+      paymentModal.progressPercent = 100
       if (failCount > 0) {
         paymentModal.status = Enums.paymentStatuses.ERROR
         paymentModal.errors = finalHodlers.filter((hodler) => hodler.isError)
@@ -267,7 +278,17 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
         paymentModal.status = Enums.paymentStatuses.SUCCESS
       }
 
-      paymentModal.progressPercent = 100
+      distTransaction = await prepDistributionTransaction(
+        desoData,
+        slimState,
+        state,
+        finalHodlers,
+        paymentModal,
+        true,
+        distTransaction.startedAt
+      )
+
+      await updateDistributionTransaction(agiliteResponse._id, distTransaction)
       setRootState({ paymentModal })
     } catch (e) {
       console.error(e)

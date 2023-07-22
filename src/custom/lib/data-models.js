@@ -18,3 +18,47 @@ export const desoUserModel = () => {
     percentOwnershipLabel: ''
   }
 }
+
+export const distributionTransactionModel = () => {
+  return {
+    startedAt: null,
+    completedAt: null,
+    isError: false,
+    errorDetails: null,
+    publicKey: '',
+    desoPriceUSD: 0,
+    feePerTransactionUSD: 0,
+    distributeTo: '',
+    distributionType: '',
+    distributionAmount: 0,
+    tokenToUse: '',
+    nftId: '',
+    rules: {
+      spreadAmountBasedOn: '',
+      filterUsers: false,
+      filterAmountIs: '',
+      filterAmount: 0
+    },
+    totalFeeUSD: 0,
+    totalFeeDESO: 0,
+    paymentCount: 0,
+    successCount: 0,
+    failCount: 0,
+    remainingCount: 0,
+    recipients: []
+  }
+}
+
+export const distributionRecipientModel = () => {
+  return {
+    publicKey: '',
+    isActive: true,
+    isVisible: true,
+    isError: false,
+    errorMessage: '',
+    tokenBalance: 0,
+    estimatedPaymentToken: 0,
+    estimatedPaymentUSD: 0,
+    percentOwnership: 0
+  }
+}
