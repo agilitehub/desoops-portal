@@ -60,3 +60,107 @@ export const cleanString = (inputString = '', maxCharacters = 0, removeHashTags 
 
   return cleanedString
 }
+
+/*
+ * ✅ Pass a String and return x random values
+ * ✅ If String, provide a separator to split String into Array first
+ * ℹ️ Pass an Array and return x random values (Needs Testing)
+ * ℹ️ Pass an Object and return x random values (Needs Testing)
+ * ✅ Allow option for duplicates values to be returned
+ * ✅ Allow option to randomize for performance, or for genuine randomness
+ * ℹ️ If Array, simply return x random Array entries (Needs Testing)
+ * ℹ️ If Object, loop through root prop keys and return random prop values (Needs Testing)
+ * ❌ Defensive Testing (Not Started)
+ */
+
+export const randomize = (input, separator = ' ', x = 1, performance = false, duplicates = false) => {
+  return new Promise((resolve, reject) => {
+    ;(async () => {
+      let errMsg = null
+
+      try {
+        // Check the input type
+        if (!Array.isArray(input)) {
+          if (typeof input === 'string') {
+            // Split the string into an array
+            input = input.split(separator)
+          } else if (typeof input === 'object') {
+            // Create an array of the object's property values
+            input = Object.values(input)
+            // Check if it's an array. If yes, do nothing.
+          } else {
+            errMsg = 'Invalid input. Please provide a string or object.'
+            throw new Error(errMsg)
+          }
+        }
+
+        // Remove duplicate items from the array
+        if (!duplicates) {
+          input = await getRandomUniqueValues(input, x)
+        }
+
+        // Check the performance option
+        if (performance) {
+          // Use the shuffle() method to shuffle the input array
+          input = await shuffle(input)
+        } else {
+          // Use the Math.random() method to generate random numbers
+          input = input
+            .map((item, index) => index)
+            .sort(() => Math.random() - 0.5)
+            .slice(0, x)
+            .map((index) => input[index])
+        }
+
+        input = input.slice(0, x)
+        resolve(input)
+      } catch (e) {
+        reject(e)
+      }
+    })()
+  })
+}
+
+// PRIVATE FUNCTIONS
+const shuffle = (array) => {
+  return new Promise((resolve, reject) => {
+    try {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        const temp = array[i]
+        array[i] = array[j]
+        array[j] = temp
+      }
+
+      resolve(array)
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+const getRandomUniqueValues = (array, x) => {
+  return new Promise((resolve, reject) => {
+    const uniqueValues = []
+    const visited = new Set()
+
+    try {
+      while (uniqueValues.length < x) {
+        const randomIndex = Math.floor(Math.random() * array.length)
+        const value = array[randomIndex]
+
+        if (!visited.has(value.toLowerCase())) {
+          uniqueValues.push(value)
+          visited.add(value.toLowerCase())
+        }
+
+        if (visited.size === array.length) {
+          break
+        }
+      }
+      resolve(uniqueValues)
+    } catch (e) {
+      reject(e)
+    }
+  })
+}

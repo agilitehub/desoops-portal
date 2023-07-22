@@ -8,6 +8,7 @@ import { calculateEstimatedPayment } from '../controller'
 import { distributionSummaryState } from '../data-models'
 import Enums from '../enums'
 import { sendCreatorCoins, sendDAOTokens, sendDESO } from '../../../lib/deso-controller'
+import { randomize } from '../../../lib/utils'
 
 const styleParams = {
   labelColXS: 12,
@@ -148,7 +149,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
 
   const handleExecute = async () => {
     let status = Enums.paymentStatuses.PREPARING
-    let tips = agiliteData.tips // TODO: Randomize Tips
+    let tips = await randomize(agiliteData.tips, null, agiliteData.tips.length)
     let progressPercent = 10
     let paymentModal = null
     let finalHodlers = null
