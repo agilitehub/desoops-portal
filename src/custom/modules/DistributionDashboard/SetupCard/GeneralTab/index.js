@@ -175,7 +175,6 @@ const GenenralTab = ({
         isOpen={rootState.openNftSearch}
         publicKey={desoProfile.publicKey}
         rootState={rootState}
-        setRootState={setRootState}
         onConfirmNFT={onConfirmNFT}
         onCancelNFT={onCancelNFT}
       />

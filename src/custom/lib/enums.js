@@ -19,7 +19,8 @@ const Enums = {
     DIV_ROOT: 'root',
     FOLLOWERS: 'Followers',
     FOLLOWING: 'Following',
-    SELECTED_USERS: 'Selected Users in Table'
+    SELECTED_USERS: 'Selected Users in Table',
+    DESO_ESSENTIALS_PLAYLIST_URL: 'https://www.youtube.com/playlist?list=PLuSeo-NlSN_lXF3wXTmLxnsQQsyIqlb8r'
   },
   paymentTypes: {
     DESO: '$DESO',

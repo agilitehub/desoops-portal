@@ -12,14 +12,14 @@ import { desoNFTSearchModal } from './data-models'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
-const DeSoNFTSearchModal = ({ isOpen, publicKey, parentState, onConfirmNFT, onCancelNFT, onSetState }) => {
+const DeSoNFTSearchModal = ({ isOpen, publicKey, rootState, onConfirmNFT, onCancelNFT }) => {
   const [state, setState] = useReducer(reducer, desoNFTSearchModal())
 
   // Create a useEffect hook to monitor the prop isOpen
   useEffect(() => {
     if (isOpen) {
       // Populate the state using Parent State
-      setState({ nftUrl: parentState.nftUrl, nftMetaData: parentState.nftMetaData, nftHodlers: parentState.nftHodlers })
+      setState({ nftUrl: rootState.nftUrl, nftMetaData: rootState.nftMetaData, nftHodlers: rootState.nftHodlers })
     } else {
       // Reset the state
       setState(desoNFTSearchModal())
@@ -40,8 +40,10 @@ const DeSoNFTSearchModal = ({ isOpen, publicKey, parentState, onConfirmNFT, onCa
       // - https://diamondapp.com/posts{nftId}}
       // - https://desocialworld.com/posts/{nftId}
 
+      // Remove anything after the ? including the ? in the url;
+      const nftUrl = e.target.value.toLowerCase().split('?')[0]
+
       // Split the url so we can validate the domain is correct and return the NFT ID
-      const nftUrl = e.target.value
       const urlSplit = nftUrl.toLowerCase().split('/')
 
       // If the value is empty, return
