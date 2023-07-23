@@ -30,21 +30,18 @@ const DeSoNFTSearchModal = ({ isOpen, publicKey, rootState, onConfirmNFT, onCanc
   const handleProcessNFTURL = async (e) => {
     const errMsgDefault = 'Invalid DeSo NFT URL. Please try again'
 
-    let nftDomain = null
+    // let nftDomain = null
     let nftRoute = null
     let nftId = null
 
     try {
       // The following are examples of valid DeSo NFT URLs:
       // - https://diamondapp.com/nft/{nftId}}
-      // - https://diamondapp.com/posts{nftId}}
+      // - https://diamondapp.com/posts/{nftId}}
       // - https://desocialworld.com/posts/{nftId}
-
+      // - https://xxx.nftz.zone/nft/{nftId}
       // Remove anything after the ? including the ? in the url;
       const nftUrl = e.target.value.toLowerCase().split('?')[0]
-
-      // Split the url so we can validate the domain is correct and return the NFT ID
-      const urlSplit = nftUrl.toLowerCase().split('/')
 
       // If the value is empty, return
       if (!nftUrl) {
@@ -52,26 +49,20 @@ const DeSoNFTSearchModal = ({ isOpen, publicKey, rootState, onConfirmNFT, onCanc
         return
       }
 
+      // Split the url so we can validate the domain is correct and return the NFT ID
+      const urlSplit = nftUrl.toLowerCase().split('/')
+
       // After the split, there should be at least 5 items in the array
       if (urlSplit.length < 5) throw new Error(errMsgDefault)
 
       // Validate the domain is correct as a switch statement
-      nftDomain = urlSplit[2]
+      // nftDomain = urlSplit[2]
       nftRoute = urlSplit[3]
       nftId = urlSplit[4]
 
-      switch (nftDomain) {
-        case 'diamondapp.com':
-        case 'desocialworld.com':
-          // check if nftRoute = 'nft' or 'posts'
-          if (!['nft', 'posts'].includes(nftRoute)) {
-            throw new Error(errMsgDefault)
-          }
-
-          break
-        default:
-          // If we get here, the domain is not valid
-          throw new Error(`Invalid DeSo NFT domain (${nftDomain}). Please try again`)
+      // check if nftRoute = 'nft' or 'posts'
+      if (!['nft', 'posts'].includes(nftRoute)) {
+        throw new Error(errMsgDefault)
       }
 
       // If we get here, the NFT URL is valid and the ID was returned
