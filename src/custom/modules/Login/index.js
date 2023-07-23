@@ -1,6 +1,6 @@
-import React, { useReducer, useState } from 'react'
+import React, { useReducer } from 'react'
 import { identity, configure } from 'deso-protocol'
-import { Col, Row, message, Spin, theme, Card, Button } from 'antd'
+import { Col, Row, message, theme, Card, Button } from 'antd'
 import { deviceDetect } from 'react-device-detect'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
@@ -41,7 +41,6 @@ const reducer = (state, newState) => ({ ...state, ...newState })
 
 const Login = () => {
   const [state, setState] = useReducer(reducer, {
-    loading: false,
     openVideoModal: false
   })
 
@@ -49,10 +48,10 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      setState({ loading: true })
+      // setState({ loading: true })
       await identity.login()
     } catch (e) {
-      setState({ loading: false })
+      // setState({ loading: false })
       message.error(e)
     }
   }
@@ -83,32 +82,33 @@ const Login = () => {
                       <img src={logo} alt='DeSo Ops Portal' style={{ width: 300 }} />
                       <h1 style={{ marginTop: -20 }}> PORTAL SIGN-IN</h1>
                     </center>
-                    {!state.loading ? (
-                      <Row justify='center' style={{ marginBottom: 20 }}>
-                        <Col>
-                          <span>
-                            New to DeSo?
-                            <Button
-                              type='link'
-                              style={{ cursor: 'pointer', color: token.colorPrimary, fontSize: 17 }}
-                              onClick={handleWatchIntroduction}
-                            >
-                              {' '}
-                              Watch Introduction
-                            </Button>
-                          </span>
-                        </Col>
-                      </Row>
-                    ) : null}
+                    {/* {!state.loading ? ( */}
+                    <Row justify='center' style={{ marginBottom: 20 }}>
+                      <Col>
+                        <span>
+                          New to DeSo?
+                          <Button
+                            type='link'
+                            style={{ cursor: 'pointer', color: token.colorPrimary, fontSize: 17 }}
+                            onClick={handleWatchIntroduction}
+                          >
+                            {' '}
+                            Watch Introduction
+                          </Button>
+                        </span>
+                      </Col>
+                    </Row>
+                    {/* // ) : null} */}
 
                     <Row justify='space-around' gutter={[12, 12]}>
                       <Col span={24}>
                         <center>
                           <button
                             className={styles.signInButton}
-                            disabled={state.loading}
+                            // disabled={state.loading}
                             onClick={handleLogin}
-                            style={state.loading ? { background: '#cccccc52' } : { background: '#188EFF' }}
+                            // style={state.loading ? { background: '#cccccc52' } : { background: '#188EFF' }}
+                            style={{ background: '#188EFF' }}
                           >
                             <div>
                               <LoginOutlined style={{ fontSize: 20 }} />
@@ -136,13 +136,13 @@ const Login = () => {
                         </div>
                       </Col>
                     </Row>
-                    {state.loading ? (
+                    {/* {state.loading ? (
                       <Row justify='center' style={{ marginTop: 20 }}>
                         <Col>
                           <Spin size='large' />
                         </Col>
                       </Row>
-                    ) : undefined}
+                    ) : undefined} */}
                   </Col>
                 </Row>
               </Card>
