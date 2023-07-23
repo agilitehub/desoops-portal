@@ -7,6 +7,7 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DeSoIdentityContext } from 'react-deso-protocol'
+import { isMobile, isTablet } from 'react-device-detect'
 
 // App Components
 import DistributionDashboard from './modules/DistributionDashboard'
@@ -15,7 +16,7 @@ import Toolbar from './modules/Toolbar'
 import Spinner from './reusables/components/Spinner'
 
 // Utils
-import { setDeSoData, setAgiliteData, resetState } from './reducer'
+import { setDeSoData, setAgiliteData, resetState, setDeviceType } from './reducer'
 import {
   generateProfilePicUrl,
   getCCHodlersAndBalance,
@@ -28,7 +29,7 @@ import {
 import Enums from './lib/enums'
 import { getAgiliteData } from './lib/agilite-controller'
 import logo from './assets/deso-ops-logo-full-v2.png'
-import { cloneDeep, set } from 'lodash'
+import { cloneDeep } from 'lodash'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -37,6 +38,11 @@ const App = () => {
   const [initCompleted, setInitCompleted] = useState(false)
   const [userReturned, setUserReturned] = useState(false)
   const [spinTip, setSpinTip] = useState('Initializing DeSo Ops Portal...')
+
+  // Determine Device Type
+  useEffect(() => {
+    dispatch(setDeviceType({ isMobile, isTablet }))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     // This function gets a user's profile, balance, and other DeSo data
@@ -93,7 +99,7 @@ const App = () => {
         tmpDeSoData.profile.ccHodlings = ccHodlings
 
         // Set the DeSo data in the redux store
-        console.log('tmpDeSoData', tmpDeSoData)
+        // console.log('tmpDeSoData', tmpDeSoData)
         dispatch(setDeSoData(tmpDeSoData))
         setInitCompleted(true)
       } catch (e) {

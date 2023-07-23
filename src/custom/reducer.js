@@ -21,9 +21,14 @@ const slice = createSlice({
     updateFollowing: (state, data) => {
       state.desoData.profile.following = data.payload.data
       state.desoData.fetchedFollowing = true
+    },
+    setDeviceType: (state, data) => {
+      state.isMobile = data.payload.isMobile
+      state.isTablet = data.payload.isTablet
     }
   }
 })
 
-export const { resetState, setDeSoData, setAgiliteData, updateFollowers, updateFollowing } = slice.actions
+export const { resetState, setDeSoData, setAgiliteData, updateFollowers, updateFollowing, setDeviceType } =
+  slice.actions
 export default slice.reducer

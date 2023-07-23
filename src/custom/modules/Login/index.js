@@ -1,7 +1,6 @@
 import React, { useReducer } from 'react'
 import { identity, configure } from 'deso-protocol'
 import { Col, Row, message, theme, Card, Button } from 'antd'
-import { deviceDetect } from 'react-device-detect'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import { LoginOutlined } from '@ant-design/icons'
@@ -11,6 +10,7 @@ import styles from './style.module.sass'
 import logo from '../../assets/deso-ops-logo-full-v2.png'
 import VideoModal from '../../reusables/components/VideoModal'
 import Enums from '../../lib/enums'
+import { useSelector } from 'react-redux'
 
 configure({
   appName: process.env.REACT_APP_NAME,
@@ -45,6 +45,7 @@ const Login = () => {
   })
 
   const { token } = theme.useToken()
+  const { isMobile, isTablet } = useSelector((state) => state.custom)
 
   const handleLogin = async () => {
     try {
@@ -60,6 +61,12 @@ const Login = () => {
     setState({ openVideoModal: true })
   }
 
+  const styleProps = {
+    rowMarginTop: isTablet ? -100 : isMobile ? -20 : -100,
+    contentBorderRadius: isMobile && !isTablet ? 12 : 30,
+    bulletPointFontSize: isMobile && !isTablet ? 14 : 16
+  }
+
   return (
     <>
       <Row className={styles.wrapper}>
@@ -67,16 +74,18 @@ const Login = () => {
           <Row justify='center'>
             <Col span={24}>
               <Card type='inner' size='small' className={styles.card}>
-                <Row justify='center' style={{ marginTop: -100 }}>
+                <Row justify='center' style={{ marginTop: styleProps.rowMarginTop }}>
                   <Col
                     className={styles.cardContent}
                     style={{
-                      borderRadius: deviceDetect().isMobile ? 12 : 30
+                      borderRadius: styleProps.contentBorderRadius
                     }}
                     xs={24}
-                    sm={20}
-                    md={18}
-                    lg={10}
+                    sm={22}
+                    md={16}
+                    lg={14}
+                    xl={12}
+                    xxl={10}
                   >
                     <center>
                       <img src={logo} alt='DeSo Ops Portal' style={{ width: 300 }} />
@@ -118,19 +127,23 @@ const Login = () => {
                         </center>
                       </Col>
                       <Col span={24}>
-                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <div style={{ display: 'flex', justifyContent: 'center', paddingLeft: 5, paddingRight: 5 }}>
                           <div>
-                            <p>
-                              <FontAwesomeIcon className={styles.checkColor} icon={faCheckCircle} /> Payment
-                              Distributions
+                            <p style={{ marginTop: 0 }}>
+                              <FontAwesomeIcon className={styles.checkColor} icon={faCheckCircle} />{' '}
+                              <span style={{ fontSize: styleProps.bulletPointFontSize }}>Payment Distributions</span>
                             </p>
-                            <p>
-                              <FontAwesomeIcon className={styles.checkColor} icon={faCheckCircle} /> Distribute to DAO
-                              Token, Creator Coin, and NFT Holders
+                            <p style={{ marginTop: -10 }}>
+                              <FontAwesomeIcon className={styles.checkColor} icon={faCheckCircle} />{' '}
+                              <span style={{ fontSize: styleProps.bulletPointFontSize }}>
+                                Distribute to DAO Token, Creator Coin, and NFT Holders
+                              </span>
                             </p>
-                            <p>
-                              <FontAwesomeIcon className={styles.checkColor} icon={faCheckCircle} /> Distribute $DESO,
-                              DAO Tokens, and Creator Coins
+                            <p style={{ marginTop: -10 }}>
+                              <FontAwesomeIcon className={styles.checkColor} icon={faCheckCircle} />{' '}
+                              <span style={{ fontSize: styleProps.bulletPointFontSize }}>
+                                Distribute $DESO, DAO Tokens, and Creator Coins
+                              </span>
                             </p>
                           </div>
                         </div>

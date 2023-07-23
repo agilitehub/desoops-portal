@@ -28,6 +28,8 @@ const agiliteData = {
 
 export const customState = () => {
   return {
+    isMobile: false,
+    isTablet: false,
     desoData,
     agiliteData
   }

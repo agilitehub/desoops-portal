@@ -10,6 +10,7 @@ import Enums from '../enums'
 import { sendCreatorCoins, sendDAOTokens, sendDESO } from '../../../lib/deso-controller'
 import { randomize } from '../../../lib/utils'
 import { createDistributionTransaction, updateDistributionTransaction } from '../../../lib/agilite-controller'
+import { useSelector } from 'react-redux'
 
 const styleParams = {
   labelColXS: 12,
@@ -29,6 +30,7 @@ const reducer = (state, newState) => ({ ...state, ...newState })
 
 const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefreshWallet }) => {
   const [state, setState] = useReducer(reducer, distributionSummaryState())
+  const { isMobile, isTablet } = useSelector((state) => state.custom)
 
   useEffect(() => {
     try {
@@ -407,22 +409,17 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
         <>
           <Divider style={styleParams.dividerStyle} />
           <Row>
-            <Col
-              xs={styleParams.labelColXS}
-              sm={styleParams.labelColSM}
-              md={styleParams.labelColMD}
-              style={styleParams.labelColStyle}
-            >
+            <Col xs={24} sm={styleParams.labelColSM} md={styleParams.labelColMD} style={styleParams.labelColStyle}>
               <span style={{ fontWeight: 'bold' }}>Amount to distribute:</span>
             </Col>
-            <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
+            <Col xs={24} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
               <InputNumber
                 status={state.amountExceeded ? 'error' : null}
                 addonBefore={rootState.distributionType}
                 placeholder='0'
                 disabled={rootState.isExecuting || state.isExecuting}
                 value={rootState.distributionAmount}
-                style={{ width: 250 }}
+                style={{ width: isMobile && !isTablet ? '100%' : 250 }}
                 onChange={handleDistributionAmount}
               />
             </Col>
