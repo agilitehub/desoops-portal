@@ -16,9 +16,19 @@ import Spinner from './reusables/components/Spinner'
 
 // Utils
 import { setDeSoData, setAgiliteData, resetState } from './reducer'
-import { generateProfilePicUrl, getDeSoData } from './lib/deso-controller'
+import {
+  generateProfilePicUrl,
+  getCCHodlersAndBalance,
+  getCCHodlings,
+  getDAOHodlersAndBalance,
+  getDAOHodlings,
+  getDeSoPricing,
+  getTotalFollowersOrFollowing
+} from './lib/deso-controller'
 import Enums from './lib/enums'
 import { getAgiliteData } from './lib/agilite-controller'
+import logo from './assets/deso-ops-logo-full-v2.png'
+import { cloneDeep, set } from 'lodash'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -26,6 +36,7 @@ const App = () => {
   const { currentUser, isLoading } = useContext(DeSoIdentityContext)
   const [initCompleted, setInitCompleted] = useState(false)
   const [userReturned, setUserReturned] = useState(false)
+  const [spinTip, setSpinTip] = useState('Initializing DeSo Ops Portal...')
 
   useEffect(() => {
     // This function gets a user's profile, balance, and other DeSo data
@@ -35,6 +46,9 @@ const App = () => {
       let tmpAgiliteData = null
       let desoBalance = 0
       let desoBalanceUSD = 0
+      let daoHodlings = null
+      let ccHodlings = null
+      let followers = 0
 
       try {
         // First we retrieve configurations from Agilit-e
@@ -42,22 +56,41 @@ const App = () => {
         dispatch(setAgiliteData(tmpAgiliteData))
 
         // Retrieve various data sets from the DeSo blockchain related to the user
-        tmpDeSoData = await getDeSoData(currentUser.PublicKeyBase58Check, desoData)
+        tmpDeSoData = cloneDeep(desoData)
+        tmpDeSoData.desoPrice = await getDeSoPricing()
+
+        setSpinTip('Fetching DAO Hodlers and Balance...')
+        const { daoHodlers, daoBalance } = await getDAOHodlersAndBalance(currentUser.PublicKeyBase58Check)
+        daoHodlings = await getDAOHodlings(currentUser.PublicKeyBase58Check)
+
+        setSpinTip('Fetching Creator Coin Hodlers and Balance...')
+        const { ccHodlers, ccBalance } = await getCCHodlersAndBalance(currentUser.PublicKeyBase58Check)
+        ccHodlings = await getCCHodlings(currentUser.PublicKeyBase58Check)
+
+        setSpinTip('Finalizing Blockchain Data...')
+        // We know how many the current User is following, but we don't know how many are following the current User
+        followers = await getTotalFollowersOrFollowing(currentUser.PublicKeyBase58Check, Enums.values.FOLLOWERS)
 
         // Calculate the user's DeSo balance in DeSo and USD
         desoBalance = currentUser.ProfileEntryResponse.DESOBalanceNanos / Enums.values.NANO_VALUE
         desoBalanceUSD = Math.floor(desoBalance * tmpDeSoData.desoPrice * 100) / 100
         desoBalance = Math.floor(desoBalance * 10000) / 10000
 
-        // Add final pieces of user profile information to the DeSo data
-        tmpDeSoData.profile = {
-          ...tmpDeSoData.profile,
-          username: currentUser.ProfileEntryResponse.Username,
-          profilePicUrl: await generateProfilePicUrl(currentUser.PublicKeyBase58Check),
-          desoBalance,
-          desoBalanceUSD,
-          totalFollowing: currentUser.PublicKeysBase58CheckFollowedByUser.length
-        }
+        // Update the tmpDeSoData Profile object
+        tmpDeSoData.profile.publicKey = currentUser.PublicKeyBase58Check
+        tmpDeSoData.profile.username = currentUser.ProfileEntryResponse.Username
+        tmpDeSoData.profile.profilePicUrl = await generateProfilePicUrl(currentUser.PublicKeyBase58Check)
+        tmpDeSoData.profile.desoBalance = desoBalance
+        tmpDeSoData.profile.desoBalanceUSD = desoBalanceUSD
+
+        tmpDeSoData.profile.daoBalance = daoBalance
+        tmpDeSoData.profile.ccBalance = ccBalance
+        tmpDeSoData.profile.totalFollowers = followers
+        tmpDeSoData.profile.totalFollowing = currentUser.PublicKeysBase58CheckFollowedByUser.length
+        tmpDeSoData.profile.daoHodlers = daoHodlers
+        tmpDeSoData.profile.daoHodlings = daoHodlings
+        tmpDeSoData.profile.ccHodlers = ccHodlers
+        tmpDeSoData.profile.ccHodlings = ccHodlings
 
         // Set the DeSo data in the redux store
         console.log('tmpDeSoData', tmpDeSoData)
@@ -83,9 +116,19 @@ const App = () => {
   return (
     <>
       {isLoading && !initCompleted ? (
-        <Spinner tip='Initializing DeSo Ops Portal...' />
+        <>
+          <Spinner tip={spinTip} />
+          <center>
+            <img src={logo} alt='DeSo Ops Portal' style={{ width: 300 }} />
+          </center>
+        </>
       ) : currentUser && !initCompleted ? (
-        <Spinner tip='Fetching DeSo Data...' />
+        <>
+          <Spinner tip={spinTip} />
+          <center>
+            <img src={logo} alt='DeSo Ops Portal' style={{ width: 300 }} />
+          </center>
+        </>
       ) : currentUser && initCompleted ? (
         <>
           <Toolbar />

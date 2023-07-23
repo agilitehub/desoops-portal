@@ -7,7 +7,7 @@ const Spinner = ({ tip }) => {
   return (
     <Row justify='center' style={{ marginTop: 100 }}>
       <Spin tip={tip} size='large'>
-        <div style={{ width: 300 }} />
+        <div style={{ width: 400 }} />
       </Spin>
     </Row>
   )

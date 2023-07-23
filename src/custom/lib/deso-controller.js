@@ -41,18 +41,13 @@ export const desoLogin = () => {
  *
  * @returns {Promise} A promise that resolves a void, or rejects when an error occurs.
  */
-export const desoLogout = () => {
-  return new Promise((resolve, reject) => {
-    ;(async () => {
-      try {
-        await identity.logout()
-        resolve()
-      } catch (e) {
-        reject(e)
-        console.log(e)
-      }
-    })()
-  })
+export const desoLogout = async () => {
+  try {
+    await identity.logout()
+    return
+  } catch (e) {
+    throw new Error(e)
+  }
 }
 
 /**
