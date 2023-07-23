@@ -15,8 +15,8 @@ import { useSelector } from 'react-redux'
 configure({
   appName: process.env.REACT_APP_NAME,
   spendingLimitOptions: {
-    // IsUnlimited: true,
-    GlobalDESOLimit: 1 * 1e9, // 1 Deso
+    // IsUnlimited: true
+    GlobalDESOLimit: 100 * 1e9, // 100 Deso
     CreatorCoinOperationLimitMap: {
       '': {
         any: 'UNLIMITED'
