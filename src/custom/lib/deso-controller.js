@@ -13,6 +13,7 @@ import {
   transferDeSoToken,
   transferCreatorCoin
 } from 'deso-protocol'
+import BigNumber from 'bignumber.js'
 import Enums from './enums'
 import { desoUserModel } from './data-models'
 import { cleanString, hexToInt } from './utils'
@@ -557,14 +558,20 @@ export const sendDESO = async (sender, recipient, amount) => {
  */
 export const sendDAOTokens = async (sender, recipient, token, amount) => {
   let response = null
+  let finalAmount = null
+  let hexAmount = null
 
   try {
+    finalAmount = (amount * Enums.values.NANO_VALUE * Enums.values.NANO_VALUE).toFixed(0)
+    finalAmount = new BigNumber(finalAmount)
+    hexAmount = finalAmount.toString(16)
+    finalAmount = Enums.values.HEX_PREFIX + hexAmount
+
     response = await transferDeSoToken({
       SenderPublicKeyBase58Check: sender,
       ProfilePublicKeyBase58CheckOrUsername: token,
       ReceiverPublicKeyBase58CheckOrUsername: recipient,
-      DAOCoinToTransferNanos:
-        Enums.values.HEX_PREFIX + (amount * Enums.values.NANO_VALUE * Enums.values.NANO_VALUE).toString(16),
+      DAOCoinToTransferNanos: finalAmount,
       MinFeeRateNanosPerKB: 1000
     })
 
