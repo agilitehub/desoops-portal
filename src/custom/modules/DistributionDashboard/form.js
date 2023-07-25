@@ -162,15 +162,16 @@ const _BatchTransactionsForm = () => {
       tokenTotal,
       distributionType,
       tokenToUse: Enums.values.EMPTY_STRING,
+      tokenToUseLabel: Enums.values.EMPTY_STRING,
       distributionAmount: null,
       spreadAmountBasedOn: 'Ownership'
     })
   }
 
-  const handleTokenToUse = async (tokenToUse) => {
+  const handleTokenToUse = async (tokenToUse, tokenToUseLabel) => {
     const finalHodlers = cloneDeep(state.finalHodlers)
     await calculateEstimatedPayment(finalHodlers, '')
-    setState({ finalHodlers, tokenToUse, distributionAmount: null })
+    setState({ finalHodlers, tokenToUse, tokenToUseLabel, distributionAmount: null })
   }
 
   const handleConfirmNFT = async (nftMetaData, nftHodlers, nftUrl) => {

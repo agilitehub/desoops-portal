@@ -142,7 +142,7 @@ const GenenralTab = ({
             <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
               <Select
                 disabled={rootState.isExecuting}
-                onChange={(value) => onTokenToUse(value)}
+                onChange={(value, item) => onTokenToUse(value, item.label)}
                 value={rootState.tokenToUse}
                 style={{ width: 250 }}
               >
@@ -151,7 +151,7 @@ const GenenralTab = ({
                   .sort((a, b) => a.index.localeCompare(b.index))
                   .map((entry) => {
                     return (
-                      <Select.Option key={entry.key} value={entry.value}>
+                      <Select.Option key={entry.key} value={entry.value} label={entry.username}>
                         <Space>
                           <Image
                             src={entry.imageUrl}

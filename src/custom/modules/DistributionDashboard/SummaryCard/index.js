@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer } from 'react'
-import { Card, Row, Col, Divider, InputNumber, Popconfirm, Button, Alert, message } from 'antd'
+import { Card, Row, Col, Divider, InputNumber, Button, Alert, App } from 'antd'
 import { cloneDeep } from 'lodash'
 import { RightCircleOutlined } from '@ant-design/icons'
 
@@ -31,6 +31,7 @@ const reducer = (state, newState) => ({ ...state, ...newState })
 const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefreshWallet }) => {
   const [state, setState] = useReducer(reducer, distributionSummaryState())
   const { isMobile, isTablet } = useSelector((state) => state.custom)
+  const { modal, message } = App.useApp()
 
   useEffect(() => {
     try {
@@ -148,6 +149,26 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
     if (rootState.distributionType === CoreEnums.paymentTypes.DESO) desoPrice = desoData.desoPrice
     await calculateEstimatedPayment(finalHodlers, distributionAmount, rootState.spreadAmountBasedOn, desoPrice)
     setRootState({ distributionAmount, finalHodlers })
+  }
+
+  const handleConfirmExecute = () => {
+    const tokenName = rootState.tokenToUseLabel ? `$${rootState.tokenToUseLabel} token(s)` : rootState.distributionType
+    let title = `Please confirm you are ready to distribute ${rootState.distributionAmount}`
+    title += ` ${tokenName} to ${state.noOfPaymentTransactions} users.`
+    title += ' This operation cannot be undone.'
+
+    modal.confirm({
+      title,
+      okText: 'Confirm',
+      okType: 'danger',
+      cancelText: 'Cancel',
+      onOk: async () => {
+        await handleExecute()
+      },
+      onCancel: () => {
+        setState({ resetLoading: false })
+      }
+    })
   }
 
   const handleExecute = async () => {
@@ -429,26 +450,17 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
       <Divider style={{ margin: '10px 0' }} />
       <Row justify='center'>
         <Col>
-          <Popconfirm
-            title='Please confirm you are ready to execute payments. This operation cannot be undone.'
-            okText='Confirm'
-            cancelText='Cancel'
-            onConfirm={() => setTimeout(() => handleExecute(), 0)}
+          <Button
+            style={
+              state.isExecuting || state.executeDisabled ? styleParams.btnExecuteInactive : styleParams.btnExecuteActive
+            }
+            icon={<RightCircleOutlined />}
+            size='large'
             disabled={state.isExecuting || state.executeDisabled}
+            onClick={handleConfirmExecute}
           >
-            <Button
-              style={
-                state.isExecuting || state.executeDisabled
-                  ? styleParams.btnExecuteInactive
-                  : styleParams.btnExecuteActive
-              }
-              icon={<RightCircleOutlined />}
-              size='large'
-              disabled={state.isExecuting || state.executeDisabled}
-            >
-              Execute Distribution
-            </Button>
-          </Popconfirm>
+            Execute Distribution
+          </Button>
         </Col>
       </Row>
       {state.warningMessages.length > 0 ? (
@@ -476,4 +488,18 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
   )
 }
 
-export default SummaryCard
+const app = ({ desoData, agiliteData, rootState, setRootState, onRefreshWallet }) => {
+  return (
+    <App>
+      <SummaryCard
+        desoData={desoData}
+        rootState={rootState}
+        agiliteData={agiliteData}
+        onRefreshWallet={onRefreshWallet}
+        setRootState={setRootState}
+      />
+    </App>
+  )
+}
+
+export default app

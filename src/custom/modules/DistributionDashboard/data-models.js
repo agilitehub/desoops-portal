@@ -12,6 +12,7 @@ export const distributionDashboardState = (feePerTransactionUSD) => {
     distributionAmountEnabled: false,
     rulesEnabled: false,
     tokenToUse: '',
+    tokenToUseLabel: '',
     spreadAmountBasedOn: 'Ownership',
     filterUsers: false,
     filterAmountIs: '>',
