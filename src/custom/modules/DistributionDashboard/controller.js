@@ -281,7 +281,7 @@ export const payCeatorHodler = (senderKey, receiverKey, creatorKey, amount, type
             request = {
               SenderPublicKeyBase58Check: senderKey,
               CreatorPublicKeyBase58Check: creatorKey ? creatorKey : senderKey,
-              CreatorCoinToTransferNanos: parseInt((amount * Enums.values.NANO_VALUE).toFixed(0)),
+              CreatorCoinToTransferNanos: Math.floor(amount * Enums.values.NANO_VALUE),
               ReceiverUsernameOrPublicKeyBase58Check: receiverKey,
               MinFeeRateNanosPerKB: 1000
             }
@@ -337,7 +337,7 @@ export const payDaoHodler = (senderKey, receiverKey, creatorKey, amount, type) =
             request = {
               SenderPublicKeyBase58Check: senderKey,
               CreatorPublicKeyBase58Check: creatorKey ? creatorKey : senderKey,
-              CreatorCoinToTransferNanos: parseInt((amount * Enums.values.NANO_VALUE).toFixed(0)),
+              CreatorCoinToTransferNanos: Math.floor(amount * Enums.values.NANO_VALUE),
               ReceiverUsernameOrPublicKeyBase58Check: receiverKey,
               MinFeeRateNanosPerKB: 1000
             }

@@ -562,7 +562,7 @@ export const sendDAOTokens = async (sender, recipient, token, amount) => {
   let hexAmount = null
 
   try {
-    finalAmount = (amount * Enums.values.NANO_VALUE * Enums.values.NANO_VALUE).toFixed(0)
+    finalAmount = Math.floor(amount * Enums.values.NANO_VALUE * Enums.values.NANO_VALUE).toString()
     finalAmount = new BigNumber(finalAmount)
     hexAmount = finalAmount.toString(16)
     finalAmount = Enums.values.HEX_PREFIX + hexAmount
@@ -600,7 +600,7 @@ export const sendCreatorCoins = async (sender, recipient, creatorCoin, amount) =
       SenderPublicKeyBase58Check: sender,
       CreatorPublicKeyBase58Check: creatorCoin,
       ReceiverUsernameOrPublicKeyBase58Check: recipient,
-      CreatorCoinToTransferNanos: parseInt((amount * Enums.values.NANO_VALUE).toFixed(0)),
+      CreatorCoinToTransferNanos: Math.floor(amount * Enums.values.NANO_VALUE),
       MinFeeRateNanosPerKB: 1000
     })
 

@@ -162,8 +162,10 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
       okText: 'Confirm',
       okType: 'danger',
       cancelText: 'Cancel',
-      onOk: async () => {
-        await handleExecute()
+      onOk: () => {
+        setTimeout(() => {
+          handleExecute()
+        }, 0)
       },
       onCancel: () => {
         setState({ resetLoading: false })

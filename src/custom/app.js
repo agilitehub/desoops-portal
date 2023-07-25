@@ -106,7 +106,7 @@ const App = () => {
         console.error(e)
       }
     }
-
+    console.log('App.js - currentUser', currentUser, userReturned)
     if (currentUser) {
       if (!userReturned) {
         setUserReturned(true)
