@@ -1,9 +1,6 @@
 import React from 'react'
 import { Button, Dropdown, Image, Space } from 'antd'
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronDown, faUser } from '@fortawesome/free-solid-svg-icons'
-
 import { desoLogout } from '../../../lib/deso-controller'
 import { useSelector } from 'react-redux'
 import { DownOutlined } from '@ant-design/icons'

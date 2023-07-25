@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Col, Image, List, Modal, Progress, Row, Typography } from 'antd'
-import { CheckCircleOutlined, CheckOutlined, CloseOutlined, SyncOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined, CloseOutlined, SyncOutlined } from '@ant-design/icons'
 import Enums from '../enums'
 
 const { Text } = Typography

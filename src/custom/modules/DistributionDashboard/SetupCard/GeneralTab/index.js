@@ -31,8 +31,6 @@ const GenenralTab = ({
 
   useEffect(() => {
     let tmpTokenOwnerList = []
-    let tmpDAOBalance = 0
-    let tmpCCBalance = 0
     let index = 0
 
     switch (rootState.distributionType) {

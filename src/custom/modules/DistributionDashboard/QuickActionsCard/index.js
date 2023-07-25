@@ -1,5 +1,5 @@
 import React, { useReducer } from 'react'
-import { App, Card, Button, Dropdown, Space, Modal, Row, Col, Divider, Tooltip } from 'antd'
+import { App, Card, Button, Dropdown, Modal, Row, Col } from 'antd'
 import { DownOutlined, UserOutlined, ReloadOutlined, CopyOutlined, RollbackOutlined } from '@ant-design/icons'
 import { copyTextToClipboard } from '../../../lib/utils'
 import RandomizeDialogContent from './RandomizeDialog'
@@ -18,11 +18,6 @@ const initialState = {
   randomUserKey: null,
   randomizeInProgress: false,
   randomUsers: 0
-}
-
-const styleParams = {
-  labelColStyle: { marginTop: 4 },
-  dividerStyle: { margin: '7px 0' }
 }
 
 const reducer = (state, newState) => ({ ...state, ...newState })
@@ -131,13 +126,13 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
     }
   }
 
-  const handleLoadRandomizeDialog = (item) => {
-    setState({
-      returnLoading: true,
-      loadRandomizeModal: true,
-      randomUserKey: item.key
-    })
-  }
+  // const handleLoadRandomizeDialog = (item) => {
+  //   setState({
+  //     returnLoading: true,
+  //     loadRandomizeModal: true,
+  //     randomUserKey: item.key
+  //   })
+  // }
 
   const handleCloseRandomizeDialog = () => {
     setState({

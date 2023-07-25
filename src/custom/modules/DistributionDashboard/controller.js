@@ -115,7 +115,6 @@ export const calculatePercentages = (hodlers, sortOrder = 'desc') => {
 export const calculateEstimatedPayment = (hodlers, amount, spreadAmountBasedOn, desoPrice) => {
   return new Promise((resolve, reject) => {
     let estimatedPaymentToken = null
-    let estimatedPaymentLabel = null
     let estimatedPaymentUSD = null
     let activeHodlers = 0
 
@@ -129,7 +128,6 @@ export const calculateEstimatedPayment = (hodlers, amount, spreadAmountBasedOn, 
       // Calculate the estimated payment for each hodler
       hodlers.forEach((hodler) => {
         estimatedPaymentToken = 0
-        estimatedPaymentLabel = ''
 
         if (amount === '' || !hodler.isActive) {
           estimatedPaymentToken = 0
