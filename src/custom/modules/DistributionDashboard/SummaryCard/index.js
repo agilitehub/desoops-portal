@@ -102,15 +102,15 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
       // Check to see if we need to display any warning messages, but only if most of the setup has been provided
       if (isInFinalStage) {
         if (transactionFeeExceeded) {
-          warningMessages.push({ key: '1', value: 'The Transaction Fee exceeds your DESO Balance.' })
+          warningMessages.push({ key: '1', value: '- The Transaction Fee exceeds your DESO Balance.' })
         }
 
         if (warningMsg) {
-          warningMessages.push({ key: '2', value: warningMsg })
+          warningMessages.push({ key: '2', value: `- ${warningMsg}` })
         }
 
         if (noOfPaymentTransactions === 0) {
-          warningMessages.push({ key: '3', value: 'There are no users to distribute to.' })
+          warningMessages.push({ key: '3', value: '- There are no users to distribute to.' })
         }
       }
 
@@ -472,7 +472,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
         <>
           <Divider style={{ margin: '10px 0' }} />
           <Row justify='center'>
-            <Col span={18}>
+            <Col xs={24} md={18}>
               <Alert
                 message={<span style={{ fontWeight: 'bold', fontSize: 14 }}>Warning</span>}
                 description={
