@@ -7,7 +7,10 @@ const slice = createSlice({
   name: 'custom',
   initialState,
   reducers: {
-    resetState: () => initialState,
+    resetState: (state) => {
+      state.desoData = initialState.desoData
+      state.agiliteData = initialState.agiliteData
+    },
     setDeSoData: (state, data) => {
       state.desoData = data.payload
     },
@@ -23,9 +26,9 @@ const slice = createSlice({
       state.desoData.fetchedFollowing = true
     },
     setDeviceType: (state, data) => {
-      state.isMobile = data.payload.isMobile
-      state.isTablet = data.payload.isTablet
-      state.isSmartphone = data.payload.isSmartphone
+      state.userAgent.isMobile = data.payload.isMobile
+      state.userAgent.isTablet = data.payload.isTablet
+      state.userAgent.isSmartphone = data.payload.isSmartphone
     }
   }
 })

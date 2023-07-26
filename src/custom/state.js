@@ -26,12 +26,16 @@ const agiliteData = {
   tips: []
 }
 
+const userAgent = {
+  isMobile: false,
+  isTablet: false,
+  isSmartphone: false
+}
+
 export const customState = () => {
   return {
-    isMobile: false,
-    isTablet: false,
-    isSmartphone: false,
     desoData,
-    agiliteData
+    agiliteData,
+    userAgent
   }
 }
