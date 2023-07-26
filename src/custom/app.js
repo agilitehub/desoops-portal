@@ -34,6 +34,7 @@ import { cloneDeep } from 'lodash'
 const App = () => {
   const dispatch = useDispatch()
   const desoData = useSelector((state) => state.custom.desoData)
+  const userAgent = useSelector((state) => state.custom.userAgent)
   const { currentUser, isLoading } = useContext(DeSoIdentityContext)
   const [initCompleted, setInitCompleted] = useState(false)
   const [userReturned, setUserReturned] = useState(false)
@@ -138,7 +139,7 @@ const App = () => {
         </>
       ) : currentUser && initCompleted ? (
         <>
-          <Toolbar />
+          <Toolbar deviceType={userAgent} />
           <DistributionDashboard />
         </>
       ) : (

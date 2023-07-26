@@ -45,7 +45,7 @@ const Login = () => {
   })
 
   const { token } = theme.useToken()
-  const { isMobile, isTablet } = useSelector((state) => state.custom)
+  const { isTablet, isSmartphone } = useSelector((state) => state.custom.userAgent)
 
   const handleLogin = async () => {
     try {
@@ -62,9 +62,10 @@ const Login = () => {
   }
 
   const styleProps = {
-    rowMarginTop: isTablet ? -100 : isMobile ? -20 : -100,
-    contentBorderRadius: isMobile && !isTablet ? 12 : 30,
-    bulletPointFontSize: isMobile && !isTablet ? 14 : 16
+    rowMarginTop: isTablet ? -100 : isSmartphone ? -20 : -100,
+    contentBorderRadius: isSmartphone ? 12 : 30,
+    bulletPointFontSize: isSmartphone ? 14 : 16,
+    logoWidth: isSmartphone ? 200 : 300
   }
 
   return (
@@ -88,7 +89,7 @@ const Login = () => {
                     xxl={10}
                   >
                     <center>
-                      <img src={logo} alt='DeSo Ops Portal' style={{ width: 300 }} />
+                      <img src={logo} alt='DeSo Ops Portal' style={{ width: styleProps.logoWidth }} />
                       <h1 style={{ marginTop: -20 }}> PORTAL SIGN-IN</h1>
                     </center>
                     {/* {!state.loading ? ( */}

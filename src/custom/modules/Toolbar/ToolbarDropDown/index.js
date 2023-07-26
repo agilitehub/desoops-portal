@@ -5,8 +5,21 @@ import { desoLogout } from '../../../lib/deso-controller'
 import { useSelector } from 'react-redux'
 import { DownOutlined } from '@ant-design/icons'
 
-const ToolbarDropDown = () => {
+const ToolbarDropDown = ({ deviceType }) => {
   const profile = useSelector((state) => state.custom.desoData.profile)
+
+  const styleProps = {
+    btn: {
+      height: 40,
+      marginTop: 3,
+      backgroundColor: 'transparent',
+      color: 'white',
+      border: 'none',
+      fontSize: 14
+    },
+    btnIcon: { borderRadius: 8, width: 25, height: 25 },
+    dropdownItems: { fontSize: 14 }
+  }
 
   const handleGetItems = () => {
     const dropDownItems = {
@@ -14,12 +27,14 @@ const ToolbarDropDown = () => {
         danger: true,
         key: 'Sign Out',
         label: 'Sign Out',
+        style: styleProps.dropdownItems,
         onClick: desoLogout
       },
       version: {
         key: 'version',
         disabled: true,
-        label: <small>Version {process.env.REACT_APP_VERSION}</small>
+        label: `Version ${process.env.REACT_APP_VERSION}`,
+        style: styleProps.dropdownItems
       }
     }
 
@@ -36,16 +51,8 @@ const ToolbarDropDown = () => {
         }}
       >
         <Button
-          style={{ height: 50, marginTop: 5, backgroundColor: 'transparent', color: 'white', border: 'none' }}
-          icon={
-            <Image
-              src={profile.profilePicUrl}
-              width={35}
-              height={35}
-              style={{ borderRadius: 8, marginLeft: -10 }}
-              preview={false}
-            />
-          }
+          style={styleProps.btn}
+          icon={<Image src={profile.profilePicUrl} style={styleProps.btnIcon} preview={false} />}
         >
           <Space>
             {profile.username}
