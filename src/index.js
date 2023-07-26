@@ -11,7 +11,8 @@ import Core from './core/components/core'
 import Enums from './custom/lib/enums'
 
 // Import default Stylesheet for application
-import './index.css'
+import './index.sass'
+// import './index.css'
 
 // Initiate Agilite Controller
 initAgilite()
