@@ -41,7 +41,8 @@ const App = () => {
 
   // Determine Device Type
   useEffect(() => {
-    dispatch(setDeviceType({ isMobile, isTablet }))
+    const isSmartphone = isMobile && !isTablet
+    dispatch(setDeviceType({ isMobile, isTablet, isSmartphone }))
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {

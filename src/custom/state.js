@@ -30,6 +30,7 @@ export const customState = () => {
   return {
     isMobile: false,
     isTablet: false,
+    isSmartphone: false,
     desoData,
     agiliteData
   }

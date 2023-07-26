@@ -25,6 +25,7 @@ const slice = createSlice({
     setDeviceType: (state, data) => {
       state.isMobile = data.payload.isMobile
       state.isTablet = data.payload.isTablet
+      state.isSmartphone = data.payload.isSmartphone
     }
   }
 })
