@@ -22,10 +22,6 @@ import { generateProfilePicUrl, getDeSoData, getDeSoUser } from '../../lib/deso-
 import PaymentModal from './PaymentModal'
 import { getAgiliteData } from '../../lib/agilite-controller'
 
-const styleParams = {
-  dividerStyle: { margin: '5px 0', borderBlockStart: 0 }
-}
-
 const reducer = (state, newState) => ({ ...state, ...newState })
 
 const _BatchTransactionsForm = () => {
@@ -33,6 +29,14 @@ const _BatchTransactionsForm = () => {
   const desoData = useSelector((state) => state.custom.desoData)
   const agiliteData = useSelector((state) => state.custom.agiliteData)
   const [state, setState] = useReducer(reducer, distributionDashboardState(agiliteData.transactionFeeUSD))
+  const { isTablet, isSmartphone, isMobile } = useSelector((state) => state.custom.userAgent)
+
+  const styleProps = {
+    divider: { margin: '4px 0', borderBlockStart: 0 },
+    verticalGutter: isSmartphone ? 6 : 12
+  }
+
+  const deviceType = { isSmartphone, isTablet, isMobile }
 
   useEffect(() => {
     let rulesEnabled = false
@@ -197,19 +201,30 @@ const _BatchTransactionsForm = () => {
 
   return (
     <>
-      <Row justify='center'>
+      <Row justify='center' gutter={[12, 12]}>
         <Col xs={22} xl={20} xxl={16}>
-          <ContainerCard title={'Distribution Dashboard'}>
-            <Row gutter={12}>
-              <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12}>
-                <Row>
-                  <Col span={24}>
-                    <WalletOverviewCard desoProfile={desoData.profile} />
+          <ContainerCard title={'Distribution Dashboard'} deviceType={deviceType}>
+            <Row gutter={[12, styleProps.verticalGutter]}>
+              <Col span={24}>
+                <Row gutter={[12, styleProps.verticalGutter]}>
+                  <Col xs={24} md={12}>
+                    <WalletOverviewCard desoProfile={desoData.profile} deviceType={deviceType} />
                   </Col>
+                  {!isSmartphone ? (
+                    <Col xs={24} md={12}>
+                      <QuickActionsCard
+                        desoData={desoData}
+                        onResetDashboard={resetState}
+                        onRefreshWallet={handleRefreshWallet}
+                        rootState={state}
+                        deviceType={deviceType}
+                      />
+                    </Col>
+                  ) : null}
                 </Row>
-                <Divider style={styleParams.dividerStyle} />
-                <Row>
-                  <Col span={24}>
+                {isSmartphone ? <Divider style={styleProps.divider} /> : null}
+                <Row gutter={[12, styleProps.verticalGutter]}>
+                  <Col xs={24} md={12}>
                     <SetupCard
                       desoData={desoData}
                       rootState={state}
@@ -218,30 +233,17 @@ const _BatchTransactionsForm = () => {
                       onTokenToUse={handleTokenToUse}
                       setRootState={setState}
                       onConfirmNFT={handleConfirmNFT}
+                      deviceType={deviceType}
                     />
                   </Col>
-                </Row>
-              </Col>
-              <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={12}>
-                <Row>
-                  <Col span={24}>
-                    <QuickActionsCard
-                      desoData={desoData}
-                      onResetDashboard={resetState}
-                      onRefreshWallet={handleRefreshWallet}
-                      rootState={state}
-                    />
-                  </Col>
-                </Row>
-                <Divider style={styleParams.dividerStyle} />
-                <Row>
-                  <Col span={24}>
+                  <Col xs={24} md={12}>
                     <SummaryCard
                       desoData={desoData}
                       agiliteData={agiliteData}
                       rootState={state}
                       setRootState={setState}
                       onRefreshWallet={handleRefreshWallet}
+                      deviceType={deviceType}
                     />
                   </Col>
                 </Row>
@@ -249,7 +251,7 @@ const _BatchTransactionsForm = () => {
             </Row>
             {state.distributeTo ? (
               <Row>
-                <TableData desoData={desoData} rootState={state} setRootState={setState} />
+                <TableData desoData={desoData} rootState={state} setRootState={setState} deviceType={deviceType} />
               </Row>
             ) : null}
           </ContainerCard>

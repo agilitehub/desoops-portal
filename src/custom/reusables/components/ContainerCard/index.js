@@ -5,19 +5,26 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Card, theme } from 'antd'
 
-const ContainerCard = ({ title, children }) => {
+const ContainerCard = ({ title, deviceType, children }) => {
   const { token } = theme.useToken()
+
+  const styleProps = {
+    card: { width: '100%', overflow: 'hidden', marginTop: 10 },
+    title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
+    headStyle: { backgroundColor: token.colorSecondaryLight, minHeight: deviceType.isSmartphone ? 30 : 40 },
+    bodyStyle: { padding: 4, background: token.colorInputBg }
+  }
 
   return (
     <Card
       title={
         <center>
-          <span style={{ fontSize: '18px' }}>{title}</span>
+          <span style={styleProps.title}>{title}</span>
         </center>
       }
-      style={{ width: '100%', overflow: 'hidden', marginTop: 10 }}
-      headStyle={{ backgroundColor: token.colorSecondaryLight, fontSize: 18 }}
-      bodyStyle={{ padding: 4, background: token.colorInputBg }}
+      style={styleProps.card}
+      headStyle={styleProps.headStyle}
+      bodyStyle={styleProps.bodyStyle}
       type='inner'
       size='small'
     >
