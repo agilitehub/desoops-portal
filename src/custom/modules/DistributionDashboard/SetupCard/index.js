@@ -11,8 +11,29 @@ const SetupCard = ({
   onDistributionType,
   onTokenToUse,
   setRootState,
-  onConfirmNFT
+  onConfirmNFT,
+  deviceType
 }) => {
+  const styleProps = {
+    title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
+    headStyle: { minHeight: deviceType.isSmartphone ? 30 : 40 },
+    tabButton: {
+      color: '#188EFF',
+      borderColor: '#188EFF',
+      backgroundColor: 'white',
+      fontSize: deviceType.isSmartphone ? 14 : 16,
+      marginBottom: deviceType.isSmartphone ? 3 : 0
+    },
+    nftIcon: {
+      borderRadius: 5,
+      marginLeft: deviceType.isSmartphone ? -10 : -15,
+      marginTop: deviceType.isSmartphone ? -0 : -3,
+      width: 25,
+      height: 25
+    },
+    tabBarStyle: { fontSize: 14 }
+  }
+
   const handleSelectNFT = () => {
     setRootState({ openNftSearch: true })
   }
@@ -30,6 +51,7 @@ const SetupCard = ({
         <GeneralTab
           desoProfile={desoData.profile}
           rootState={rootState}
+          deviceType={deviceType}
           onDistributeTo={onDistributeTo}
           onDistributionType={onDistributionType}
           setRootState={setRootState}
@@ -43,31 +65,37 @@ const SetupCard = ({
       key: '2',
       label: 'Rules',
       disabled: !rootState.rulesEnabled || rootState.isExecuting,
-      children: <RulesTab desoData={desoData} rootState={rootState} setRootState={setRootState} />
+      children: (
+        <RulesTab desoData={desoData} deviceType={deviceType} rootState={rootState} setRootState={setRootState} />
+      )
     }
   ]
 
   return (
-    <Card title='👇 Start Here: Setup & Config' size='small'>
+    <Card
+      size='small'
+      title={
+        <center>
+          <span style={styleProps.title}>👇 Start Here: Setup & Config</span>
+        </center>
+      }
+      headStyle={styleProps.headStyle}
+    >
       <Tabs
         disabled={true}
         activeKey={rootState.activeRulesTab}
         size='small'
+        tabBarGutter={deviceType.isSmartphone ? 15 : 20}
+        tabBarStyle={styleProps.tabBarStyle}
         onTabClick={(key) => setRootState({ activeRulesTab: key })}
         tabBarExtraContent={
           rootState.distributeTo === Enums.values.NFT ? (
             <Button
-              style={{ color: '#188EFF', borderColor: '#188EFF', backgroundColor: 'white' }}
+              style={styleProps.tabButton}
               onClick={handleSelectNFT}
               icon={
                 !rootState.nftMetaData.id ? null : (
-                  <Image
-                    src={rootState.nftMetaData.imageUrl}
-                    width={25}
-                    height={25}
-                    style={{ borderRadius: 5, marginLeft: -15, marginTop: -3 }}
-                    preview={false}
-                  />
+                  <Image src={rootState.nftMetaData.imageUrl} style={styleProps.nftIcon} preview={false} />
                 )
               }
             >

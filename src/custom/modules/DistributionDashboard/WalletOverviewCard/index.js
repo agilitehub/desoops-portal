@@ -1,42 +1,59 @@
 import React from 'react'
 import { Card, Row, Col } from 'antd'
+import { useSelector } from 'react-redux'
 
-const WalletOverviewCard = ({ desoProfile }) => {
+const WalletOverviewCard = ({ desoProfile, deviceType }) => {
   const { desoBalance, desoBalanceUSD, daoBalance, ccBalance } = desoProfile
 
   // Format Values
   const formattedDaoBalance = daoBalance.toLocaleString('en-US', { useGrouping: true })
 
+  const styleProps = {
+    title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
+    headStyle: { minHeight: deviceType.isSmartphone ? 30 : 40 },
+    bodyStyle: { height: deviceType.isSmartphone ? 58 : 75 },
+    divWrapper: {
+      backgroundColor: '#FFA07A',
+      paddingTop: 2,
+      paddingBottom: 2,
+      borderRadius: '5px',
+      fontSize: deviceType.isSmartphone ? 12 : 14
+    },
+    backgroundColor: '#FFA07A',
+    textColor: '#F3F3F3'
+  }
+
   return (
-    <Card title='Wallet Overview' size='small' bodyStyle={{ height: 75 }}>
-      <Row gutter={[16, 16]} style={{ textAlign: 'center' }}>
+    <Card
+      title={
+        <center>
+          <span style={styleProps.title}>Wallet Overview</span>
+        </center>
+      }
+      size='small'
+      bodyStyle={styleProps.bodyStyle}
+      headStyle={styleProps.headStyle}
+    >
+      <Row gutter={[5, 5]} style={{ textAlign: 'center' }}>
+        <Col span={8}>
+          <div style={styleProps.divWrapper}>
+            <div style={{ color: styleProps.textColor, fontWeight: 'bold' }}>$DESO</div>
+            <div style={{ color: styleProps.textColor, marginTop: -5 }}>{`${desoBalance} (~$${desoBalanceUSD})`}</div>
+          </div>
+        </Col>
         <Col span={8}>
           <Col span={24}>
-            <div
-              style={{ backgroundColor: '#FFA07A', paddingTop: 2, paddingBottom: 2, borderRadius: '5px', fontSize: 14 }}
-            >
-              <div style={{ color: '#F3F3F3', fontWeight: 'bold' }}>$DESO</div>
-              <div style={{ color: '#F3F3F3', marginTop: -5 }}>{`${desoBalance} (~$${desoBalanceUSD})`}</div>
+            <div style={styleProps.divWrapper}>
+              <div style={{ color: styleProps.textColor, fontWeight: 'bold' }}>DAO Token</div>
+              <div style={{ color: styleProps.textColor, marginTop: -5 }}>{formattedDaoBalance}</div>
             </div>
           </Col>
         </Col>
         <Col span={8}>
           <Col span={24}>
-            <div
-              style={{ backgroundColor: '#FFA07A', paddingTop: 2, paddingBottom: 2, borderRadius: '5px', fontSize: 14 }}
-            >
-              <div style={{ color: '#F3F3F3', fontWeight: 'bold' }}>DAO Token</div>
-              <div style={{ color: '#F3F3F3', marginTop: -5 }}>{formattedDaoBalance}</div>
-            </div>
-          </Col>
-        </Col>
-        <Col span={8}>
-          <Col span={24}>
-            <div
-              style={{ backgroundColor: '#FFA07A', paddingTop: 2, paddingBottom: 2, borderRadius: '5px', fontSize: 14 }}
-            >
-              <div style={{ color: '#F3F3F3', fontWeight: 'bold' }}>Creator Coin</div>
-              <div style={{ color: '#F3F3F3', marginTop: -5 }}>{ccBalance}</div>
+            <div style={styleProps.divWrapper}>
+              <div style={{ color: styleProps.textColor, fontWeight: 'bold' }}>Creator Coin</div>
+              <div style={{ color: styleProps.textColor, marginTop: -5 }}>{ccBalance}</div>
             </div>
           </Col>
         </Col>

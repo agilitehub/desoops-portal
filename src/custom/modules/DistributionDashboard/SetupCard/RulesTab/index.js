@@ -15,12 +15,18 @@ const styleParams = {
   valueColXS: 24,
   valueColSM: 12,
   valueColMD: 15,
-  colRightXS: 24,
-  labelColStyle: { marginTop: 4 },
-  dividerStyle: { margin: '7px 0' }
+  colRightXS: 24
 }
 
-const RulesTab = ({ desoData, rootState, setRootState }) => {
+const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
+  const styleProps = {
+    select: { width: 200 },
+    selectTokenToUse: { width: deviceType.isSmartphone ? '100%' : 250 },
+    fieldLabel: { fontSize: 14, fontWeight: 'bold' },
+    labelColStyle: { marginTop: deviceType.isSmartphone ? 0 : 4 },
+    divider: { margin: deviceType.isSmartphone ? '3px 0' : '7px 0' }
+  }
+
   const handleFilterUsers = async (propType, propValue) => {
     // propType could be either 'filterUsers' or 'filterAmountIs' or 'filterAmount'
     // propValue could be either true/false or '>'/'<' or a number based on propType
@@ -110,12 +116,13 @@ const RulesTab = ({ desoData, rootState, setRootState }) => {
     <>
       <Row>
         <Col xs={styleParams.col1XS} style={{ marginBottom: 5 }}>
-          <span style={{ fontSize: 16 }}>
+          <span style={styleProps.fieldLabel}>
             <b>Spread amount based on:</b>
           </span>
         </Col>
         <Col xs={styleParams.col1XS}>
           <Radio.Group
+            size='small'
             value={rootState.spreadAmountBasedOn}
             buttonStyle='solid'
             onChange={handleSpreadAmountBasedOn}
@@ -126,10 +133,10 @@ const RulesTab = ({ desoData, rootState, setRootState }) => {
           </Radio.Group>
         </Col>
       </Row>
-      <Divider style={styleParams.dividerStyle} />
+      <Divider style={styleProps.divider} />
       <Row>
         <Col xs={styleParams.col1XS} style={{ marginBottom: 5 }}>
-          <span style={{ fontSize: 16 }}>
+          <span style={styleProps.fieldLabel}>
             <b>Filter users based on Tokens owned?</b>
           </span>
         </Col>
@@ -137,7 +144,6 @@ const RulesTab = ({ desoData, rootState, setRootState }) => {
           <Switch
             disabled={rootState.isExecuting}
             checked={rootState.filterUsers}
-            style={{ width: 65 }}
             checkedChildren='Yes'
             unCheckedChildren='No'
             onChange={(checked) => {
@@ -148,14 +154,14 @@ const RulesTab = ({ desoData, rootState, setRootState }) => {
       </Row>
       {rootState.filterUsers ? (
         <>
-          <Divider style={styleParams.dividerStyle} />
+          <Divider style={styleProps.divider} />
           <Row>
             <Col xs={24} sm={7} md={5} lg={24} style={{ paddingTop: 3, paddingBottom: 3 }}>
-              <span style={{ fontSize: 16 }}>
+              <span style={styleProps.fieldLabel}>
                 <b>Where Token Balance is</b>
               </span>
             </Col>
-            <Col xs={5} sm={4} md={3} lg={5}>
+            <Col xs={6} sm={4} md={3} lg={5}>
               <Select
                 disabled={rootState.isExecuting}
                 style={{ width: 70 }}

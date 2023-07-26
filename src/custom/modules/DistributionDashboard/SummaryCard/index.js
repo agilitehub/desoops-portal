@@ -13,25 +13,30 @@ import { createDistributionTransaction, updateDistributionTransaction } from '..
 import { useSelector } from 'react-redux'
 
 const styleParams = {
-  labelColXS: 12,
+  labelColXS: 11,
   labelColSM: 12,
   labelColMD: 10,
-  valueColXS: 12,
+  valueColXS: 13,
   valueColSM: 12,
   valueColMD: 14,
-  colRightXS: 24,
-  labelColStyle: {},
-  dividerStyle: { margin: '7px 0' },
-  btnExecuteActive: { color: 'green', borderColor: 'green', backgroundColor: 'white' },
-  btnExecuteInactive: { color: '#D5D5D5', borderColor: '#D5D5D5', backgroundColor: 'white' }
+  colRightXS: 24
 }
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
-const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefreshWallet }) => {
+const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefreshWallet, deviceType }) => {
   const [state, setState] = useReducer(reducer, distributionSummaryState())
-  const { isMobile, isTablet } = useSelector((state) => state.custom)
+  const { isMobile, isTablet } = useSelector((state) => state.custom.userAgent)
   const { modal, message } = App.useApp()
+
+  const styleProps = {
+    divider: { margin: '7px 0' },
+    btnExecuteActive: { color: 'green', borderColor: 'green', backgroundColor: 'white' },
+    btnExecuteInactive: { color: '#D5D5D5', borderColor: '#D5D5D5', backgroundColor: 'white' },
+    fieldLabel: { fontSize: deviceType.isSmartphone ? 14 : 16, fontWeight: 'bold' },
+    fieldValue: { fontSize: deviceType.isSmartphone ? 14 : 16 },
+    distributionCost: { color: state.transactionFeeExceeded ? 'red' : '', fontSize: deviceType.isSmartphone ? 14 : 16 }
+  }
 
   useEffect(() => {
     try {
@@ -368,10 +373,10 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
           md={styleParams.labelColMD}
           style={styleParams.labelColStyle}
         >
-          <span style={{ fontWeight: 'bold' }}>Total transactions:</span>
+          <span style={styleProps.fieldLabel}>Total transactions:</span>
         </Col>
         <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
-          <span>{state.noOfPaymentTransactions}</span>
+          <span style={styleProps.fieldValue}>{state.noOfPaymentTransactions}</span>
         </Col>
       </Row>
       <Row>
@@ -381,10 +386,10 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
           md={styleParams.labelColMD}
           style={styleParams.labelColStyle}
         >
-          <span style={{ fontWeight: 'bold' }}>DeSo price:</span>
+          <span style={styleProps.fieldLabel}>DeSo price:</span>
         </Col>
         <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
-          <span>{`$${desoData.desoPrice}`}</span>
+          <span style={styleProps.fieldValue}>{`$${desoData.desoPrice}`}</span>
         </Col>
       </Row>
       <Row>
@@ -394,10 +399,10 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
           md={styleParams.labelColMD}
           style={styleParams.labelColStyle}
         >
-          <span style={{ fontWeight: 'bold' }}>Transaction fee:</span>
+          <span style={styleProps.fieldLabel}>Transaction fee</span>
         </Col>
         <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
-          <span>{`$${rootState.feePerTransactionUSD} per transaction`}</span>
+          <span style={styleProps.fieldValue}>{`$${rootState.feePerTransactionUSD} per transaction`}</span>
         </Col>
       </Row>
       <Row>
@@ -407,12 +412,10 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
           md={styleParams.labelColMD}
           style={styleParams.labelColStyle}
         >
-          <span style={{ fontWeight: 'bold' }}>Distribution cost:</span>
+          <span style={styleProps.fieldLabel}>Distribution cost:</span>
         </Col>
         <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
-          <span
-            style={{ color: state.transactionFeeExceeded ? 'red' : '' }}
-          >{`$${state.totalFeeUSD} (~${state.totalFeeDESOLabel} $DESO)`}</span>
+          <span style={styleProps.distributionCost}>{`$${state.totalFeeUSD} (~${state.totalFeeDESOLabel} $DESO)`}</span>
         </Col>
       </Row>
       <Row>
@@ -422,18 +425,18 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
           md={styleParams.labelColMD}
           style={styleParams.labelColStyle}
         >
-          <span style={{ fontWeight: 'bold' }}>Token to distribute:</span>
+          <span style={styleProps.fieldLabel}>Token to distribute:</span>
         </Col>
         <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
-          <span>{state.tokenToDistribute}</span>
+          <span style={styleProps.fieldValue}>{state.tokenToDistribute}</span>
         </Col>
       </Row>
       {rootState.distributionAmountEnabled ? (
         <>
-          <Divider style={styleParams.dividerStyle} />
+          <Divider style={styleProps.divider} />
           <Row>
             <Col xs={24} sm={styleParams.labelColSM} md={styleParams.labelColMD} style={styleParams.labelColStyle}>
-              <span style={{ fontWeight: 'bold' }}>Amount to distribute:</span>
+              <span style={styleProps.fieldLabel}>Amount to distribute:</span>
             </Col>
             <Col xs={24} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
               <InputNumber
@@ -454,7 +457,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
         <Col>
           <Button
             style={
-              state.isExecuting || state.executeDisabled ? styleParams.btnExecuteInactive : styleParams.btnExecuteActive
+              state.isExecuting || state.executeDisabled ? styleProps.btnExecuteInactive : styleProps.btnExecuteActive
             }
             icon={<RightCircleOutlined />}
             size='large'
@@ -490,7 +493,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
   )
 }
 
-const app = ({ desoData, agiliteData, rootState, setRootState, onRefreshWallet }) => {
+const app = ({ desoData, agiliteData, rootState, setRootState, onRefreshWallet, deviceType }) => {
   return (
     <App>
       <SummaryCard
@@ -499,6 +502,7 @@ const app = ({ desoData, agiliteData, rootState, setRootState, onRefreshWallet }
         agiliteData={agiliteData}
         onRefreshWallet={onRefreshWallet}
         setRootState={setRootState}
+        deviceType={deviceType}
       />
     </App>
   )

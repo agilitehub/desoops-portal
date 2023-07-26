@@ -12,22 +12,28 @@ const styleParams = {
   valueColXS: 24,
   valueColSM: 12,
   valueColMD: 15,
-  colRightXS: 24,
-  labelColStyle: { marginTop: 4 },
-  dividerStyle: { margin: '7px 0' }
+  colRightXS: 24
 }
 
 const GenenralTab = ({
   rootState,
+  deviceType,
   onDistributeTo,
   onDistributionType,
   onTokenToUse,
   desoProfile,
   onConfirmNFT,
-  onCancelNFT,
-  setRootState
+  onCancelNFT
 }) => {
   const [tokenOwnerList, setTokenOwnerList] = useState([])
+
+  const styleProps = {
+    select: { width: 200 },
+    selectTokenToUse: { width: deviceType.isSmartphone ? '100%' : 250 },
+    fieldLabel: { fontSize: 14, fontWeight: 'bold' },
+    labelColStyle: { marginTop: deviceType.isSmartphone ? 0 : 4 },
+    divider: { margin: deviceType.isSmartphone ? '3px 0' : '7px 0' }
+  }
 
   useEffect(() => {
     let tmpTokenOwnerList = []
@@ -78,16 +84,16 @@ const GenenralTab = ({
           xs={styleParams.labelColXS}
           sm={styleParams.labelColSM}
           md={styleParams.labelColMD}
-          style={styleParams.labelColStyle}
+          style={styleProps.labelColStyle}
         >
-          <span style={{ fontWeight: 'bold' }}>Distribute to:</span>
+          <span style={styleProps.fieldLabel}>Distribute to:</span>
         </Col>
         <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
           <Select
             disabled={rootState.isExecuting}
             onChange={(value) => onDistributeTo(value)}
             value={rootState.distributeTo}
-            style={{ width: 250 }}
+            style={styleProps.select}
           >
             <Select.Option value={Enums.values.EMPTY_STRING}>- Select -</Select.Option>
             <Select.Option value={Enums.values.CREATOR}>Creator Coin Holders</Select.Option>
@@ -98,22 +104,22 @@ const GenenralTab = ({
       </Row>
       {rootState.distributeTo !== Enums.values.EMPTY_STRING ? (
         <>
-          <Divider style={styleParams.dividerStyle} />
+          <Divider style={styleProps.divider} />
           <Row>
             <Col
               xs={styleParams.labelColXS}
               sm={styleParams.labelColSM}
               md={styleParams.labelColMD}
-              style={styleParams.labelColStyle}
+              style={styleProps.labelColStyle}
             >
-              <span style={{ fontWeight: 'bold' }}>Type of distribution:</span>
+              <span style={styleProps.fieldLabel}>Type of distribution:</span>
             </Col>
             <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
               <Select
                 disabled={rootState.isExecuting}
                 onChange={(value) => onDistributionType(value)}
                 value={rootState.distributionType}
-                style={{ width: 250 }}
+                style={styleProps.select}
               >
                 <Select.Option value={Enums.values.EMPTY_STRING}>- Select -</Select.Option>
                 <Select.Option value={Enums.paymentTypes.DESO}>$DESO</Select.Option>
@@ -127,22 +133,22 @@ const GenenralTab = ({
       {rootState.distributionType === Enums.paymentTypes.DAO ||
       rootState.distributionType === Enums.paymentTypes.CREATOR ? (
         <>
-          <Divider style={styleParams.dividerStyle} />
+          <Divider style={styleProps.divider} />
           <Row>
             <Col
               xs={styleParams.labelColXS}
               sm={styleParams.labelColSM}
               md={styleParams.labelColMD}
-              style={styleParams.labelColStyle}
+              style={styleProps.labelColStyle}
             >
-              <span style={{ fontWeight: 'bold' }}>{`${rootState.distributionType} Token to use:`}</span>
+              <span style={styleProps.fieldLabel}>{`${rootState.distributionType} Token to use:`}</span>
             </Col>
             <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
               <Select
                 disabled={rootState.isExecuting}
                 onChange={(value, item) => onTokenToUse(value, item.label)}
                 value={rootState.tokenToUse}
-                style={{ width: 250 }}
+                style={styleProps.selectTokenToUse}
               >
                 <Select.Option value={Enums.values.EMPTY_STRING}>- Select -</Select.Option>
                 {tokenOwnerList
@@ -171,6 +177,7 @@ const GenenralTab = ({
       ) : null}
       <DeSoNFTSearchModal
         isOpen={rootState.openNftSearch}
+        deviceType={deviceType}
         publicKey={desoProfile.publicKey}
         rootState={rootState}
         onConfirmNFT={onConfirmNFT}

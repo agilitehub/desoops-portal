@@ -12,7 +12,7 @@ import { desoNFTSearchModal } from './data-models'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
-const DeSoNFTSearchModal = ({ isOpen, publicKey, rootState, onConfirmNFT, onCancelNFT }) => {
+const DeSoNFTSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfirmNFT, onCancelNFT }) => {
   const [state, setState] = useReducer(reducer, desoNFTSearchModal())
 
   // Create a useEffect hook to monitor the prop isOpen
@@ -91,7 +91,7 @@ const DeSoNFTSearchModal = ({ isOpen, publicKey, rootState, onConfirmNFT, onCanc
 
   return (
     <Modal
-      title={'Search for DeSo NFT'}
+      title={'Link to DeSo NFT'}
       open={isOpen}
       onOk={handleConfirmNFT}
       onCancel={onCancelNFT}
@@ -110,10 +110,10 @@ const DeSoNFTSearchModal = ({ isOpen, publicKey, rootState, onConfirmNFT, onCanc
         <Col span={24}>
           <Input.TextArea
             disabled={state.isExecuting}
-            placeholder='Paste the DeSo NFT URL Link here (Note: Links from Diamond App, DeSocialWorld, and Desofy are allowed).'
+            placeholder='Paste the DeSo NFT URL Link here (Note: Links from Diamond App, DeSocialWorld, Desofy, and NFTz are allowed).'
             value={state.nftUrl}
             onChange={handleProcessNFTURL}
-            rows={3}
+            rows={deviceType.isSmartphone ? 5 : 3}
           />
           {state.isExecuting ? (
             <center style={{ marginTop: 5 }}>
