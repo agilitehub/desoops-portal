@@ -74,11 +74,7 @@ const SetupCard = ({
   return (
     <Card
       size='small'
-      title={
-        <center>
-          <span style={styleProps.title}>👇 Start Here: Setup & Config</span>
-        </center>
-      }
+      title={<span style={styleProps.title}>👇 Start Here: Setup & Config</span>}
       headStyle={styleProps.headStyle}
     >
       <Tabs

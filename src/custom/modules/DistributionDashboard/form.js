@@ -210,17 +210,15 @@ const _BatchTransactionsForm = () => {
                   <Col xs={24} md={12}>
                     <WalletOverviewCard desoProfile={desoData.profile} deviceType={deviceType} />
                   </Col>
-                  {!isSmartphone ? (
-                    <Col xs={24} md={12}>
-                      <QuickActionsCard
-                        desoData={desoData}
-                        onResetDashboard={resetState}
-                        onRefreshWallet={handleRefreshWallet}
-                        rootState={state}
-                        deviceType={deviceType}
-                      />
-                    </Col>
-                  ) : null}
+                  <Col xs={24} md={12}>
+                    <QuickActionsCard
+                      desoData={desoData}
+                      onResetDashboard={resetState}
+                      onRefreshWallet={handleRefreshWallet}
+                      rootState={state}
+                      deviceType={deviceType}
+                    />
+                  </Col>
                 </Row>
                 {isSmartphone ? <Divider style={styleProps.divider} /> : null}
                 <Row gutter={[12, styleProps.verticalGutter]}>
@@ -249,6 +247,7 @@ const _BatchTransactionsForm = () => {
                 </Row>
               </Col>
             </Row>
+            {isSmartphone ? <Divider style={styleProps.divider} /> : null}
             {state.distributeTo ? (
               <Row>
                 <TableData desoData={desoData} rootState={state} setRootState={setState} deviceType={deviceType} />

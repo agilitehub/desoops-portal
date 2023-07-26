@@ -30,9 +30,10 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
   const { modal, message } = App.useApp()
 
   const styleProps = {
+    title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
     divider: { margin: '7px 0' },
-    btnExecuteActive: { color: 'green', borderColor: 'green', backgroundColor: 'white' },
-    btnExecuteInactive: { color: '#D5D5D5', borderColor: '#D5D5D5', backgroundColor: 'white' },
+    btnExecuteActive: { color: 'green', borderColor: 'green', backgroundColor: 'white', marginTop: -10 },
+    btnExecuteInactive: { color: '#D5D5D5', borderColor: '#D5D5D5', backgroundColor: 'white', marginTop: -10 },
     fieldLabel: { fontSize: deviceType.isSmartphone ? 14 : 16, fontWeight: 'bold' },
     fieldValue: { fontSize: deviceType.isSmartphone ? 14 : 16 },
     distributionCost: { color: state.transactionFeeExceeded ? 'red' : '', fontSize: deviceType.isSmartphone ? 14 : 16 }
@@ -365,7 +366,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
   }
 
   return (
-    <Card title='Step 3: Distribution Summary' size='small'>
+    <Card title={<span style={styleProps.title}>Step 3: Distribution Summary</span>} size='small'>
       <Row>
         <Col
           xs={styleParams.labelColXS}
@@ -460,7 +461,6 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
               state.isExecuting || state.executeDisabled ? styleProps.btnExecuteInactive : styleProps.btnExecuteActive
             }
             icon={<RightCircleOutlined />}
-            size='large'
             disabled={state.isExecuting || state.executeDisabled}
             onClick={handleConfirmExecute}
           >

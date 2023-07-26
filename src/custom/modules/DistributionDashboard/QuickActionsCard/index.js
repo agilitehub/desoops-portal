@@ -22,10 +22,23 @@ const initialState = {
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
-const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootState }) => {
+const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootState, deviceType }) => {
   const dispatch = useDispatch()
   const { modal, message } = App.useApp()
   const [state, setState] = useReducer(reducer, initialState)
+
+  const styleProps = {
+    title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
+    headStyle: { minHeight: deviceType.isSmartphone ? 30 : 40 },
+    bodyStyle: { height: deviceType.isSmartphone ? 58 : 75 },
+    actionWrapper: { marginTop: -5 },
+    iconReset: { color: '#DC3847', borderColor: '#DC3847', backgroundColor: 'white' },
+    iconRefresh: { color: '#FFC20E', borderColor: '#FFC20E', backgroundColor: 'white' },
+    iconCopy: { color: '#800080', borderColor: '#800080', backgroundColor: 'white' },
+    labelReset: { color: '#DC3847', fontSize: 12 },
+    labelRefresh: { color: '#FFC20E', fontSize: 12 },
+    labelCopy: { color: '#800080', fontSize: 12 }
+  }
 
   const handleResetDashboard = () => {
     setState({ resetLoading: true })
@@ -169,37 +182,41 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
   ]
 
   return (
-    <Card title='Quick Actions' size='small' bodyStyle={{ height: 75 }}>
+    <Card
+      title={<span style={styleProps.title}>Quick Actions</span>}
+      size='small'
+      bodyStyle={styleProps.bodyStyle}
+      headStyle={styleProps.headStyle}
+    >
       <Row gutter={[16, 16]} style={{ textAlign: 'center' }}>
         <Col span={8}>
-          <Col span={24}>
+          <Col span={24} style={styleProps.actionWrapper}>
             <Button
               shape='circle'
-              danger
-              style={{ backgroundColor: 'white' }}
+              style={styleProps.iconReset}
               icon={<RollbackOutlined />}
               loading={state.resetLoading}
               disabled={state.resetLoading || rootState.isExecuting}
               onClick={handleResetDashboard}
             />
-            <div style={{ color: '#DC3847' }}>Reset</div>
+            <div style={styleProps.labelReset}>Reset</div>
           </Col>
         </Col>
         <Col span={8}>
-          <Col span={24}>
+          <Col span={24} style={styleProps.actionWrapper}>
             <Button
               shape='circle'
-              style={{ color: '#FFC20E', borderColor: '#FFC20E', backgroundColor: 'white' }}
+              style={styleProps.iconRefresh}
               icon={<ReloadOutlined />}
               loading={state.refreshLoading}
               disabled={state.refreshLoading || rootState.isExecuting}
               onClick={handleRefreshDashboardValues}
             />
-            <div style={{ color: '#FFC20E' }}>Refresh</div>
+            <div style={styleProps.labelRefresh}>Refresh</div>
           </Col>
         </Col>
         <Col span={8}>
-          <Col span={24}>
+          <Col span={24} style={styleProps.actionWrapper}>
             <Dropdown
               menu={{ items: dropdownItems, onClick: handleCopyToClipboard }}
               icon={<DownOutlined />}
@@ -207,14 +224,9 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
               disabled={state.ctcLoading || rootState.isExecuting}
               trigger={['click']}
             >
-              <Button
-                shape='circle'
-                style={{ color: '#800080', borderColor: '#800080' }}
-                icon={<CopyOutlined />}
-                loading={state.ctcLoading}
-              />
+              <Button shape='circle' style={styleProps.iconCopy} icon={<CopyOutlined />} loading={state.ctcLoading} />
             </Dropdown>
-            <div style={{ color: '#800080' }}>Copy</div>
+            <div style={styleProps.labelCopy}>Copy</div>
           </Col>
         </Col>
       </Row>
@@ -268,7 +280,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
   )
 }
 
-const app = ({ desoData, onResetDashboard, onRefreshWallet, rootState }) => {
+const app = ({ desoData, onResetDashboard, onRefreshWallet, rootState, deviceType }) => {
   return (
     <App>
       <QuickActionsCard
@@ -276,6 +288,7 @@ const app = ({ desoData, onResetDashboard, onRefreshWallet, rootState }) => {
         onResetDashboard={onResetDashboard}
         onRefreshWallet={onRefreshWallet}
         rootState={rootState}
+        deviceType={deviceType}
       />
     </App>
   )

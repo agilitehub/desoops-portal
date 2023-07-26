@@ -1,6 +1,5 @@
 import React from 'react'
 import { Card, Row, Col } from 'antd'
-import { useSelector } from 'react-redux'
 
 const WalletOverviewCard = ({ desoProfile, deviceType }) => {
   const { desoBalance, desoBalanceUSD, daoBalance, ccBalance } = desoProfile
@@ -25,11 +24,7 @@ const WalletOverviewCard = ({ desoProfile, deviceType }) => {
 
   return (
     <Card
-      title={
-        <center>
-          <span style={styleProps.title}>Wallet Overview</span>
-        </center>
-      }
+      title={<span style={styleProps.title}>Wallet Overview</span>}
       size='small'
       bodyStyle={styleProps.bodyStyle}
       headStyle={styleProps.headStyle}

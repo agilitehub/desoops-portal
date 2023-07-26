@@ -29,10 +29,13 @@ const slice = createSlice({
       state.userAgent.isMobile = data.payload.isMobile
       state.userAgent.isTablet = data.payload.isTablet
       state.userAgent.isSmartphone = data.payload.isSmartphone
+    },
+    setLeftMenu: (state, data) => {
+      state.leftMenu = data.payload
     }
   }
 })
 
-export const { resetState, setDeSoData, setAgiliteData, updateFollowers, updateFollowing, setDeviceType } =
+export const { resetState, setDeSoData, setAgiliteData, updateFollowers, updateFollowing, setDeviceType, setLeftMenu } =
   slice.actions
 export default slice.reducer

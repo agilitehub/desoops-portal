@@ -32,10 +32,16 @@ const userAgent = {
   isSmartphone: false
 }
 
+const leftMenu = {
+  open: false,
+  activeMenu: 'home'
+}
+
 export const customState = () => {
   return {
     desoData,
     agiliteData,
-    userAgent
+    userAgent,
+    leftMenu
   }
 }

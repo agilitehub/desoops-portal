@@ -70,17 +70,17 @@ const TableData = (props) => {
               style={{ color: theme.twitterBootstrap.primary, fontSize: 12 }}
             >{`Ownership: ${entry.percentOwnershipLabel}% - Amount: ${estimatedPaymentLabel}`}</span>
             <br />
-            <span style={{ color: theme.twitterBootstrap.warning, fontSize: 12 }}>Status: </span>
-            {entry.status === Enums.paymentStatuses.SUCCESS ? (
-              <CheckCircleOutlined style={{ fontSize: 12, color: theme.twitterBootstrap.success }} />
+            <span style={{ color: '#FFA07A', fontSize: 14 }}>Status: </span>
+            {entry.paymentStatus === Enums.paymentStatuses.SUCCESS ? (
+              <CheckCircleOutlined style={{ fontSize: 14, color: theme.twitterBootstrap.success }} />
             ) : entry.isError ? (
               <Popover content={<p>{entry.errorMessage}</p>} title='Payment Error'>
-                <CloseCircleOutlined style={{ fontSize: 12, color: theme.twitterBootstrap.danger }} />
+                <CloseCircleOutlined style={{ fontSize: 14, color: theme.twitterBootstrap.danger }} />
               </Popover>
-            ) : entry.status === Enums.paymentStatuses.IN_PROGRESS ? (
-              <ReloadOutlined style={{ fontSize: 12, color: theme.twitterBootstrap.primary }} spin />
+            ) : entry.paymentStatus === Enums.paymentStatuses.IN_PROGRESS ? (
+              <ReloadOutlined style={{ fontSize: 14, color: theme.twitterBootstrap.primary }} spin />
             ) : (
-              <span style={{ color: theme.twitterBootstrap.info }}>{entry.status}</span>
+              <span style={{ color: theme.twitterBootstrap.info, fontSize: 14 }}>{entry.paymentStatus}</span>
             )}
           </>
         )
