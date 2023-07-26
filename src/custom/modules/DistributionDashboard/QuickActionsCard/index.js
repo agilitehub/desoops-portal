@@ -122,7 +122,8 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
 
       setState({ ctcLoading: false })
     } catch (e) {
-      message.error(e.message)
+      message.error(e.message, 5)
+      setState({ ctcLoading: false })
     }
   }
 

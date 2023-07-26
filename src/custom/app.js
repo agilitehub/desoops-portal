@@ -37,7 +37,7 @@ const App = () => {
   const { currentUser, isLoading } = useContext(DeSoIdentityContext)
   const [initCompleted, setInitCompleted] = useState(false)
   const [userReturned, setUserReturned] = useState(false)
-  const [spinTip, setSpinTip] = useState('')
+  const [spinTip, setSpinTip] = useState('Initializing DeSo Ops Portal...')
 
   // Determine Device Type
   useEffect(() => {
@@ -57,7 +57,6 @@ const App = () => {
       let followers = 0
 
       try {
-        setSpinTip('Initializing DeSo Ops Portal...')
         // First we retrieve configurations from Agilit-e
         tmpAgiliteData = await getAgiliteData()
         dispatch(setAgiliteData(tmpAgiliteData))
@@ -100,22 +99,21 @@ const App = () => {
         tmpDeSoData.profile.ccHodlings = ccHodlings
 
         // Set the DeSo data in the redux store
-        // console.log('tmpDeSoData', tmpDeSoData)
-        setSpinTip('')
         dispatch(setDeSoData(tmpDeSoData))
         setInitCompleted(true)
+        setSpinTip('Initializing DeSo Ops Portal...')
       } catch (e) {
         console.error(e)
       }
     }
-    console.log('App.js - currentUser', currentUser, userReturned)
+
     if (currentUser) {
       if (!userReturned) {
         setUserReturned(true)
         getDeSoDataHook()
       }
-    } else if (!currentUser) {
-      resetState()
+    } else {
+      dispatch(resetState())
       setInitCompleted(false)
       setUserReturned(false)
     }

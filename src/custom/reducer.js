@@ -1,13 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { customState } from './state'
 
+const initialState = customState()
+
 const slice = createSlice({
   name: 'custom',
-  initialState: customState(),
+  initialState,
   reducers: {
-    resetState: (state) => {
-      state = customState()
-    },
+    resetState: () => initialState,
     setDeSoData: (state, data) => {
       state.desoData = data.payload
     },

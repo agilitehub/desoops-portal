@@ -4,26 +4,33 @@
  * @param {string} text - The text to be copied to the clipboard.
  * @returns {Promise} A promise that resolves when the text has been successfully copied, or rejects when an error occurs or the Clipboard API is not supported.
  */
-export const copyTextToClipboard = (text) => {
-  return new Promise((resolve, reject) => {
+export const copyTextToClipboard = async (text) => {
+  let error = null
+
+  try {
     // Check if the text is a string and not empty.
     if (typeof text !== 'string' || text.trim() === '') {
-      reject(new Error('Invalid text: Text should be a non-empty string.'))
-      return
+      throw new Error('Invalid text: Text should be a non-empty string.')
     }
 
     // Check if the Clipboard API is supported.
     if (!navigator.clipboard) {
-      reject(new Error('Clipboard API not supported'))
-      return
+      throw new Error('The Clipboard API is supported in this browser.')
     }
 
     // Try to write the text to the clipboard.
-    navigator.clipboard
-      .writeText(text)
-      .then(resolve) // If successful, resolve the promise.
-      .catch(reject) // If an error occurs, reject the promise with the error.
-  })
+    error = 'clipboard'
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch (e) {
+    if (error === 'clipboard') {
+      error = 'The Clipboard API failed due to initial permissions issues. Please try once more.'
+    } else {
+      error = e.message
+    }
+
+    throw new Error(error)
+  }
 }
 
 /**
