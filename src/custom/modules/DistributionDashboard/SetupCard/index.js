@@ -30,8 +30,7 @@ const SetupCard = ({
       marginTop: deviceType.isSmartphone ? -0 : -3,
       width: 25,
       height: 25
-    },
-    tabBarStyle: { fontSize: 14 }
+    }
   }
 
   const handleSelectNFT = () => {
@@ -82,7 +81,6 @@ const SetupCard = ({
         activeKey={rootState.activeRulesTab}
         size='small'
         tabBarGutter={deviceType.isSmartphone ? 15 : 20}
-        tabBarStyle={styleProps.tabBarStyle}
         onTabClick={(key) => setRootState({ activeRulesTab: key })}
         tabBarExtraContent={
           rootState.distributeTo === Enums.values.NFT ? (

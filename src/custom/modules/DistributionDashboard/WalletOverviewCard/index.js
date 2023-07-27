@@ -10,13 +10,14 @@ const WalletOverviewCard = ({ desoProfile, deviceType }) => {
   const styleProps = {
     title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
     headStyle: { minHeight: deviceType.isSmartphone ? 30 : 40 },
-    bodyStyle: { height: deviceType.isSmartphone ? 58 : 75 },
+    bodyStyle: { height: deviceType.isSmartphone ? 58 : deviceType.isTablet ? 70 : 75 },
+    rowWrapper: { textAlign: 'center', marginTop: deviceType.isSmartphone ? 0 : deviceType.isTablet ? 4 : 4 },
     divWrapper: {
       backgroundColor: '#FFA07A',
       paddingTop: 2,
       paddingBottom: 2,
       borderRadius: '5px',
-      fontSize: deviceType.isSmartphone ? 12 : 14
+      fontSize: deviceType.isSmartphone ? 12 : deviceType.isTablet ? 13 : 14
     },
     backgroundColor: '#FFA07A',
     textColor: '#F3F3F3'
@@ -29,7 +30,7 @@ const WalletOverviewCard = ({ desoProfile, deviceType }) => {
       bodyStyle={styleProps.bodyStyle}
       headStyle={styleProps.headStyle}
     >
-      <Row gutter={[5, 5]} style={{ textAlign: 'center' }}>
+      <Row gutter={[5, 5]} style={styleProps.rowWrapper}>
         <Col span={8}>
           <div style={styleProps.divWrapper}>
             <div style={{ color: styleProps.textColor, fontWeight: 'bold' }}>$DESO</div>

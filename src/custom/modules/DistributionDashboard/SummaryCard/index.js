@@ -10,15 +10,16 @@ import Enums from '../enums'
 import { sendCreatorCoins, sendDAOTokens, sendDESO } from '../../../lib/deso-controller'
 import { randomize } from '../../../lib/utils'
 import { createDistributionTransaction, updateDistributionTransaction } from '../../../lib/agilite-controller'
-import { useSelector } from 'react-redux'
 
 const styleParams = {
   labelColXS: 11,
   labelColSM: 12,
-  labelColMD: 10,
+  labelColMD: 8,
+  labelColLG: 10,
   valueColXS: 13,
   valueColSM: 12,
-  valueColMD: 14,
+  valueColMD: 16,
+  valueColLG: 14,
   colRightXS: 24
 }
 
@@ -26,17 +27,29 @@ const reducer = (state, newState) => ({ ...state, ...newState })
 
 const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefreshWallet, deviceType }) => {
   const [state, setState] = useReducer(reducer, distributionSummaryState())
-  const { isMobile, isTablet } = useSelector((state) => state.custom.userAgent)
   const { modal, message } = App.useApp()
 
   const styleProps = {
     title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
     divider: { margin: '7px 0' },
-    btnExecuteActive: { color: 'green', borderColor: 'green', backgroundColor: 'white', marginTop: -10 },
-    btnExecuteInactive: { color: '#D5D5D5', borderColor: '#D5D5D5', backgroundColor: 'white', marginTop: -10 },
-    fieldLabel: { fontSize: deviceType.isSmartphone ? 14 : 16, fontWeight: 'bold' },
-    fieldValue: { fontSize: deviceType.isSmartphone ? 14 : 16 },
-    distributionCost: { color: state.transactionFeeExceeded ? 'red' : '', fontSize: deviceType.isSmartphone ? 14 : 16 }
+    btnExecuteActive: {
+      color: 'green',
+      borderColor: 'green',
+      backgroundColor: 'white',
+      marginTop: -10
+    },
+    btnExecuteInactive: {
+      color: '#D5D5D5',
+      borderColor: '#D5D5D5',
+      backgroundColor: 'white',
+      marginTop: -10
+    },
+    fieldLabel: { fontSize: deviceType.isSmartphone ? 14 : deviceType.isTablet ? 18 : 16, fontWeight: 'bold' },
+    fieldValue: { fontSize: deviceType.isSmartphone ? 14 : deviceType.isTablet ? 18 : 16 },
+    distributionCost: {
+      color: state.transactionFeeExceeded ? 'red' : '',
+      fontSize: deviceType.isSmartphone ? 14 : deviceType.isTablet ? 18 : 16
+    }
   }
 
   useEffect(() => {
@@ -372,11 +385,17 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
           xs={styleParams.labelColXS}
           sm={styleParams.labelColSM}
           md={styleParams.labelColMD}
+          lg={styleParams.labelColLG}
           style={styleParams.labelColStyle}
         >
           <span style={styleProps.fieldLabel}>Total transactions:</span>
         </Col>
-        <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
+        <Col
+          xs={styleParams.valueColXS}
+          sm={styleParams.valueColSM}
+          md={styleParams.valueColMD}
+          lg={styleParams.valueColLG}
+        >
           <span style={styleProps.fieldValue}>{state.noOfPaymentTransactions}</span>
         </Col>
       </Row>
@@ -385,11 +404,17 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
           xs={styleParams.labelColXS}
           sm={styleParams.labelColSM}
           md={styleParams.labelColMD}
+          lg={styleParams.labelColLG}
           style={styleParams.labelColStyle}
         >
           <span style={styleProps.fieldLabel}>DeSo price:</span>
         </Col>
-        <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
+        <Col
+          xs={styleParams.valueColXS}
+          sm={styleParams.valueColSM}
+          md={styleParams.valueColMD}
+          lg={styleParams.valueColLG}
+        >
           <span style={styleProps.fieldValue}>{`$${desoData.desoPrice}`}</span>
         </Col>
       </Row>
@@ -398,11 +423,17 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
           xs={styleParams.labelColXS}
           sm={styleParams.labelColSM}
           md={styleParams.labelColMD}
+          lg={styleParams.labelColLG}
           style={styleParams.labelColStyle}
         >
           <span style={styleProps.fieldLabel}>Transaction fee</span>
         </Col>
-        <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
+        <Col
+          xs={styleParams.valueColXS}
+          sm={styleParams.valueColSM}
+          md={styleParams.valueColMD}
+          lg={styleParams.valueColLG}
+        >
           <span style={styleProps.fieldValue}>{`$${rootState.feePerTransactionUSD} per transaction`}</span>
         </Col>
       </Row>
@@ -411,11 +442,17 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
           xs={styleParams.labelColXS}
           sm={styleParams.labelColSM}
           md={styleParams.labelColMD}
+          lg={styleParams.labelColLG}
           style={styleParams.labelColStyle}
         >
           <span style={styleProps.fieldLabel}>Distribution cost:</span>
         </Col>
-        <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
+        <Col
+          xs={styleParams.valueColXS}
+          sm={styleParams.valueColSM}
+          md={styleParams.valueColMD}
+          lg={styleParams.valueColLG}
+        >
           <span style={styleProps.distributionCost}>{`$${state.totalFeeUSD} (~${state.totalFeeDESOLabel} $DESO)`}</span>
         </Col>
       </Row>
@@ -424,11 +461,17 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
           xs={styleParams.labelColXS}
           sm={styleParams.labelColSM}
           md={styleParams.labelColMD}
+          lg={styleParams.labelColLG}
           style={styleParams.labelColStyle}
         >
           <span style={styleProps.fieldLabel}>Token to distribute:</span>
         </Col>
-        <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
+        <Col
+          xs={styleParams.valueColXS}
+          sm={styleParams.valueColSM}
+          md={styleParams.valueColMD}
+          lg={styleParams.valueColLG}
+        >
           <span style={styleProps.fieldValue}>{state.tokenToDistribute}</span>
         </Col>
       </Row>
@@ -436,17 +479,23 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
         <>
           <Divider style={styleProps.divider} />
           <Row>
-            <Col xs={24} sm={styleParams.labelColSM} md={styleParams.labelColMD} style={styleParams.labelColStyle}>
+            <Col
+              xs={24}
+              sm={styleParams.labelColSM}
+              md={styleParams.labelColMD}
+              lg={styleParams.labelColLG}
+              style={styleParams.labelColStyle}
+            >
               <span style={styleProps.fieldLabel}>Amount to distribute:</span>
             </Col>
-            <Col xs={24} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
+            <Col xs={24} sm={styleParams.valueColSM} md={styleParams.valueColMD} lg={styleParams.valueColLG}>
               <InputNumber
                 status={state.amountExceeded ? 'error' : null}
                 addonBefore={rootState.distributionType}
                 placeholder='0'
                 disabled={rootState.isExecuting || state.isExecuting}
                 value={rootState.distributionAmount}
-                style={{ width: isMobile && !isTablet ? '100%' : 250 }}
+                style={{ width: deviceType.isSmartphone ? '100%' : 250 }}
                 onChange={handleDistributionAmount}
               />
             </Col>
@@ -457,6 +506,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
       <Row justify='center'>
         <Col>
           <Button
+            size={deviceType.isTablet ? 'large' : 'medium'}
             style={
               state.isExecuting || state.executeDisabled ? styleProps.btnExecuteInactive : styleProps.btnExecuteActive
             }

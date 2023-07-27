@@ -30,14 +30,14 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
   const styleProps = {
     title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
     headStyle: { minHeight: deviceType.isSmartphone ? 30 : 40 },
-    bodyStyle: { height: deviceType.isSmartphone ? 58 : 75 },
-    actionWrapper: { marginTop: -5 },
+    bodyStyle: { height: deviceType.isSmartphone ? 58 : deviceType.isTablet ? 70 : 75 },
+    actionWrapper: { marginTop: deviceType.isSmartphone ? -5 : -3 },
     iconReset: { color: '#DC3847', borderColor: '#DC3847', backgroundColor: 'white' },
     iconRefresh: { color: '#FFC20E', borderColor: '#FFC20E', backgroundColor: 'white' },
     iconCopy: { color: '#800080', borderColor: '#800080', backgroundColor: 'white' },
-    labelReset: { color: '#DC3847', fontSize: 12 },
-    labelRefresh: { color: '#FFC20E', fontSize: 12 },
-    labelCopy: { color: '#800080', fontSize: 12 }
+    labelReset: { color: '#DC3847', fontSize: deviceType.isSmartphone ? 12 : 16 },
+    labelRefresh: { color: '#FFC20E', fontSize: deviceType.isSmartphone ? 12 : 16 },
+    labelCopy: { color: '#800080', fontSize: deviceType.isSmartphone ? 12 : 16 }
   }
 
   const handleResetDashboard = () => {

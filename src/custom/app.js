@@ -38,7 +38,7 @@ const App = () => {
   const { currentUser, isLoading } = useContext(DeSoIdentityContext)
   const [initCompleted, setInitCompleted] = useState(false)
   const [userReturned, setUserReturned] = useState(false)
-  const [spinTip, setSpinTip] = useState('Initializing DeSo Ops Portal...')
+  const [spinTip, setSpinTip] = useState('Initializing DeSoOps Portal...')
 
   // Determine Device Type
   useEffect(() => {
@@ -103,7 +103,7 @@ const App = () => {
         // Set the DeSo data in the redux store
         dispatch(setDeSoData(tmpDeSoData))
         setInitCompleted(true)
-        setSpinTip('Initializing DeSo Ops Portal...')
+        setSpinTip('Initializing DeSoOps Portal...')
       } catch (e) {
         console.error(e)
       }
@@ -127,14 +127,14 @@ const App = () => {
         <>
           <Spinner tip={spinTip} />
           <center>
-            <img src={logo} alt='DeSo Ops Portal' style={{ width: 300 }} />
+            <img src={logo} alt='DeSoOps Portal' style={{ width: 300 }} />
           </center>
         </>
       ) : currentUser && !initCompleted ? (
         <>
           <Spinner tip={spinTip} />
           <center>
-            <img src={logo} alt='DeSo Ops Portal' style={{ width: 300 }} />
+            <img src={logo} alt='DeSoOps Portal' style={{ width: 300 }} />
           </center>
         </>
       ) : currentUser && initCompleted ? (

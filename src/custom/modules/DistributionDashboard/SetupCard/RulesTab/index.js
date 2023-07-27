@@ -22,9 +22,9 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
   const styleProps = {
     select: { width: 200 },
     selectTokenToUse: { width: deviceType.isSmartphone ? '100%' : 250 },
-    fieldLabel: { fontSize: 14, fontWeight: 'bold' },
+    fieldLabel: { fontSize: deviceType.isSmartphone ? 14 : 16, fontWeight: 'bold' },
     labelColStyle: { marginTop: deviceType.isSmartphone ? 0 : 4 },
-    divider: { margin: deviceType.isSmartphone ? '3px 0' : '7px 0' }
+    divider: { margin: deviceType.isMobile ? '3px 0' : '7px 0' }
   }
 
   const handleFilterUsers = async (propType, propValue) => {
@@ -122,7 +122,7 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
         </Col>
         <Col xs={styleParams.col1XS}>
           <Radio.Group
-            size='small'
+            size={deviceType.isSmartphone ? 'small' : 'medium'}
             value={rootState.spreadAmountBasedOn}
             buttonStyle='solid'
             onChange={handleSpreadAmountBasedOn}
@@ -156,7 +156,7 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
         <>
           <Divider style={styleProps.divider} />
           <Row>
-            <Col xs={24} sm={7} md={5} lg={24} style={{ paddingTop: 3, paddingBottom: 3 }}>
+            <Col span={24} style={{ paddingTop: 3, paddingBottom: 3 }}>
               <span style={styleProps.fieldLabel}>
                 <b>Where Token Balance is</b>
               </span>

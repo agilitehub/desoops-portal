@@ -1,8 +1,8 @@
 <center><img src="./src/custom/assets/deso-ops-logo-full-v2.png" width="200" /></center>
 
-# DeSo Ops Portal
+# DeSoOps Portal
 
-DeSo Ops serves as a management hub for Content Creators on the [DeSo](https://deso.com) platform, simplifying numerous responsibilities associated with their projects, coin holders, and supporters. Primarily, it facilitates the distribution of $DESO, Creator Coins, and DAO Tokens to your holders and supporters.
+DeSoOps serves as a management hub for Content Creators on the [DeSo](https://deso.com) platform, simplifying numerous responsibilities associated with their projects, coin holders, and supporters. Primarily, it facilitates the distribution of $DESO, Creator Coins, and DAO Tokens to your holders and supporters.
 
 ## Table of Contents
 
@@ -22,7 +22,7 @@ DeSo Ops serves as a management hub for Content Creators on the [DeSo](https://d
 
 ## Usage
 
-To access the DeSo Ops Portal, simply navigate to [desoopscom](https://desoops.com) and sign in using your DeSo account.
+To access the DeSoOps Portal, simply navigate to [desoopscom](https://desoops.com) and sign in using your DeSo account.
 
 ## Features
 
@@ -58,8 +58,8 @@ To access the DeSo Ops Portal, simply navigate to [desoopscom](https://desoops.c
 
 ## Links
 
-- DeSo Ops Portal: https://desoops.com
-- DeSo Ops Fundraising DAO: https://openfund.com/d/DeSoOps
+- DeSoOps Portal: https://desoops.com
+- DeSoOps Fundraising DAO: https://openfund.com/d/DeSoOps
 - Ant Design: https://ant.design
 - DeSo Platform: https://deso.com
 - React JS: http://reactjs.org

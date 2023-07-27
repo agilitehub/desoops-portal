@@ -89,7 +89,7 @@ const Login = () => {
                     xxl={10}
                   >
                     <center>
-                      <img src={logo} alt='DeSo Ops Portal' style={{ width: styleProps.logoWidth }} />
+                      <img src={logo} alt='DeSoOps Portal' style={{ width: styleProps.logoWidth }} />
                       <h1 style={{ marginTop: -20 }}> PORTAL SIGN-IN</h1>
                     </center>
                     {/* {!state.loading ? ( */}

@@ -220,9 +220,9 @@ const _BatchTransactionsForm = () => {
                     />
                   </Col>
                 </Row>
-                {isSmartphone ? <Divider style={styleProps.divider} /> : null}
+                <Divider style={styleProps.divider} />
                 <Row gutter={[12, styleProps.verticalGutter]}>
-                  <Col xs={24} md={12}>
+                  <Col xs={24} lg={12}>
                     <SetupCard
                       desoData={desoData}
                       rootState={state}
@@ -234,7 +234,7 @@ const _BatchTransactionsForm = () => {
                       deviceType={deviceType}
                     />
                   </Col>
-                  <Col xs={24} md={12}>
+                  <Col xs={24} lg={12}>
                     <SummaryCard
                       desoData={desoData}
                       agiliteData={agiliteData}
@@ -247,7 +247,7 @@ const _BatchTransactionsForm = () => {
                 </Row>
               </Col>
             </Row>
-            {isSmartphone ? <Divider style={styleProps.divider} /> : null}
+            <Divider style={styleProps.divider} />
             {state.distributeTo ? (
               <Row>
                 <TableData desoData={desoData} rootState={state} setRootState={setState} deviceType={deviceType} />

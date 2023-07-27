@@ -15,10 +15,10 @@ const ToolbarDropDown = ({ deviceType }) => {
       backgroundColor: 'transparent',
       color: 'white',
       border: 'none',
-      fontSize: 14
+      fontSize: deviceType.isSmartphone ? 14 : 18
     },
-    btnIcon: { borderRadius: 8, width: 25, height: 25 },
-    dropdownItems: { fontSize: 14 }
+    btnIcon: { borderRadius: 8, width: deviceType.isSmartphone ? 25 : 35, height: deviceType.isSmartphone ? 25 : 35 },
+    dropdownItems: { fontSize: deviceType.isSmartphone ? 14 : 18 }
   }
 
   const handleGetItems = () => {

@@ -29,10 +29,10 @@ const GenenralTab = ({
 
   const styleProps = {
     select: { width: 200 },
-    selectTokenToUse: { width: deviceType.isSmartphone ? '100%' : 250 },
-    fieldLabel: { fontSize: 14, fontWeight: 'bold' },
+    selectTokenToUse: { width: deviceType.isTablet ? '90%' : '100%' },
+    fieldLabel: { fontSize: deviceType.isSmartphone ? 14 : 16, fontWeight: 'bold' },
     labelColStyle: { marginTop: deviceType.isSmartphone ? 0 : 4 },
-    divider: { margin: deviceType.isSmartphone ? '3px 0' : '7px 0' }
+    divider: { margin: deviceType.isMobile ? '3px 0' : '7px 0' }
   }
 
   useEffect(() => {
