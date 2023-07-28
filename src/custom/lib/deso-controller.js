@@ -609,31 +609,3 @@ export const sendCreatorCoins = async (sender, recipient, creatorCoin, amount) =
     throw new Error(e)
   }
 }
-
-// TODO: Remove these functions from the app once the logic that uses it is refactored
-export const getPostDetails = (postHashHex) => {
-  return new Promise((resolve, reject) => {
-    ;(async () => {
-      let request = null
-      let response = null
-
-      try {
-        request = {
-          PostHashHex: postHashHex,
-          CommentLimit: 1000
-        }
-
-        response = await getSinglePost(request)
-
-        resolve(response)
-      } catch (e) {
-        console.log(e)
-        reject(Enums.messages.UNKNOWN_ERROR)
-      }
-    })()
-  })
-}
-
-export const getDeSo = () => {
-  return {}
-}
