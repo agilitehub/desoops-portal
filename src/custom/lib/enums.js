@@ -11,6 +11,7 @@ const Enums = {
     DAO: 'dao',
     CREATOR: 'creator',
     NFT: 'nft',
+    CUSTOM: 'custom',
     POST: 'post',
     HEX_PREFIX: '0x',
     YES: 'Yes',
@@ -26,6 +27,9 @@ const Enums = {
     DESO: '$DESO',
     DAO: 'DAO',
     CREATOR: 'CC'
+  },
+  defaults: {
+    USER_SEARCH_NUM_TO_FETCH: 20
   },
   paymentStatuses: {
     QUEUED: 'Queued',
