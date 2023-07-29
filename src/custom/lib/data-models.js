@@ -4,6 +4,7 @@ export const desoUserModel = () => {
     isActive: true,
     isVisible: true,
     isError: false,
+    isCustom: false,
     errorMessage: '',
     publicKey: '',
     username: '',

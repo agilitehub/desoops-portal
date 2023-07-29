@@ -25,6 +25,7 @@ export const distributionDashboardState = (feePerTransactionUSD) => {
     nftMetaData: {},
     nftHodlers: [],
     openNftSearch: false,
+    customListModal: customListModal(),
     paymentModal: paymentModal()
   }
 }
@@ -56,5 +57,13 @@ export const paymentModal = () => {
     progressPercent: 0,
     tips: [],
     errors: []
+  }
+}
+
+export const customListModal = (isOpen = false) => {
+  return {
+    isOpen,
+    autoSort: true,
+    userList: []
   }
 }

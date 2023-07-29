@@ -15,7 +15,7 @@ import TableData from './TableData'
 // Custom Utils
 import Enums from '../../lib/enums'
 import { calculateEstimatedPayment, setupHodlers, updateHodlers } from './controller'
-import { distributionDashboardState, paymentModal } from './data-models'
+import { customListModal, distributionDashboardState, paymentModal } from './data-models'
 import { setDeSoData, setAgiliteData } from '../../reducer'
 import { cloneDeep } from 'lodash'
 import { generateProfilePicUrl, getDeSoData, getDeSoUser } from '../../lib/deso-controller'
@@ -45,11 +45,11 @@ const _BatchTransactionsForm = () => {
     if (state.distributeTo && state.distributionType) {
       if ([Enums.paymentTypes.DAO, Enums.paymentTypes.CREATOR].includes(state.distributionType)) {
         if (state.tokenToUse) {
-          rulesEnabled = true
+          rulesEnabled = state.distributeTo !== Enums.values.CUSTOM
           distributionAmountEnabled = true
         }
       } else {
-        rulesEnabled = true
+        rulesEnabled = state.distributeTo !== Enums.values.CUSTOM
         distributionAmountEnabled = true
       }
     }
@@ -114,9 +114,12 @@ const _BatchTransactionsForm = () => {
       resetState()
       if (!distributeTo) return
 
-      // Then, if user selects NFT or Post, no extra work is needed
+      // Then, if user selects NFT or CUSTOM, no extra work is needed
       if (distributeTo === Enums.values.NFT) {
         setState({ distributeTo, nftUrl: '', nftMetaData: {}, nftHodlers: [], openNftSearch: true })
+        return
+      } else if (distributeTo === Enums.values.CUSTOM) {
+        setState({ distributeTo, customListModal: customListModal(true) })
         return
       }
 
@@ -137,7 +140,7 @@ const _BatchTransactionsForm = () => {
       // Update State
       setState({ distributeTo, finalHodlers, tokenTotal, selectedTableKeys })
     } catch (e) {
-      message.error(e)
+      console.error(e)
     }
 
     setState({ loading: false })
@@ -195,6 +198,24 @@ const _BatchTransactionsForm = () => {
     setState({ loading: false })
   }
 
+  const handleConfirmCustomList = async (userList, autoSort) => {
+    try {
+      const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(userList)
+
+      setState({
+        finalHodlers,
+        tokenTotal,
+        selectedTableKeys,
+        customListModal: { ...state.customListModal, isOpen: false, userList, autoSort }
+      })
+    } catch (e) {
+      console.error(e)
+      message.error(e.message)
+    }
+
+    setState({ loading: false })
+  }
+
   const handlePaymentDone = async () => {
     setState({ paymentModal: paymentModal() })
   }
@@ -231,6 +252,7 @@ const _BatchTransactionsForm = () => {
                       onTokenToUse={handleTokenToUse}
                       setRootState={setState}
                       onConfirmNFT={handleConfirmNFT}
+                      onConfirmCustomList={handleConfirmCustomList}
                       deviceType={deviceType}
                     />
                   </Col>

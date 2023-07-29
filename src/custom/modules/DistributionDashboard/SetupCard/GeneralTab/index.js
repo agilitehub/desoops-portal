@@ -4,6 +4,7 @@ import Enums from '../../../../lib/enums'
 
 // App Components
 import DeSoNFTSearchModal from '../../../../reusables/components/DeSoNFTSearchModal'
+import DeSoUserSearchModal from '../../../../reusables/components/DeSoUserSearchModal'
 
 const styleParams = {
   labelColXS: 24,
@@ -23,7 +24,9 @@ const GenenralTab = ({
   onTokenToUse,
   desoProfile,
   onConfirmNFT,
-  onCancelNFT
+  onCancelNFT,
+  onConfirmCustomList,
+  onCancelCustomList
 }) => {
   const [tokenOwnerList, setTokenOwnerList] = useState([])
 
@@ -99,6 +102,7 @@ const GenenralTab = ({
             <Select.Option value={Enums.values.CREATOR}>Creator Coin Holders</Select.Option>
             <Select.Option value={Enums.values.DAO}>DAO Coin Holders</Select.Option>
             <Select.Option value={Enums.values.NFT}>NFT Owners</Select.Option>
+            <Select.Option value={Enums.values.CUSTOM}>Custom List</Select.Option>
           </Select>
         </Col>
       </Row>
@@ -182,6 +186,14 @@ const GenenralTab = ({
         rootState={rootState}
         onConfirmNFT={onConfirmNFT}
         onCancelNFT={onCancelNFT}
+      />
+      <DeSoUserSearchModal
+        isOpen={rootState.customListModal.isOpen}
+        deviceType={deviceType}
+        publicKey={desoProfile.publicKey}
+        rootState={rootState}
+        onConfirm={onConfirmCustomList}
+        onCancel={onCancelCustomList}
       />
     </>
   )

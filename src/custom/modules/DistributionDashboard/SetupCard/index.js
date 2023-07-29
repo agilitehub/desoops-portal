@@ -3,6 +3,7 @@ import { Card, Tabs, Button, Image } from 'antd'
 import GeneralTab from './GeneralTab'
 import RulesTab from './RulesTab'
 import Enums from '../../../lib/enums'
+import { UsergroupAddOutlined } from '@ant-design/icons'
 
 const SetupCard = ({
   desoData,
@@ -12,6 +13,7 @@ const SetupCard = ({
   onTokenToUse,
   setRootState,
   onConfirmNFT,
+  onConfirmCustomList,
   deviceType
 }) => {
   const styleProps = {
@@ -33,12 +35,23 @@ const SetupCard = ({
     }
   }
 
-  const handleSelectNFT = () => {
-    setRootState({ openNftSearch: true })
+  const handleButtonClick = () => {
+    switch (rootState.distributeTo) {
+      case Enums.values.NFT:
+        setRootState({ openNftSearch: true })
+        break
+      case Enums.values.CUSTOM:
+        setRootState({ customListModal: { ...rootState.customListModal, isOpen: true } })
+        break
+    }
   }
 
   const handleCancelNFT = () => {
     setRootState({ openNftSearch: false })
+  }
+
+  const handleCancelCustomList = () => {
+    setRootState({ customListModal: { ...rootState.customListModal, isOpen: false } })
   }
 
   const tabItems = [
@@ -57,6 +70,8 @@ const SetupCard = ({
           onTokenToUse={onTokenToUse}
           onConfirmNFT={onConfirmNFT}
           onCancelNFT={handleCancelNFT}
+          onConfirmCustomList={onConfirmCustomList}
+          onCancelCustomList={handleCancelCustomList}
         />
       )
     },
@@ -86,14 +101,18 @@ const SetupCard = ({
           rootState.distributeTo === Enums.values.NFT ? (
             <Button
               style={styleProps.tabButton}
-              onClick={handleSelectNFT}
+              onClick={handleButtonClick}
               icon={
-                !rootState.nftMetaData.id ? null : (
+                rootState.nftMetaData.id ? (
                   <Image src={rootState.nftMetaData.imageUrl} style={styleProps.nftIcon} preview={false} />
-                )
+                ) : null
               }
             >
               Select NFT
+            </Button>
+          ) : rootState.distributeTo === Enums.values.CUSTOM ? (
+            <Button style={styleProps.tabButton} onClick={handleButtonClick} icon={<UsergroupAddOutlined />}>
+              Manage List
             </Button>
           ) : null
         }

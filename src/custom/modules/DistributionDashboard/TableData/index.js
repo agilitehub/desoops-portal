@@ -62,9 +62,9 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
                 fallback='https://openfund.com/images/ghost-profile-image.svg'
                 preview={false}
               />
-              <span
-                style={{ color: theme.twitterBootstrap.primary, marginLeft: 5, fontSize: 14 }}
-              >{`${entry.username} (${entry.tokenBalanceLabel} tokens)`}</span>
+              <span style={{ color: theme.twitterBootstrap.primary, marginLeft: 5, fontSize: 14 }}>{`${
+                entry.username
+              } (${entry.tokenBalanceLabel}${entry.isCustom ? '' : ' token(s)'})`}</span>
               <br />
               <span
                 style={{ color: theme.twitterBootstrap.primary, fontSize: 12 }}
@@ -87,6 +87,27 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
         }
       }
     ]
+
+    // // If distributeTo is CUSTOM, then add Actions column with an edit icon for each row entry
+    // if (rootState.distributeTo === Enums.values.CUSTOM) {
+    //   tableColumns.push({
+    //     title: 'Actions',
+    //     dataIndex: 'username',
+    //     key: 'actions',
+    //     width: '100%',
+    //     render: (value, entry) => {
+    //       return (
+    //         <Button
+    //           className='btn-table-edit'
+    //           type='link'
+    //           // onClick={() => handleEditCustomHodler(entry)}
+    //         >
+    //           <EditOutlined style={{ color: '#FF7F50', fontSize: 20 }} />
+    //         </Button>
+    //       )
+    //     }
+    //   })
+    // }
   } else {
     tableColumns = [
       {
@@ -105,9 +126,9 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
                 fallback='https://openfund.com/images/ghost-profile-image.svg'
                 preview={false}
               />
-              <span
-                style={{ color: theme.twitterBootstrap.primary, marginLeft: 5 }}
-              >{`${value} (${entry.tokenBalanceLabel})`}</span>
+              <span style={{ color: theme.twitterBootstrap.primary, marginLeft: 5 }}>{`${value} (${
+                entry.tokenBalanceLabel
+              }${entry.isCustom ? '' : ' token(s)'})`}</span>
             </div>
           )
         }
