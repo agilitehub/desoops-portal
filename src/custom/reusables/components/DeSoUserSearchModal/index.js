@@ -131,7 +131,7 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
     }, [fetchOptions, debounceTimeout])
     return (
       <Select
-        autoFocus
+        autoFocus={!deviceType.isMobile}
         labelInValue
         filterOption={false}
         onSearch={debounceFetcher}
@@ -147,8 +147,8 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
   }
 
   const styleProps = {
-    checkbox: { fontSize: deviceType.isSmartphone ? 14 : 16, fontWeight: 'bold' },
-    searchField: { width: '100%', fontSize: deviceType.isSmartphone ? 14 : 16 },
+    checkbox: { fontSize: 16, fontWeight: 'bold' },
+    searchField: { width: '100%', fontSize: 16 },
     divider: { margin: deviceType.isMobile ? '3px 0' : '7px 0', borderBlockStart: 0 }
   }
 
