@@ -1,11 +1,8 @@
 // This library provide a set of functions that can be used to interact with the DeSo blockchain.
-import { cloneDeep } from 'lodash'
 import {
-  identity,
   getNFTCollectionSummary,
   getNFTEntriesForPost,
   getHodlersForUser,
-  getExchangeRates,
   getFollowersForUser,
   getSingleProfile,
   sendDeso,
@@ -14,117 +11,41 @@ import {
   getProfiles
 } from 'deso-protocol'
 import BigNumber from 'bignumber.js'
+import Axios from 'agilite-utils/axios'
 import Enums from './enums'
 import { desoUserModel } from './data-models'
 import { cleanString, hexToInt } from './utils'
 
-/**
- * Logs the user into the DeSo blockchain.
- *
- * @returns {Promise} A promise that resolves a user object, or rejects when an error occurs.
- */
-export const desoLogin = () => {
-  return new Promise((resolve, reject) => {
-    ;(async () => {
-      try {
-        const response = await identity.login({ accessLevelRequest: 4 })
-        resolve(response)
-      } catch (e) {
-        reject(e)
-        console.log(e)
-      }
-    })()
-  })
-}
+const BASE_URL = 'https://mw2okjv87a.execute-api.us-east-1.amazonaws.com/prod/api/v0'
+const METHOD_DEFAULT = 'POST'
+const route = '/get-single-profile'
 
 /**
- * Logs the user out of DeSo blockchain.
+ * Uses the User's public key to fetch their Profile data from the DeSo blockchain.
  *
- * @returns {Promise} A promise that resolves a void, or rejects when an error occurs.
+ * @param {string} publicKey - The public key of the DeSo User.
+ * @returns {Promise} A promise that resolves the user's data as JSON, or rejects when an error occurs.
  */
-export const desoLogout = async () => {
+export const getDeSoUser = async (publicKey = '') => {
   try {
-    await identity.logout()
-    return
+    const config = {
+      method: METHOD_DEFAULT,
+      url: `${BASE_URL}${route}`,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': 'desoops'
+      },
+      data: {
+        PublicKeyBase58Check: publicKey
+      }
+    }
+
+    const response = await Axios.request(config)
+    console.log('getDeSoUser', response.data)
+    return response.data
   } catch (e) {
     throw new Error(e)
   }
-}
-
-/**
- * Fetches various data sets from the DeSo blockchain based on the provided public key.
- *
- * @param {string} publicKey - The public key of the DeSo User.
- * @param {object} desoDataState - The current desoData Redux state.
- * @returns {object} A promise that resolves a new instance of the desoData Redux state, or rejects when an error occurs.
- */
-export const getDeSoData = (publicKey, desoDataState, getFollowing = false) => {
-  return new Promise((resolve, reject) => {
-    ;(async () => {
-      let daoHodlings = null
-      let ccHodlings = null
-      let desoPrice = null
-      let desoData = null
-      let followers = 0
-      let following = 0
-
-      try {
-        desoData = cloneDeep(desoDataState)
-
-        desoPrice = await getDeSoPricing()
-        const { daoHodlers, daoBalance } = await getDAOHodlersAndBalance(publicKey)
-        daoHodlings = await getDAOHodlings(publicKey)
-        const { ccHodlers, ccBalance } = await getCCHodlersAndBalance(publicKey)
-        ccHodlings = await getCCHodlings(publicKey)
-
-        // We know how many the current User is following, but we don't know how many are following the current User
-        followers = await getTotalFollowersOrFollowing(publicKey, Enums.values.FOLLOWERS)
-
-        // We might need to override the following count
-        if (getFollowing) {
-          following = await getTotalFollowersOrFollowing(publicKey, Enums.values.FOLLOWING)
-        }
-
-        // Update the desoData object
-        desoData.desoPrice = desoPrice
-        desoData.profile.publicKey = publicKey
-        desoData.profile.daoBalance = daoBalance
-        desoData.profile.ccBalance = ccBalance
-        desoData.profile.totalFollowers = followers
-        desoData.profile.totalFollowing = following
-        desoData.profile.daoHodlers = daoHodlers
-        desoData.profile.daoHodlings = daoHodlings
-        desoData.profile.ccHodlers = ccHodlers
-        desoData.profile.ccHodlings = ccHodlings
-
-        resolve(desoData)
-      } catch (e) {
-        reject(e)
-        console.log(e)
-      }
-    })()
-  })
-}
-
-/**
- * Fetches the Exchange Rates for the $DESO token.
- *
- * @returns {Promise} A promise that resolves the Coinbase Exchange Rate, or rejects when an error occurs.
- */
-export const getDeSoPricing = () => {
-  return new Promise((resolve, reject) => {
-    ;(async () => {
-      let desoPrice = null
-
-      try {
-        desoPrice = await getExchangeRates()
-        desoPrice = desoPrice.USDCentsPerDeSoCoinbase / 100
-        resolve(desoPrice)
-      } catch (e) {
-        reject(e)
-      }
-    })()
-  })
 }
 
 /**
