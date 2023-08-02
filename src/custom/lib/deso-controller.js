@@ -128,6 +128,26 @@ export const getDeSoPricing = () => {
 }
 
 /**
+ * Uses the User's public key to fetch their Profile data from the DeSo blockchain.
+ *
+ * @param {string} publicKey - The public key of the DeSo User.
+ * @returns {Promise} A promise that resolves the user's data as JSON, or rejects when an error occurs.
+ */
+export const getDeSoUser = async (publicKey = '') => {
+  let user = null
+
+  try {
+    user = await getSingleProfile({
+      PublicKeyBase58Check: publicKey
+    })
+
+    return user
+  } catch (e) {
+    throw new Error(e)
+  }
+}
+
+/**
  * Uses the User's public key to generate a URL to their profile picture.
  *
  * @param {string} publicKey - The public key of the DeSo User.

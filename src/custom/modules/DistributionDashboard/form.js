@@ -18,8 +18,7 @@ import { calculateEstimatedPayment, setupHodlers, updateHodlers } from './contro
 import { customListModal, distributionDashboardState, paymentModal } from './data-models'
 import { setDeSoData, setAgiliteData } from '../../reducer'
 import { cloneDeep } from 'lodash'
-import { generateProfilePicUrl, getDeSoData } from '../../lib/deso-controller'
-import { getDeSoUser } from '../../lib/desoops-api-controller'
+import { generateProfilePicUrl, getDeSoData, getDeSoUser } from '../../lib/deso-controller'
 import PaymentModal from './PaymentModal'
 import { getAgiliteData } from '../../lib/agilite-controller'
 
