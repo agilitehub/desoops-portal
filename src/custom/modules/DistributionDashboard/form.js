@@ -18,7 +18,13 @@ import { calculateEstimatedPayment, setupHodlers, updateHodlers } from './contro
 import { customListModal, distributionDashboardState, paymentModal } from './data-models'
 import { setDeSoData, setAgiliteData } from '../../reducer'
 import { cloneDeep } from 'lodash'
-import { generateProfilePicUrl, getDeSoData, getDeSoUser } from '../../lib/deso-controller'
+import {
+  generateProfilePicUrl,
+  getCCHodlersAndBalance,
+  getDAOHodlersAndBalance,
+  getDeSoData,
+  getDeSoUser
+} from '../../lib/deso-controller'
 import PaymentModal from './PaymentModal'
 import { getAgiliteData } from '../../lib/agilite-controller'
 
@@ -105,6 +111,8 @@ const _BatchTransactionsForm = () => {
 
   const handleDistributeTo = async (distributeTo) => {
     let tmpHodlers = null
+    let myHodlers = true
+    let distributeDeSoUser = []
 
     try {
       // If user selects the current value, do nothing
@@ -138,7 +146,7 @@ const _BatchTransactionsForm = () => {
       const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(tmpHodlers)
 
       // Update State
-      setState({ distributeTo, finalHodlers, tokenTotal, selectedTableKeys })
+      setState({ distributeTo, myHodlers, distributeDeSoUser, finalHodlers, tokenTotal, selectedTableKeys })
     } catch (e) {
       console.error(e)
     }
@@ -173,6 +181,63 @@ const _BatchTransactionsForm = () => {
       distributionAmount: null,
       spreadAmountBasedOn: 'Ownership'
     })
+  }
+
+  const handleDistributeMyHodlers = async (myHodlers) => {
+    setState({ loading: true })
+    let tmpHodlers = []
+    let distributeDeSoUser = []
+    let distributionAmount = null
+
+    // Fetch Own Hodlers that need to be set up if checked
+    if (myHodlers) {
+      switch (state.distributeTo) {
+        case Enums.values.DAO:
+          tmpHodlers = cloneDeep(desoData.profile.daoHodlers)
+
+          break
+        case Enums.values.CREATOR:
+          tmpHodlers = cloneDeep(desoData.profile.ccHodlers)
+          break
+      }
+    }
+
+    const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(tmpHodlers)
+
+    // Update State
+    setState({
+      myHodlers,
+      distributeDeSoUser,
+      finalHodlers,
+      tokenTotal,
+      selectedTableKeys,
+      distributionAmount,
+      loading: false
+    })
+  }
+
+  const handleDistributeDeSoUser = async (distributeDeSoUser) => {
+    let tmpHodlers = null
+
+    if (distributeDeSoUser.length === 0) {
+      setState({ distributeDeSoUser, finalHodlers: [], tokenTotal: 0, selectedTableKeys: [] })
+      return
+    }
+
+    setState({ loading: true, distributeDeSoUser })
+
+    if (state.distributeTo === Enums.values.CREATOR) {
+      tmpHodlers = await getCCHodlersAndBalance(distributeDeSoUser[0].key)
+      tmpHodlers = tmpHodlers.ccHodlers
+    } else {
+      tmpHodlers = await getDAOHodlersAndBalance(distributeDeSoUser[0].key)
+      tmpHodlers = tmpHodlers.daoHodlers
+    }
+
+    const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(tmpHodlers)
+
+    // Update State
+    setState({ finalHodlers, tokenTotal, selectedTableKeys, loading: false })
   }
 
   const handleTokenToUse = async (tokenToUse, tokenToUseLabel) => {
@@ -248,6 +313,8 @@ const _BatchTransactionsForm = () => {
                       desoData={desoData}
                       rootState={state}
                       onDistributeTo={handleDistributeTo}
+                      onDistributeMyHodlers={handleDistributeMyHodlers}
+                      onDistributeDeSoUser={handleDistributeDeSoUser}
                       onDistributionType={handleDistributionType}
                       onTokenToUse={handleTokenToUse}
                       setRootState={setState}

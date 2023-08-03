@@ -9,6 +9,8 @@ const SetupCard = ({
   desoData,
   rootState,
   onDistributeTo,
+  onDistributeMyHodlers,
+  onDistributeDeSoUser,
   onDistributionType,
   onTokenToUse,
   setRootState,
@@ -65,6 +67,8 @@ const SetupCard = ({
           rootState={rootState}
           deviceType={deviceType}
           onDistributeTo={onDistributeTo}
+          onDistributeMyHodlers={onDistributeMyHodlers}
+          onDistributeDeSoUser={onDistributeDeSoUser}
           onDistributionType={onDistributionType}
           setRootState={setRootState}
           onTokenToUse={onTokenToUse}

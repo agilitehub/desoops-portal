@@ -30,6 +30,8 @@ export const distributionTransactionModel = () => {
     desoPriceUSD: 0,
     feePerTransactionUSD: 0,
     distributeTo: '',
+    myHodlers: true,
+    distributeDeSoUser: '',
     distributionType: '',
     distributionAmount: 0,
     tokenToUse: '',

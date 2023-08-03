@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import { Row, Col, Select, Divider, Space, Image } from 'antd'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { Row, Col, Select, Divider, Space, Image, Switch, Spin } from 'antd'
+import { Link } from 'react-scroll'
 import Enums from '../../../../lib/enums'
 
 // App Components
 import DeSoNFTSearchModal from '../../../../reusables/components/DeSoNFTSearchModal'
 import DeSoUserSearchModal from '../../../../reusables/components/DeSoUserSearchModal'
+import { debounce } from 'lodash'
+import { searchForUsers } from '../../../../lib/deso-controller'
 
 const styleParams = {
   labelColXS: 24,
@@ -16,10 +19,12 @@ const styleParams = {
   colRightXS: 24
 }
 
-const GenenralTab = ({
+const GeneralTab = ({
   rootState,
   deviceType,
   onDistributeTo,
+  onDistributeMyHodlers,
+  onDistributeDeSoUser,
   onDistributionType,
   onTokenToUse,
   desoProfile,
@@ -29,14 +34,62 @@ const GenenralTab = ({
   onCancelCustomList
 }) => {
   const [tokenOwnerList, setTokenOwnerList] = useState([])
+  const [showMyHodlers, setShowMyHodlers] = useState(false)
+  const [showDeSoUser, setShowDeSoUser] = useState(false)
+  const [showDistributionType, setShowDistributionType] = useState(false)
+  const [showTokenToUse, setShowTokenToUse] = useState(false)
 
   const styleProps = {
     select: { width: 200 },
     selectTokenToUse: { width: deviceType.isTablet ? '90%' : '100%' },
     fieldLabel: { fontSize: deviceType.isSmartphone ? 14 : 16, fontWeight: 'bold' },
     labelColStyle: { marginTop: deviceType.isSmartphone ? 0 : 4 },
-    divider: { margin: deviceType.isMobile ? '3px 0' : '7px 0' }
+    divider: { margin: deviceType.isMobile ? '3px 0' : '7px 0' },
+    searchField: { width: '100%', fontSize: 16 }
   }
+
+  // Create a useEffect that manages the state of what fields get displayed or hidden
+  useEffect(() => {
+    let tmpShowMyHodlers = false
+    let tmpShowDeSoUser = false
+    let tmpShowDistributionType = false
+    let tmpShowTokenToUse = false
+
+    if (rootState.distributeTo !== Enums.values.EMPTY_STRING) {
+      tmpShowDistributionType = true
+
+      if ([Enums.values.CREATOR, Enums.values.DAO].includes(rootState.distributeTo)) {
+        tmpShowMyHodlers = true
+
+        if (!rootState.myHodlers) {
+          tmpShowDeSoUser = true
+
+          if (rootState.distributeDeSoUser.length === 0) {
+            tmpShowDistributionType = false
+            tmpShowTokenToUse = false
+          }
+        }
+      }
+
+      if (
+        tmpShowDistributionType &&
+        [Enums.paymentTypes.CREATOR, Enums.paymentTypes.DAO].includes(rootState.distributionType)
+      ) {
+        tmpShowTokenToUse = true
+      }
+    }
+
+    setShowMyHodlers(tmpShowMyHodlers)
+    setShowDeSoUser(tmpShowDeSoUser)
+    setShowDistributionType(tmpShowDistributionType)
+    setShowTokenToUse(tmpShowTokenToUse)
+  }, [
+    rootState.distributeTo,
+    rootState.myHodlers,
+    rootState.distributeDeSoUser,
+    rootState.distributionType,
+    rootState.tokenToUse
+  ])
 
   useEffect(() => {
     let tmpTokenOwnerList = []
@@ -80,6 +133,50 @@ const GenenralTab = ({
     setTokenOwnerList(tmpTokenOwnerList)
   }, [rootState.distributionType]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const DebounceSelect = ({ fetchOptions, debounceTimeout = 800, ...props }) => {
+    const [fetching, setFetching] = useState(false)
+    const [options, setOptions] = useState([])
+    const fetchRef = useRef(0)
+
+    const debounceFetcher = useMemo(() => {
+      const loadOptions = (value) => {
+        // Only allow one value in field
+        if (rootState.distributeDeSoUser.length > 0) return
+        fetchRef.current += 1
+        const fetchId = fetchRef.current
+        setOptions([])
+        setFetching(true)
+
+        fetchOptions(value).then((newOptions) => {
+          if (fetchId !== fetchRef.current) {
+            // for fetch callback order
+            return
+          }
+          setOptions(newOptions)
+          setFetching(false)
+        })
+      }
+      return debounce(loadOptions, debounceTimeout)
+    }, [fetchOptions, debounceTimeout])
+    return (
+      <Link to='distributeDeSoUser' smooth={true} duration={500} offset={-100}>
+        <Select
+          id='distributeDeSoUser'
+          labelInValue
+          filterOption={false}
+          onSearch={debounceFetcher}
+          notFoundContent={fetching ? <Spin size='small' /> : null}
+          {...props}
+          options={options}
+        />
+      </Link>
+    )
+  }
+
+  const fetchUserList = async (search) => {
+    return await searchForUsers(desoProfile.publicKey, search, Enums.defaults.USER_SEARCH_NUM_TO_FETCH)
+  }
+
   return (
     <>
       <Row>
@@ -106,7 +203,61 @@ const GenenralTab = ({
           </Select>
         </Col>
       </Row>
-      {rootState.distributeTo !== Enums.values.EMPTY_STRING ? (
+      {showMyHodlers ? (
+        <>
+          <Divider style={styleProps.divider} />
+          <Row>
+            <Col
+              xs={styleParams.labelColXS}
+              sm={styleParams.labelColSM}
+              md={styleParams.labelColMD}
+              style={styleProps.labelColStyle}
+            >
+              <span style={styleProps.fieldLabel}>
+                <b>My Holders?</b>
+              </span>
+            </Col>
+            <Col xs={styleParams.col1XS}>
+              <Switch
+                disabled={rootState.isExecuting}
+                checked={rootState.myHodlers}
+                checkedChildren='Yes'
+                unCheckedChildren='No'
+                onChange={onDistributeMyHodlers}
+              />
+            </Col>
+          </Row>
+        </>
+      ) : null}
+      {showDeSoUser ? (
+        <>
+          <Divider style={styleProps.divider} />
+          <Row>
+            <Col
+              xs={styleParams.labelColXS}
+              sm={styleParams.labelColSM}
+              md={styleParams.labelColMD}
+              style={styleProps.labelColStyle}
+            >
+              <span style={styleProps.fieldLabel}>
+                <b>Search DeSo User</b>
+              </span>
+            </Col>
+            <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
+              <DebounceSelect
+                mode='multiple'
+                value={rootState.distributeDeSoUser}
+                fetchOptions={fetchUserList}
+                onChange={(desoUser) => {
+                  onDistributeDeSoUser(desoUser)
+                }}
+                style={styleProps.searchField}
+              />
+            </Col>
+          </Row>
+        </>
+      ) : null}
+      {showDistributionType ? (
         <>
           <Divider style={styleProps.divider} />
           <Row>
@@ -134,8 +285,7 @@ const GenenralTab = ({
           </Row>
         </>
       ) : null}
-      {rootState.distributionType === Enums.paymentTypes.DAO ||
-      rootState.distributionType === Enums.paymentTypes.CREATOR ? (
+      {showTokenToUse ? (
         <>
           <Divider style={styleProps.divider} />
           <Row>
@@ -199,4 +349,4 @@ const GenenralTab = ({
   )
 }
 
-export default GenenralTab
+export default GeneralTab

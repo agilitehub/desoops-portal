@@ -7,6 +7,8 @@ export const distributionDashboardState = (feePerTransactionUSD) => {
     isExecuting: false,
     activeRulesTab: '1',
     distributeTo: '',
+    myHodlers: true,
+    distributeDeSoUser: [],
     distributionType: '',
     distributionAmount: null,
     distributionAmountEnabled: false,

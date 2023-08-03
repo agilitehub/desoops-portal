@@ -285,6 +285,9 @@ export const prepDistributionTransaction = async (
     distTransaction.desoPriceUSD = desoData.desoPrice
     distTransaction.feePerTransactionUSD = rootState.feePerTransactionUSD
     distTransaction.distributeTo = rootState.distributeTo
+    distTransaction.myHodlers = rootState.myHodlers
+    distTransaction.distributeDeSoUser =
+      rootState.distributeDeSoUser.length > 0 ? rootState.distributeDeSoUser[0].key : ''
     distTransaction.distributionType = rootState.distributionType
     distTransaction.distributionAmount = rootState.distributionAmount
     distTransaction.tokenToUse = rootState.tokenToUse
