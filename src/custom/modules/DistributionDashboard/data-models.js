@@ -44,7 +44,9 @@ export const distributionSummaryState = () => {
     isExecuting: false,
     warningMessages: [],
     isInFinalStage: false,
-    executeDisabled: true
+    executeDisabled: true,
+    prevDeSoPrice: '',
+    desoPriceClass: ''
   }
 }
 

@@ -14,6 +14,9 @@ const slice = createSlice({
     setDeSoData: (state, data) => {
       state.desoData = data.payload
     },
+    setDeSoPrice: (state, data) => {
+      state.desoData.desoPrice = data.payload
+    },
     setAgiliteData: (state, data) => {
       state.agiliteData = data.payload
     },
@@ -36,6 +39,14 @@ const slice = createSlice({
   }
 })
 
-export const { resetState, setDeSoData, setAgiliteData, updateFollowers, updateFollowing, setDeviceType, setLeftMenu } =
-  slice.actions
+export const {
+  resetState,
+  setDeSoData,
+  setAgiliteData,
+  updateFollowers,
+  updateFollowing,
+  setDeviceType,
+  setLeftMenu,
+  setDeSoPrice
+} = slice.actions
 export default slice.reducer

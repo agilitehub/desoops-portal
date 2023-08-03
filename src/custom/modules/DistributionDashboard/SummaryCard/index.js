@@ -11,6 +11,8 @@ import { sendCreatorCoins, sendDAOTokens, sendDESO } from '../../../lib/deso-con
 import { randomize } from '../../../lib/utils'
 import { createDistributionTransaction, updateDistributionTransaction } from '../../../lib/agilite-controller'
 
+import './style.sass'
+
 const styleParams = {
   labelColXS: 11,
   labelColSM: 12,
@@ -28,7 +30,7 @@ const reducer = (state, newState) => ({ ...state, ...newState })
 const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefreshWallet, deviceType }) => {
   const [state, setState] = useReducer(reducer, distributionSummaryState())
   const { modal, message } = App.useApp()
-
+  const { desoPrice } = desoData
   const styleProps = {
     title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
     divider: { margin: '7px 0' },
@@ -158,6 +160,27 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
     desoData.profile.ccHodlings,
     desoData.desoPrice
   ])
+
+  useEffect(() => {
+    let desoPriceClass = ''
+
+    if (!state.prevDesoPrice) {
+      setState({ prevDesoPrice: desoData.desoPrice })
+      return
+    }
+
+    if (desoData.desoPrice > state.prevDesoPrice) {
+      desoPriceClass = 'updated-positive'
+    } else {
+      desoPriceClass = 'updated-negative'
+    }
+
+    setState({ desoPriceClass, prevDesoPrice: desoData.desoPrice })
+
+    setTimeout(() => {
+      setState({ desoPriceClass: '' })
+    }, 3000)
+  }, [desoPrice]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDistributionAmount = async (distributionAmount) => {
     let desoPrice = null
@@ -415,7 +438,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
           md={styleParams.valueColMD}
           lg={styleParams.valueColLG}
         >
-          <span style={styleProps.fieldValue}>{`$${desoData.desoPrice}`}</span>
+          <span style={styleProps.fieldValue} className={state.desoPriceClass}>{`$${desoPrice}`}</span>
         </Col>
       </Row>
       <Row>

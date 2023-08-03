@@ -16,7 +16,7 @@ import Toolbar from './modules/Toolbar'
 import Spinner from './reusables/components/Spinner'
 
 // Utils
-import { setDeSoData, setAgiliteData, resetState, setDeviceType } from './reducer'
+import { setDeSoData, setAgiliteData, resetState, setDeviceType, setDeSoPrice } from './reducer'
 import {
   generateProfilePicUrl,
   getCCHodlersAndBalance,
@@ -44,6 +44,14 @@ const App = () => {
   useEffect(() => {
     const isSmartphone = isMobile && !isTablet
     dispatch(setDeviceType({ isMobile, isTablet, isSmartphone }))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updateDeSoPrice()
+    }, 60000)
+
+    return () => clearInterval(interval)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -120,6 +128,11 @@ const App = () => {
       setUserReturned(false)
     }
   }, [currentUser]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const updateDeSoPrice = async () => {
+    const desoPrice = await getDeSoPricing()
+    dispatch(setDeSoPrice(desoPrice))
+  }
 
   return (
     <>
