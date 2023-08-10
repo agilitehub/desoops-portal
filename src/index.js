@@ -5,6 +5,7 @@ import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
 import { DeSoIdentityProvider } from 'react-deso-protocol'
 
+// Utilities
 import { initAgilite } from './custom/lib/agilite-controller'
 import Store from './store'
 import Core from './core/components/core'
@@ -17,7 +18,7 @@ import './index.sass'
 // Initiate Agilite Controller
 initAgilite()
 
-// VARIABLES
+// Initialize Firebase
 let tmpAnalytics = null
 
 if (process.env.REACT_APP_FIREBASE_ENABLED === Enums.values.YES) {
@@ -31,7 +32,6 @@ if (process.env.REACT_APP_FIREBASE_ENABLED === Enums.values.YES) {
     measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
   }
 
-  // Initialize Firebase
   const app = initializeApp(firebaseConfig)
   tmpAnalytics = getAnalytics(app)
 }
