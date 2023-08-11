@@ -175,6 +175,11 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
       desoPriceClass = 'updated-negative'
     }
 
+    // The price of $DESO changed. If there is an amount to distribute and it's $DESO, we need to update the estimated payment values
+    if (rootState.distributionAmount && rootState.distributionType === CoreEnums.paymentTypes.DESO) {
+      handleDistributionAmount(rootState.distributionAmount)
+    }
+
     setState({ desoPriceClass, prevDesoPrice: desoData.desoPrice })
 
     setTimeout(() => {
