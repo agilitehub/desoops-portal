@@ -8,6 +8,9 @@ export const copyTextToClipboard = async (text) => {
   let error = null
 
   try {
+    // If text is a number, then convert to a string
+    if (typeof text === 'number') text = text.toString()
+
     // Check if the text is a string and not empty.
     if (typeof text !== 'string' || text.trim() === '') {
       throw new Error('Invalid text: Text should be a non-empty string.')
