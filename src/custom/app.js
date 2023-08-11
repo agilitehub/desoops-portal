@@ -49,7 +49,7 @@ const App = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       updateDeSoPrice()
-    }, 60000)
+    }, 30000)
 
     return () => clearInterval(interval)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -130,8 +130,10 @@ const App = () => {
   }, [currentUser]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateDeSoPrice = async () => {
-    const desoPrice = await getDeSoPricing()
-    dispatch(setDeSoPrice(desoPrice))
+    try {
+      const desoPrice = await getDeSoPricing()
+      dispatch(setDeSoPrice(desoPrice))
+    } catch (e) {}
   }
 
   return (
