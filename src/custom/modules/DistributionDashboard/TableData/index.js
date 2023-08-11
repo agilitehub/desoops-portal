@@ -1,14 +1,16 @@
-import React, { useEffect } from 'react'
-import { Table, Popover, Image } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { Table, Popover, Image, App } from 'antd'
 import { CheckCircleOutlined, CloseCircleOutlined, ReloadOutlined } from '@ant-design/icons'
 import { cloneDeep } from 'lodash'
 
 import theme from '../../../../core/utils/theme'
 import { updateHodlers } from '../controller'
 import Enums from '../../../lib/enums'
+import { copyTextToClipboard } from '../../../lib/utils'
 
 const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
-  const [tableData, setTableData] = React.useState([])
+  const [tableData, setTableData] = useState([])
+  const { message } = App.useApp()
 
   const handleSelectionChange = async (changedSelectedTableKeys) => {
     const tmpHodlers = cloneDeep(rootState.finalHodlers)
@@ -41,6 +43,14 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
         dataIndex: 'username',
         key: 'username',
         width: '100%',
+        onCell: (entry) => {
+          return {
+            onClick: async (e) => {
+              await copyTextToClipboard(entry.estimatedPaymentToken)
+              message.success(`Full Payment value for ${entry.username} copied to clipboard`)
+            }
+          }
+        },
         render: (value, entry) => {
           let estimatedPaymentLabel = entry.estimatedPaymentLabel
 
@@ -87,27 +97,6 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
         }
       }
     ]
-
-    // // If distributeTo is CUSTOM, then add Actions column with an edit icon for each row entry
-    // if (rootState.distributeTo === Enums.values.CUSTOM) {
-    //   tableColumns.push({
-    //     title: 'Actions',
-    //     dataIndex: 'username',
-    //     key: 'actions',
-    //     width: '100%',
-    //     render: (value, entry) => {
-    //       return (
-    //         <Button
-    //           className='btn-table-edit'
-    //           type='link'
-    //           // onClick={() => handleEditCustomHodler(entry)}
-    //         >
-    //           <EditOutlined style={{ color: '#FF7F50', fontSize: 20 }} />
-    //         </Button>
-    //       )
-    //     }
-    //   })
-    // }
   } else {
     tableColumns = [
       {
@@ -150,7 +139,18 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
           }
 
           return (
-            <span style={{ color: theme.twitterBootstrap.primary }}>{`${value}% -> ${estimatedPaymentLabel}`}</span>
+            <>
+              <span style={{ color: theme.twitterBootstrap.primary }}>{`${value}% -> `}</span>
+              <span
+                style={{ color: theme.twitterBootstrap.primary, cursor: 'pointer' }}
+                onClick={async (e) => {
+                  await copyTextToClipboard(entry.estimatedPaymentToken)
+                  message.success(`Full payment value for ${entry.username} copied to clipboard`)
+                }}
+              >
+                {estimatedPaymentLabel}
+              </span>
+            </>
           )
         }
       },
@@ -193,4 +193,12 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
   )
 }
 
-export default TableData
+const app = ({ desoData, rootState, setRootState, deviceType }) => {
+  return (
+    <App style={{ width: '100%' }}>
+      <TableData desoData={desoData} setRootState={setRootState} rootState={rootState} deviceType={deviceType} />
+    </App>
+  )
+}
+
+export default app

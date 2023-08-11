@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Col, Image, List, Modal, Progress, Row, Typography } from 'antd'
+import { App, Button, Col, Image, List, Modal, Progress, Row, Typography } from 'antd'
 import { CheckCircleOutlined, CloseOutlined, SyncOutlined } from '@ant-design/icons'
 import Enums from '../enums'
+import { copyTextToClipboard } from '../../../lib/utils'
 
 const { Text } = Typography
 
 const PaymentModal = ({ props, onPaymentDone }) => {
   const [tipIndex, setTipIndex] = useState(0)
+  const { message } = App.useApp()
 
   useEffect(() => {
     let interval = null
@@ -104,7 +106,7 @@ const PaymentModal = ({ props, onPaymentDone }) => {
                   itemLayout='horizontal'
                   header='Error Report'
                   dataSource={props.errors}
-                  renderItem={(entry, index) => (
+                  renderItem={(entry) => (
                     <List.Item>
                       <List.Item.Meta
                         avatar={
@@ -118,10 +120,16 @@ const PaymentModal = ({ props, onPaymentDone }) => {
                           />
                         }
                         description={
-                          <>
+                          <div
+                            style={{ cursor: 'pointer' }}
+                            onClick={async (e) => {
+                              await copyTextToClipboard(entry.estimatedPaymentToken)
+                              message.success(`Full payment value for ${entry.username} copied to clipboard`)
+                            }}
+                          >
                             <span style={{ fontSize: 12, fontWeight: 'bold' }}>{`${entry.username} - `}</span>{' '}
                             <span style={{ fontSize: 12 }}>{entry.errorMessage}</span>
-                          </>
+                          </div>
                         }
                       />
                     </List.Item>
@@ -143,4 +151,12 @@ const PaymentModal = ({ props, onPaymentDone }) => {
   )
 }
 
-export default PaymentModal
+const app = ({ props, onPaymentDone }) => {
+  return (
+    <App>
+      <PaymentModal props={props} onPaymentDone={onPaymentDone} />
+    </App>
+  )
+}
+
+export default app
