@@ -60,9 +60,19 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
         (hodler) => hodler.isActive && hodler.isVisible
       ).length
 
-      let totalFeeUSD = noOfPaymentTransactions * rootState.feePerTransactionUSD
-      let totalFeeDESO = totalFeeUSD / desoData.desoPrice
+      const estimateDurationMinutes = (noOfPaymentTransactions * agiliteData.estimateTimePerTransactionSeconds) / 60
+      const estimateDurationLabel = estimateDurationMinutes < 1 ? '< 1' : Math.ceil(estimateDurationMinutes)
+
+      let desoOpsFeeUSD = noOfPaymentTransactions * rootState.feePerTransactionUSD
+      let desoOpsFeeDESO = desoOpsFeeUSD / desoData.desoPrice
+      let desoOpsFeeDESOLabel = 0
+
+      let totalFeeUSD = 0
+      let totalFeeUSDLabel = 0
+      let totalFeeDESO = 0
       let totalFeeDESOLabel = 0
+
+      let desoGasFeesNanos = 0
       let distributionAmount = rootState.distributionAmount
       let amountExceeded = false
       let transactionFeeExceeded = false
@@ -73,13 +83,33 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
       let warningMsg = null
       let tokenToDistribute = ''
 
-      if (isNaN(totalFeeUSD)) totalFeeUSD = 0
+      if (isNaN(desoOpsFeeUSD)) desoOpsFeeUSD = 0
       if (isNaN(distributionAmount)) distributionAmount = 0
-      if (isNaN(totalFeeDESO)) {
-        totalFeeDESO = 0
+
+      if (isNaN(desoOpsFeeDESO)) {
+        desoOpsFeeDESO = 0
       } else {
-        totalFeeDESOLabel = Math.floor(totalFeeDESO * 10000) / 10000
+        desoOpsFeeDESOLabel = Math.floor(desoOpsFeeDESO * 10000) / 10000
       }
+
+      // Determine Gas Fees using Switch
+      switch (rootState.distributionType) {
+        case CoreEnums.paymentTypes.DESO:
+          desoGasFeesNanos = agiliteData.desoGasFeesSendDESONanos * noOfPaymentTransactions
+          break
+        case CoreEnums.paymentTypes.CREATOR:
+          desoGasFeesNanos = agiliteData.desoGasFeesSendCCNanos * noOfPaymentTransactions
+          break
+        case CoreEnums.paymentTypes.DAO:
+          desoGasFeesNanos = agiliteData.desoGasFeesSendDAONanos * noOfPaymentTransactions
+          break
+      }
+
+      // Determine Total Cost
+      totalFeeDESO = desoOpsFeeDESO + desoGasFeesNanos / CoreEnums.values.NANO_VALUE
+      totalFeeDESOLabel = Math.floor(totalFeeDESO * 10000) / 10000
+      totalFeeUSD = totalFeeDESO * desoData.desoPrice
+      totalFeeUSDLabel = Math.floor(totalFeeUSD * 10000) / 10000
 
       if (totalFeeDESO >= desoData.profile.desoBalance) transactionFeeExceeded = true
 
@@ -136,9 +166,16 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
 
       setState({
         noOfPaymentTransactions,
+        desoOpsFeeUSD,
+        desoOpsFeeDESO,
+        desoOpsFeeDESOLabel,
+        desoGasFeesNanos,
         totalFeeUSD,
+        totalFeeUSDLabel,
         totalFeeDESO,
         totalFeeDESOLabel,
+        estimateDurationMinutes,
+        estimateDurationLabel,
         amountExceeded,
         transactionFeeExceeded,
         warningMessages,
@@ -158,7 +195,11 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
     desoData.profile.desoBalance,
     desoData.profile.daoHodlings,
     desoData.profile.ccHodlings,
-    desoData.desoPrice
+    desoData.desoPrice,
+    agiliteData.estimateTimePerTransactionSeconds,
+    agiliteData.desoGasFeesSendDESONanos,
+    agiliteData.desoGasFeesSendCCNanos,
+    agiliteData.desoGasFeesSendDAONanos
   ])
 
   useEffect(() => {
@@ -434,7 +475,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
           lg={styleParams.labelColLG}
           style={styleParams.labelColStyle}
         >
-          <span style={styleProps.fieldLabel}>DeSo price:</span>
+          <span style={styleProps.fieldLabel}>$DESO price:</span>
         </Col>
         <Col
           xs={styleParams.valueColXS}
@@ -453,7 +494,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
           lg={styleParams.labelColLG}
           style={styleParams.labelColStyle}
         >
-          <span style={styleProps.fieldLabel}>Transaction fee</span>
+          <span style={styleProps.fieldLabel}>DeSoOps fee:</span>
         </Col>
         <Col
           xs={styleParams.valueColXS}
@@ -461,7 +502,26 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
           md={styleParams.valueColMD}
           lg={styleParams.valueColLG}
         >
-          <span style={styleProps.fieldValue}>{`$${rootState.feePerTransactionUSD} per transaction`}</span>
+          <span style={styleProps.fieldValue}>{`$${state.desoOpsFeeUSD} (~${state.desoOpsFeeDESOLabel} $DESO)`}</span>
+        </Col>
+      </Row>
+      <Row>
+        <Col
+          xs={styleParams.labelColXS}
+          sm={styleParams.labelColSM}
+          md={styleParams.labelColMD}
+          lg={styleParams.labelColLG}
+          style={styleParams.labelColStyle}
+        >
+          <span style={styleProps.fieldLabel}>Gas fees:</span>
+        </Col>
+        <Col
+          xs={styleParams.valueColXS}
+          sm={styleParams.valueColSM}
+          md={styleParams.valueColMD}
+          lg={styleParams.valueColLG}
+        >
+          <span style={styleProps.fieldValue}>{`~${state.desoGasFeesNanos} nanos`}</span>
         </Col>
       </Row>
       <Row>
@@ -480,7 +540,9 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
           md={styleParams.valueColMD}
           lg={styleParams.valueColLG}
         >
-          <span style={styleProps.distributionCost}>{`$${state.totalFeeUSD} (~${state.totalFeeDESOLabel} $DESO)`}</span>
+          <span
+            style={styleProps.distributionCost}
+          >{`~$${state.totalFeeUSDLabel} (~${state.totalFeeDESOLabel} $DESO)`}</span>
         </Col>
       </Row>
       <Row>

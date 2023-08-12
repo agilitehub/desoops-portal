@@ -35,7 +35,12 @@ export const distributionDashboardState = (feePerTransactionUSD) => {
 export const distributionSummaryState = () => {
   return {
     noOfPaymentTransactions: 0,
+    desoOpsFeeUSD: 0,
+    desoOpsFeeDESO: 0,
+    desoOpsFeeDESOLabel: 0,
+    desoGasFeesNanos: 0,
     totalFeeUSD: 0,
+    totalFeeUSDLabel: 0,
     totalFeeDESO: 0,
     totalFeeDESOLabel: 0,
     tokenToDistribute: '',

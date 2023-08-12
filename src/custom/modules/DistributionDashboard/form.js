@@ -34,7 +34,7 @@ const _BatchTransactionsForm = () => {
   const dispatch = useDispatch()
   const desoData = useSelector((state) => state.custom.desoData)
   const agiliteData = useSelector((state) => state.custom.agiliteData)
-  const [state, setState] = useReducer(reducer, distributionDashboardState(agiliteData.transactionFeeUSD))
+  const [state, setState] = useReducer(reducer, distributionDashboardState(agiliteData.feePerTransactionUSD))
   const { isTablet, isSmartphone, isMobile } = useSelector((state) => state.custom.userAgent)
 
   const styleProps = {
@@ -64,7 +64,7 @@ const _BatchTransactionsForm = () => {
   }, [state.distributeTo, state.distributionType, state.tokenToUse]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const resetState = async () => {
-    setState(distributionDashboardState(agiliteData.transactionFeeUSD))
+    setState(distributionDashboardState(agiliteData.feePerTransactionUSD))
   }
 
   const handleRefreshWallet = async () => {

@@ -22,7 +22,10 @@ const desoData = {
 }
 
 const agiliteData = {
-  transactionFeeUSD: 0,
+  feePerTransactionUSD: 0,
+  desoGasFeesSendDESONanos: 0,
+  desoGasFeesSendDAONanos: 0,
+  desoGasFeesSendCCNanos: 0,
   tips: []
 }
 
