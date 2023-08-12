@@ -31,7 +31,7 @@ export const desoLogin = () => {
         resolve(response)
       } catch (e) {
         reject(e)
-        console.log(e)
+        console.error(e)
       }
     })()
   })
@@ -100,7 +100,7 @@ export const getDeSoData = (publicKey, desoDataState, getFollowing = false) => {
         resolve(desoData)
       } catch (e) {
         reject(e)
-        console.log(e)
+        console.error(e)
       }
     })()
   })
@@ -511,7 +511,7 @@ export const getNFTDetails = (nftId, publicKey) => {
 
         resolve({ nftMetaData, nftHodlers })
       } catch (e) {
-        console.log(e)
+        console.error(e)
         reject(e)
       }
     })()

@@ -13,7 +13,14 @@ import Enums from './custom/lib/enums'
 
 // Import default Stylesheet for application
 import './index.sass'
-// import './index.css'
+
+// Nullify console outputs for production
+if (process.env.NODE_ENV === 'production') {
+  console.error = function () {}
+  console.log = function () {}
+  console.warn = function () {}
+  console.info = function () {}
+}
 
 // Initiate Agilite Controller
 initAgilite()

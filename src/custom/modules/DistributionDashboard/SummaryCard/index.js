@@ -146,8 +146,8 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
         executeDisabled,
         tokenToDistribute
       })
-    } catch (error) {
-      console.error(error)
+    } catch (e) {
+      console.error(e)
     }
   }, [
     rootState.finalHodlers,
@@ -315,7 +315,6 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
         } catch (e) {
           hodler.isError = true
           hodler.errorMessage = e.message
-          console.error('Error', hodler)
         }
 
         // Update the Payment Modal

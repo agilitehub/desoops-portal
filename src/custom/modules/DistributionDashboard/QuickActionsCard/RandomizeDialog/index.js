@@ -48,7 +48,6 @@ const RandomizeDialogContent = ({ randomUserKey, copyToClipboard, setRandomizeSt
 
   const handleCopyClick = (e) => {
     copyToClipboard(e.title)
-    console.log(e)
   }
 
   const handleExecuteRandomize = () => {
