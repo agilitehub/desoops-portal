@@ -1,13 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Row, Col, Select, Divider, Space, Image, Switch, Spin } from 'antd'
-import { Link } from 'react-scroll'
 import Enums from '../../../../lib/enums'
 
 // App Components
-import DeSoNFTSearchModal from '../../../../reusables/components/DeSoNFTSearchModal'
-import DeSoUserSearchModal from '../../../../reusables/components/DeSoUserSearchModal'
 import { debounce } from 'lodash'
 import { searchForUsers } from '../../../../lib/deso-controller'
+import { Link } from 'react-scroll'
 
 const styleParams = {
   labelColXS: 24,
@@ -27,11 +25,7 @@ const GeneralTab = ({
   onDistributeDeSoUser,
   onDistributionType,
   onTokenToUse,
-  desoProfile,
-  onConfirmNFT,
-  onCancelNFT,
-  onConfirmCustomList,
-  onCancelCustomList
+  desoProfile
 }) => {
   const [tokenOwnerList, setTokenOwnerList] = useState([])
   const [showMyHodlers, setShowMyHodlers] = useState(false)
@@ -329,22 +323,6 @@ const GeneralTab = ({
           </Row>
         </>
       ) : null}
-      <DeSoNFTSearchModal
-        isOpen={rootState.openNftSearch}
-        deviceType={deviceType}
-        publicKey={desoProfile.publicKey}
-        rootState={rootState}
-        onConfirmNFT={onConfirmNFT}
-        onCancelNFT={onCancelNFT}
-      />
-      <DeSoUserSearchModal
-        isOpen={rootState.customListModal.isOpen}
-        deviceType={deviceType}
-        publicKey={desoProfile.publicKey}
-        rootState={rootState}
-        onConfirm={onConfirmCustomList}
-        onCancel={onCancelCustomList}
-      />
     </>
   )
 }

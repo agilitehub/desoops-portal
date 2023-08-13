@@ -28,7 +28,8 @@ export const distributionDashboardState = (feePerTransactionUSD) => {
     nftHodlers: [],
     openNftSearch: false,
     customListModal: customListModal(),
-    paymentModal: paymentModal()
+    paymentModal: paymentModal(),
+    selectTemplateModal: selectTemplateModal()
   }
 }
 
@@ -74,5 +75,13 @@ export const customListModal = (isOpen = false) => {
     isOpen,
     autoSort: true,
     userList: []
+  }
+}
+
+export const selectTemplateModal = (isOpen = false) => {
+  return {
+    isOpen,
+    template: null,
+    templateModified: false
   }
 }
