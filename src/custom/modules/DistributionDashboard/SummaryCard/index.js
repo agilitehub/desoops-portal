@@ -228,6 +228,11 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
     }, 3000)
   }, [desoPrice]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleBeforeUnload = (e) => {
+    e.preventDefault()
+    e.returnValue = 'Token distribution is still in progress. Are you sure you want to leave this page?'
+  }
+
   const handleDistributionAmount = async (distributionAmount) => {
     let desoPrice = null
     let finalHodlers = null
@@ -277,6 +282,9 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
     let executeInCatch = false
 
     try {
+      // Prompt user if they try to close the browser window
+      window.addEventListener('beforeunload', handleBeforeUnload)
+
       // Prep the Payment Modal
       paymentModal = cloneDeep(rootState.paymentModal)
 
@@ -343,6 +351,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
                 rootState.tokenToUse,
                 hodler.estimatedPaymentToken
               )
+
               break
             case CoreEnums.paymentTypes.CREATOR:
               await sendCreatorCoins(
@@ -385,6 +394,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
 
       // If there were any errors, add them to errors array and change the payment status
       paymentModal.progressPercent = 100
+
       if (failCount > 0) {
         paymentModal.status = Enums.paymentStatuses.ERROR_PAYMENT_TRANSACTION
         paymentModal.errors = finalHodlers.filter((hodler) => hodler.isError)
@@ -403,6 +413,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
       )
 
       await updateDistributionTransaction(agiliteResponse._id, distTransaction)
+      window.removeEventListener('beforeunload', handleBeforeUnload)
       setRootState({ paymentModal })
     } catch (e) {
       console.error(e)
@@ -442,6 +453,8 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
         isExecuting: false,
         paymentModal
       })
+
+      window.removeEventListener('beforeunload', handleBeforeUnload)
       message.error(e.message)
     }
   }
