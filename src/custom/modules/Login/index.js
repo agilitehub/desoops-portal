@@ -7,7 +7,7 @@ import { LoginOutlined } from '@ant-design/icons'
 
 // Utils
 import styles from './style.module.sass'
-import logo from '../../assets/deso-ops-logo-full-v2.png'
+import logo from '../../assets/deso-ops-logo-full.png'
 import VideoModal from '../../reusables/components/VideoModal'
 import Enums from '../../lib/enums'
 import { useSelector } from 'react-redux'

@@ -17,6 +17,7 @@ import BigNumber from 'bignumber.js'
 import Enums from './enums'
 import { desoUserModel } from './data-models'
 import { cleanString, hexToInt } from './utils'
+import nftLogo from '../assets/nft-default-logo.png'
 
 /**
  * Logs the user into the DeSo blockchain.
@@ -474,7 +475,7 @@ export const getNFTDetails = (nftId, publicKey) => {
 
         nftMetaData = {
           id: nftId,
-          imageUrl: nftSummary.ImageURLs.length > 0 ? nftSummary.ImageURLs[0] : '',
+          imageUrl: nftSummary.ImageURLs ? nftSummary.ImageURLs[0] : nftLogo,
           description: cleanString(nftSummary.Body, 100)
         }
 

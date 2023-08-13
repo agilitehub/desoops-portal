@@ -28,7 +28,7 @@ import {
 } from './lib/deso-controller'
 import Enums from './lib/enums'
 import { getAgiliteData } from './lib/agilite-controller'
-import logo from './assets/deso-ops-logo-full-v2.png'
+import logo from './assets/deso-ops-logo-full.png'
 import { cloneDeep } from 'lodash'
 
 const App = () => {
