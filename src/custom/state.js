@@ -21,7 +21,7 @@ const desoData = {
   desoPrice: 0
 }
 
-const agiliteData = {
+const configData = {
   feePerTransactionUSD: 0,
   desoGasFeesSendDESONanos: 0,
   desoGasFeesSendDAONanos: 0,
@@ -43,7 +43,8 @@ const leftMenu = {
 export const customState = () => {
   return {
     desoData,
-    agiliteData,
+    configData,
+    distributionTemplates: [],
     userAgent,
     leftMenu
   }

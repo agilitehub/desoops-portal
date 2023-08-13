@@ -9,7 +9,7 @@ const slice = createSlice({
   reducers: {
     resetState: (state) => {
       state.desoData = initialState.desoData
-      state.agiliteData = initialState.agiliteData
+      state.configData = initialState.configData
     },
     setDeSoData: (state, data) => {
       state.desoData = data.payload
@@ -17,8 +17,11 @@ const slice = createSlice({
     setDeSoPrice: (state, data) => {
       state.desoData.desoPrice = data.payload
     },
-    setAgiliteData: (state, data) => {
-      state.agiliteData = data.payload
+    setConfigData: (state, data) => {
+      state.configData = data.payload
+    },
+    setDistributionTemplates: (state, data) => {
+      state.distributionTemplates = data.payload
     },
     updateFollowers: (state, data) => {
       state.desoData.profile.followers = data.payload.data
@@ -42,7 +45,8 @@ const slice = createSlice({
 export const {
   resetState,
   setDeSoData,
-  setAgiliteData,
+  setConfigData,
+  setDistributionTemplates,
   updateFollowers,
   updateFollowing,
   setDeviceType,

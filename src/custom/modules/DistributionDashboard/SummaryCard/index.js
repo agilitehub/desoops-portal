@@ -27,7 +27,7 @@ const styleParams = {
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
-const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefreshWallet, deviceType }) => {
+const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshWallet, deviceType }) => {
   const [state, setState] = useReducer(reducer, distributionSummaryState())
   const { modal, message } = App.useApp()
   const { desoPrice } = desoData
@@ -60,7 +60,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
         (hodler) => hodler.isActive && hodler.isVisible
       ).length
 
-      const estimateDurationMinutes = (noOfPaymentTransactions * agiliteData.estimateTimePerTransactionSeconds) / 60
+      const estimateDurationMinutes = (noOfPaymentTransactions * configData.estimateTimePerTransactionSeconds) / 60
       const estimateDurationLabel = estimateDurationMinutes < 1 ? '< 1' : Math.ceil(estimateDurationMinutes)
 
       let desoOpsFeeUSD = noOfPaymentTransactions * rootState.feePerTransactionUSD
@@ -95,13 +95,13 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
       // Determine Gas Fees using Switch
       switch (rootState.distributionType) {
         case CoreEnums.paymentTypes.DESO:
-          desoGasFeesNanos = agiliteData.desoGasFeesSendDESONanos * noOfPaymentTransactions
+          desoGasFeesNanos = configData.desoGasFeesSendDESONanos * noOfPaymentTransactions
           break
         case CoreEnums.paymentTypes.CREATOR:
-          desoGasFeesNanos = agiliteData.desoGasFeesSendCCNanos * noOfPaymentTransactions
+          desoGasFeesNanos = configData.desoGasFeesSendCCNanos * noOfPaymentTransactions
           break
         case CoreEnums.paymentTypes.DAO:
-          desoGasFeesNanos = agiliteData.desoGasFeesSendDAONanos * noOfPaymentTransactions
+          desoGasFeesNanos = configData.desoGasFeesSendDAONanos * noOfPaymentTransactions
           break
       }
 
@@ -196,10 +196,10 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
     desoData.profile.daoHodlings,
     desoData.profile.ccHodlings,
     desoData.desoPrice,
-    agiliteData.estimateTimePerTransactionSeconds,
-    agiliteData.desoGasFeesSendDESONanos,
-    agiliteData.desoGasFeesSendCCNanos,
-    agiliteData.desoGasFeesSendDAONanos
+    configData.estimateTimePerTransactionSeconds,
+    configData.desoGasFeesSendDESONanos,
+    configData.desoGasFeesSendCCNanos,
+    configData.desoGasFeesSendDAONanos
   ])
 
   useEffect(() => {
@@ -268,7 +268,7 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
 
   const handleExecute = async () => {
     let status = Enums.paymentStatuses.PREPARING
-    let tips = await randomize(agiliteData.tips, null, agiliteData.tips.length)
+    let tips = await randomize(configData.tips, null, configData.tips.length)
     let progressPercent = 10
     let paymentModal = null
     let finalHodlers = null
@@ -645,13 +645,13 @@ const SummaryCard = ({ desoData, agiliteData, rootState, setRootState, onRefresh
   )
 }
 
-const app = ({ desoData, agiliteData, rootState, setRootState, onRefreshWallet, deviceType }) => {
+const app = ({ desoData, configData, rootState, setRootState, onRefreshWallet, deviceType }) => {
   return (
     <App>
       <SummaryCard
         desoData={desoData}
         rootState={rootState}
-        agiliteData={agiliteData}
+        configData={configData}
         onRefreshWallet={onRefreshWallet}
         setRootState={setRootState}
         deviceType={deviceType}

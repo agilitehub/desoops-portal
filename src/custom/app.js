@@ -16,7 +16,14 @@ import Toolbar from './modules/Toolbar'
 import Spinner from './reusables/components/Spinner'
 
 // Utils
-import { setDeSoData, setAgiliteData, resetState, setDeviceType, setDeSoPrice } from './reducer'
+import {
+  setDeSoData,
+  setConfigData,
+  resetState,
+  setDeviceType,
+  setDeSoPrice,
+  setDistributionTemplates
+} from './reducer'
 import {
   generateProfilePicUrl,
   getCCHodlersAndBalance,
@@ -27,7 +34,7 @@ import {
   getTotalFollowersOrFollowing
 } from './lib/deso-controller'
 import Enums from './lib/enums'
-import { getAgiliteData } from './lib/agilite-controller'
+import { getConfigData, getDistributionTemplates } from './lib/agilite-controller'
 import logo from './assets/deso-ops-logo-full.png'
 import { cloneDeep } from 'lodash'
 
@@ -59,7 +66,8 @@ const App = () => {
     // and sets it in the store.
     const getDeSoDataHook = async () => {
       let tmpDeSoData = null
-      let tmpAgiliteData = null
+      let tmpConfigData = null
+      let tmpTemplates = null
       let desoBalance = 0
       let desoBalanceUSD = 0
       let daoHodlings = null
@@ -67,9 +75,13 @@ const App = () => {
       let followers = 0
 
       try {
-        // First we retrieve configurations from Agilit-e
-        tmpAgiliteData = await getAgiliteData()
-        dispatch(setAgiliteData(tmpAgiliteData))
+        // Retrieve configurations from Agilit-e
+        tmpConfigData = await getConfigData()
+        dispatch(setConfigData(tmpConfigData))
+
+        // Retrieve Distribution Templates from Agilit-e
+        tmpTemplates = await getDistributionTemplates(currentUser.PublicKeyBase58Check)
+        dispatch(setDistributionTemplates(tmpTemplates))
 
         // Retrieve various data sets from the DeSo blockchain related to the user
         tmpDeSoData = cloneDeep(desoData)

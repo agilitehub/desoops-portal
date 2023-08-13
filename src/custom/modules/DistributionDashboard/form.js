@@ -16,7 +16,7 @@ import TableData from './TableData'
 import Enums from '../../lib/enums'
 import { calculateEstimatedPayment, setupHodlers, updateHodlers } from './controller'
 import { customListModal, distributionDashboardState, paymentModal } from './data-models'
-import { setDeSoData, setAgiliteData } from '../../reducer'
+import { setDeSoData, setConfigData } from '../../reducer'
 import { cloneDeep } from 'lodash'
 import {
   generateProfilePicUrl,
@@ -26,15 +26,15 @@ import {
   getDeSoUser
 } from '../../lib/deso-controller'
 import PaymentModal from './PaymentModal'
-import { getAgiliteData } from '../../lib/agilite-controller'
+import { getConfigData } from '../../lib/agilite-controller'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
 const _BatchTransactionsForm = () => {
   const dispatch = useDispatch()
   const desoData = useSelector((state) => state.custom.desoData)
-  const agiliteData = useSelector((state) => state.custom.agiliteData)
-  const [state, setState] = useReducer(reducer, distributionDashboardState(agiliteData.feePerTransactionUSD))
+  const configData = useSelector((state) => state.custom.configData)
+  const [state, setState] = useReducer(reducer, distributionDashboardState(configData.feePerTransactionUSD))
   const { isTablet, isSmartphone, isMobile } = useSelector((state) => state.custom.userAgent)
 
   const styleProps = {
@@ -64,7 +64,7 @@ const _BatchTransactionsForm = () => {
   }, [state.distributeTo, state.distributionType, state.tokenToUse]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const resetState = async () => {
-    setState(distributionDashboardState(agiliteData.feePerTransactionUSD))
+    setState(distributionDashboardState(configData.feePerTransactionUSD))
   }
 
   const handleRefreshWallet = async () => {
@@ -75,8 +75,8 @@ const _BatchTransactionsForm = () => {
       setState({ isExecuting: true })
 
       // First we retrieve configurations from Agilit-e
-      const tmpAgiliteData = await getAgiliteData()
-      dispatch(setAgiliteData(tmpAgiliteData))
+      const tmpConfigData = await getConfigData()
+      dispatch(setConfigData(tmpConfigData))
 
       // Get User's DeSo Balance
       const currentUser = await getDeSoUser(desoData.profile.publicKey)
@@ -326,7 +326,7 @@ const _BatchTransactionsForm = () => {
                   <Col xs={24} lg={12}>
                     <SummaryCard
                       desoData={desoData}
-                      agiliteData={agiliteData}
+                      configData={configData}
                       rootState={state}
                       setRootState={setState}
                       onRefreshWallet={handleRefreshWallet}
