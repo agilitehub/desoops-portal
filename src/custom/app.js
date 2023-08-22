@@ -81,6 +81,16 @@ const App = () => {
 
         // Retrieve Distribution Templates from Agilit-e
         tmpTemplates = await getDistributionTemplates(currentUser.PublicKeyBase58Check)
+        tmpTemplates.sort((a, b) => (a.name > b.name ? 1 : -1))
+
+        // Add a key property to each template using _id
+        tmpTemplates = tmpTemplates.map((template) => {
+          return {
+            ...template,
+            key: template._id
+          }
+        })
+
         dispatch(setDistributionTemplates(tmpTemplates))
 
         // Retrieve various data sets from the DeSo blockchain related to the user

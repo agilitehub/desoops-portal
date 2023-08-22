@@ -2,7 +2,7 @@ import Axios from 'agilite-utils/axios'
 
 // Utils
 import Enums from '../../lib/enums'
-import { distributionTransactionModel } from '../../lib/data-models'
+import { distributionTemplateModel, distributionTransactionModel } from '../../lib/data-models'
 import { cloneDeep } from 'lodash'
 
 export const setupHodlers = (hodlers) => {
@@ -322,6 +322,37 @@ export const prepDistributionTransaction = async (
     }
 
     return distTransaction
+  } catch (e) {
+    throw new Error(e)
+  }
+}
+
+export const prepDistributionTemplate = async (desoData, rootState, name, rulesEnabled, isUpdate) => {
+  let transaction = null
+
+  try {
+    transaction = distributionTemplateModel()
+
+    transaction.createdAt = new Date()
+    transaction.modifiedAt = isUpdate ? new Date() : transaction.createdAt
+    transaction.name = name
+
+    transaction.publicKey = desoData.profile.publicKey
+    transaction.distributeTo = rootState.distributeTo
+    transaction.myHodlers = rootState.myHodlers
+    transaction.distributeDeSoUser = rootState.distributeDeSoUser.length > 0 ? rootState.distributeDeSoUser[0].key : ''
+    transaction.distributionType = rootState.distributionType
+    transaction.distributionAmount = rootState.distributionAmount
+    transaction.tokenToUse = rootState.tokenToUse
+    transaction.nftId = rootState.nftMetaData.id || ''
+
+    transaction.rules.enabled = rulesEnabled
+    transaction.rules.spreadAmountBasedOn = rootState.spreadAmountBasedOn
+    transaction.rules.filterUsers = rootState.filterUsers
+    transaction.rules.filterAmountIs = rootState.filterAmountIs
+    transaction.rules.filterAmount = rootState.filterAmount || 0
+
+    return transaction
   } catch (e) {
     throw new Error(e)
   }

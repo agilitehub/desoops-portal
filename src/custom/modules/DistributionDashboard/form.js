@@ -1,6 +1,6 @@
 import React, { memo, useEffect, useReducer } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-
+import { DeepDiff } from 'deep-diff'
 // UI Components
 import { Row, Col, message, Divider } from 'antd'
 
@@ -14,9 +14,9 @@ import TableData from './TableData'
 
 // Custom Utils
 import Enums from '../../lib/enums'
-import { calculateEstimatedPayment, setupHodlers, updateHodlers } from './controller'
+import { calculateEstimatedPayment, prepDistributionTemplate, setupHodlers, updateHodlers } from './controller'
 import { customListModal, distributionDashboardState, paymentModal } from './data-models'
-import { setDeSoData, setConfigData } from '../../reducer'
+import { setDeSoData, setConfigData, setDistributionTemplates } from '../../reducer'
 import { cloneDeep } from 'lodash'
 import {
   generateProfilePicUrl,
@@ -26,7 +26,7 @@ import {
   getDeSoUser
 } from '../../lib/deso-controller'
 import PaymentModal from './PaymentModal'
-import { getConfigData } from '../../lib/agilite-controller'
+import { createDistributionTemplate, getConfigData, updateDistributionTemplate } from '../../lib/agilite-controller'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
@@ -34,6 +34,7 @@ const _BatchTransactionsForm = () => {
   const dispatch = useDispatch()
   const desoData = useSelector((state) => state.custom.desoData)
   const configData = useSelector((state) => state.custom.configData)
+  const distributionTemplates = useSelector((state) => state.custom.distributionTemplates)
   const [state, setState] = useReducer(reducer, distributionDashboardState(configData.feePerTransactionUSD))
   const { isTablet, isSmartphone, isMobile } = useSelector((state) => state.custom.userAgent)
 
@@ -62,6 +63,48 @@ const _BatchTransactionsForm = () => {
 
     setState({ rulesEnabled, distributionAmountEnabled })
   }, [state.distributeTo, state.distributionType, state.tokenToUse]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Use Effect to monitor state.rulesEnabled and if truthy and a distribution template has been selected...
+  // ...check to see if any changes have been made to the template and if so, ...
+  // ...set the templateNameModal.isModified to true
+  useEffect(() => {
+    if (state.rulesEnabled && state.templateNameModal.id) {
+      const template = distributionTemplates.find((template) => template._id === state.templateNameModal.id)
+      let isModified = false
+
+      if (template) {
+        prepDistributionTemplate(desoData, state, state.templateNameModal.name, state.rulesEnabled, true).then(
+          (newTemplate) => {
+            // Set values that were not set by prepDistributionTemplate
+            newTemplate.key = template.key
+            newTemplate._id = template._id
+            newTemplate.__v = template.__v
+            newTemplate.createdAt = template.createdAt
+            newTemplate.modifiedAt = template.modifiedAt
+
+            const differences = DeepDiff(template, newTemplate)
+
+            if (differences) isModified = true
+            setState({ templateNameModal: { ...state.templateNameModal, isModified } })
+          }
+        )
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    state.rulesEnabled,
+    state.distributeTo,
+    state.myHodlers,
+    state.distributeDeSoUser,
+    state.distributionType,
+    state.tokenToUse,
+    state.distributionAmount,
+    state.nftHodlers,
+    state.filterUsers,
+    state.filterAmountIs,
+    state.filterAmount,
+    state.spreadAmountBasedOn
+  ])
 
   const resetState = async () => {
     setState(distributionDashboardState(configData.feePerTransactionUSD))
@@ -281,6 +324,137 @@ const _BatchTransactionsForm = () => {
     setState({ loading: false })
   }
 
+  const handleSelectTemplate = async (id) => {
+    try {
+      setState({ loading: true })
+      let tmpHodlers = []
+
+      // Clone a copy of the state
+      const tmpState = cloneDeep(state)
+
+      // fetch the selected template using id
+      const template = distributionTemplates.find((template) => template._id === id)
+
+      // update the state props using the selected template
+      tmpState.distributeTo = template.distributeTo
+      tmpState.myHodlers = template.myHodlers
+      tmpState.distributeDeSoUser = template.distributeDeSoUser
+      tmpState.distributionType = template.distributionType
+      tmpState.tokenToUse = template.tokenToUse
+      tmpState.distributionAmount = template.distributionAmount
+      tmpState.rulesEnabled = template.rules.enabled
+      tmpState.spreadAmountBasedOn = template.rules.spreadAmountBasedOn
+      tmpState.filterUsers = template.rules.filterUsers
+      tmpState.filterAmountIs = template.rules.filterAmountIs
+      tmpState.filterAmount = template.rules.filterAmount
+
+      // Update tmpState.templateNameModal and close Select Template Modal
+      tmpState.templateNameModal.id = template._id
+      tmpState.templateNameModal.name = template.name
+      tmpState.templateNameModal.isModified = false
+      tmpState.selectTemplateModal.isOpen = false
+
+      // Fetch Hodlers that need to be set up
+      switch (tmpState.distributeTo) {
+        case Enums.values.DAO:
+          tmpHodlers = cloneDeep(desoData.profile.daoHodlers)
+          break
+        case Enums.values.CREATOR:
+          tmpHodlers = cloneDeep(desoData.profile.ccHodlers)
+          break
+      }
+
+      const setupResult = await setupHodlers(tmpHodlers)
+
+      const tmpConditions = {
+        filterUsers: tmpState.filterUsers,
+        filterAmountIs: tmpState.filterAmountIs,
+        filterAmount: tmpState.filterAmount
+      }
+
+      const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(
+        setupResult.finalHodlers,
+        setupResult.selectedTableKeys,
+        tmpConditions
+      )
+
+      if (tmpState.distributionAmount) {
+        await calculateEstimatedPayment(
+          finalHodlers,
+          tmpState.distributionAmount,
+          tmpState.spreadAmountBasedOn,
+          desoData.desoPrice
+        )
+      }
+
+      tmpState.finalHodlers = finalHodlers
+      tmpState.selectedTableKeys = selectedTableKeys
+      tmpState.tokenTotal = tokenTotal
+
+      // Update the state with the new state
+      setState(tmpState)
+    } catch (e) {
+      console.error(e)
+      message.error(e.message)
+    }
+
+    setState({ loading: false })
+  }
+
+  const handleSetTemplateName = async (tmpName) => {
+    try {
+      setState({ loading: true })
+
+      let id = state.templateNameModal.id
+      let isUpdate = !!id
+      const name = tmpName || state.templateNameModal.name
+      const rulesEnabled = state.rulesEnabled
+      const tmpTemplates = cloneDeep(distributionTemplates)
+      let data = null
+      let response = null
+
+      if (state.templateNameModal.forceNew) {
+        // Treat existing template as a new one and update
+        id = null
+        isUpdate = false
+      }
+
+      data = await prepDistributionTemplate(desoData, state, name, rulesEnabled, isUpdate)
+
+      if (!isUpdate) {
+        response = await createDistributionTemplate(data)
+        response.key = response._id
+
+        // Add entry to the list of templates
+        tmpTemplates.push(response)
+      } else {
+        response = await updateDistributionTemplate(id, data)
+        response.key = response._id
+
+        // Update entry in the list of templates
+        const index = tmpTemplates.findIndex((template) => template._id === id)
+        tmpTemplates[index] = response
+      }
+
+      dispatch(setDistributionTemplates(tmpTemplates))
+      setState({
+        templateNameModal: {
+          ...state.templateNameModal,
+          name,
+          isOpen: false,
+          isModified: false,
+          forceNew: false,
+          id: response._id
+        }
+      })
+    } catch (e) {
+      console.error(e)
+      message.error(e.message)
+    }
+
+    setState({ loading: false })
+  }
+
   const handlePaymentDone = async () => {
     setState({ paymentModal: paymentModal() })
   }
@@ -312,6 +486,7 @@ const _BatchTransactionsForm = () => {
                     <SetupCard
                       desoData={desoData}
                       rootState={state}
+                      templateNameModal={state.templateNameModal}
                       onDistributeTo={handleDistributeTo}
                       onDistributeMyHodlers={handleDistributeMyHodlers}
                       onDistributeDeSoUser={handleDistributeDeSoUser}
@@ -320,7 +495,11 @@ const _BatchTransactionsForm = () => {
                       setRootState={setState}
                       onConfirmNFT={handleConfirmNFT}
                       onConfirmCustomList={handleConfirmCustomList}
+                      onSelectTemplate={handleSelectTemplate}
+                      onSetTemplateName={handleSetTemplateName}
                       deviceType={deviceType}
+                      isLoading={state.loading}
+                      distributionTemplates={distributionTemplates}
                     />
                   </Col>
                   <Col xs={24} lg={12}>

@@ -4,14 +4,16 @@ import { Card, Tabs, Button, Image } from 'antd'
 import GeneralTab from './GeneralTab'
 import RulesTab from './RulesTab'
 import Enums from '../../../lib/enums'
-import { UsergroupAddOutlined, FileAddOutlined } from '@ant-design/icons'
+import { UsergroupAddOutlined, FileAddOutlined, SaveOutlined } from '@ant-design/icons'
 import DeSoNFTSearchModal from '../../../reusables/components/DeSoNFTSearchModal'
 import DeSoUserSearchModal from '../../../reusables/components/DeSoUserSearchModal'
 import SelectTemplateModal from '../SelectTemplateModal'
+import TemplateNameModal from '../TemplateNameModal'
 
 const SetupCard = ({
   desoData,
   rootState,
+  templateNameModal,
   onDistributeTo,
   onDistributeMyHodlers,
   onDistributeDeSoUser,
@@ -21,7 +23,9 @@ const SetupCard = ({
   onConfirmNFT,
   onConfirmCustomList,
   onSelectTemplate,
-  deviceType
+  onSetTemplateName,
+  deviceType,
+  isLoading
 }) => {
   const distributionTemplates = useSelector((state) => state.custom.distributionTemplates)
 
@@ -51,6 +55,18 @@ const SetupCard = ({
     setRootState({ selectTemplateModal: { ...rootState.selectTemplateModal, isOpen: false } })
   }
 
+  const handleCancelTemplateNameModal = () => {
+    setRootState({ templateNameModal: { ...templateNameModal, isOpen: false, forceNew: false } })
+  }
+
+  const handleSaveSetup = (forceNew) => {
+    if (!templateNameModal.id || forceNew) {
+      setRootState({ templateNameModal: { ...templateNameModal, isOpen: true, forceNew } })
+    } else {
+      onSetTemplateName()
+    }
+  }
+
   const renderTabBarExtraContent = () => {
     let tabBarExtraContent = null
 
@@ -73,7 +89,7 @@ const SetupCard = ({
     } else if (rootState.distributeTo === Enums.values.EMPTY_STRING) {
       tabBarExtraContent = (
         <Button style={styleProps.tabButton} onClick={handleButtonClick} icon={<FileAddOutlined />}>
-          Load Template
+          Load Setup
         </Button>
       )
     }
@@ -120,6 +136,32 @@ const SetupCard = ({
       fontSize: deviceType.isSmartphone ? 14 : 16,
       marginBottom: deviceType.isSmartphone ? 3 : 0
     },
+    btnSaveActive: {
+      color: '#188EFF',
+      borderColor: '#188EFF',
+      backgroundColor: 'white',
+      marginTop: 20
+    },
+    btnSaveInactive: {
+      color: '#D5D5D5',
+      borderColor: '#D5D5D5',
+      backgroundColor: 'white',
+      marginTop: 20
+    },
+    btnUpdateActive: {
+      color: '#188EFF',
+      borderColor: '#188EFF',
+      backgroundColor: 'white',
+      marginTop: 20,
+      marginRight: 10
+    },
+    btnUpdateInactive: {
+      color: '#D5D5D5',
+      borderColor: '#D5D5D5',
+      backgroundColor: 'white',
+      marginTop: 20,
+      marginRight: 10
+    },
     nftIcon: {
       borderRadius: 5,
       marginLeft: deviceType.isSmartphone ? -10 : -15,
@@ -145,8 +187,51 @@ const SetupCard = ({
           tabBarExtraContent={renderTabBarExtraContent()}
           items={tabItems}
         />
+        <center>
+          {templateNameModal.id ? (
+            <Button
+              size={deviceType.isTablet ? 'large' : 'medium'}
+              type='primary'
+              icon={<SaveOutlined />}
+              style={
+                !rootState.rulesEnabled ||
+                rootState.isExecuting ||
+                !templateNameModal.isModified ||
+                !templateNameModal.id
+                  ? styleProps.btnUpdateInactive
+                  : styleProps.btnUpdateActive
+              }
+              onClick={() => handleSaveSetup()}
+              disabled={
+                !rootState.rulesEnabled ||
+                rootState.isExecuting ||
+                !templateNameModal.isModified ||
+                !templateNameModal.id
+              }
+            >
+              Update Setup
+            </Button>
+          ) : null}
+          <Button
+            size={deviceType.isTablet ? 'large' : 'medium'}
+            type='primary'
+            icon={<SaveOutlined />}
+            style={
+              !rootState.rulesEnabled || rootState.isExecuting ? styleProps.btnSaveInactive : styleProps.btnSaveActive
+            }
+            onClick={() => handleSaveSetup(templateNameModal.id)}
+            disabled={!rootState.rulesEnabled || rootState.isExecuting}
+          >
+            {templateNameModal.id ? 'Save As...' : 'Save Setup'}
+          </Button>
+          {templateNameModal.id ? (
+            <div style={{ display: 'block' }}>
+              <span style={{ fontSize: 12, color: '#FF7F50' }}>{`Current Template: ${templateNameModal.name}`}</span>
+            </div>
+          ) : null}
+        </center>
       </Card>
-      {rootState.distributeTo === Enums.values.NFT ? (
+      {rootState.openNftSearch ? (
         <DeSoNFTSearchModal
           isOpen={rootState.openNftSearch}
           deviceType={deviceType}
@@ -156,7 +241,7 @@ const SetupCard = ({
           onCancelNFT={handleCancelNFT}
         />
       ) : null}
-      {rootState.distributeTo === Enums.values.CUSTOM ? (
+      {rootState.customListModal.isOpen ? (
         <DeSoUserSearchModal
           isOpen={rootState.customListModal.isOpen}
           deviceType={deviceType}
@@ -166,12 +251,23 @@ const SetupCard = ({
           onCancel={handleCancelCustomList}
         />
       ) : null}
-      {rootState.distributeTo === Enums.values.EMPTY_STRING ? (
+      {rootState.selectTemplateModal.isOpen ? (
         <SelectTemplateModal
           isOpen={rootState.selectTemplateModal.isOpen}
           templates={distributionTemplates}
           onSelectTemplate={onSelectTemplate}
           onCancel={handleCancelTemplateModal}
+        />
+      ) : null}
+      {templateNameModal.isOpen ? (
+        <TemplateNameModal
+          isOpen={templateNameModal.isOpen}
+          name={templateNameModal.name}
+          deviceType={deviceType}
+          isLoading={isLoading}
+          distributionTemplates={distributionTemplates}
+          onSetTemplateName={onSetTemplateName}
+          onCancel={handleCancelTemplateNameModal}
         />
       ) : null}
     </>

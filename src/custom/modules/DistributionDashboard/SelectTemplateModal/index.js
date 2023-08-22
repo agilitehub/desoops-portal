@@ -1,7 +1,22 @@
 import React from 'react'
-import { Col, List, Modal, Row } from 'antd'
+import { Col, Modal, Row, Table } from 'antd'
 
 const SelectTemplateModal = ({ isOpen, templates, onCancel, onSelectTemplate }) => {
+  const tableColumns = [
+    {
+      title: 'Saved Templates',
+      dataIndex: 'name',
+      style: { cursor: 'pointer' },
+      onCell: () => {
+        return {
+          style: {
+            cursor: 'pointer'
+          }
+        }
+      }
+    }
+  ]
+
   return (
     <Modal
       open={isOpen}
@@ -16,28 +31,19 @@ const SelectTemplateModal = ({ isOpen, templates, onCancel, onSelectTemplate }) 
       <Row style={{ marginTop: 20, justifyContent: 'center' }}>
         {templates.length > 0 ? (
           <Col span={24}>
-            <List
-              size='small'
-              itemLayout='horizontal'
-              header='Saved Templates'
+            <Table
+              columns={tableColumns}
               dataSource={templates}
-              renderItem={(entry) => (
-                <List.Item>
-                  <List.Item.Meta
-                    description={
-                      <div
-                        style={{ cursor: 'pointer' }}
-                        onClick={(e) => {
-                          // onSelectTemplate
-                          alert('Template selected')
-                        }}
-                      >
-                        <span style={{ fontSize: 12 }}>Template Name</span>
-                      </div>
-                    }
-                  />
-                </List.Item>
-              )}
+              bordered
+              size='small'
+              pagination={false}
+              onRow={(record) => {
+                return {
+                  onClick: () => {
+                    onSelectTemplate(record._id)
+                  }
+                }
+              }}
             />
           </Col>
         ) : (

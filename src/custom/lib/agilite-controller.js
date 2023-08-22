@@ -35,14 +35,13 @@ export const updateDistributionTransaction = async (id, data) => {
     data: JSON.stringify(data)
   })
 
-  return response
+  return response.data
 }
 
 // Fetch Distribution Templates for user
 export const getDistributionTemplates = async (publicKey) => {
-  let qry = { publicKey }
   const response = await agilite.Connectors.execute('distribution_templates', 'find', {
-    filter: JSON.stringify(qry)
+    filter: JSON.stringify({ publicKey })
   })
 
   return response.data
@@ -53,7 +52,7 @@ export const createDistributionTemplate = async (data) => {
     data: JSON.stringify(data)
   })
 
-  return response
+  return response.data
 }
 
 export const updateDistributionTemplate = async (id, data) => {
@@ -62,5 +61,5 @@ export const updateDistributionTemplate = async (id, data) => {
     data: JSON.stringify(data)
   })
 
-  return response
+  return response.data
 }

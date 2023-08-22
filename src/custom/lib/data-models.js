@@ -65,3 +65,26 @@ export const distributionRecipientModel = () => {
     percentOwnership: 0
   }
 }
+
+export const distributionTemplateModel = () => {
+  return {
+    createdAt: null,
+    modifiedAt: null,
+    publicKey: '',
+    name: '',
+    distributeTo: '',
+    myHodlers: true,
+    distributeDeSoUser: '',
+    distributionType: '',
+    tokenToUse: '',
+    distributionAmount: 0,
+    nftId: '',
+    rules: {
+      enabled: true,
+      spreadAmountBasedOn: '',
+      filterUsers: false,
+      filterAmountIs: '',
+      filterAmount: 0
+    }
+  }
+}
