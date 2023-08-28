@@ -19,6 +19,35 @@ import { desoUserModel } from './data-models'
 import { cleanString, hexToInt } from './utils'
 import nftLogo from '../assets/nft-default-logo.png'
 
+const desoConfigure = {
+  appName: process.env.REACT_APP_NAME,
+  spendingLimitOptions: {
+    // IsUnlimited: true
+    GlobalDESOLimit: 0.1 * 1e9, // 100 Deso
+    CreatorCoinOperationLimitMap: {
+      '': {
+        any: 'UNLIMITED'
+      }
+    },
+    DAOCoinOperationLimitMap: {
+      '': {
+        transfer: 'UNLIMITED'
+      }
+    },
+    TransactionCountLimitMap: {
+      BASIC_TRANSFER: 'UNLIMITED',
+      DAO_COIN: 'UNLIMITED',
+      DAO_COIN_TRANSFER: 'UNLIMITED',
+      CREATOR_COIN: 'UNLIMITED',
+      CREATOR_COIN_TRANSFER: 'UNLIMITED'
+    }
+  }
+}
+
+export const getDeSoConfig = () => {
+  return desoConfigure
+}
+
 /**
  * Logs the user into the DeSo blockchain.
  *
@@ -50,6 +79,13 @@ export const desoLogout = async () => {
   } catch (e) {
     throw new Error(e)
   }
+}
+
+export const changeDeSoLimit = async (desoLimitNanos) => {
+  return await identity.requestPermissions({
+    ...identity.transactionSpendingLimitOptions,
+    GlobalDESOLimit: desoLimitNanos
+  })
 }
 
 /**

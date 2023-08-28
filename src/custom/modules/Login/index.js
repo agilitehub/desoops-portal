@@ -11,31 +11,9 @@ import logo from '../../assets/deso-ops-logo-full.png'
 import VideoModal from '../../reusables/components/VideoModal'
 import Enums from '../../lib/enums'
 import { useSelector } from 'react-redux'
+import { getDeSoConfig } from '../../lib/deso-controller'
 
-configure({
-  appName: process.env.REACT_APP_NAME,
-  spendingLimitOptions: {
-    // IsUnlimited: true
-    GlobalDESOLimit: 100 * 1e9, // 100 Deso
-    CreatorCoinOperationLimitMap: {
-      '': {
-        any: 'UNLIMITED'
-      }
-    },
-    DAOCoinOperationLimitMap: {
-      '': {
-        transfer: 'UNLIMITED'
-      }
-    },
-    TransactionCountLimitMap: {
-      BASIC_TRANSFER: 'UNLIMITED',
-      DAO_COIN: 'UNLIMITED',
-      DAO_COIN_TRANSFER: 'UNLIMITED',
-      CREATOR_COIN: 'UNLIMITED',
-      CREATOR_COIN_TRANSFER: 'UNLIMITED'
-    }
-  }
-})
+configure(getDeSoConfig())
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
