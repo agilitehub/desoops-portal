@@ -23,7 +23,7 @@ const desoConfigure = {
   appName: process.env.REACT_APP_NAME,
   spendingLimitOptions: {
     // IsUnlimited: true
-    GlobalDESOLimit: 0.1 * 1e9, // 100 Deso
+    GlobalDESOLimit: 0.5 * 1e9, // 100 Deso
     CreatorCoinOperationLimitMap: {
       '': {
         any: 'UNLIMITED'

@@ -7,11 +7,12 @@ import CoreEnums from '../../../lib/enums'
 import { calculateEstimatedPayment, prepDistributionTransaction, slimRootState } from '../controller'
 import { distributionSummaryState } from '../data-models'
 import Enums from '../enums'
-import { sendCreatorCoins, sendDAOTokens, sendDESO } from '../../../lib/deso-controller'
+import { changeDeSoLimit, sendCreatorCoins, sendDAOTokens, sendDESO } from '../../../lib/deso-controller'
 import { randomize } from '../../../lib/utils'
 import { createDistributionTransaction, updateDistributionTransaction } from '../../../lib/agilite-controller'
 
 import './style.sass'
+import { identity } from 'deso-protocol'
 
 const styleParams = {
   labelColXS: 11,
@@ -280,10 +281,26 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshW
     let slimState = null
     let agiliteResponse = null
     let executeInCatch = false
+    let newDeSoLimit = 0
+    let desoTotal = state.totalFeeDESO
 
     try {
       // Prompt user if they try to close the browser window
       window.addEventListener('beforeunload', handleBeforeUnload)
+
+      // Check if the Spending Limit needs to be changed
+      if (rootState.distributionType === CoreEnums.paymentTypes.DESO) {
+        // The Payment is in $DESO, so we need to add the distribution amount to the Global DESO Limit
+        desoTotal += rootState.distributionAmount
+      }
+
+      // Add a x $DESO buffer and then convert to nanos
+      desoTotal = (desoTotal + CoreEnums.values.DESO_LIMIT_INCREASE_BUFFER) * 1e9
+
+      if (desoTotal > identity.transactionSpendingLimitOptions.GlobalDESOLimit) {
+        newDeSoLimit = Math.ceil(identity.transactionSpendingLimitOptions.GlobalDESOLimit + desoTotal)
+        await changeDeSoLimit(newDeSoLimit)
+      }
 
       // Prep the Payment Modal
       paymentModal = cloneDeep(rootState.paymentModal)

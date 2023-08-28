@@ -7,6 +7,7 @@ const Enums = {
     ENV_DEVELOPMENT: 'development',
     LOGIN: 'login',
     NANO_VALUE: 1000000000,
+    DESO_LIMIT_INCREASE_BUFFER: 0.01,
     DESO: 'deso',
     DAO: 'dao',
     CREATOR: 'creator',

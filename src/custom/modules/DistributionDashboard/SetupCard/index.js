@@ -225,8 +225,8 @@ const SetupCard = ({
             {templateNameModal.id ? 'Save As...' : 'Save Setup'}
           </Button>
           {templateNameModal.id ? (
-            <div style={{ display: 'block' }}>
-              <span style={{ fontSize: 12, color: '#FF7F50' }}>{`Current Template: ${templateNameModal.name}`}</span>
+            <div style={{ display: 'block', marginTop: 5 }}>
+              <span style={{ fontSize: 14, color: '#FF7F50' }}>{`Current Setup: ${templateNameModal.name}`}</span>
             </div>
           ) : null}
         </center>
