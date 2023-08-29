@@ -1,8 +1,7 @@
 import React, { useReducer } from 'react'
 import { identity, configure } from 'deso-protocol'
 import { Col, Row, message, theme, Card, Button } from 'antd'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
+import { faCheckCircle, faBitcoinSign } from '@fortawesome/free-solid-svg-icons'
 import { LoginOutlined } from '@ant-design/icons'
 
 // Utils
@@ -12,6 +11,8 @@ import VideoModal from '../../reusables/components/VideoModal'
 import Enums from '../../lib/enums'
 import { useSelector } from 'react-redux'
 import { getDeSoConfig } from '../../lib/deso-controller'
+import HeroSwapModal from '../../reusables/components/HeroSwapModal'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 configure(getDeSoConfig())
 
@@ -19,7 +20,8 @@ const reducer = (state, newState) => ({ ...state, ...newState })
 
 const Login = () => {
   const [state, setState] = useReducer(reducer, {
-    openVideoModal: false
+    openVideoModal: false,
+    openHeroSwapModal: false
   })
 
   const { token } = theme.useToken()
@@ -37,6 +39,10 @@ const Login = () => {
 
   const handleWatchIntroduction = () => {
     setState({ openVideoModal: true })
+  }
+
+  const handleLaunchHeroSwap = () => {
+    setState({ openHeroSwapModal: true })
   }
 
   const styleProps = {
@@ -89,21 +95,23 @@ const Login = () => {
                     {/* // ) : null} */}
 
                     <Row justify='space-around' gutter={[12, 12]}>
-                      <Col span={24}>
-                        <center>
-                          <button
-                            className={styles.signInButton}
-                            // disabled={state.loading}
-                            onClick={handleLogin}
-                            // style={state.loading ? { background: '#cccccc52' } : { background: '#188EFF' }}
-                            style={{ background: '#188EFF' }}
-                          >
-                            <div>
-                              <LoginOutlined style={{ fontSize: 20 }} />
-                            </div>
-                            <span>SIGN IN WITH DESO</span>
-                          </button>
-                        </center>
+                      <Col
+                        span={24}
+                        className={styles.btnWrapper}
+                        style={{ display: 'flex', justifyContent: 'center' }}
+                      >
+                        <button className={styles.signInButton} onClick={handleLogin}>
+                          <div className={styles.icon}>
+                            <LoginOutlined style={{ fontSize: 20 }} />
+                          </div>
+                          <span className={styles.text}>SIGN IN WITH DESO</span>
+                        </button>
+                        <button className={styles.coinSwapButton} onClick={handleLaunchHeroSwap}>
+                          <div className={styles.icon}>
+                            <FontAwesomeIcon style={{ fontSize: 20 }} icon={faBitcoinSign} />
+                          </div>
+                          <span className={styles.text}>COIN SWAP</span>
+                        </button>
                       </Col>
                       <Col span={24}>
                         <div style={{ display: 'flex', justifyContent: 'center', paddingLeft: 5, paddingRight: 5 }}>
@@ -128,13 +136,6 @@ const Login = () => {
                         </div>
                       </Col>
                     </Row>
-                    {/* {state.loading ? (
-                      <Row justify='center' style={{ marginTop: 20 }}>
-                        <Col>
-                          <Spin size='large' />
-                        </Col>
-                      </Row>
-                    ) : undefined} */}
                   </Col>
                 </Row>
               </Card>
@@ -148,6 +149,7 @@ const Login = () => {
         url={Enums.values.DESO_ESSENTIALS_PLAYLIST_URL}
         onCloseModal={() => setState({ openVideoModal: false })}
       />
+      <HeroSwapModal isOpen={state.openHeroSwapModal} onCloseModal={() => setState({ openHeroSwapModal: false })} />
     </>
   )
 }
