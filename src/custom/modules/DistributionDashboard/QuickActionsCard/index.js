@@ -8,6 +8,9 @@ import { getFollowersOrFollowing } from '../../../lib/deso-controller'
 import { prepUsersForClipboard } from '../controller'
 import { updateFollowers, updateFollowing } from '../../../reducer'
 import { useDispatch } from 'react-redux'
+import HeroSwapModal from '../../../reusables/components/HeroSwapModal'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBitcoinSign } from '@fortawesome/free-solid-svg-icons'
 
 const initialState = {
   ctcLoading: false,
@@ -15,6 +18,7 @@ const initialState = {
   refreshLoading: false,
   returnLoading: false,
   loadRandomizeModal: false,
+  openHeroSwapModal: false,
   randomUserKey: null,
   randomizeInProgress: false,
   randomUsers: 0
@@ -37,7 +41,9 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
     iconCopy: { color: '#800080', borderColor: '#800080', backgroundColor: 'white' },
     labelReset: { color: '#DC3847', fontSize: deviceType.isSmartphone ? 12 : 16 },
     labelRefresh: { color: '#FFC20E', fontSize: deviceType.isSmartphone ? 12 : 16 },
-    labelCopy: { color: '#800080', fontSize: deviceType.isSmartphone ? 12 : 16 }
+    labelCopy: { color: '#800080', fontSize: deviceType.isSmartphone ? 12 : 16 },
+    iconSwap: { color: '#4CAF50', borderColor: '#4CAF50', backgroundColor: 'white' },
+    labelSwap: { color: '#4CAF50', fontSize: deviceType.isSmartphone ? 12 : 16 }
   }
 
   const handleResetDashboard = () => {
@@ -80,6 +86,10 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
     await onRefreshWallet()
     message.success('Refresh Confirmed')
     setState({ refreshLoading: false })
+  }
+
+  const handleCoinSwap = () => {
+    setState({ openHeroSwapModal: true })
   }
 
   const handleCopyToClipboard = async (item) => {
@@ -189,7 +199,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
       headStyle={styleProps.headStyle}
     >
       <Row gutter={[16, 16]} style={{ textAlign: 'center' }}>
-        <Col span={8}>
+        <Col span={6}>
           <Col span={24} style={styleProps.actionWrapper}>
             <Button
               shape='circle'
@@ -202,7 +212,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
             <div style={styleProps.labelReset}>Reset</div>
           </Col>
         </Col>
-        <Col span={8}>
+        <Col span={6}>
           <Col span={24} style={styleProps.actionWrapper}>
             <Button
               shape='circle'
@@ -215,7 +225,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
             <div style={styleProps.labelRefresh}>Refresh</div>
           </Col>
         </Col>
-        <Col span={8}>
+        <Col span={6}>
           <Col span={24} style={styleProps.actionWrapper}>
             <Dropdown
               menu={{ items: dropdownItems, onClick: handleCopyToClipboard }}
@@ -227,6 +237,18 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
               <Button shape='circle' style={styleProps.iconCopy} icon={<CopyOutlined />} loading={state.ctcLoading} />
             </Dropdown>
             <div style={styleProps.labelCopy}>Copy</div>
+          </Col>
+        </Col>
+        <Col span={6}>
+          <Col span={24} style={styleProps.actionWrapper}>
+            <Button
+              shape='circle'
+              style={styleProps.iconSwap}
+              icon={<FontAwesomeIcon icon={faBitcoinSign} />}
+              disabled={rootState.isExecuting}
+              onClick={handleCoinSwap}
+            />
+            <div style={styleProps.labelSwap}>Swap</div>
           </Col>
         </Col>
       </Row>
@@ -276,6 +298,9 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
           randomUserKey={state.randomUserKey}
         />
       </Modal>
+      {state.openHeroSwapModal && (
+        <HeroSwapModal isOpen={state.openHeroSwapModal} onCloseModal={() => setState({ openHeroSwapModal: false })} />
+      )}
     </Card>
   )
 }
