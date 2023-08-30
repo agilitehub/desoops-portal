@@ -16,7 +16,7 @@ const PaymentModal = ({ props, onPaymentDone }) => {
     if (props.isOpen) {
       interval = setInterval(() => {
         setTipIndex((tipIndex + 1) % props.tips.length)
-      }, 5000)
+      }, 8000)
     }
 
     return () => (interval ? clearInterval(interval) : null)

@@ -4,7 +4,7 @@ import { Col, Modal, Row, Table } from 'antd'
 const SelectTemplateModal = ({ isOpen, templates, onCancel, onSelectTemplate }) => {
   const tableColumns = [
     {
-      title: 'Saved Templates',
+      title: 'Setups',
       dataIndex: 'name',
       style: { cursor: 'pointer' },
       onCell: () => {
@@ -20,7 +20,7 @@ const SelectTemplateModal = ({ isOpen, templates, onCancel, onSelectTemplate }) 
   return (
     <Modal
       open={isOpen}
-      title={'Select Distribution Template'}
+      title={'Select Setup Template'}
       cancelText='Close'
       onCancel={onCancel}
       cancelButtonProps={{
@@ -50,8 +50,8 @@ const SelectTemplateModal = ({ isOpen, templates, onCancel, onSelectTemplate }) 
           <Col span={24}>
             <center>
               <p>
-                You do not have any saved Distribution Templates. In the Payment Modal, once the distribution is
-                completed, you will have an option to save the current distribution setup as a template.
+                You do not have any saved Setup templates. At the bottom of the "Setup & Config" Section, you will have
+                an option to save the current setup as a template once enough configurations have been provided.
               </p>
             </center>
           </Col>
