@@ -35,6 +35,8 @@ const desoConfigure = {
       }
     },
     TransactionCountLimitMap: {
+      SUBMIT_POST: 'UNLIMITED',
+      PRIVATE_MESSAGE: 'UNLIMITED',
       BASIC_TRANSFER: 'UNLIMITED',
       DAO_COIN: 'UNLIMITED',
       DAO_COIN_TRANSFER: 'UNLIMITED',

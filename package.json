@@ -1,7 +1,7 @@
 {
   "name": "desoops-portal",
   "description": "A management hub for Content Creators on the DeSo platform",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "scripts": {
     "start": "craco start",
     "build": "craco build",
@@ -28,7 +28,7 @@
     "agilite-utils": "7.5.0"
   },
   "devDependencies": {
-    "@ant-design/icons": "5.2.5",
+    "@ant-design/icons": "5.2.6",
     "@craco/craco": "7.1.0",
     "@fortawesome/fontawesome-svg-core": "6.4.2",
     "@fortawesome/free-regular-svg-icons": "6.4.2",
@@ -37,12 +37,12 @@
     "@reduxjs/toolkit": "1.9.5",
     "@types/agilite": "7.3.0",
     "agilite": "7.5.0",
-    "antd": "5.8.2",
-    "bignumber.js": "9.1.1",
-    "dayjs": "1.11.9",
+    "antd": "5.9.2",
+    "bignumber.js": "9.1.2",
+    "dayjs": "1.11.10",
     "deep-diff": "1.0.2",
-    "deso-protocol": "2.2.2",
-    "firebase": "10.1.0",
+    "deso-protocol": "2.5.0",
+    "firebase": "10.4.0",
     "immutability-helper": "3.1.1",
     "lodash": "4.17.21",
     "moment": "2.29.4",
@@ -52,15 +52,15 @@
     "react-device-detect": "2.2.3",
     "react-dom": "18.2.0",
     "react-moment": "1.1.3",
-    "react-player": "2.12.0",
+    "react-player": "2.13.0",
     "react-redux": "8.1.2",
-    "react-router-dom": "6.14.2",
+    "react-router-dom": "6.16.0",
     "react-scripts": "5.0.1",
     "react-scroll": "1.8.9",
-    "recharts": "2.7.3",
+    "recharts": "2.8.0",
     "redux": "4.2.1",
     "redux-devtools-extension": "2.13.9",
     "redux-thunk": "2.4.2",
-    "sass": "1.65.1"
+    "sass": "1.68.0"
   }
 }
