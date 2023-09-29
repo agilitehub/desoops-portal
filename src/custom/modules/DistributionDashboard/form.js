@@ -57,11 +57,11 @@ const _BatchTransactionsForm = () => {
     if (state.distributeTo && state.distributionType) {
       if ([Enums.paymentTypes.DAO, Enums.paymentTypes.CREATOR].includes(state.distributionType)) {
         if (state.tokenToUse) {
-          rulesEnabled = state.distributeTo !== Enums.values.CUSTOM
+          rulesEnabled = true
           distributionAmountEnabled = true
         }
       } else {
-        rulesEnabled = state.distributeTo !== Enums.values.CUSTOM
+        rulesEnabled = true
         distributionAmountEnabled = true
       }
     }
@@ -313,7 +313,7 @@ const _BatchTransactionsForm = () => {
     setState({ loading: false })
   }
 
-  const handleConfirmCustomList = async (userList, autoSort) => {
+  const handleConfirmCustomList = async (userList) => {
     try {
       const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(userList)
 
@@ -321,7 +321,7 @@ const _BatchTransactionsForm = () => {
         finalHodlers,
         tokenTotal,
         selectedTableKeys,
-        customListModal: { ...state.customListModal, isOpen: false, userList, autoSort }
+        customListModal: { ...state.customListModal, isOpen: false, userList }
       })
     } catch (e) {
       console.error(e)
@@ -355,6 +355,11 @@ const _BatchTransactionsForm = () => {
       tmpState.filterAmountIs = template.rules.filterAmountIs
       tmpState.filterAmount = template.rules.filterAmount
 
+      if (template.distributeTo === Enums.values.CUSTOM) {
+        tmpState.customListModal = customListModal()
+        tmpState.customListModal.userList = template.customList
+      }
+
       // Update tmpState.templateNameModal and close Select Template Modal
       tmpState.templateNameModal.id = template._id
       tmpState.templateNameModal.name = template.name
@@ -368,6 +373,9 @@ const _BatchTransactionsForm = () => {
           break
         case Enums.values.CREATOR:
           tmpHodlers = cloneDeep(desoData.profile.ccHodlers)
+          break
+        case Enums.values.CUSTOM:
+          tmpHodlers = cloneDeep(template.customList)
           break
       }
 

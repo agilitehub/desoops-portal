@@ -7,15 +7,15 @@
 // Once the user is happy with the list of users, they can click the Confirm button, which will call a passed function and close the Modal.
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Row, Modal, Col, Spin, Select, Checkbox, Divider } from 'antd'
+import { Row, Modal, Col, Spin, Select, Divider, Button } from 'antd'
 import { generateProfilePicUrl, searchForUsers } from '../../../lib/deso-controller'
 import { cloneDeep, debounce } from 'lodash'
 import Enums from '../../../lib/enums'
 import { desoUserModel } from '../../../lib/data-models'
+import { SortAscendingOutlined } from '@ant-design/icons'
 
 const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfirm, onCancel }) => {
   const [search, setSearch] = useState([])
-  const [autoSort, setAutoSort] = useState(false)
 
   // Create a useEffect hook to monitor the prop isOpen
   useEffect(() => {
@@ -26,11 +26,9 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
       })
 
       setSearch(options)
-      setAutoSort(rootState.customListModal.autoSort)
     } else {
       // Reset the state
       setSearch([])
-      setAutoSort(false)
     }
   }, [isOpen]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -42,7 +40,6 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
     // with the new list and remove any entries that are not in the new list.
     // If there are new entries in the new list, add them to...
     // ...rootState.customListModal.userList initiating using desoUserModel()
-    // If autoSort is true, then sort the list by username
 
     if (rootState.customListModal.userList.length > 0) {
       userList = cloneDeep(rootState.customListModal.userList)
@@ -91,19 +88,25 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
       }
     }
 
-    if (autoSort) {
-      userList.sort((a, b) => {
-        if (a.username.toLowerCase() < b.username.toLowerCase()) {
-          return -1
-        }
-        if (a.username.toLowerCase() > b.username.toLowerCase()) {
-          return 1
-        }
-        return 0
-      })
-    }
+    onConfirm(userList)
+  }
 
-    onConfirm(userList, autoSort)
+  // Create a function to sort the list by username ascending
+  const sortList = () => {
+    console.log(search)
+    const userList = cloneDeep(search)
+
+    userList.sort((a, b) => {
+      if (a.label.toLowerCase() < b.label.toLowerCase()) {
+        return -1
+      }
+      if (a.label.toLowerCase() > b.label.toLowerCase()) {
+        return 1
+      }
+      return 0
+    })
+
+    setSearch(userList)
   }
 
   const DebounceSelect = ({ fetchOptions, debounceTimeout = 800, ...props }) => {
@@ -180,15 +183,14 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
       <Divider style={styleProps.divider} />
       <Row>
         <Col span={24}>
-          <Checkbox
-            style={styleProps.checkbox}
-            checked={autoSort}
-            onChange={(e) => {
-              setAutoSort(e.target.checked)
-            }}
+          <Button
+            size={deviceType.isTablet ? 'large' : 'medium'}
+            type='primary'
+            icon={<SortAscendingOutlined />}
+            onClick={sortList}
           >
-            Auto Sort List on Confirm
-          </Checkbox>
+            Sort Users
+          </Button>
         </Col>
       </Row>
     </Modal>

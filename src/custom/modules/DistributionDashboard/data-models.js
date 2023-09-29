@@ -74,7 +74,6 @@ export const paymentModal = () => {
 export const customListModal = (isOpen = false) => {
   return {
     isOpen,
-    autoSort: true,
     userList: []
   }
 }

@@ -352,6 +352,10 @@ export const prepDistributionTemplate = async (desoData, rootState, name, rulesE
     transaction.rules.filterAmountIs = rootState.filterAmountIs
     transaction.rules.filterAmount = rootState.filterAmount || 0
 
+    if (transaction.distributeTo === Enums.values.CUSTOM) {
+      transaction.customList = rootState.customListModal.userList
+    }
+
     return transaction
   } catch (e) {
     throw new Error(e)
