@@ -40,7 +40,8 @@ export const distributionTransactionModel = () => {
       spreadAmountBasedOn: '',
       filterUsers: false,
       filterAmountIs: '',
-      filterAmount: 0
+      filterAmount: 0,
+      returnAmount: 0
     },
     totalFeeUSD: 0,
     totalFeeDESO: 0,
@@ -85,7 +86,8 @@ export const distributionTemplateModel = () => {
       spreadAmountBasedOn: '',
       filterUsers: false,
       filterAmountIs: '',
-      filterAmount: 0
+      filterAmount: 0,
+      returnAmount: 0
     }
   }
 }

@@ -93,7 +93,6 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
 
   // Create a function to sort the list by username ascending
   const sortList = () => {
-    console.log(search)
     const userList = cloneDeep(search)
 
     userList.sort((a, b) => {

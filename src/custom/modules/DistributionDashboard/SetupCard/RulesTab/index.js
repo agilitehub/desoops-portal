@@ -58,10 +58,17 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
         newState.filterAmount = rootState.filterAmount
       }
 
+      if (propType === 'returnAmount') {
+        newState.returnAmount = propValue
+      } else {
+        newState.returnAmount = rootState.returnAmount
+      }
+
       // If rootState.filterUsers is true and newState.filterUsers is set to false, then we can run updateHolders
       if (rootState.filterUsers && !newState.filterUsers) {
         runUpdateHolders = true
         newState.filterAmount = null
+        newState.returnAmount = null
         newState.filterAmountIs = '>'
       } else if (newState.filterUsers) {
         runUpdateHolders = true
@@ -137,7 +144,7 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
       <Row>
         <Col xs={styleParams.col1XS} style={{ marginBottom: 5 }}>
           <span style={styleProps.fieldLabel}>
-            <b>Filter users based on Tokens owned?</b>
+            <b>Filter Users?</b>
           </span>
         </Col>
         <Col xs={styleParams.col1XS}>
@@ -181,10 +188,32 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
                 disabled={rootState.isExecuting}
                 addonAfter='tokens'
                 min={0}
+                value={rootState.filterAmount}
                 placeholder='0'
                 style={{ width: 200 }}
                 onChange={(filterAmount) => {
                   handleFilterUsers('filterAmount', filterAmount)
+                }}
+              />
+            </Col>
+          </Row>
+          <Divider style={styleProps.divider} />
+          <Row>
+            <Col span={24} style={{ paddingTop: 3, paddingBottom: 3 }}>
+              <span style={styleProps.fieldLabel}>
+                <b>Return only top</b>
+              </span>
+            </Col>
+            <Col>
+              <InputNumber
+                disabled={rootState.isExecuting}
+                addonAfter='users'
+                min={0}
+                value={rootState.returnAmount}
+                placeholder='10'
+                style={{ width: 200 }}
+                onChange={(returnAmount) => {
+                  handleFilterUsers('returnAmount', returnAmount)
                 }}
               />
             </Col>

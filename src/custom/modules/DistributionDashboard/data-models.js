@@ -19,6 +19,7 @@ export const distributionDashboardState = (feePerTransactionUSD) => {
     filterUsers: false,
     filterAmountIs: '>',
     filterAmount: null,
+    returnAmount: null,
     finalHodlers: [],
     selectedTableKeys: [],
     tokenTotal: 0,

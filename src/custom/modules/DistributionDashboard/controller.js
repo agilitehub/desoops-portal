@@ -167,7 +167,7 @@ const processHodlerConditions = (hodlers, conditions) => {
     let selectedTableKeys = []
 
     try {
-      if (!conditions.filterUsers || conditions.filterAmount === null) {
+      if (!conditions.filterUsers || (conditions.filterAmount === null && conditions.returnAmount === null)) {
         // Step 2: If `conditions` is an empty object, set the `isVisible` property of all entries in the `hodlers` array to `true`.
         hodlers.forEach((hodler) => {
           hodler.isVisible = true
@@ -182,7 +182,7 @@ const processHodlerConditions = (hodlers, conditions) => {
         })
 
         // Step 4: Set the `isVisible` property of each entry in the `hodlers` array based on whether the `tokenBalance` property is greater than, less than, equal to, or not equal to `conditions.filterAmount`.
-        hodlers.forEach((hodler) => {
+        hodlers.forEach((hodler, index) => {
           switch (conditions.filterAmountIs) {
             case '>':
               hodler.isVisible = hodler.tokenBalance > conditions.filterAmount
@@ -196,6 +196,11 @@ const processHodlerConditions = (hodlers, conditions) => {
             case '<=':
               hodler.isVisible = hodler.tokenBalance <= conditions.filterAmount
               break
+          }
+
+          // Next, if there is a conditions.returnAmount, the hodler.isVisible is only true if the holder's index in the array is less than the conditions.returnAmount
+          if (conditions.returnAmount !== null && conditions.returnAmount !== 0) {
+            hodler.isVisible = hodler.isVisible && index < conditions.returnAmount
           }
 
           if (hodler.isVisible) {
@@ -297,6 +302,7 @@ export const prepDistributionTransaction = async (
     distTransaction.rules.filterUsers = rootState.filterUsers
     distTransaction.rules.filterAmountIs = rootState.filterAmountIs
     distTransaction.rules.filterAmount = rootState.filterAmount || 0
+    distTransaction.rules.returnAmount = rootState.returnAmount || 0
 
     distTransaction.totalFeeUSD = summaryState.totalFeeUSD
     distTransaction.totalFeeDESO = summaryState.totalFeeDESO
@@ -351,6 +357,7 @@ export const prepDistributionTemplate = async (desoData, rootState, name, rulesE
     transaction.rules.filterUsers = rootState.filterUsers
     transaction.rules.filterAmountIs = rootState.filterAmountIs
     transaction.rules.filterAmount = rootState.filterAmount || 0
+    transaction.rules.returnAmount = rootState.returnAmount || 0
 
     if (transaction.distributeTo === Enums.values.CUSTOM) {
       transaction.customList = rootState.customListModal.userList
