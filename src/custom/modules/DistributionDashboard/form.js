@@ -299,6 +299,8 @@ const _BatchTransactionsForm = () => {
       setState({ loading: true })
 
       nftHodlers = cloneDeep(nftHodlers)
+      nftHodlers.sort((a, b) => b.tokenBalance - a.tokenBalance)
+
       const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(nftHodlers)
 
       // Update States
