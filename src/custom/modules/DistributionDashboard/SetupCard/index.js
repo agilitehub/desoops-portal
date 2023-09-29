@@ -23,6 +23,8 @@ const SetupCard = ({
   onConfirmNFT,
   onConfirmCustomList,
   onSelectTemplate,
+  onEditTemplate,
+  onDeleteTemplate,
   onSetTemplateName,
   deviceType,
   isLoading
@@ -255,14 +257,21 @@ const SetupCard = ({
         <SelectTemplateModal
           isOpen={rootState.selectTemplateModal.isOpen}
           templates={distributionTemplates}
+          deviceType={deviceType}
+          templateNameModal={templateNameModal}
+          distributionTemplates={distributionTemplates}
+          onCancelTemplateNameModal={handleCancelTemplateNameModal}
           onSelectTemplate={onSelectTemplate}
+          onEditTemplate={onEditTemplate}
+          onDeleteTemplate={onDeleteTemplate}
           onCancel={handleCancelTemplateModal}
+          setRootState={setRootState}
         />
       ) : null}
       {templateNameModal.isOpen ? (
         <TemplateNameModal
           isOpen={templateNameModal.isOpen}
-          name={templateNameModal.name}
+          templateNameModal={templateNameModal}
           deviceType={deviceType}
           isLoading={isLoading}
           distributionTemplates={distributionTemplates}

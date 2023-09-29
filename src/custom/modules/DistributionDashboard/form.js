@@ -26,7 +26,12 @@ import {
   getDeSoUser
 } from '../../lib/deso-controller'
 import PaymentModal from './PaymentModal'
-import { createDistributionTemplate, getConfigData, updateDistributionTemplate } from '../../lib/agilite-controller'
+import {
+  createDistributionTemplate,
+  deleteDistributionTemplate,
+  getConfigData,
+  updateDistributionTemplate
+} from '../../lib/agilite-controller'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
@@ -419,7 +424,14 @@ const _BatchTransactionsForm = () => {
         isUpdate = false
       }
 
-      data = await prepDistributionTemplate(desoData, state, name, rulesEnabled, isUpdate)
+      if (!state.distributeTo && isUpdate) {
+        // It's only a rename of the Template Name, use existing data
+        data = distributionTemplates.find((template) => template._id === id)
+        data = cloneDeep(data)
+        data.name = name
+      } else {
+        data = await prepDistributionTemplate(desoData, state, name, rulesEnabled, isUpdate)
+      }
 
       if (!isUpdate) {
         response = await createDistributionTemplate(data)
@@ -447,6 +459,23 @@ const _BatchTransactionsForm = () => {
           id: response._id
         }
       })
+    } catch (e) {
+      console.error(e)
+      message.error(e.message)
+    }
+
+    setState({ loading: false })
+  }
+
+  const handleDeleteTemplate = async (id) => {
+    try {
+      setState({ loading: true })
+
+      await deleteDistributionTemplate(id)
+      const tmpTemplates = distributionTemplates.filter((item) => item._id !== id)
+      dispatch(setDistributionTemplates(tmpTemplates))
+
+      setState({ loading: false })
     } catch (e) {
       console.error(e)
       message.error(e.message)
@@ -496,6 +525,7 @@ const _BatchTransactionsForm = () => {
                       onConfirmNFT={handleConfirmNFT}
                       onConfirmCustomList={handleConfirmCustomList}
                       onSelectTemplate={handleSelectTemplate}
+                      onDeleteTemplate={handleDeleteTemplate}
                       onSetTemplateName={handleSetTemplateName}
                       deviceType={deviceType}
                       isLoading={state.loading}

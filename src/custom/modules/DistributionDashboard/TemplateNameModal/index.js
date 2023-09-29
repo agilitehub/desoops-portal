@@ -1,16 +1,24 @@
 import React, { useState } from 'react'
 import { Col, Input, Modal, Row, Spin } from 'antd'
 
-const TemplateNameModal = ({ isOpen, name, onSetTemplateName, onCancel, isLoading, distributionTemplates }) => {
-  const [templateName, setTemplateName] = useState(name)
+const TemplateNameModal = ({
+  isOpen,
+  templateNameModal,
+  onSetTemplateName,
+  onCancel,
+  isLoading,
+  distributionTemplates
+}) => {
+  const [templateName, setTemplateName] = useState(templateNameModal.name)
   const [errMsg, setErrMsg] = useState('')
 
   const handleOnOk = (e) => {
     // Validate that there is a value and is not the same as the passed value
-    if (templateName && templateName !== name) {
+    if (templateName && templateName !== templateNameModal.name) {
       // Check if the templateName already exists using case insensitive search
       const template = distributionTemplates.find(
-        (template) => template.name.toLowerCase() === templateName.toLowerCase()
+        (template) =>
+          templateNameModal.id !== template._id && template.name.toLowerCase() === templateName.toLowerCase()
       )
 
       if (template) {

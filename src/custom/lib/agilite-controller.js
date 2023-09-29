@@ -63,3 +63,11 @@ export const updateDistributionTemplate = async (id, data) => {
 
   return response.data
 }
+
+export const deleteDistributionTemplate = async (id) => {
+  const response = await agilite.Connectors.execute('distribution_templates', 'find_id_delete', {
+    id
+  })
+
+  return response.data
+}
