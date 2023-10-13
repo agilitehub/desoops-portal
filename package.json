@@ -29,6 +29,8 @@
   },
   "devDependencies": {
     "@ant-design/icons": "5.2.6",
+    "@apollo/client": "3.8.4",
+    "@chakra-ui/color-mode": "2.2.0",
     "@craco/craco": "7.1.0",
     "@fortawesome/fontawesome-svg-core": "6.4.2",
     "@fortawesome/free-regular-svg-icons": "6.4.2",
@@ -43,6 +45,7 @@
     "deep-diff": "1.0.2",
     "deso-protocol": "2.5.0",
     "firebase": "10.4.0",
+    "graphql": "16.8.1",
     "immutability-helper": "3.1.1",
     "lodash": "4.17.21",
     "moment": "2.29.4",
