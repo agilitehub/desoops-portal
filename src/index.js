@@ -1,18 +1,19 @@
 import React from 'react'
-import { Provider, useSelector } from 'react-redux'
+import { Provider } from 'react-redux'
 import { createRoot } from 'react-dom/client'
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
 import { DeSoIdentityProvider } from 'react-deso-protocol'
+import { ColorModeProvider } from '@chakra-ui/color-mode'
 
 // Utilities
 import { initAgilite } from './custom/lib/agilite-controller'
 import Store from './store'
-import Core from './core/components/core'
+// import Core from './core/components/core'
+import App from './custom/app'
 import Enums from './custom/lib/enums'
 
-// Import default Stylesheet for application
-import './index.sass'
+import './custom/styles/index.sass'
 
 // Nullify console outputs for production
 if (process.env.NODE_ENV === 'production') {
@@ -44,16 +45,18 @@ if (process.env.REACT_APP_FIREBASE_ENABLED === Enums.values.YES) {
 }
 
 // Initialize App
-const App = () => {
-  const state = useSelector((state) => state.core)
-  return <Core state={state} />
-}
+// const App = () => {
+//   const state = useSelector((state) => state.core)
+//   return <Core state={state} />
+// }
 const root = createRoot(document.getElementById(Enums.values.DIV_ROOT))
 
 root.render(
   <Provider store={Store}>
     <DeSoIdentityProvider>
-      <App />
+      <ColorModeProvider>
+        <App />
+      </ColorModeProvider>
     </DeSoIdentityProvider>
   </Provider>
 )
