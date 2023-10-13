@@ -1,0 +1,39 @@
+// colors
+$primary1: #ffffff
+$background: #F7F9F9
+$text-color1: #2B2D2D
+$border-color: #E4EBEB
+
+$primary1-dark: #343641
+$background-dark: #444654
+$text-color1-dark: #C9CDD3
+$border-color-dark: #2B2B32
+
+$white: #ffffff
+$black: #000000
+
+// media queries
+=xxl
+  @media only screen and (min-width: "1600px")
+      @content
+=xl
+  @media only screen and (min-width: "1200px") and (max-width: "1599px")
+      @content
+=lg
+  @media only screen and (min-width: "992px") and (max-width: "1199px")
+      @content 
+=md
+  @media only screen and (min-width: "768px") and (max-width: "991px")
+      @content
+=sm
+  @media only screen and (min-width: "576px") and (max-width: "767px")
+      @content
+=xs
+  @media only screen and (max-width: "575px")
+      @content
+
+// theme
+=dark
+    @at-root body.chakra-ui-dark &
+        @content
+
