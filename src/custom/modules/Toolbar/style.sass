@@ -1,0 +1,19 @@
+@import custom/styles/helpers
+
+.layout
+    margin: 0
+    padding: 0
+    border-bottom: 1px solid $border-color
+    +dark
+        border-bottom: 1px solid $border-color-dark
+
+.header
+    display: flex,
+    flex-direction: row
+    justify-content: space-between
+    background-color: $primary1
+    height: 60px
+    +dark
+        background-color: $primary1-dark
+    +xs
+        height: 45px

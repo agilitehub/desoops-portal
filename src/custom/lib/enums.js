@@ -32,6 +32,10 @@ const Enums = {
   defaults: {
     USER_SEARCH_NUM_TO_FETCH: 20
   },
+  colorMode: {
+    LIGHT: 'light',
+    DARK: 'dark'
+  },
   paymentStatuses: {
     QUEUED: 'Queued',
     IN_PROGRESS: 'In Progress',
