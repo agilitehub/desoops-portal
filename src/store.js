@@ -2,12 +2,8 @@ import { legacy_createStore as createStore, combineReducers, applyMiddleware } f
 import Thunk from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension'
 
-// Utilities
-import Enums from './custom/lib/enums'
-
-// Reducers
-import coreReducer from './core/utils/reducer'
-import customReducer from './custom/reducer'
+import Enums from 'lib/enums'
+import coreReducer from 'reducer'
 
 const devTools =
   process.env.NODE_ENV === Enums.values.ENV_PRODUCTION
@@ -15,8 +11,7 @@ const devTools =
     : composeWithDevTools(applyMiddleware(Thunk))
 
 const reducers = {
-  core: coreReducer.reducer,
-  custom: customReducer
+  core: coreReducer
 }
 
 const store = createStore(combineReducers(reducers), {}, devTools)

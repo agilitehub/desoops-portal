@@ -53,4 +53,5 @@ export const {
   setLeftMenu,
   setDeSoPrice
 } = slice.actions
+
 export default slice.reducer

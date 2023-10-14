@@ -80,6 +80,7 @@ const App = () => {
         dispatch(setConfigData(tmpConfigData))
 
         // Retrieve Distribution Templates from Agilit-e
+        console.log(currentUser)
         tmpTemplates = await getDistributionTemplates(currentUser.PublicKeyBase58Check)
         tmpTemplates.sort((a, b) => (a.name > b.name ? 1 : -1))
 
