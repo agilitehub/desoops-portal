@@ -1,6 +1,6 @@
 import React from 'react'
 
-import logo from 'custom/assets/deso-ops-logo-full.png'
+import logo from 'assets/deso-ops-logo-full.png'
 
 import './style.sass'
 

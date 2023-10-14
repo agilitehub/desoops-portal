@@ -12,7 +12,7 @@ import { coreState } from '../utils/core-state'
 // Components
 import TabNavigation from './TabNavigation'
 import Toolbar from './Toolbar'
-import App from '../../custom/app'
+import App from 'app'
 
 // Theme
 import { darkTheme, lightTheme } from '../utils/antd-theme'

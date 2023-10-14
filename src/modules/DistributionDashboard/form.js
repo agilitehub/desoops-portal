@@ -37,11 +37,11 @@ const reducer = (state, newState) => ({ ...state, ...newState })
 
 const _BatchTransactionsForm = () => {
   const dispatch = useDispatch()
-  const desoData = useSelector((state) => state.custom.desoData)
-  const configData = useSelector((state) => state.custom.configData)
-  const distributionTemplates = useSelector((state) => state.custom.distributionTemplates)
+  const desoData = useSelector((state) => state.core.desoData)
+  const configData = useSelector((state) => state.core.configData)
+  const distributionTemplates = useSelector((state) => state.core.distributionTemplates)
   const [state, setState] = useReducer(reducer, distributionDashboardState(configData.feePerTransactionUSD))
-  const { isTablet, isSmartphone, isMobile } = useSelector((state) => state.custom.userAgent)
+  const { isTablet, isSmartphone, isMobile } = useSelector((state) => state.core.userAgent)
 
   const styleProps = {
     divider: { margin: '4px 0', borderBlockStart: 0 },

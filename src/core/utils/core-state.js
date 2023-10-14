@@ -1,5 +1,5 @@
 import Theme from './theme'
-import App from '../../custom/app'
+import App from 'app'
 
 export const coreState = () => {
   return {

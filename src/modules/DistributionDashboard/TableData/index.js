@@ -3,10 +3,10 @@ import { Table, Popover, Image, App } from 'antd'
 import { CheckCircleOutlined, CloseCircleOutlined, ReloadOutlined } from '@ant-design/icons'
 import { cloneDeep } from 'lodash'
 
-import theme from '../../../../core/utils/theme'
+import theme from 'core/utils/theme'
 import { updateHodlers } from '../controller'
-import Enums from '../../../lib/enums'
-import { copyTextToClipboard } from '../../../lib/utils'
+import Enums from 'lib/enums'
+import { copyTextToClipboard } from 'lib/utils'
 
 const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
   const [tableData, setTableData] = useState([])

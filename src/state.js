@@ -35,17 +35,11 @@ const userAgent = {
   isSmartphone: false
 }
 
-const leftMenu = {
-  open: false,
-  activeMenu: 'home'
-}
-
-export const customState = () => {
+export const coreState = () => {
   return {
     desoData,
     configData,
     distributionTemplates: [],
-    userAgent,
-    leftMenu
+    userAgent
   }
 }

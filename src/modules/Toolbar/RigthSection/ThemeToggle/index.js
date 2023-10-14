@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons'
 
 import './style.sass'
-import Enums from 'custom/lib/enums'
+import Enums from 'lib/enums'
 
 const ThemeToggle = () => {
   const { colorMode, toggleColorMode } = useColorMode()

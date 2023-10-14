@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { customState } from './state'
+import { coreState } from 'state'
 
-const initialState = customState()
+const initialState = coreState()
 
 const slice = createSlice({
-  name: 'custom',
+  name: 'core',
   initialState,
   reducers: {
     resetState: (state) => {
@@ -35,9 +35,6 @@ const slice = createSlice({
       state.userAgent.isMobile = data.payload.isMobile
       state.userAgent.isTablet = data.payload.isTablet
       state.userAgent.isSmartphone = data.payload.isSmartphone
-    },
-    setLeftMenu: (state, data) => {
-      state.leftMenu = data.payload
     }
   }
 })

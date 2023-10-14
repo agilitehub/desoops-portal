@@ -7,16 +7,15 @@ import { DeSoIdentityProvider } from 'react-deso-protocol'
 import { ColorModeProvider } from '@chakra-ui/color-mode'
 
 // Utilities
-import { initAgilite } from './custom/lib/agilite-controller'
+import { initAgilite } from 'lib/agilite-controller'
 import Store from './store'
-// import Core from './core/components/core'
-import App from './custom/app'
-import Enums from './custom/lib/enums'
+import App from 'app'
+import Enums from 'lib/enums'
 
-import './custom/styles/index.sass'
+import 'styles/index.sass'
 
 // Nullify console outputs for production
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === Enums.values.ENV_PRODUCTION) {
   console.error = function () {}
   console.log = function () {}
   console.warn = function () {}
@@ -44,11 +43,6 @@ if (process.env.REACT_APP_FIREBASE_ENABLED === Enums.values.YES) {
   tmpAnalytics = getAnalytics(app)
 }
 
-// Initialize App
-// const App = () => {
-//   const state = useSelector((state) => state.core)
-//   return <Core state={state} />
-// }
 const root = createRoot(document.getElementById(Enums.values.DIV_ROOT))
 
 root.render(

@@ -29,7 +29,7 @@ const SetupCard = ({
   deviceType,
   isLoading
 }) => {
-  const distributionTemplates = useSelector((state) => state.custom.distributionTemplates)
+  const distributionTemplates = useSelector((state) => state.core.distributionTemplates)
 
   const handleButtonClick = () => {
     switch (rootState.distributeTo) {

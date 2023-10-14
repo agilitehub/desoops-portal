@@ -8,7 +8,7 @@ import { DownOutlined } from '@ant-design/icons'
 import './style.sass'
 
 const ToolbarDropDown = () => {
-  const profile = useSelector((state) => state.custom.desoData.profile)
+  const profile = useSelector((state) => state.core.desoData.profile)
 
   const handleGetItems = () => {
     const dropDownItems = {

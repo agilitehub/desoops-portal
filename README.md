@@ -1,4 +1,4 @@
-<center><img src="./src/custom/assets/deso-ops-logo-full.png" width="200" /></center>
+<center><img src="./src/assets/deso-ops-logo-full.png" width="200" /></center>
 
 # DeSoOps Portal
 

@@ -25,7 +25,7 @@ const Login = () => {
   })
 
   const { token } = theme.useToken()
-  const { isTablet, isSmartphone } = useSelector((state) => state.custom.userAgent)
+  const { isTablet, isSmartphone } = useSelector((state) => state.core.userAgent)
 
   const handleLogin = async () => {
     try {
