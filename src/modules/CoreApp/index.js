@@ -8,7 +8,7 @@ import React, { useContext, useEffect, useReducer } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DeSoIdentityContext } from 'react-deso-protocol'
 import { isMobile, isTablet } from 'react-device-detect'
-import { useLazyQuery, gql } from '@apollo/client'
+import { useLazyQuery } from '@apollo/client'
 
 // App Components
 import DistributionDashboard from 'modules/DistributionDashboard'
@@ -51,14 +51,9 @@ const CoreApp = () => {
 
   // Finalize DeSo Object once we have the user's DeSo data via GraphQL
   useEffect(() => {
-    console.log('loading', loading)
-    console.log('error', error)
-    console.log('data', data)
-
     const init = async () => {
       let tmpDeSoData = null
       if (!loading && !error && data) {
-        console.log('finalizing')
         // Finalize the DeSo Data Object for the current User
         tmpDeSoData = await finalizeInitialDeSoData(currentUser, desoData, data)
         dispatch(setDeSoData(tmpDeSoData))
@@ -72,13 +67,6 @@ const CoreApp = () => {
 
   // Determine the State of the page and what loads
   useEffect(() => {
-    console.log('-START-')
-    console.log('currentUser', currentUser)
-    console.log('isLoading', isLoading)
-    console.log('userReturned', state.userReturned)
-    console.log('initInProgress', state.initializing)
-    console.log('-END-')
-
     // This function gets a user's profile, balance, and other DeSo data
     // and sets it in the Redux store.
     const init = async () => {
@@ -89,7 +77,7 @@ const CoreApp = () => {
 
       try {
         newState = await renderApp(currentUser, isLoading, state)
-        console.log('renderState', newState.renderState)
+
         switch (newState.renderState) {
           case Enums.appRenderState.SIGNING_IN:
           case Enums.appRenderState.LAUNCH:
@@ -194,6 +182,7 @@ const CoreApp = () => {
     case Enums.appRenderState.SIGNING_IN:
       return (
         <>
+          <Toolbar />
           <Spinner tip={state.spinTip} />
           <center>
             <img src={logo} alt={process.env.REACT_APP_NAME} style={{ width: 300 }} />
@@ -208,7 +197,12 @@ const CoreApp = () => {
         </>
       )
     case Enums.appRenderState.LOGIN:
-      return <Login />
+      return (
+        <>
+          <Toolbar />
+          <Login />
+        </>
+      )
   }
 }
 
