@@ -24,6 +24,12 @@ const Enums = {
     SELECTED_USERS: 'Selected Users in Table',
     DESO_ESSENTIALS_PLAYLIST_URL: 'https://www.youtube.com/playlist?list=PLuSeo-NlSN_lXF3wXTmLxnsQQsyIqlb8r'
   },
+  heroSwap: {
+    THEME_LIGHT: 'default',
+    THEME_DARK: 'dark-icy',
+    DESPOSIT_TICKER: 'DESO',
+    DESTINATION_TICKER: 'DUSD'
+  },
   paymentTypes: {
     DESO: '$DESO',
     DAO: 'DAO',

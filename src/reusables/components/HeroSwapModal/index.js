@@ -2,16 +2,26 @@
 // Using react-player and a passed url, the video will be displayed in the Modal.
 // additional props can be passed to this component to control the video player.
 import React, { useState } from 'react'
-
 import { Row, Modal, Col, Spin } from 'antd'
-import Enums from '../../../lib/enums'
+import { useColorMode } from '@chakra-ui/color-mode'
+import Enums from 'lib/enums'
+
+import './style.sass'
 
 const HeroSwapModal = ({ isOpen, onCloseModal }) => {
   const [isLoading, setIsLoading] = useState(true)
+  const { colorMode } = useColorMode()
 
   const handleLoad = () => {
     setIsLoading(false)
   }
+
+  // URL Variables
+  const url = process.env.REACT_APP_HERO_SWAP_URL
+  const theme = colorMode === Enums.colorMode.LIGHT ? Enums.heroSwap.THEME_LIGHT : Enums.heroSwap.THEME_DARK
+  const depositTicker = Enums.heroSwap.DESPOSIT_TICKER
+  const destinationTicker = Enums.heroSwap.DESTINATION_TICKER
+  const affiliateAddress = Enums.values.DESO_OPS_PUBLIC_KEY
 
   return (
     <Modal
@@ -23,26 +33,19 @@ const HeroSwapModal = ({ isOpen, onCloseModal }) => {
       cancelButtonProps={{ style: { display: 'none' } }}
       destroyOnClose
     >
-      <Row style={{ height: 400 }}>
+      <Row className='cs-iframe-wrapper'>
         <Col span={24}>
           {isLoading && (
-            <center
-              style={{
-                height: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexDirection: 'column'
-              }}
-            >
+            <div className='cs-spin-wrapper'>
               <Spin />
-              <span style={{ fontSize: 16, marginTop: 10 }}>Loading...</span>
-            </center>
+              <span>Loading...</span>
+            </div>
           )}
           <iframe
             title='DeSoOps Coin Swap'
-            style={{ width: '100%', height: '100%', display: isLoading ? 'none' : 'block' }}
-            src={`https://heroswap.com/widget?depositTicker=SOL&destinationTicker=DESO&affiliateAddress=${Enums.values.DESO_OPS_PUBLIC_KEY}`}
+            className='cs-iframe'
+            style={{ display: isLoading ? 'none' : 'block' }}
+            src={`${url}?depositTicker=${depositTicker}&destinationTicker=${destinationTicker}&affiliateAddress=${affiliateAddress}&theme=${theme}`}
             onLoad={handleLoad}
           />
         </Col>
