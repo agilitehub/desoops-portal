@@ -1,0 +1,88 @@
+@import styles/helpers
+
+.login-wrapper
+  justify-content: center
+  min-height: 100vh
+  align-items: center
+
+  .row
+    margin-top: -100px
+    +xs
+      margin-top: -20px
+
+.login-card
+  border: none
+  background: none
+  padding-top: 24px
+  padding-bottom: 24px
+
+.login-card-content
+    padding-top: 20px
+    padding-bottom: 20px
+    background: $primary1
+    border-radius: 30px
+    +dark
+        background: $primary1-dark
+    +xs
+      border-radius: 12px
+
+.login-logo
+  width: 300px
+  +xs
+    width: 200px
+
+.deso-btn-link
+  cursor: pointer
+  font-size: 17px
+  color: $blue1
+
+.login-btn-wrapper
+  display: flex
+  justify-content: center
+  display: flex
+  justify-content: center
+
+  button
+    display: flex
+    flex-direction: row
+    align-items: center
+    width: 'auto'
+    padding: 8px
+    gap: 12px
+    border-radius: 8px
+    border: 1px $black solid
+    cursor: pointer
+
+    .icon
+      font-size: 20px
+      margin-left: 10px
+      +xs
+        font-size: 16px
+        margin-left: 5px
+    .text
+      font-size: 16px
+      +xs
+        font-size: 14px
+
+.sign-in-btn
+  color: $white
+  background: $blue1
+  margin-right: 10px
+
+.coin-swap-btn
+  color: $white
+  background: $green1
+
+.check-wrapper
+  display: flex
+  justify-content: center
+  padding-left: 5px
+  padding-right: 5px
+
+.check-color
+  color: $orange1
+
+.check-label
+  font-size: 16px
+  +xs
+    font-size: 14px

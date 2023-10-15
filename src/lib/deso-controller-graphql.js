@@ -56,18 +56,12 @@ export const getDeSoConfig = () => {
  *
  * @returns {Promise} A promise that resolves a user object, or rejects when an error occurs.
  */
-export const desoLogin = () => {
-  return new Promise((resolve, reject) => {
-    ;(async () => {
-      try {
-        const response = await identity.login({ accessLevelRequest: 4 })
-        resolve(response)
-      } catch (e) {
-        reject(e)
-        console.error(e)
-      }
-    })()
-  })
+export const desoLogin = async () => {
+  try {
+    return await identity.login()
+  } catch (e) {
+    throw e
+  }
 }
 
 /**

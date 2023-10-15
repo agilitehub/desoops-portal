@@ -1,18 +1,19 @@
 import React, { useReducer } from 'react'
-import { identity, configure } from 'deso-protocol'
-import { Col, Row, message, theme, Card, Button } from 'antd'
+import { configure } from 'deso-protocol'
+import { Col, Row, Card, Button } from 'antd'
 import { faCheckCircle, faBitcoinSign } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { LoginOutlined } from '@ant-design/icons'
 
 // Utils
-import styles from './style.module.sass'
-import logo from '../../assets/deso-ops-logo-full.png'
-import VideoModal from '../../reusables/components/VideoModal'
-import Enums from '../../lib/enums'
-import { useSelector } from 'react-redux'
-import { getDeSoConfig } from '../../lib/deso-controller'
-import HeroSwapModal from '../../reusables/components/HeroSwapModal'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import logo from 'assets/deso-ops-logo-full.png'
+import { getDeSoConfig } from 'lib/deso-controller'
+import Enums from 'lib/enums'
+import VideoModal from 'reusables/components/VideoModal'
+import HeroSwapModal from 'reusables/components/HeroSwapModal'
+
+import './style.sass'
+import { desoLogin } from 'lib/deso-controller-graphql'
 
 configure(getDeSoConfig())
 
@@ -24,19 +25,6 @@ const Login = () => {
     openHeroSwapModal: false
   })
 
-  const { token } = theme.useToken()
-  const { isTablet, isSmartphone } = useSelector((state) => state.core.userAgent)
-
-  const handleLogin = async () => {
-    try {
-      // setState({ loading: true })
-      await identity.login()
-    } catch (e) {
-      // setState({ loading: false })
-      message.error(e)
-    }
-  }
-
   const handleWatchIntroduction = () => {
     setState({ openVideoModal: true })
   }
@@ -45,92 +33,62 @@ const Login = () => {
     setState({ openHeroSwapModal: true })
   }
 
-  const styleProps = {
-    rowMarginTop: isTablet ? -100 : isSmartphone ? -20 : -100,
-    contentBorderRadius: isSmartphone ? 12 : 30,
-    bulletPointFontSize: isSmartphone ? 14 : 16,
-    logoWidth: isSmartphone ? 200 : 300
-  }
-
   return (
     <>
-      <Row className={styles.wrapper}>
+      <Row className='login-wrapper'>
         <Col span={24}>
           <Row justify='center'>
             <Col span={24}>
-              <Card type='inner' size='small' className={styles.card}>
-                <Row justify='center' style={{ marginTop: styleProps.rowMarginTop }}>
-                  <Col
-                    className={styles.cardContent}
-                    style={{
-                      borderRadius: styleProps.contentBorderRadius
-                    }}
-                    xs={24}
-                    sm={22}
-                    md={16}
-                    lg={14}
-                    xl={12}
-                    xxl={10}
-                  >
+              <Card type='inner' size='small' className='login-card'>
+                <Row justify='center' className='row'>
+                  <Col className='login-card-content' xs={24} sm={22} md={16} lg={14} xl={12} xxl={10}>
                     <center>
-                      <img src={logo} alt='DeSoOps Portal' style={{ width: styleProps.logoWidth }} />
+                      <img src={logo} alt={process.env.REACT_APP_NAME} className='login-logo' />
                       <h1 style={{ marginTop: -20 }}> PORTAL SIGN-IN</h1>
                     </center>
-                    {/* {!state.loading ? ( */}
                     <Row justify='center' style={{ marginBottom: 20 }}>
                       <Col>
                         <span>
                           New to DeSo?
-                          <Button
-                            type='link'
-                            style={{ cursor: 'pointer', color: token.colorPrimary, fontSize: 17 }}
-                            onClick={handleWatchIntroduction}
-                          >
+                          <Button type='link' className='deso-btn-link' onClick={handleWatchIntroduction}>
                             {' '}
                             Watch Introduction
                           </Button>
                         </span>
                       </Col>
                     </Row>
-                    {/* // ) : null} */}
 
                     <Row justify='space-around' gutter={[12, 12]}>
-                      <Col
-                        span={24}
-                        className={styles.btnWrapper}
-                        style={{ display: 'flex', justifyContent: 'center' }}
-                      >
-                        <button className={styles.signInButton} onClick={handleLogin}>
-                          <div className={styles.icon}>
+                      <Col span={24} className='login-btn-wrapper'>
+                        <button className='sign-in-btn' onClick={desoLogin}>
+                          <div className='icon'>
                             <LoginOutlined style={{ fontSize: 20 }} />
                           </div>
-                          <span className={styles.text}>SIGN IN WITH DESO</span>
+                          <span className='text'>SIGN IN WITH DESO</span>
                         </button>
-                        <button className={styles.coinSwapButton} onClick={handleLaunchHeroSwap}>
-                          <div className={styles.icon}>
+                        <button className='coin-swap-btn' onClick={handleLaunchHeroSwap}>
+                          <div className='icon'>
                             <FontAwesomeIcon style={{ fontSize: 20 }} icon={faBitcoinSign} />
                           </div>
-                          <span className={styles.text}>COIN SWAP</span>
+                          <span className='text'>COIN SWAP</span>
                         </button>
                       </Col>
                       <Col span={24}>
-                        <div style={{ display: 'flex', justifyContent: 'center', paddingLeft: 5, paddingRight: 5 }}>
+                        <div className='check-wrapper'>
                           <div>
                             <p style={{ marginTop: 0 }}>
-                              <FontAwesomeIcon className={styles.checkColor} icon={faCheckCircle} />{' '}
-                              <span style={{ fontSize: styleProps.bulletPointFontSize }}>Payment Distributions</span>
+                              <FontAwesomeIcon className='check-color' icon={faCheckCircle} />{' '}
+                              <span className='check-label'>Payment Distributions</span>
                             </p>
                             <p style={{ marginTop: -10 }}>
-                              <FontAwesomeIcon className={styles.checkColor} icon={faCheckCircle} />{' '}
-                              <span style={{ fontSize: styleProps.bulletPointFontSize }}>
+                              <FontAwesomeIcon className='check-color' icon={faCheckCircle} />{' '}
+                              <span className='check-label'>
                                 Distribute to DAO Token, Creator Coin, and NFT Holders
                               </span>
                             </p>
                             <p style={{ marginTop: -10 }}>
-                              <FontAwesomeIcon className={styles.checkColor} icon={faCheckCircle} />{' '}
-                              <span style={{ fontSize: styleProps.bulletPointFontSize }}>
-                                Distribute $DESO, DAO Tokens, and Creator Coins
-                              </span>
+                              <FontAwesomeIcon className='check-color' icon={faCheckCircle} />{' '}
+                              <span className='check-label'>Distribute $DESO, DAO Tokens, and Creator Coins</span>
                             </p>
                           </div>
                         </div>
