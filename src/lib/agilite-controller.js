@@ -44,6 +44,16 @@ export const getDistributionTemplates = async (publicKey) => {
     filter: JSON.stringify({ publicKey })
   })
 
+  response.data.sort((a, b) => (a.name > b.name ? 1 : -1))
+
+  // Add a key property to each template using _id
+  response.data = response.data.map((template) => {
+    return {
+      ...template,
+      key: template._id
+    }
+  })
+
   return response.data
 }
 

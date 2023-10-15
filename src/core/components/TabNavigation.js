@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Tabs } from 'antd'
-import App from 'app'
+import App from 'modules/CoreApp'
 
 const TabNavigation = (props) => {
   const CustomRootContent = props.state.rootContent || App

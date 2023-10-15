@@ -5,11 +5,12 @@ import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
 import { DeSoIdentityProvider } from 'react-deso-protocol'
 import { ColorModeProvider } from '@chakra-ui/color-mode'
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 
 // Utilities
 import { initAgilite } from 'lib/agilite-controller'
-import Store from './store'
-import App from 'app'
+import Store from 'store'
+import App from 'modules/CoreApp'
 import Enums from 'lib/enums'
 
 import 'styles/index.sass'
@@ -21,6 +22,12 @@ if (process.env.NODE_ENV === Enums.values.ENV_PRODUCTION) {
   console.warn = function () {}
   console.info = function () {}
 }
+
+// Init Apollo Client
+const client = new ApolloClient({
+  uri: process.env.REACT_APP_GQL_API_URL,
+  cache: new InMemoryCache()
+})
 
 // Initiate Agilite Controller
 initAgilite()
@@ -47,11 +54,13 @@ const root = createRoot(document.getElementById(Enums.values.DIV_ROOT))
 
 root.render(
   <Provider store={Store}>
-    <DeSoIdentityProvider>
-      <ColorModeProvider>
-        <App />
-      </ColorModeProvider>
-    </DeSoIdentityProvider>
+    <ApolloProvider client={client}>
+      <DeSoIdentityProvider>
+        <ColorModeProvider>
+          <App />
+        </ColorModeProvider>
+      </DeSoIdentityProvider>
+    </ApolloProvider>
   </Provider>
 )
 

@@ -30,7 +30,8 @@ const Enums = {
     CREATOR: 'CC'
   },
   defaults: {
-    USER_SEARCH_NUM_TO_FETCH: 20
+    USER_SEARCH_NUM_TO_FETCH: 20,
+    UPDATE_DESO_PRICE_INTERVAL_SEC: 30000
   },
   colorMode: {
     LIGHT: 'light',
@@ -41,6 +42,16 @@ const Enums = {
     IN_PROGRESS: 'In Progress',
     SUCCESS: 'Success',
     FAILED: 'Failed'
+  },
+  appRenderState: {
+    INIT: 'init',
+    SIGNING_IN: 'signingIn',
+    LAUNCH: 'launch',
+    LOGIN: 'login'
+  },
+  spinnerMessages: {
+    INIT: 'Initializing DeSoOps Portal...',
+    SIGNING_IN: 'Signing In...'
   },
   messages: {
     UNKNOWN_ERROR: 'Unknown Error Occured. Please check console',
