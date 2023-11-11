@@ -1,7 +1,7 @@
 import React from 'react'
 
 import ToolbarDropDown from './ToolbarDropDown'
-import ThemeToggle from './ThemeToggle'
+// import ThemeToggle from './ThemeToggle'
 
 import './style.sass'
 import { useSelector } from 'react-redux'
@@ -11,7 +11,7 @@ const RightSection = () => {
 
   return (
     <div className='right-section'>
-      <ThemeToggle />
+      {/* <ThemeToggle /> */}
       {profile.publicKey ? <ToolbarDropDown /> : null}
     </div>
   )

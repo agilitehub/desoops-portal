@@ -24,7 +24,7 @@ const desoConfigure = {
   appName: process.env.REACT_APP_NAME,
   spendingLimitOptions: {
     // IsUnlimited: true
-    GlobalDESOLimit: 0.5 * 1e9, // 100 Deso
+    GlobalDESOLimit: 0.5 * 1e9, // 0.1 Deso
     CreatorCoinOperationLimitMap: {
       '': {
         any: 'UNLIMITED'
@@ -96,32 +96,36 @@ export const finalizeInitialDeSoData = async (currentUser, desoData, gqlData) =>
   let daoBalance = 0
   let ccBalance = 0
   let tokenBalance = 0
+  let desoBalance = 0
   let newDeSoData = null
 
   try {
     newDeSoData = cloneDeep(desoData)
     newDeSoData.profile.publicKey = currentUser.PublicKeyBase58Check
     newDeSoData.profile.username = currentUser.ProfileEntryResponse.Username
-    newDeSoData.profile.totalFollowing = currentUser.PublicKeysBase58CheckFollowedByUser.length
     newDeSoData.profile.profilePicUrl = await generateProfilePicUrl(currentUser.PublicKeyBase58Check)
 
     // Fetch the current price of DeSo
+    desoBalance = currentUser.ProfileEntryResponse.DESOBalanceNanos / Enums.values.NANO_VALUE
     newDeSoData.desoPrice = await getDeSoPricing()
 
     // Populate the GQL Data
     gqlData = gqlData.accountByPublicKey.tokenBalancesAsCreator
 
     for (const entry of gqlData.nodes) {
-      tokenBalance = entry.balanceNanos / Enums.values.NANO_VALUE / Enums.values.NANO_VALUE
-      tokenBalance = Math.floor(tokenBalance * 10000) / 10000
-
       if (entry.isDaoCoin) {
+        tokenBalance = entry.balanceNanos / Enums.values.NANO_VALUE / Enums.values.NANO_VALUE
+        tokenBalance = Math.floor(tokenBalance * 10000) / 10000
         daoBalance = tokenBalance
       } else {
+        tokenBalance = entry.balanceNanos / Enums.values.NANO_VALUE
+        tokenBalance = Math.floor(tokenBalance * 10000) / 10000
         ccBalance = tokenBalance
       }
     }
 
+    newDeSoData.profile.desoBalanceUSD = Math.floor(desoBalance * newDeSoData.desoPrice * 100) / 100
+    newDeSoData.profile.desoBalance = Math.floor(desoBalance * 10000) / 10000
     newDeSoData.profile.daoBalance = daoBalance
     newDeSoData.profile.ccBalance = ccBalance
 
@@ -152,6 +156,7 @@ export const getDeSoData = (publicKey, desoDataState, getFollowing = false) => {
         desoData = cloneDeep(desoDataState)
 
         desoPrice = await getDeSoPricing()
+
         const { daoHodlers, daoBalance } = await getDAOHodlersAndBalance(publicKey)
         daoHodlings = await getDAOHodlings(publicKey)
         const { ccHodlers, ccBalance } = await getCCHodlersAndBalance(publicKey)
@@ -171,7 +176,6 @@ export const getDeSoData = (publicKey, desoDataState, getFollowing = false) => {
         desoData.profile.daoBalance = daoBalance
         desoData.profile.ccBalance = ccBalance
         desoData.profile.totalFollowers = followers
-        desoData.profile.totalFollowing = following
         desoData.profile.daoHodlers = daoHodlers
         desoData.profile.daoHodlings = daoHodlings
         desoData.profile.ccHodlers = ccHodlers

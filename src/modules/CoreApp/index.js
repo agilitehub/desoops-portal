@@ -127,33 +127,6 @@ const CoreApp = () => {
 
             break
         }
-        // const { daoHodlers, daoBalance } = await getDAOHodlersAndBalance(currentUser.PublicKeyBase58Check)
-        // daoHodlings = await getDAOHodlings(currentUser.PublicKeyBase58Check)
-
-        // const { ccHodlers, ccBalance } = await getCCHodlersAndBalance(currentUser.PublicKeyBase58Check)
-        // ccHodlings = await getCCHodlings(currentUser.PublicKeyBase58Check)
-
-        // We know how many the current User is following, but we don't know how many are following the current User
-        // followers = await getTotalFollowersOrFollowing(currentUser.PublicKeyBase58Check, Enums.values.FOLLOWERS)
-
-        // Calculate the user's DeSo balance in DeSo and USD
-        // desoBalance = currentUser.ProfileEntryResponse.DESOBalanceNanos / Enums.values.NANO_VALUE
-        // desoBalanceUSD = Math.floor(desoBalance * tmpDeSoData.desoPrice * 100) / 100
-        // desoBalance = Math.floor(desoBalance * 10000) / 10000
-
-        // Update the tmpDeSoData Profile object
-        // tmpDeSoData.profile.desoBalance = desoBalance
-        // tmpDeSoData.profile.desoBalanceUSD = desoBalanceUSD
-
-        // tmpDeSoData.profile.daoBalance = daoBalance
-        // tmpDeSoData.profile.ccBalance = ccBalance
-        // tmpDeSoData.profile.totalFollowers = followers
-        // tmpDeSoData.profile.daoHodlers = daoHodlers
-        // tmpDeSoData.profile.daoHodlings = daoHodlings
-        // tmpDeSoData.profile.ccHodlers = ccHodlers
-        // tmpDeSoData.profile.ccHodlings = ccHodlings
-
-        // Set the DeSo data in the redux store
       } catch (e) {
         console.error(e)
       }

@@ -130,7 +130,6 @@ export const getDeSoData = (publicKey, desoDataState, getFollowing = false) => {
         desoData.profile.daoBalance = daoBalance
         desoData.profile.ccBalance = ccBalance
         desoData.profile.totalFollowers = followers
-        desoData.profile.totalFollowing = following
         desoData.profile.daoHodlers = daoHodlers
         desoData.profile.daoHodlings = daoHodlings
         desoData.profile.ccHodlers = ccHodlers
