@@ -43,7 +43,8 @@ const CoreApp = () => {
   const { colorMode } = useColorMode()
   const desoData = useSelector((state) => state.core.desoData)
   const { currentUser, isLoading } = useContext(DeSoIdentityContext)
-  const [getInitialDeSoData, { loading, error, data }] = useLazyQuery(GQL_GET_INITIAL_DESO_DATA)
+  const [getInitialDeSoData, { loading: loading1, error: error1, data: data1 }] =
+    useLazyQuery(GQL_GET_INITIAL_DESO_DATA)
   const [state, setState] = useReducer(reducer, initialState)
 
   // Determine Device Type
@@ -55,18 +56,19 @@ const CoreApp = () => {
   // Finalize DeSo Object once we have the user's DeSo data via GraphQL
   useEffect(() => {
     const init = async () => {
-      let tmpDeSoData = null
-      if (!loading && !error && data) {
+      let tmpdata = null
+
+      if (!loading1 && !error1 && data1) {
         // Finalize the DeSo Data Object for the current User
-        tmpDeSoData = await finalizeInitialDeSoData(currentUser, desoData, data)
-        dispatch(setDeSoData(tmpDeSoData))
+        tmpdata = await finalizeInitialDeSoData(currentUser, desoData, data1)
+        dispatch(setDeSoData(tmpdata))
         setState({ initializing: false })
       }
     }
 
     init()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, error, data])
+  }, [loading1, error1, data1])
 
   // Determine the State of the page and what loads
   useEffect(() => {
@@ -102,7 +104,7 @@ const CoreApp = () => {
             dispatch(setDistributionTemplates(tmpTemplates))
 
             // Next, we need to fetch the rest of the user's DeSo data
-            if (!data) {
+            if (!data1) {
               gqlProps = {
                 variables: {
                   publicKey: currentUser.PublicKeyBase58Check,
@@ -120,7 +122,7 @@ const CoreApp = () => {
             } else {
               // We already have the user's DeSo data via GraphQL
               // Finalize the DeSo Data Object for the current User
-              const tmpDeSoData = await finalizeInitialDeSoData(currentUser, desoData, data)
+              const tmpDeSoData = await finalizeInitialDeSoData(currentUser, desoData, data1)
               dispatch(setDeSoData(tmpDeSoData))
               setState({ initializing: false })
             }

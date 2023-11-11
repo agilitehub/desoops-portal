@@ -32,6 +32,9 @@ import {
   getConfigData,
   updateDistributionTemplate
 } from '../../lib/agilite-controller'
+import { GQL_GET_HODLERS } from 'lib/graphql-models'
+import { useLazyQuery } from '@apollo/client'
+import { finalizeHodlers } from 'lib/deso-controller-graphql'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
@@ -42,6 +45,7 @@ const _BatchTransactionsForm = () => {
   const distributionTemplates = useSelector((state) => state.core.distributionTemplates)
   const [state, setState] = useReducer(reducer, distributionDashboardState(configData.feePerTransactionUSD))
   const { isTablet, isSmartphone, isMobile } = useSelector((state) => state.core.userAgent)
+  const [getHodlers, { loading: loading2, error: error2, data: data2 }] = useLazyQuery(GQL_GET_HODLERS)
 
   const styleProps = {
     divider: { margin: '4px 0', borderBlockStart: 0 },
@@ -49,6 +53,21 @@ const _BatchTransactionsForm = () => {
   }
 
   const deviceType = { isSmartphone, isTablet, isMobile }
+
+  useEffect(() => {
+    const init = async () => {
+      let tmpdata = null
+
+      if (!loading2 && !error2 && data2) {
+        tmpdata = await finalizeHodlers(data2)
+        const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(tmpdata)
+        setState({ finalHodlers, tokenTotal, selectedTableKeys, loading: false, setupModfied: false })
+      }
+    }
+
+    init()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading2, error2, data2])
 
   useEffect(() => {
     let rulesEnabled = false
@@ -200,7 +219,7 @@ const _BatchTransactionsForm = () => {
       console.error(e)
     }
 
-    setState({ loading: false })
+    setState({ loading: false, setupModfied: true })
   }
 
   const handleDistributionType = async (distributionType) => {
@@ -229,7 +248,8 @@ const _BatchTransactionsForm = () => {
       tokenToUse: Enums.values.EMPTY_STRING,
       tokenToUseLabel: Enums.values.EMPTY_STRING,
       distributionAmount: null,
-      spreadAmountBasedOn: 'Ownership'
+      spreadAmountBasedOn: 'Ownership',
+      setupModfied: true
     })
   }
 
@@ -262,7 +282,8 @@ const _BatchTransactionsForm = () => {
       tokenTotal,
       selectedTableKeys,
       distributionAmount,
-      loading: false
+      loading: false,
+      setupModfied: true
     })
   }
 
@@ -287,13 +308,13 @@ const _BatchTransactionsForm = () => {
     const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(tmpHodlers)
 
     // Update State
-    setState({ finalHodlers, tokenTotal, selectedTableKeys, loading: false })
+    setState({ finalHodlers, tokenTotal, selectedTableKeys, loading: false, setupModfied: true })
   }
 
   const handleTokenToUse = async (tokenToUse, tokenToUseLabel) => {
     const finalHodlers = cloneDeep(state.finalHodlers)
     await calculateEstimatedPayment(finalHodlers, '')
-    setState({ finalHodlers, tokenToUse, tokenToUseLabel, distributionAmount: null })
+    setState({ finalHodlers, tokenToUse, tokenToUseLabel, distributionAmount: null, setupModfied: true })
   }
 
   const handleConfirmNFT = async (nftMetaData, nftHodlers, nftUrl) => {
@@ -312,7 +333,7 @@ const _BatchTransactionsForm = () => {
       message.error(e.message)
     }
 
-    setState({ loading: false })
+    setState({ loading: false, setupModfied: true })
   }
 
   const handleConfirmCustomList = async (userList) => {
@@ -323,6 +344,7 @@ const _BatchTransactionsForm = () => {
         finalHodlers,
         tokenTotal,
         selectedTableKeys,
+        setupModfied: true,
         customListModal: { ...state.customListModal, isOpen: false, userList }
       })
     } catch (e) {
@@ -331,6 +353,45 @@ const _BatchTransactionsForm = () => {
     }
 
     setState({ loading: false })
+  }
+
+  const handlePopulateTable = async () => {
+    let isDaoCoin = false
+    let gqlProps = null
+
+    try {
+      setState({ loading: true })
+
+      // Fetch Hodlers that need to be set up
+      switch (state.distributeTo) {
+        case Enums.values.DAO:
+        case Enums.values.CREATOR:
+          if (state.distributeTo === Enums.values.DAO) isDaoCoin = true
+
+          gqlProps = {
+            variables: {
+              publicKey: desoData.profile.publicKey,
+              tokenBalancesAsCreatorFilter: {
+                holder: {
+                  publicKey: {
+                    notEqualTo: desoData.profile.publicKey
+                  }
+                },
+                isDaoCoin: {
+                  in: isDaoCoin
+                }
+              },
+              orderBy: 'BALANCE_NANOS_DESC'
+            }
+          }
+
+          getHodlers(gqlProps)
+
+          break
+      }
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   const handleSelectTemplate = async (id) => {
@@ -541,6 +602,7 @@ const _BatchTransactionsForm = () => {
                       onSelectTemplate={handleSelectTemplate}
                       onDeleteTemplate={handleDeleteTemplate}
                       onSetTemplateName={handleSetTemplateName}
+                      onHandlePopulateTable={handlePopulateTable}
                       deviceType={deviceType}
                       isLoading={state.loading}
                       distributionTemplates={distributionTemplates}

@@ -12,3 +12,20 @@ export const GQL_GET_INITIAL_DESO_DATA = gql`
     }
   }
 `
+
+export const GQL_GET_HODLERS = gql`
+  query AccountByPublicKey($publicKey: String!, $tokenBalancesAsCreatorFilter: TokenBalanceFilter) {
+    accountByPublicKey(publicKey: $publicKey) {
+      tokenBalancesAsCreator(filter: $tokenBalancesAsCreatorFilter) {
+        nodes {
+          balanceNanos
+          isDaoCoin
+          holder {
+            username
+            publicKey
+          }
+        }
+      }
+    }
+  }
+`

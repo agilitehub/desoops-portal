@@ -135,6 +135,40 @@ export const finalizeInitialDeSoData = async (currentUser, desoData, gqlData) =>
   }
 }
 
+export const finalizeHodlers = async (gqlData) => {
+  let newEntry = null
+  let tokenBalance = 0
+  let result = []
+
+  try {
+    // Populate the GQL Data
+    gqlData = gqlData.accountByPublicKey.tokenBalancesAsCreator
+
+    for (const entry of gqlData.nodes) {
+      newEntry = desoUserModel()
+
+      newEntry.publicKey = entry.holder.publicKey
+      newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
+      newEntry.username = entry.holder.username
+
+      tokenBalance = entry.balanceNanos / Enums.values.NANO_VALUE
+
+      if (entry.isDaoCoin) {
+        tokenBalance = tokenBalance / Enums.values.NANO_VALUE
+      }
+
+      tokenBalance = Math.floor(tokenBalance * 10000) / 10000
+      newEntry.tokenBalance = tokenBalance
+
+      result.push(newEntry)
+    }
+
+    return result
+  } catch (e) {
+    throw e
+  }
+}
+
 /**
  * Fetches various data sets from the DeSo blockchain based on the provided public key.
  *

@@ -28,6 +28,7 @@ const SetupCard = ({
   onEditTemplate,
   onDeleteTemplate,
   onSetTemplateName,
+  onHandlePopulateTable,
   deviceType,
   isLoading
 }) => {
@@ -164,9 +165,20 @@ const SetupCard = ({
           items={tabItems}
         />
         <center>
+          <div style={{ display: 'block', marginTop: 15 }}>
+            <Button
+              size='large'
+              icon={<SaveOutlined />}
+              onClick={onHandlePopulateTable}
+              disabled={!rootState.rulesEnabled || rootState.isExecuting}
+              className={rootState.finalHodlers.length > 0 && rootState.setupModified ? 'btn-refresh' : 'btn-populate'}
+            >
+              {rootState.finalHodlers.length > 0 && rootState.setupModified ? 'Refresh Table' : 'Populate Table'}
+            </Button>
+          </div>
           {templateNameModal.id ? (
             <Button
-              size={deviceType.isTablet ? 'large' : 'medium'}
+              size='medium'
               type='primary'
               icon={<SaveOutlined />}
               className={
@@ -189,7 +201,7 @@ const SetupCard = ({
             </Button>
           ) : null}
           <Button
-            size={deviceType.isTablet ? 'large' : 'medium'}
+            size='medium'
             type='primary'
             icon={<SaveOutlined />}
             className={
