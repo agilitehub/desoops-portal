@@ -1,6 +1,6 @@
 import React, { useReducer } from 'react'
 import { App, Card, Button, Dropdown, Modal, Row, Col } from 'antd'
-import { DownOutlined, UserOutlined, ReloadOutlined, CopyOutlined, RollbackOutlined } from '@ant-design/icons'
+import { DownOutlined, UserOutlined, CopyOutlined, RollbackOutlined, WalletOutlined } from '@ant-design/icons'
 import { copyTextToClipboard } from '../../../lib/utils'
 import RandomizeDialogContent from './RandomizeDialog'
 import Enums from '../../../lib/enums'
@@ -68,17 +68,17 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
     })
   }
 
-  const handleRefreshDashboardValues = () => {
+  const handleRefreshWallet = () => {
     setState({ refreshLoading: true })
 
     modal.confirm({
-      title: 'Refresh Dashboard Values',
-      content: 'Are you sure you want to refresh the Dashboard values? This action cannot be undone.',
+      title: 'Refresh Wallet Balances',
+      content: 'Are you sure you want to refresh your Wallet values? This action cannot be undone.',
       okText: 'Confirm',
       okButtonProps: { className: 'modal-btn-confirm' },
       cancelButtonProps: { className: 'modal-btn-cancel' },
       onOk: () => {
-        handleRefreshDashboardValuesExtended()
+        handleRefreshWalletExtended()
       },
       onCancel: () => {
         setState({ refreshLoading: false })
@@ -86,7 +86,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
     })
   }
 
-  const handleRefreshDashboardValuesExtended = async () => {
+  const handleRefreshWalletExtended = async () => {
     await onRefreshWallet()
     message.success('Refresh Confirmed')
     setState({ refreshLoading: false })
@@ -202,7 +202,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
       bodyStyle={styleProps.bodyStyle}
       headStyle={styleProps.headStyle}
     >
-      <Row gutter={[16, 16]} style={{ textAlign: 'center' }}>
+      <Row gutter={[16, 16]} style={{ textAlign: 'center', marginTop: 6 }}>
         <Col span={6}>
           <Col span={24} style={styleProps.actionWrapper}>
             <Button
@@ -221,10 +221,10 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
             <Button
               shape='circle'
               style={styleProps.iconRefresh}
-              icon={<ReloadOutlined />}
+              icon={<WalletOutlined />}
               loading={state.refreshLoading}
               disabled={state.refreshLoading || rootState.isExecuting}
-              onClick={handleRefreshDashboardValues}
+              onClick={handleRefreshWallet}
             />
             <div style={styleProps.labelRefresh}>Refresh</div>
           </Col>
