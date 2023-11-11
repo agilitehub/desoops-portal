@@ -31,10 +31,15 @@
   +xs
     width: 200px
 
-.deso-btn-link
-  cursor: pointer
-  font-size: 17px
-  color: $blue1
+.introduction
+  +dark
+    color: $text-color1-dark
+  button
+    cursor: pointer
+    font-size: 17px
+    color: $blue1
+    +dark
+      color: $blue1-dark
 
 .login-btn-wrapper
   display: flex
@@ -87,3 +92,5 @@
   font-size: 16px
   +xs
     font-size: 14px
+  +dark
+    color: $text-color1-dark

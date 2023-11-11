@@ -10,6 +10,8 @@ import DeSoUserSearchModal from '../../../reusables/components/DeSoUserSearchMod
 import SelectTemplateModal from '../SelectTemplateModal'
 import TemplateNameModal from '../TemplateNameModal'
 
+import './style.sass'
+
 const SetupCard = ({
   desoData,
   rootState,
@@ -78,19 +80,19 @@ const SetupCard = ({
       ) : null
 
       tabBarExtraContent = (
-        <Button style={styleProps.tabButton} onClick={handleButtonClick} icon={nftIcon}>
+        <Button className='btn-tab' onClick={handleButtonClick} icon={nftIcon}>
           Select NFT
         </Button>
       )
     } else if (rootState.distributeTo === Enums.values.CUSTOM) {
       tabBarExtraContent = (
-        <Button style={styleProps.tabButton} onClick={handleButtonClick} icon={<UsergroupAddOutlined />}>
+        <Button className='btn-tab' onClick={handleButtonClick} icon={<UsergroupAddOutlined />}>
           Manage List
         </Button>
       )
     } else if (rootState.distributeTo === Enums.values.EMPTY_STRING) {
       tabBarExtraContent = (
-        <Button style={styleProps.tabButton} onClick={handleButtonClick} icon={<FileAddOutlined />}>
+        <Button className='btn-tab' onClick={handleButtonClick} icon={<FileAddOutlined />}>
           Load Setup
         </Button>
       )
@@ -129,40 +131,12 @@ const SetupCard = ({
   ]
 
   const styleProps = {
-    title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
-    headStyle: { minHeight: deviceType.isSmartphone ? 30 : 40 },
     tabButton: {
       color: '#188EFF',
       borderColor: '#188EFF',
       backgroundColor: 'white',
       fontSize: deviceType.isSmartphone ? 14 : 16,
       marginBottom: deviceType.isSmartphone ? 3 : 0
-    },
-    btnSaveActive: {
-      color: '#188EFF',
-      borderColor: '#188EFF',
-      backgroundColor: 'white',
-      marginTop: 20
-    },
-    btnSaveInactive: {
-      color: '#D5D5D5',
-      borderColor: '#D5D5D5',
-      backgroundColor: 'white',
-      marginTop: 20
-    },
-    btnUpdateActive: {
-      color: '#188EFF',
-      borderColor: '#188EFF',
-      backgroundColor: 'white',
-      marginTop: 20,
-      marginRight: 10
-    },
-    btnUpdateInactive: {
-      color: '#D5D5D5',
-      borderColor: '#D5D5D5',
-      backgroundColor: 'white',
-      marginTop: 20,
-      marginRight: 10
     },
     nftIcon: {
       borderRadius: 5,
@@ -177,8 +151,8 @@ const SetupCard = ({
     <>
       <Card
         size='small'
-        title={<span style={styleProps.title}>👇 Start Here: Setup & Config</span>}
-        headStyle={styleProps.headStyle}
+        className='card-wrapper'
+        title={<span className='class-title'>👇 Start Here: Setup & Config</span>}
       >
         <Tabs
           disabled={true}
@@ -195,13 +169,13 @@ const SetupCard = ({
               size={deviceType.isTablet ? 'large' : 'medium'}
               type='primary'
               icon={<SaveOutlined />}
-              style={
+              className={
                 !rootState.rulesEnabled ||
                 rootState.isExecuting ||
                 !templateNameModal.isModified ||
                 !templateNameModal.id
-                  ? styleProps.btnUpdateInactive
-                  : styleProps.btnUpdateActive
+                  ? 'btn-save btn-disabled'
+                  : 'btn-save btn-primary'
               }
               onClick={() => handleSaveSetup()}
               disabled={
@@ -218,8 +192,8 @@ const SetupCard = ({
             size={deviceType.isTablet ? 'large' : 'medium'}
             type='primary'
             icon={<SaveOutlined />}
-            style={
-              !rootState.rulesEnabled || rootState.isExecuting ? styleProps.btnSaveInactive : styleProps.btnSaveActive
+            className={
+              !rootState.rulesEnabled || rootState.isExecuting ? 'btn-save btn-disabled' : 'btn-save btn-primary'
             }
             onClick={() => handleSaveSetup(templateNameModal.id)}
             disabled={!rootState.rulesEnabled || rootState.isExecuting}

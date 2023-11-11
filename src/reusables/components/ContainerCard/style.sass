@@ -1,0 +1,19 @@
+@import styles/helpers
+
+.card-wrapper
+    width: 100%
+    overflow: hidden
+    margin-top: 10px
+    border: 1px solid $border-color
+    background: $background
+    +dark
+        border: 1px solid $border-color-dark
+        background: $background-dark
+
+.card-title
+    color: $text-color1
+    font-size: 18px
+    +dark
+        color: $text-color1-dark
+    +xs
+        font-size: 14px

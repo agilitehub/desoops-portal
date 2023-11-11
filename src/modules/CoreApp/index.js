@@ -9,16 +9,17 @@ import { useDispatch, useSelector } from 'react-redux'
 import { DeSoIdentityContext } from 'react-deso-protocol'
 import { isMobile, isTablet } from 'react-device-detect'
 import { useLazyQuery } from '@apollo/client'
+import { useColorMode } from '@chakra-ui/color-mode'
 
 // App Components
 import DistributionDashboard from 'modules/DistributionDashboard'
 import Login from 'modules/Login'
 import Toolbar from 'modules/Toolbar'
-import Spinner from 'reusables/components/Spinner'
 
 // Utils
 import Enums from 'lib/enums'
 import logo from 'assets/deso-ops-logo-full.png'
+import logoDark from 'assets/deso-ops-logo-full-dark.png'
 import { setDeSoData, setConfigData, resetState, setDeviceType, setDeSoPrice, setDistributionTemplates } from 'reducer'
 import { getConfigData, getDistributionTemplates } from 'lib/agilite-controller'
 
@@ -26,6 +27,7 @@ import { getDeSoPricing } from 'lib/deso-controller'
 import { renderApp } from './controller'
 import { finalizeInitialDeSoData } from 'lib/deso-controller-graphql'
 import { GQL_GET_INITIAL_DESO_DATA } from 'lib/graphql-models'
+import { Spin } from 'antd'
 
 const initialState = {
   initializing: false,
@@ -38,6 +40,7 @@ const reducer = (state, newState) => ({ ...state, ...newState })
 
 const CoreApp = () => {
   const dispatch = useDispatch()
+  const { colorMode } = useColorMode()
   const desoData = useSelector((state) => state.core.desoData)
   const { currentUser, isLoading } = useContext(DeSoIdentityContext)
   const [getInitialDeSoData, { loading, error, data }] = useLazyQuery(GQL_GET_INITIAL_DESO_DATA)
@@ -183,9 +186,16 @@ const CoreApp = () => {
       return (
         <>
           <Toolbar />
-          <Spinner tip={state.spinTip} />
+          <div className='cs-spin-wrapper'>
+            <Spin />
+            <span>{state.spinTip}</span>
+          </div>
           <center>
-            <img src={logo} alt={process.env.REACT_APP_NAME} style={{ width: 300 }} />
+            {colorMode === Enums.colorMode.LIGHT ? (
+              <img src={logo} alt={process.env.REACT_APP_NAME} style={{ width: 300 }} />
+            ) : (
+              <img src={logoDark} alt={process.env.REACT_APP_NAME} style={{ width: 300 }} />
+            )}
           </center>
         </>
       )

@@ -12,6 +12,8 @@ import HeroSwapModal from '../../../reusables/components/HeroSwapModal'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBitcoinSign } from '@fortawesome/free-solid-svg-icons'
 
+import './style.sass'
+
 const initialState = {
   ctcLoading: false,
   resetLoading: false,
@@ -53,7 +55,8 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
       title: 'Reset Dashboard',
       content: 'Are you sure you want to reset the dashboard? This action cannot be undone.',
       okText: 'Confirm',
-      okType: 'danger',
+      okButtonProps: { className: 'modal-btn-confirm' },
+      cancelButtonProps: { className: 'modal-btn-cancel' },
       onOk: async () => {
         await onResetDashboard()
         setState({ resetLoading: false })
@@ -72,7 +75,8 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
       title: 'Refresh Dashboard Values',
       content: 'Are you sure you want to refresh the Dashboard values? This action cannot be undone.',
       okText: 'Confirm',
-      okType: 'danger',
+      okButtonProps: { className: 'modal-btn-confirm' },
+      cancelButtonProps: { className: 'modal-btn-cancel' },
       onOk: () => {
         handleRefreshDashboardValuesExtended()
       },

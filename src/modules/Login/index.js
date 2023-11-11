@@ -4,9 +4,11 @@ import { Col, Row, Card, Button } from 'antd'
 import { faCheckCircle, faBitcoinSign } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { LoginOutlined } from '@ant-design/icons'
+import { useColorMode } from '@chakra-ui/color-mode'
 
 // Utils
 import logo from 'assets/deso-ops-logo-full.png'
+import logoDark from 'assets/deso-ops-logo-full-dark.png'
 import { getDeSoConfig } from 'lib/deso-controller'
 import Enums from 'lib/enums'
 import VideoModal from 'reusables/components/VideoModal'
@@ -20,6 +22,8 @@ configure(getDeSoConfig())
 const reducer = (state, newState) => ({ ...state, ...newState })
 
 const Login = () => {
+  const { colorMode } = useColorMode()
+
   const [state, setState] = useReducer(reducer, {
     openVideoModal: false,
     openHeroSwapModal: false
@@ -43,12 +47,21 @@ const Login = () => {
                 <Row justify='center' className='row'>
                   <Col className='login-card-content' xs={24} sm={22} md={16} lg={14} xl={12} xxl={10}>
                     <center>
-                      <img src={logo} alt={process.env.REACT_APP_NAME} className='login-logo' />
-                      <h1 style={{ marginTop: -20 }}> PORTAL SIGN-IN</h1>
+                      {colorMode === Enums.colorMode.LIGHT ? (
+                        <>
+                          <img src={logo} alt={process.env.REACT_APP_NAME} className='login-logo' />
+                          <h1 style={{ marginTop: -20 }}> PORTAL SIGN-IN</h1>
+                        </>
+                      ) : (
+                        <>
+                          <img src={logoDark} alt={process.env.REACT_APP_NAME} className='login-logo' />
+                          <h1 style={{ marginTop: -20, color: '#ffffff' }}> PORTAL SIGN-IN</h1>
+                        </>
+                      )}
                     </center>
                     <Row justify='center' style={{ marginBottom: 20 }}>
                       <Col>
-                        <span>
+                        <span className='introduction'>
                           New to DeSo?
                           <Button type='link' className='deso-btn-link' onClick={handleWatchIntroduction}>
                             {' '}

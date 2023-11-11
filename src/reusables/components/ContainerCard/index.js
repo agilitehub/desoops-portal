@@ -3,28 +3,19 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Card, theme } from 'antd'
+import { Card } from 'antd'
+
+import './style.sass'
 
 const ContainerCard = ({ title, deviceType, children }) => {
-  const { token } = theme.useToken()
-
-  const styleProps = {
-    card: { width: '100%', overflow: 'hidden', marginTop: 10 },
-    title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
-    headStyle: { backgroundColor: token.colorSecondaryLight, minHeight: deviceType.isSmartphone ? 30 : 40 },
-    bodyStyle: { padding: 4, background: token.colorInputBg }
-  }
-
   return (
     <Card
       title={
         <center>
-          <span style={styleProps.title}>{title}</span>
+          <span className='card-title'>{title}</span>
         </center>
       }
-      style={styleProps.card}
-      headStyle={styleProps.headStyle}
-      bodyStyle={styleProps.bodyStyle}
+      className='card-wrapper'
       type='inner'
       size='small'
     >

@@ -1,3 +1,19 @@
 @import ./helpers
 @import ./reset
 @import ./ant-design-overrides
+
+.btn-primary
+    color: $white
+    background: $blue1
+
+.btn-orange
+    color: $white
+    background: $orange1
+
+.btn-disabled
+    color: $border-color
+    background: $border-color
+    +dark
+        color: $text-color1-dark
+        border: 1px solid $border-color-dark
+        background: $background-dark
