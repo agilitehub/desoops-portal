@@ -74,7 +74,8 @@ export const desoLogout = async () => {
     await identity.logout()
     return
   } catch (e) {
-    throw new Error(e)
+    // Most likely the user cancelled the logout. We can leave it be
+    return e
   }
 }
 

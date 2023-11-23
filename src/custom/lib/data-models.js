@@ -16,7 +16,8 @@ export const desoUserModel = () => {
     estimatedPaymentUSD: 0,
     estimatedPaymentLabel: 0,
     percentOwnership: 0,
-    percentOwnershipLabel: ''
+    percentOwnershipLabel: '',
+    lastTransactionTimestamp: null
   }
 }
 

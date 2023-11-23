@@ -1,4 +1,5 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
 import { Layout } from 'antd'
 import { Header } from 'antd/es/layout/layout'
 
@@ -8,11 +9,14 @@ import Logo from './Logo'
 import './style.sass'
 
 const Toolbar = () => {
+  const profile = useSelector((state) => state.custom.desoData.profile)
+
   return (
     <Layout className='toolbar-layout'>
       <Header className='toolbar-header'>
         <Logo />
-        <ToolbarDropDown />
+
+        {profile.publicKey ? <ToolbarDropDown /> : null}
       </Header>
     </Layout>
   )
