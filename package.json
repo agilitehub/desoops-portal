@@ -28,6 +28,8 @@
     "agilite-utils": "7.5.0"
   },
   "devDependencies": {
+    "@apollo/client": "3.8.4",
+    "graphql": "16.8.1",
     "@ant-design/icons": "5.2.6",
     "@craco/craco": "7.1.0",
     "@fortawesome/fontawesome-svg-core": "6.4.2",

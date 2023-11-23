@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client'
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
 import { DeSoIdentityProvider } from 'react-deso-protocol'
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 
 // Utilities
 import { initAgilite } from './custom/lib/agilite-controller'
@@ -21,6 +22,12 @@ if (process.env.NODE_ENV === 'production') {
   console.warn = function () {}
   console.info = function () {}
 }
+
+// Init Apollo Client
+const client = new ApolloClient({
+  uri: process.env.REACT_APP_GQL_API_URL,
+  cache: new InMemoryCache()
+})
 
 // Initiate Agilite Controller
 initAgilite()
@@ -52,9 +59,11 @@ const root = createRoot(document.getElementById(Enums.values.DIV_ROOT))
 
 root.render(
   <Provider store={Store}>
-    <DeSoIdentityProvider>
-      <App />
-    </DeSoIdentityProvider>
+    <ApolloProvider client={client}>
+      <DeSoIdentityProvider>
+        <App />
+      </DeSoIdentityProvider>
+    </ApolloProvider>
   </Provider>
 )
 
