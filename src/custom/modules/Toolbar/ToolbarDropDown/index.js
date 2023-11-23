@@ -3,7 +3,7 @@ import { Button, Dropdown, Image, Space } from 'antd'
 import { useSelector } from 'react-redux'
 import { DownOutlined } from '@ant-design/icons'
 
-import { desoLogout } from 'custom/lib/deso-controller'
+import { desoLogout } from 'custom/lib/deso-controller-graphql'
 
 import './style.sass'
 

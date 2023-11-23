@@ -8,7 +8,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Row, Modal, Col, Spin, Select, Divider, Button } from 'antd'
-import { generateProfilePicUrl, searchForUsers } from '../../../lib/deso-controller'
+import { generateProfilePicUrl, searchForUsers } from '../../../lib/deso-controller-graphql'
 import { cloneDeep, debounce } from 'lodash'
 import Enums from '../../../lib/enums'
 import { desoUserModel } from '../../../lib/data-models'

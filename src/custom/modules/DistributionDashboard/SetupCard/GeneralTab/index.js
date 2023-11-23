@@ -4,7 +4,7 @@ import Enums from '../../../../lib/enums'
 
 // App Components
 import { debounce } from 'lodash'
-import { searchForUsers } from '../../../../lib/deso-controller'
+import { searchForUsers } from '../../../../lib/deso-controller-graphql'
 import { Link } from 'react-scroll'
 
 const styleParams = {

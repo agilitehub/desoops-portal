@@ -3,6 +3,11 @@ import { gql } from '@apollo/client'
 export const GQL_GET_INITIAL_DESO_DATA = gql`
   query AccountByPublicKey($publicKey: String!) {
     accountByPublicKey(publicKey: $publicKey) {
+      publicKey
+      username
+      desoBalance {
+        balanceNanos
+      }
       tokenBalancesAsCreator {
         nodes {
           balanceNanos

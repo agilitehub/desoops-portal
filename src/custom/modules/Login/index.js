@@ -10,7 +10,7 @@ import logo from '../../assets/deso-ops-logo-full.png'
 import VideoModal from '../../reusables/components/VideoModal'
 import Enums from '../../lib/enums'
 import { useSelector } from 'react-redux'
-import { getDeSoConfig } from '../../lib/deso-controller'
+import { getDeSoConfig } from '../../lib/deso-controller-graphql'
 import HeroSwapModal from '../../reusables/components/HeroSwapModal'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 

@@ -29,9 +29,8 @@ import {
 } from 'custom/reducer'
 import { getConfigData, getDistributionTemplates } from 'custom/lib/agilite-controller'
 
-import { getDeSoPricing } from 'custom/lib/deso-controller'
 import { renderApp } from './controller'
-import { finalizeInitialDeSoData } from 'custom/lib/deso-controller-graphql'
+import { getDeSoPricing, getDeSoData } from 'custom/lib/deso-controller-graphql'
 import { GQL_GET_INITIAL_DESO_DATA } from 'custom/lib/graphql-models'
 
 const initialState = {
@@ -64,7 +63,7 @@ const CoreApp = () => {
 
       if (!loading1 && !error1 && data1) {
         // Finalize the DeSo Data Object for the current User
-        tmpdata = await finalizeInitialDeSoData(currentUser, desoData, data1)
+        tmpdata = await getDeSoData(desoData, data1)
         dispatch(setDeSoData(tmpdata))
         setState({ initializing: false })
       }
@@ -119,7 +118,7 @@ const CoreApp = () => {
             } else {
               // We already have the user's DeSo data via GraphQL
               // Finalize the DeSo Data Object for the current User
-              const tmpDeSoData = await finalizeInitialDeSoData(currentUser, desoData, data1)
+              const tmpDeSoData = await getDeSoData(desoData, data1)
               dispatch(setDeSoData(tmpDeSoData))
               setState({ initializing: false })
             }

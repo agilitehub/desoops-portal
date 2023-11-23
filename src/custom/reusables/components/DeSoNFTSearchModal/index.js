@@ -7,7 +7,7 @@
 import React, { useEffect, useReducer } from 'react'
 // import PropTypes from 'prop-types'
 import { Row, Modal, Col, Input, Spin, Image, Divider, message } from 'antd'
-import { getNFTDetails } from '../../../lib/deso-controller'
+import { getNFTDetails } from '../../../lib/deso-controller-graphql'
 import { desoNFTSearchModal } from './data-models'
 
 const reducer = (state, newState) => ({ ...state, ...newState })

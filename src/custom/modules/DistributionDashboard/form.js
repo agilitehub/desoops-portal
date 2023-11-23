@@ -18,13 +18,7 @@ import { calculateEstimatedPayment, prepDistributionTemplate, setupHodlers, upda
 import { customListModal, distributionDashboardState, paymentModal } from './data-models'
 import { setDeSoData, setConfigData, setDistributionTemplates } from '../../reducer'
 import { cloneDeep } from 'lodash'
-import {
-  generateProfilePicUrl,
-  getCCHodlersAndBalance,
-  getDAOHodlersAndBalance,
-  getDeSoData,
-  getDeSoUser
-} from '../../lib/deso-controller'
+import { getCCHodlersAndBalance, getDAOHodlersAndBalance, getDeSoData } from '../../lib/deso-controller-graphql'
 import PaymentModal from './PaymentModal'
 import {
   createDistributionTemplate,
@@ -32,6 +26,8 @@ import {
   getConfigData,
   updateDistributionTemplate
 } from '../../lib/agilite-controller'
+import { useLazyQuery } from '@apollo/client'
+import { GQL_GET_INITIAL_DESO_DATA } from 'custom/lib/graphql-models'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
@@ -42,6 +38,8 @@ const _BatchTransactionsForm = () => {
   const distributionTemplates = useSelector((state) => state.custom.distributionTemplates)
   const [state, setState] = useReducer(reducer, distributionDashboardState(configData.feePerTransactionUSD))
   const { isTablet, isSmartphone, isMobile } = useSelector((state) => state.custom.userAgent)
+
+  const [refreshDeSoData, { loading: loading2, error: error2, data: data2 }] = useLazyQuery(GQL_GET_INITIAL_DESO_DATA)
 
   const styleProps = {
     divider: { margin: '4px 0', borderBlockStart: 0 },
@@ -68,6 +66,22 @@ const _BatchTransactionsForm = () => {
 
     setState({ rulesEnabled, distributionAmountEnabled })
   }, [state.distributeTo, state.distributionType, state.tokenToUse]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const init = async () => {
+      let tmpdata = null
+
+      if (!loading2 && !error2 && data2) {
+        // Finalize the DeSo Data Object for the current User
+        tmpdata = await getDeSoData(desoData, data2)
+        dispatch(setDeSoData(tmpdata))
+        setState({ isExecuting: false })
+      }
+    }
+
+    init()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading2, error2, data2])
 
   // Use Effect to monitor state.rulesEnabled and if truthy and a distribution template has been selected...
   // ...check to see if any changes have been made to the template and if so, ...
@@ -116,9 +130,8 @@ const _BatchTransactionsForm = () => {
     setState(distributionDashboardState(configData.feePerTransactionUSD))
   }
 
-  const handleRefreshWallet = async () => {
-    let desoBalance = 0
-    let desoBalanceUSD = 0
+  const handleRefreshDashboard = async () => {
+    let gqlProps = null
 
     try {
       setState({ isExecuting: true })
@@ -127,31 +140,14 @@ const _BatchTransactionsForm = () => {
       const tmpConfigData = await getConfigData()
       dispatch(setConfigData(tmpConfigData))
 
-      // Get User's DeSo Balance
-      const currentUser = await getDeSoUser(desoData.profile.publicKey)
-
-      // Get the rest of the DeSo Data TODO: This data is duplicated on app.js
-      const tmpDeSoData = await getDeSoData(desoData.profile.publicKey, desoData, true)
-
-      // Calculate the user's DeSo balance in DeSo and USD
-      desoBalance = currentUser.Profile.DESOBalanceNanos / Enums.values.NANO_VALUE
-      desoBalanceUSD = Math.floor(desoBalance * tmpDeSoData.desoPrice * 100) / 100
-      desoBalance = Math.floor(desoBalance * 10000) / 10000
-
-      // Add final pieces of user profile information to the DeSo data
-      tmpDeSoData.profile = {
-        ...tmpDeSoData.profile,
-        username: currentUser.Profile.Username,
-        profilePicUrl: await generateProfilePicUrl(currentUser.Profile.PublicKeyBase58Check),
-        desoBalance,
-        desoBalanceUSD
+      // Get the rest of the DeSo Data
+      gqlProps = {
+        variables: {
+          publicKey: desoData.profile.publicKey
+        }
       }
 
-      // Set the DeSo data in the redux store
-      dispatch(setDeSoData(tmpDeSoData))
-
-      // Update State
-      setState({ isExecuting: false })
+      refreshDeSoData(gqlProps)
       return
     } catch (e) {
       message.error(e)
@@ -517,7 +513,7 @@ const _BatchTransactionsForm = () => {
                     <QuickActionsCard
                       desoData={desoData}
                       onResetDashboard={resetState}
-                      onRefreshWallet={handleRefreshWallet}
+                      onRefreshDashboard={handleRefreshDashboard}
                       rootState={state}
                       deviceType={deviceType}
                     />
@@ -552,7 +548,7 @@ const _BatchTransactionsForm = () => {
                       configData={configData}
                       rootState={state}
                       setRootState={setState}
-                      onRefreshWallet={handleRefreshWallet}
+                      onRefreshDashboard={handleRefreshDashboard}
                       deviceType={deviceType}
                     />
                   </Col>

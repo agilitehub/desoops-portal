@@ -7,7 +7,7 @@ import CoreEnums from '../../../lib/enums'
 import { calculateEstimatedPayment, prepDistributionTransaction, slimRootState } from '../controller'
 import { distributionSummaryState } from '../data-models'
 import Enums from '../enums'
-import { changeDeSoLimit, sendCreatorCoins, sendDAOTokens, sendDESO } from '../../../lib/deso-controller'
+import { changeDeSoLimit, sendCreatorCoins, sendDAOTokens, sendDESO } from '../../../lib/deso-controller-graphql'
 import { randomize } from '../../../lib/utils'
 import { createDistributionTransaction, updateDistributionTransaction } from '../../../lib/agilite-controller'
 
@@ -28,7 +28,7 @@ const styleParams = {
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
-const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshWallet, deviceType }) => {
+const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshDashboard, deviceType }) => {
   const [state, setState] = useReducer(reducer, distributionSummaryState())
   const { modal, message } = App.useApp()
   const { desoPrice } = desoData
@@ -407,7 +407,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshW
       paymentModal.status = Enums.paymentStatuses.FINALIZING
       setRootState({ paymentModal })
 
-      await onRefreshWallet()
+      await onRefreshDashboard()
 
       // If there were any errors, add them to errors array and change the payment status
       paymentModal.progressPercent = 100
@@ -662,14 +662,14 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshW
   )
 }
 
-const app = ({ desoData, configData, rootState, setRootState, onRefreshWallet, deviceType }) => {
+const app = ({ desoData, configData, rootState, setRootState, onRefreshDashboard, deviceType }) => {
   return (
     <App>
       <SummaryCard
         desoData={desoData}
         rootState={rootState}
         configData={configData}
-        onRefreshWallet={onRefreshWallet}
+        onRefreshDashboard={onRefreshDashboard}
         setRootState={setRootState}
         deviceType={deviceType}
       />

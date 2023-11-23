@@ -4,7 +4,7 @@ import { DownOutlined, UserOutlined, ReloadOutlined, CopyOutlined, RollbackOutli
 import { copyTextToClipboard } from '../../../lib/utils'
 import RandomizeDialogContent from './RandomizeDialog'
 import Enums from '../../../lib/enums'
-import { getFollowersOrFollowing } from '../../../lib/deso-controller'
+import { getFollowersOrFollowing } from '../../../lib/deso-controller-graphql'
 import { prepUsersForClipboard } from '../controller'
 import { updateFollowers, updateFollowing } from '../../../reducer'
 import { useDispatch } from 'react-redux'
@@ -26,7 +26,7 @@ const initialState = {
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
-const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootState, deviceType }) => {
+const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, rootState, deviceType }) => {
   const dispatch = useDispatch()
   const { modal, message } = App.useApp()
   const [state, setState] = useReducer(reducer, initialState)
@@ -69,8 +69,8 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
     setState({ refreshLoading: true })
 
     modal.confirm({
-      title: 'Refresh Dashboard Values',
-      content: 'Are you sure you want to refresh the Dashboard values? This action cannot be undone.',
+      title: 'Refresh Dashboard',
+      content: 'Are you sure you want to refresh the Dashboard? This action cannot be undone.',
       okText: 'Confirm',
       okType: 'danger',
       onOk: () => {
@@ -83,7 +83,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
   }
 
   const handleRefreshDashboardValuesExtended = async () => {
-    await onRefreshWallet()
+    await onRefreshDashboard()
     message.success('Refresh Confirmed')
     setState({ refreshLoading: false })
   }
@@ -305,13 +305,13 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshWallet, rootSta
   )
 }
 
-const app = ({ desoData, onResetDashboard, onRefreshWallet, rootState, deviceType }) => {
+const app = ({ desoData, onResetDashboard, onRefreshDashboard, rootState, deviceType }) => {
   return (
     <App>
       <QuickActionsCard
         desoData={desoData}
         onResetDashboard={onResetDashboard}
-        onRefreshWallet={onRefreshWallet}
+        onRefreshDashboard={onRefreshDashboard}
         rootState={rootState}
         deviceType={deviceType}
       />

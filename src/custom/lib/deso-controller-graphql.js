@@ -60,7 +60,7 @@ export const desoLogin = async () => {
   try {
     return await identity.login()
   } catch (e) {
-    throw e
+    return e
   }
 }
 
@@ -93,7 +93,7 @@ export const changeDeSoLimit = async (desoLimitNanos) => {
  * @param {object} desoData - The current desoData Redux state.
  * @returns {object} A promise that resolves a new instance of the desoData Redux state, or rejects when an error occurs.
  */
-export const finalizeInitialDeSoData = async (currentUser, desoData, gqlData) => {
+export const getDeSoData = async (desoData, gqlData) => {
   const daoHodlers = []
   const ccHodlers = []
   const daoHodlings = []
@@ -107,12 +107,12 @@ export const finalizeInitialDeSoData = async (currentUser, desoData, gqlData) =>
 
   try {
     newDeSoData = cloneDeep(desoData)
-    newDeSoData.profile.publicKey = currentUser.PublicKeyBase58Check
-    newDeSoData.profile.username = currentUser.ProfileEntryResponse.Username
-    newDeSoData.profile.profilePicUrl = await generateProfilePicUrl(currentUser.PublicKeyBase58Check)
+    newDeSoData.profile.publicKey = gqlData.accountByPublicKey.publicKey
+    newDeSoData.profile.username = gqlData.accountByPublicKey.username
+    newDeSoData.profile.profilePicUrl = await generateProfilePicUrl(newDeSoData.profile.publicKey)
 
     // Fetch the current price of DeSo
-    desoBalance = currentUser.ProfileEntryResponse.DESOBalanceNanos / Enums.values.NANO_VALUE
+    desoBalance = gqlData.accountByPublicKey.desoBalance.balanceNanos / Enums.values.NANO_VALUE
     newDeSoData.desoPrice = await getDeSoPricing()
 
     // We need to loop through the tokenBalancesAsCreator array to find the DAO and CC Balances
@@ -123,13 +123,13 @@ export const finalizeInitialDeSoData = async (currentUser, desoData, gqlData) =>
       newEntry = await createUserEntry(entry)
 
       if (entry.isDaoCoin) {
-        if (newEntry.publicKey === currentUser.PublicKeyBase58Check) {
+        if (newEntry.publicKey === newDeSoData.profile.publicKey) {
           daoBalance = newEntry.tokenBalance
         } else {
           daoHodlers.push(newEntry)
         }
       } else {
-        if (newEntry.publicKey === currentUser.PublicKeyBase58Check) {
+        if (newEntry.publicKey === newDeSoData.profile.publicKey) {
           ccBalance = newEntry.tokenBalance
         } else {
           ccHodlers.push(newEntry)
@@ -163,41 +163,7 @@ export const finalizeInitialDeSoData = async (currentUser, desoData, gqlData) =>
 
     return newDeSoData
   } catch (e) {
-    throw e
-  }
-}
-
-export const finalizeHodlers = async (gqlData) => {
-  let newEntry = null
-  let tokenBalance = 0
-  let result = []
-
-  try {
-    // Populate the GQL Data
-    gqlData = gqlData.accountByPublicKey.tokenBalancesAsCreator
-
-    for (const entry of gqlData.nodes) {
-      newEntry = desoUserModel()
-
-      newEntry.publicKey = entry.holder.publicKey
-      newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
-      newEntry.username = entry.holder.username
-
-      tokenBalance = entry.balanceNanos / Enums.values.NANO_VALUE
-
-      if (entry.isDaoCoin) {
-        tokenBalance = tokenBalance / Enums.values.NANO_VALUE
-      }
-
-      tokenBalance = Math.floor(tokenBalance * 10000) / 10000
-      newEntry.tokenBalance = tokenBalance
-
-      result.push(newEntry)
-    }
-
-    return result
-  } catch (e) {
-    throw e
+    return e
   }
 }
 
@@ -208,7 +174,7 @@ export const finalizeHodlers = async (gqlData) => {
  * @param {object} desoDataState - The current desoData Redux state.
  * @returns {object} A promise that resolves a new instance of the desoData Redux state, or rejects when an error occurs.
  */
-export const getDeSoData = (publicKey, desoDataState, getFollowing = false) => {
+export const getDeSoDataTemp = (publicKey, desoDataState, getFollowing = false) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       let daoHodlings = null
@@ -262,39 +228,15 @@ export const getDeSoData = (publicKey, desoDataState, getFollowing = false) => {
  *
  * @returns {Promise} A promise that resolves the Coinbase Exchange Rate, or rejects when an error occurs.
  */
-export const getDeSoPricing = () => {
-  return new Promise((resolve, reject) => {
-    ;(async () => {
-      let desoPrice = null
-
-      try {
-        desoPrice = await getExchangeRates()
-        desoPrice = desoPrice.USDCentsPerDeSoCoinbase / 100
-        resolve(desoPrice)
-      } catch (e) {
-        reject(e)
-      }
-    })()
-  })
-}
-
-/**
- * Uses the User's public key to fetch their Profile data from the DeSo blockchain.
- *
- * @param {string} publicKey - The public key of the DeSo User.
- * @returns {Promise} A promise that resolves the user's data as JSON, or rejects when an error occurs.
- */
-export const getDeSoUser = async (publicKey = '') => {
-  let user = null
+export const getDeSoPricing = async () => {
+  let desoPrice = null
 
   try {
-    user = await getSingleProfile({
-      PublicKeyBase58Check: publicKey
-    })
-
-    return user
+    desoPrice = await getExchangeRates()
+    desoPrice = desoPrice.USDCentsPerDeSoCoinbase / 100
+    return desoPrice
   } catch (e) {
-    throw new Error(e)
+    return e
   }
 }
 
@@ -305,8 +247,7 @@ export const getDeSoUser = async (publicKey = '') => {
  * @returns {Promise} A promise that resolves the profile picture URL, or rejects when an error occurs.
  */
 export const generateProfilePicUrl = async (publicKey = '') => {
-  const result = `https://blockproducer.deso.org/api/v0/get-single-profile-picture/${publicKey}`
-  return result
+  return `https://blockproducer.deso.org/api/v0/get-single-profile-picture/${publicKey}`
 }
 
 /**
