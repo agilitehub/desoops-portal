@@ -601,36 +601,3 @@ export const sendCreatorCoins = async (sender, recipient, creatorCoin, amount) =
     throw new Error(e)
   }
 }
-
-/**
- * Searches DeSo Blockchain for users based on the search query.
- * @async
- * @function
- * @param {string} publicKey - The public key of the user performing the search.
- * @param {string} searchQuery - The search query to be used.
- * @param {string} numToFetch - The number of users to return.
- * @returns {Promise<Object>} - A Promise that resolves with the response from the sendCreatorCoins call.
- * @throws {Error} - Throws an error if the searchForUsers call fails.
- */
-export const searchForUsers = async (publicKey, searchQuery, numToFetch) => {
-  try {
-    const response = await getProfiles({
-      ReaderPublicKeyBase58Check: publicKey,
-      UsernamePrefix: searchQuery,
-      NumToFetch: numToFetch
-    })
-
-    // Clean up the list
-    const result = response.ProfilesFound.map((entry) => {
-      return {
-        key: entry.PublicKeyBase58Check,
-        label: entry.Username,
-        value: entry.PublicKeyBase58Check
-      }
-    })
-
-    return result
-  } catch (e) {
-    throw e
-  }
-}

@@ -8,14 +8,17 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Row, Modal, Col, Spin, Select, Divider, Button } from 'antd'
-import { generateProfilePicUrl, searchForUsers } from '../../../lib/deso-controller-graphql'
+import { generateProfilePicUrl } from '../../../lib/deso-controller-graphql'
 import { cloneDeep, debounce } from 'lodash'
 import Enums from '../../../lib/enums'
 import { desoUserModel } from '../../../lib/data-models'
 import { SortAscendingOutlined } from '@ant-design/icons'
+import { SEARCH_PROFILES } from 'custom/lib/graphql-models'
+import { useApolloClient } from '@apollo/client'
 
 const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfirm, onCancel }) => {
   const [search, setSearch] = useState([])
+  const client = useApolloClient()
 
   // Create a useEffect hook to monitor the prop isOpen
   useEffect(() => {
@@ -108,7 +111,7 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
     setSearch(userList)
   }
 
-  const DebounceSelect = ({ fetchOptions, debounceTimeout = 800, ...props }) => {
+  const DebounceSelect = ({ debounceTimeout = 800, ...props }) => {
     const [fetching, setFetching] = useState(false)
     const [options, setOptions] = useState([])
     const fetchRef = useRef(0)
@@ -120,17 +123,35 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
         setOptions([])
         setFetching(true)
 
-        fetchOptions(value).then((newOptions) => {
+        const gqlProps = {
+          filter: {
+            username: {
+              includesInsensitive: value
+            }
+          },
+          first: Enums.defaults.USER_SEARCH_NUM_TO_FETCH
+        }
+
+        client.query({ query: SEARCH_PROFILES, variables: gqlProps }).then((newOptions) => {
           if (fetchId !== fetchRef.current) {
             // for fetch callback order
             return
           }
-          setOptions(newOptions)
+
+          const result = newOptions.data.profiles.nodes.map((entry) => {
+            return {
+              key: entry.publicKey,
+              label: entry.username,
+              value: entry.publicKey
+            }
+          })
+
+          setOptions(result)
           setFetching(false)
         })
       }
       return debounce(loadOptions, debounceTimeout)
-    }, [fetchOptions, debounceTimeout])
+    }, [debounceTimeout])
     return (
       <Select
         autoFocus={!deviceType.isMobile}
@@ -142,10 +163,6 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
         options={options}
       />
     )
-  }
-
-  const fetchUserList = async (search) => {
-    return await searchForUsers(publicKey, search, Enums.defaults.USER_SEARCH_NUM_TO_FETCH)
   }
 
   const styleProps = {
@@ -171,7 +188,6 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
             mode='multiple'
             value={search}
             placeholder='Search users'
-            fetchOptions={fetchUserList}
             onChange={(search) => {
               setSearch(search)
             }}
