@@ -26,8 +26,8 @@ import {
   getConfigData,
   updateDistributionTemplate
 } from '../../lib/agilite-controller'
-import { useLazyQuery } from '@apollo/client'
-import { GQL_GET_INITIAL_DESO_DATA } from 'custom/lib/graphql-models'
+import { useApolloClient, useLazyQuery } from '@apollo/client'
+import { GET_HODLERS, GQL_GET_INITIAL_DESO_DATA } from 'custom/lib/graphql-models'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
@@ -36,6 +36,7 @@ const _BatchTransactionsForm = () => {
   const desoData = useSelector((state) => state.custom.desoData)
   const configData = useSelector((state) => state.custom.configData)
   const distributionTemplates = useSelector((state) => state.custom.distributionTemplates)
+  const client = useApolloClient()
   const [state, setState] = useReducer(reducer, distributionDashboardState(configData.feePerTransactionUSD))
   const { isTablet, isSmartphone, isMobile } = useSelector((state) => state.custom.userAgent)
 
@@ -263,7 +264,9 @@ const _BatchTransactionsForm = () => {
   }
 
   const handleDistributeDeSoUser = async (distributeDeSoUser) => {
+    const gqlProps = {}
     let tmpHodlers = null
+    let gqlData = null
 
     if (distributeDeSoUser.length === 0) {
       setState({ distributeDeSoUser, finalHodlers: [], tokenTotal: 0, selectedTableKeys: [] })
@@ -272,12 +275,24 @@ const _BatchTransactionsForm = () => {
 
     setState({ loading: true, distributeDeSoUser })
 
+    gqlProps.publicKey = distributeDeSoUser[0].key
+
     if (state.distributeTo === Enums.values.CREATOR) {
-      tmpHodlers = await getCCHodlersAndBalance(distributeDeSoUser[0].key)
-      tmpHodlers = tmpHodlers.ccHodlers
+      gqlProps.filter = { isDaoCoin: { in: false } }
+      gqlData = await client.query({ query: GET_HODLERS, variables: gqlProps })
+      const { ccHodlers } = await getCCHodlersAndBalance(
+        distributeDeSoUser[0].key,
+        gqlData.data.accountByPublicKey.tokenBalancesAsCreator.nodes
+      )
+      tmpHodlers = ccHodlers
     } else {
-      tmpHodlers = await getDAOHodlersAndBalance(distributeDeSoUser[0].key)
-      tmpHodlers = tmpHodlers.daoHodlers
+      gqlProps.filter = { isDaoCoin: { in: true } }
+      gqlData = await client.query({ query: GET_HODLERS, variables: gqlProps })
+      const { daoHodlers } = await getDAOHodlersAndBalance(
+        distributeDeSoUser[0].key,
+        gqlData.data.accountByPublicKey.tokenBalancesAsCreator.nodes
+      )
+      tmpHodlers = daoHodlers
     }
 
     const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(tmpHodlers)

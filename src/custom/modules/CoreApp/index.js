@@ -138,15 +138,15 @@ const CoreApp = () => {
   // Update DeSo Price every x seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      if (state.renderState === Enums.appRenderState.LAUNCH) updateDeSoPrice()
+      if (state.renderState === Enums.appRenderState.LAUNCH) updateDeSoPrice(desoData.desoPrice)
     }, Enums.defaults.UPDATE_DESO_PRICE_INTERVAL_SEC)
 
     return () => clearInterval(interval)
   }, [state.renderState]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const updateDeSoPrice = async () => {
+  const updateDeSoPrice = async (currDeSoPrice) => {
     try {
-      const desoPrice = await getDeSoPricing()
+      const desoPrice = await getDeSoPricing(currDeSoPrice)
       dispatch(setDeSoPrice(desoPrice))
     } catch (e) {}
   }

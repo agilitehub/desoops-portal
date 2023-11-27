@@ -94,13 +94,9 @@ export const changeDeSoLimit = async (desoLimitNanos) => {
  * @returns {object} A promise that resolves a new instance of the desoData Redux state, or rejects when an error occurs.
  */
 export const getDeSoData = async (desoData, gqlData) => {
-  const daoHodlers = []
-  const ccHodlers = []
   const daoHodlings = []
   const ccHodlings = []
   let newEntry = null
-  let daoBalance = 0
-  let ccBalance = 0
   let desoBalance = 0
   let newDeSoData = null
   let tmpGQLData = null
@@ -113,29 +109,13 @@ export const getDeSoData = async (desoData, gqlData) => {
 
     // Fetch the current price of DeSo
     desoBalance = gqlData.accountByPublicKey.desoBalance.balanceNanos / Enums.values.NANO_VALUE
-    newDeSoData.desoPrice = await getDeSoPricing()
+    newDeSoData.desoPrice = await getDeSoPricing(newDeSoData.desoPrice)
 
     // We need to loop through the tokenBalancesAsCreator array to find the DAO and CC Balances
     // But we also need to separate our own balances, and then create holders arrays
-    tmpGQLData = gqlData.accountByPublicKey.tokenBalancesAsCreator
-
-    for (const entry of tmpGQLData.nodes) {
-      newEntry = await createUserEntry(entry)
-
-      if (entry.isDaoCoin) {
-        if (newEntry.publicKey === newDeSoData.profile.publicKey) {
-          daoBalance = newEntry.tokenBalance
-        } else {
-          daoHodlers.push(newEntry)
-        }
-      } else {
-        if (newEntry.publicKey === newDeSoData.profile.publicKey) {
-          ccBalance = newEntry.tokenBalance
-        } else {
-          ccHodlers.push(newEntry)
-        }
-      }
-    }
+    tmpGQLData = gqlData.accountByPublicKey.tokenBalancesAsCreator.nodes
+    const { daoHodlers, daoBalance } = await getDAOHodlersAndBalance(newDeSoData.profile.publicKey, tmpGQLData)
+    const { ccHodlers, ccBalance } = await getCCHodlersAndBalance(newDeSoData.profile.publicKey, tmpGQLData)
 
     // Next, we need to loop through the tokenBalancesAsHodler array to find the DAO and CC Balances
     // and then create hodlings arrays
@@ -168,67 +148,11 @@ export const getDeSoData = async (desoData, gqlData) => {
 }
 
 /**
- * Fetches various data sets from the DeSo blockchain based on the provided public key.
- *
- * @param {string} publicKey - The public key of the DeSo User.
- * @param {object} desoDataState - The current desoData Redux state.
- * @returns {object} A promise that resolves a new instance of the desoData Redux state, or rejects when an error occurs.
- */
-export const getDeSoDataTemp = (publicKey, desoDataState, getFollowing = false) => {
-  return new Promise((resolve, reject) => {
-    ;(async () => {
-      let daoHodlings = null
-      let ccHodlings = null
-      let desoPrice = null
-      let desoData = null
-      let followers = 0
-      let following = 0
-
-      try {
-        desoData = cloneDeep(desoDataState)
-
-        desoPrice = await getDeSoPricing()
-
-        const { daoHodlers, daoBalance } = await getDAOHodlersAndBalance(publicKey)
-        daoHodlings = await getDAOHodlings(publicKey)
-        const { ccHodlers, ccBalance } = await getCCHodlersAndBalance(publicKey)
-        ccHodlings = await getCCHodlings(publicKey)
-
-        // We know how many the current User is following, but we don't know how many are following the current User
-        followers = await getTotalFollowersOrFollowing(publicKey, Enums.values.FOLLOWERS)
-
-        // We might need to override the following count
-        if (getFollowing) {
-          following = await getTotalFollowersOrFollowing(publicKey, Enums.values.FOLLOWING)
-        }
-
-        // Update the desoData object
-        desoData.desoPrice = desoPrice
-        desoData.profile.publicKey = publicKey
-        desoData.profile.daoBalance = daoBalance
-        desoData.profile.ccBalance = ccBalance
-        desoData.profile.totalFollowers = followers
-        desoData.profile.totalfollowing = following
-        desoData.profile.daoHodlers = daoHodlers
-        desoData.profile.daoHodlings = daoHodlings
-        desoData.profile.ccHodlers = ccHodlers
-        desoData.profile.ccHodlings = ccHodlings
-
-        resolve(desoData)
-      } catch (e) {
-        reject(e)
-        console.error(e)
-      }
-    })()
-  })
-}
-
-/**
  * Fetches the Exchange Rates for the $DESO token.
  *
  * @returns {Promise} A promise that resolves the Coinbase Exchange Rate, or rejects when an error occurs.
  */
-export const getDeSoPricing = async () => {
+export const getDeSoPricing = async (currDeSoPrice) => {
   let desoPrice = null
 
   try {
@@ -236,7 +160,7 @@ export const getDeSoPricing = async () => {
     desoPrice = desoPrice.USDCentsPerDeSoCoinbase / 100
     return desoPrice
   } catch (e) {
-    return e
+    return currDeSoPrice
   }
 }
 
@@ -250,43 +174,22 @@ export const generateProfilePicUrl = async (publicKey = '') => {
   return `https://blockproducer.deso.org/api/v0/get-single-profile-picture/${publicKey}`
 }
 
-/**
- * Uses the User's public key to fetch all DeSo Users who own the User's DAO Tokens. The DAO Balance is also calculated and returned.
- *
- * @param {string} publicKey - The public key of the DeSo User.
- * @returns {Promise} A promise that resolves an object that contains an array of DAO Hodlers and the DAO Balance, or rejects when an error occurs.
- */
-export const getDAOHodlersAndBalance = (publicKey) => {
+export const getDAOHodlersAndBalance = (publicKey, data) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
-      let data = null
       let newEntry = null
       let daoHodlers = []
       let daoBalance = 0
-      let tokenBalance = 0
 
       try {
-        for (const entry of data.Hodlers) {
-          // Skip if no ProfileEntryResponse
-          if (!entry.ProfileEntryResponse) continue
+        for (const entry of data) {
+          if (!entry.isDaoCoin) continue
 
-          tokenBalance = entry.BalanceNanosUint256
-          tokenBalance = hexToInt(tokenBalance)
-          tokenBalance = tokenBalance / Enums.values.NANO_VALUE / Enums.values.NANO_VALUE
-          tokenBalance = Math.floor(tokenBalance * 10000) / 10000
-
-          // Don't add current user to hodlers list, but rather fetch and format their balance
-          if (entry.ProfileEntryResponse.PublicKeyBase58Check !== publicKey) {
-            newEntry = desoUserModel()
-
-            newEntry.publicKey = entry.ProfileEntryResponse.PublicKeyBase58Check
-            newEntry.username = entry.ProfileEntryResponse.Username
-            newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
-            newEntry.tokenBalance = tokenBalance
-
-            daoHodlers.push(newEntry)
+          newEntry = await createUserEntry(entry)
+          if (newEntry.publicKey === publicKey) {
+            daoBalance = newEntry.tokenBalance
           } else {
-            daoBalance = tokenBalance
+            daoHodlers.push(newEntry)
           }
         }
 
@@ -376,48 +279,23 @@ export const createUserEntry = (entry) => {
   })
 }
 
-/**
- * Uses the User's public key to fetch all DeSo Users who own the User's Creator Coins. The Creator Coin Balance is also calculated and returned.
- *
- * @param {string} publicKey - The public key of the DeSo User.
- * @returns {Promise} A promise that resolves an object that contains an array of Creator Coin Hodlers and the Creator Coin Balance, or rejects when an error occurs.
- */
-export const getCCHodlersAndBalance = (publicKey) => {
+export const getCCHodlersAndBalance = (publicKey, data) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
-      let data = null
       let newEntry = null
       let ccHodlers = []
       let ccBalance = 0
-      let tokenBalance = 0
 
       try {
-        data = await getHodlersForUser({
-          FetchAll: true,
-          FetchHodlings: false,
-          IsDAOCoin: false,
-          PublicKeyBase58Check: publicKey
-        })
+        for (const entry of data) {
+          if (entry.isDaoCoin) continue
 
-        for (const entry of data.Hodlers) {
-          // Skip if no ProfileEntryResponse
-          if (!entry.ProfileEntryResponse) continue
+          newEntry = await createUserEntry(entry)
 
-          tokenBalance = entry.BalanceNanos / Enums.values.NANO_VALUE
-          tokenBalance = Math.floor(tokenBalance * 10000) / 10000
-
-          // Don't add current user to hodlers list, but rather fetch and format their balance
-          if (entry.ProfileEntryResponse.PublicKeyBase58Check !== publicKey) {
-            newEntry = desoUserModel()
-
-            newEntry.publicKey = entry.ProfileEntryResponse.PublicKeyBase58Check
-            newEntry.username = entry.ProfileEntryResponse.Username
-            newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
-            newEntry.tokenBalance = tokenBalance
-
-            ccHodlers.push(newEntry)
+          if (newEntry.publicKey === publicKey) {
+            ccBalance = newEntry.tokenBalance
           } else {
-            ccBalance = tokenBalance
+            ccHodlers.push(newEntry)
           }
         }
 
@@ -753,6 +631,6 @@ export const searchForUsers = async (publicKey, searchQuery, numToFetch) => {
 
     return result
   } catch (e) {
-    throw new Error(e)
+    throw e
   }
 }

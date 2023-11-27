@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Row, Col, Select, Divider, Space, Image, Switch, Spin } from 'antd'
+import { useApolloClient } from '@apollo/client'
 import Enums from '../../../../lib/enums'
 
 // App Components
 import { debounce } from 'lodash'
-import { searchForUsers } from '../../../../lib/deso-controller-graphql'
 import { Link } from 'react-scroll'
+import { SEARCH_PROFILES } from 'custom/lib/graphql-models'
 
 const styleParams = {
   labelColXS: 24,
@@ -27,6 +28,8 @@ const GeneralTab = ({
   onTokenToUse,
   desoProfile
 }) => {
+  const client = useApolloClient()
+
   const [tokenOwnerList, setTokenOwnerList] = useState([])
   const [showMyHodlers, setShowMyHodlers] = useState(false)
   const [showDeSoUser, setShowDeSoUser] = useState(false)
@@ -127,7 +130,7 @@ const GeneralTab = ({
     setTokenOwnerList(tmpTokenOwnerList)
   }, [rootState.distributionType]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const DebounceSelect = ({ fetchOptions, debounceTimeout = 800, ...props }) => {
+  const DebounceSelect = ({ debounceTimeout = 800, ...props }) => {
     const [fetching, setFetching] = useState(false)
     const [options, setOptions] = useState([])
     const fetchRef = useRef(0)
@@ -141,17 +144,35 @@ const GeneralTab = ({
         setOptions([])
         setFetching(true)
 
-        fetchOptions(value).then((newOptions) => {
+        const gqlProps = {
+          filter: {
+            username: {
+              includesInsensitive: value
+            }
+          },
+          first: Enums.defaults.USER_SEARCH_NUM_TO_FETCH
+        }
+
+        client.query({ query: SEARCH_PROFILES, variables: gqlProps }).then((newOptions) => {
           if (fetchId !== fetchRef.current) {
             // for fetch callback order
             return
           }
-          setOptions(newOptions)
+
+          const result = newOptions.data.profiles.nodes.map((entry) => {
+            return {
+              key: entry.publicKey,
+              label: entry.username,
+              value: entry.publicKey
+            }
+          })
+
+          setOptions(result)
           setFetching(false)
         })
       }
       return debounce(loadOptions, debounceTimeout)
-    }, [fetchOptions, debounceTimeout])
+    }, [debounceTimeout])
     return (
       <Link to='distributeDeSoUser' smooth={true} duration={500} offset={-100}>
         <Select
@@ -165,10 +186,6 @@ const GeneralTab = ({
         />
       </Link>
     )
-  }
-
-  const fetchUserList = async (search) => {
-    return await searchForUsers(desoProfile.publicKey, search, Enums.defaults.USER_SEARCH_NUM_TO_FETCH)
   }
 
   return (
@@ -241,7 +258,6 @@ const GeneralTab = ({
               <DebounceSelect
                 mode='multiple'
                 value={rootState.distributeDeSoUser}
-                fetchOptions={fetchUserList}
                 onChange={(desoUser) => {
                   onDistributeDeSoUser(desoUser)
                 }}
