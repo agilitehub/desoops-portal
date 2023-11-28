@@ -253,14 +253,15 @@ export const prepUsersForClipboard = (userList) => {
       let result = null
 
       try {
-        for (const username of userList) {
-          tmpResult.push(`@${username}`)
+        for (const entry of userList) {
+          tmpResult.push(`@${entry.username}`)
         }
 
         result = {
           length: tmpResult.length,
           data: `${tmpResult.join(' ')} `
         }
+
         resolve(result)
       } catch (e) {
         reject(e)

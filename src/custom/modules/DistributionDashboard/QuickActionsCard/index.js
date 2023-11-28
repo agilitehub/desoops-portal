@@ -4,13 +4,15 @@ import { DownOutlined, UserOutlined, ReloadOutlined, CopyOutlined, RollbackOutli
 import { copyTextToClipboard } from '../../../lib/utils'
 import RandomizeDialogContent from './RandomizeDialog'
 import Enums from '../../../lib/enums'
-import { getFollowersOrFollowing } from '../../../lib/deso-controller-graphql'
+import { processFollowersOrFollowing } from '../../../lib/deso-controller-graphql'
 import { prepUsersForClipboard } from '../controller'
 import { updateFollowers, updateFollowing } from '../../../reducer'
 import { useDispatch } from 'react-redux'
 import HeroSwapModal from '../../../reusables/components/HeroSwapModal'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBitcoinSign } from '@fortawesome/free-solid-svg-icons'
+import { useApolloClient } from '@apollo/client'
+import { GET_FOLLOWERS, GET_FOLLOWING } from 'custom/lib/graphql-models'
 
 const initialState = {
   ctcLoading: false,
@@ -30,6 +32,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
   const dispatch = useDispatch()
   const { modal, message } = App.useApp()
   const [state, setState] = useReducer(reducer, initialState)
+  const client = useApolloClient()
 
   const styleProps = {
     title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
@@ -94,8 +97,8 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
 
   const handleCopyToClipboard = async (item) => {
     let userList = null
-    let numberToFetch = 0
     let alreadyFetched = false
+    let gqlProps = null
 
     try {
       setState({ ctcLoading: true })
@@ -113,21 +116,27 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
         case Enums.values.FOLLOWING:
           if (item.key === Enums.values.FOLLOWERS) {
             alreadyFetched = desoData.fetchedFollowers
-            numberToFetch = desoData.profile.totalFollowers
             userList = desoData.profile.followers
           } else {
             alreadyFetched = desoData.fetchedFollowing
-            numberToFetch = desoData.profile.totalFollowing
             userList = desoData.profile.following
           }
 
           if (!alreadyFetched) {
-            userList = await getFollowersOrFollowing(desoData.profile.publicKey, item.key, numberToFetch)
+            gqlProps = {
+              publicKey: desoData.profile.publicKey
+            }
 
             // Update State that we received followers/following
             if (item.key === Enums.values.FOLLOWERS) {
+              userList = await client.query({ query: GET_FOLLOWERS, variables: gqlProps })
+              userList = userList.data.accountByPublicKey.followers.nodes
+              userList = await processFollowersOrFollowing(item.key, userList)
               dispatch(updateFollowers({ data: userList }))
             } else {
+              userList = await client.query({ query: GET_FOLLOWING, variables: gqlProps })
+              userList = userList.data.accountByPublicKey.following.nodes
+              userList = await processFollowersOrFollowing(item.key, userList)
               dispatch(updateFollowing({ data: userList }))
             }
           }
@@ -145,6 +154,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
 
       setState({ ctcLoading: false })
     } catch (e) {
+      console.error(e)
       message.error(e.message, 5)
       setState({ ctcLoading: false })
     }

@@ -95,3 +95,39 @@ export const GET_NFT_ENTRIES = gql`
     }
   }
 `
+
+export const GET_FOLLOWERS = gql`
+  query AccountByPublicKey($publicKey: String!) {
+    accountByPublicKey(publicKey: $publicKey) {
+      followers {
+        nodes {
+          follower {
+            username
+            publicKey
+            transactionStats {
+              latestTransactionTimestamp
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const GET_FOLLOWING = gql`
+  query AccountByPublicKey($publicKey: String!) {
+    accountByPublicKey(publicKey: $publicKey) {
+      following {
+        nodes {
+          followee {
+            username
+            publicKey
+            transactionStats {
+              latestTransactionTimestamp
+            }
+          }
+        }
+      }
+    }
+  }
+`

@@ -4,7 +4,6 @@ import {
   identity,
   getHodlersForUser,
   getExchangeRates,
-  getFollowersForUser,
   sendDeso,
   transferDeSoToken,
   transferCreatorCoin
@@ -350,84 +349,35 @@ export const getCCHodlings = (publicKey) => {
   })
 }
 
-/**
- * Uses the User's public key to either fetch the total count of DeSo Users who follow the User, or the total count of the DeSo Users who the User follows.
- *
- * @param {string} publicKey - The public key of the DeSo User.
- * @param {string} followType - The type of follow to fetch. Either 'followers' or 'following'.
- *
- * @returns {Promise} A promise that resolves the total count of followers or following, or rejects when an error occurs.
- */
-export const getTotalFollowersOrFollowing = (publicKey, followType) => {
-  return new Promise((resolve, reject) => {
-    ;(async () => {
-      let userData = null
-      let errMsg = null
-      let params = null
-
-      try {
-        params = {
-          PublicKeyBase58Check: publicKey,
-          GetEntriesFollowingUsername: followType === Enums.values.FOLLOWERS
-        }
-
-        // First get # of followers
-        userData = await getFollowersForUser(params)
-        resolve(userData.NumFollowers)
-      } catch (e) {
-        if (e.response?.data?.message) {
-          errMsg = e.response.data.message
-        } else {
-          errMsg = Enums.messages.UNKNOWN_ERROR
-        }
-
-        console.error(e)
-        reject(errMsg)
-      }
-    })()
-  })
-}
-
-/**
- * Uses the User's public key to either fetch the usernames of all DeSo Users who follow the User, or all DeSo Users who the User follows.
- *
- * @param {string} publicKey - The public key of the DeSo User.
- * @param {string} followType - The type of follow to fetch. Either 'followers' or 'following'.
- * @param {number} numberToFetch - The number of followers or following to fetch.
- *
- * @returns {Promise} A promise that resolves an array of DeSo Usernames, or rejects when an error occurs.
- */
-export const getFollowersOrFollowing = (publicKey, followType, numberToFetch) => {
+export const processFollowersOrFollowing = (followType, data) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       const result = []
-      let userData = null
       let errMsg = null
-      let params = null
-      let user = null
+      let tmpEntry = null
+      let newEntry = null
 
       try {
-        params = {
-          PublicKeyBase58Check: publicKey,
-          GetEntriesFollowingUsername: followType === Enums.values.FOLLOWERS,
-          NumToFetch: numberToFetch
-        }
+        for (const entry of data) {
+          if (followType === Enums.values.FOLLOWERS) {
+            tmpEntry = entry.follower
+          } else {
+            tmpEntry = entry.followee
+          }
 
-        userData = await getFollowersForUser(params)
+          newEntry = desoUserModel()
 
-        for (const item of Object.keys(userData.PublicKeyToProfileEntry)) {
-          user = { ...userData.PublicKeyToProfileEntry[item] }
-          result.push(user.Username)
+          newEntry.publicKey = tmpEntry.publicKey
+          newEntry.username = tmpEntry.username
+          newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
+          newEntry.lastTransactionTimestamp = tmpEntry.transactionStats.latestTransactionTimestamp
+          newEntry.tokenBalance = 1
+
+          result.push(newEntry)
         }
 
         resolve(result)
       } catch (e) {
-        if (e.response?.data?.message) {
-          errMsg = e.response.data.message
-        } else {
-          errMsg = Enums.messages.UNKNOWN_ERROR
-        }
-
         console.error(e)
         reject(errMsg)
       }
