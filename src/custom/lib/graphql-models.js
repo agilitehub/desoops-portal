@@ -68,3 +68,30 @@ export const GET_HODLERS = gql`
     }
   }
 `
+
+export const GET_NFT_POST = gql`
+  query Profiles($filter: NftFilter, $first: Int) {
+    nfts(filter: $filter, first: $first) {
+      nodes {
+        post {
+          body
+          imageUrls
+        }
+        id
+      }
+    }
+  }
+`
+
+export const GET_NFT_ENTRIES = gql`
+  query Profiles($filter: NftFilter) {
+    nfts(filter: $filter) {
+      nodes {
+        owner {
+          username
+          publicKey
+        }
+      }
+    }
+  }
+`

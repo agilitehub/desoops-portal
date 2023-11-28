@@ -2,16 +2,12 @@
 import { cloneDeep } from 'lodash'
 import {
   identity,
-  getNFTCollectionSummary,
-  getNFTEntriesForPost,
   getHodlersForUser,
   getExchangeRates,
   getFollowersForUser,
-  getSingleProfile,
   sendDeso,
   transferDeSoToken,
-  transferCreatorCoin,
-  getProfiles
+  transferCreatorCoin
 } from 'deso-protocol'
 import BigNumber from 'bignumber.js'
 
@@ -439,46 +435,23 @@ export const getFollowersOrFollowing = (publicKey, followType, numberToFetch) =>
   })
 }
 
-/**
- * Uses the hex value from an NFT URL link to fetch the NFT details.
- *
- * @param {string} nftId - The hex value from an NFT URL link.
- *
- * @returns {Promise} A promise that resolves an object containing the NFT details, or rejects when an error occurs.
- */
-export const getNFTDetails = (nftId, publicKey) => {
+export const processNFTs = (nftPost, nftEntries) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
-      let request = null
-      let nftSummary = null
-      let nftItems = null
       let nftMetaData = null
       let nftHodlers = []
-      let nftUser = null
       let newEntry = null
 
       try {
-        request = { PostHashHex: nftId }
-
-        // Fetch the NFT Meta Data
-        nftSummary = await getNFTCollectionSummary(request)
-        nftSummary = nftSummary.NFTCollectionResponse.PostEntryResponse
-
         nftMetaData = {
-          id: nftId,
-          imageUrl: nftSummary.ImageURLs ? nftSummary.ImageURLs[0] : nftLogo,
-          description: cleanString(nftSummary.Body, 100)
+          id: nftPost.id,
+          imageUrl: nftPost.post.imageUrls.length > 0 ? nftPost.post.imageUrls[0] : nftLogo,
+          description: cleanString(nftPost.post.body, 100)
         }
 
-        // Fetch the Users who own the NFTs
-        nftItems = await await getNFTEntriesForPost(request)
-
-        for (const nftItem of nftItems.NFTEntryResponses) {
-          // Don't add current user to hodlers list
-          if (nftItem.OwnerPublicKeyBase58Check === publicKey) continue
-
+        for (const entry of nftEntries) {
           // Check if the user is already in the hodlers list
-          const userIndex = nftHodlers.findIndex((item) => item.publicKey === nftItem.OwnerPublicKeyBase58Check)
+          const userIndex = nftHodlers.findIndex((item) => item.publicKey === entry.owner.publicKey)
 
           if (userIndex > -1) {
             // User found. Increment token balance
@@ -487,14 +460,10 @@ export const getNFTDetails = (nftId, publicKey) => {
           }
 
           // User not found. Add to hodlers list
-          nftUser = await getSingleProfile({
-            PublicKeyBase58Check: nftItem.OwnerPublicKeyBase58Check
-          })
-
           newEntry = desoUserModel()
 
-          newEntry.publicKey = nftItem.OwnerPublicKeyBase58Check
-          newEntry.username = nftUser.Profile.Username
+          newEntry.publicKey = entry.owner.publicKey
+          newEntry.username = entry.owner.username
           newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
           newEntry.tokenBalance = 1
 
