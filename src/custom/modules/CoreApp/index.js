@@ -33,6 +33,8 @@ import { renderApp } from './controller'
 import { getDeSoPricing, getDeSoData } from 'custom/lib/deso-controller-graphql'
 import { GQL_GET_INITIAL_DESO_DATA } from 'custom/lib/graphql-models'
 
+import './style.sass'
+
 const initialState = {
   initializing: false,
   renderState: Enums.appRenderState.LOGIN,
@@ -158,7 +160,7 @@ const CoreApp = () => {
         <>
           <Toolbar />
           <div className='cs-spin-wrapper'>
-            <Spin />
+            <Spin size='large' />
             <span>{state.spinTip}</span>
           </div>
           <center>
