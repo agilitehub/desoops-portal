@@ -71,6 +71,14 @@ export const cleanString = (inputString = '', maxCharacters = 0, removeHashTags 
   return cleanedString
 }
 
+export const calculateDaysSinceLastActive = (lastTransactionTimestamp) => {
+  const oneDay = 24 * 60 * 60 * 1000 // hours*minutes*seconds*milliseconds
+  const lastActiveDate = new Date(lastTransactionTimestamp)
+  const now = new Date()
+  const diffDays = Math.round(Math.abs((now - lastActiveDate) / oneDay))
+  return diffDays
+}
+
 /*
  * ✅ Pass a String and return x random values
  * ✅ If String, provide a separator to split String into Array first

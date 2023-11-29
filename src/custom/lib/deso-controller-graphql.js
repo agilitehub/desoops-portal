@@ -12,7 +12,7 @@ import BigNumber from 'bignumber.js'
 
 import Enums from './enums'
 import { desoUserModel } from './data-models'
-import { cleanString, hexToInt } from './utils'
+import { calculateDaysSinceLastActive, cleanString, hexToInt } from './utils'
 import nftLogo from '../assets/nft-default-logo.png'
 
 const desoConfigure = {
@@ -262,7 +262,7 @@ export const createUserEntry = (entry) => {
 
         newEntry.publicKey = tmpEntry.publicKey
         newEntry.username = tmpEntry.username
-        newEntry.lastTransactionTimestamp = tmpEntry.transactionStats.latestTransactionTimestamp
+        newEntry.lastActiveDays = calculateDaysSinceLastActive(tmpEntry.transactionStats.latestTransactionTimestamp)
         newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
         newEntry.tokenBalance = tokenBalance
 
@@ -370,7 +370,7 @@ export const processFollowersOrFollowing = (followType, data) => {
           newEntry.publicKey = tmpEntry.publicKey
           newEntry.username = tmpEntry.username
           newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
-          newEntry.lastTransactionTimestamp = tmpEntry.transactionStats.latestTransactionTimestamp
+          newEntry.lastActiveDays = calculateDaysSinceLastActive(tmpEntry.transactionStats.latestTransactionTimestamp)
           newEntry.tokenBalance = 1
 
           result.push(newEntry)
@@ -415,6 +415,9 @@ export const processNFTs = (nftPost, nftEntries) => {
           newEntry.publicKey = entry.owner.publicKey
           newEntry.username = entry.owner.username
           newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
+          newEntry.lastActiveDays = calculateDaysSinceLastActive(
+            entry.owner.transactionStats.latestTransactionTimestamp
+          )
           newEntry.tokenBalance = 1
 
           nftHodlers.push(newEntry)

@@ -124,6 +124,7 @@ const _BatchTransactionsForm = () => {
     state.filterAmountIs,
     state.filterAmount,
     state.returnAmount,
+    state.lastActiveDays,
     state.spreadAmountBasedOn
   ])
 
@@ -207,7 +208,8 @@ const _BatchTransactionsForm = () => {
       filterUsers: false,
       filterAmountIs: '>',
       filterAmount: null,
-      returnAmount: null
+      returnAmount: null,
+      lastActiveDays: null
     }
 
     const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(
@@ -368,6 +370,7 @@ const _BatchTransactionsForm = () => {
       tmpState.filterAmountIs = template.rules.filterAmountIs
       tmpState.filterAmount = template.rules.filterAmount
       tmpState.returnAmount = template.rules.returnAmount
+      tmpState.lastActiveDays = template.rules.lastActiveDays
 
       if (template.distributeTo === Enums.values.CUSTOM) {
         tmpState.customListModal = customListModal()
@@ -399,7 +402,8 @@ const _BatchTransactionsForm = () => {
         filterUsers: tmpState.filterUsers,
         filterAmountIs: tmpState.filterAmountIs,
         filterAmount: tmpState.filterAmount,
-        returnAmount: tmpState.returnAmount
+        returnAmount: tmpState.returnAmount,
+        lastActiveDays: tmpState.lastActiveDays
       }
 
       const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(

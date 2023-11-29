@@ -17,7 +17,7 @@ export const desoUserModel = () => {
     estimatedPaymentLabel: 0,
     percentOwnership: 0,
     percentOwnershipLabel: '',
-    lastTransactionTimestamp: null
+    lastActiveDays: 0
   }
 }
 
@@ -42,7 +42,8 @@ export const distributionTransactionModel = () => {
       filterUsers: false,
       filterAmountIs: '',
       filterAmount: 0,
-      returnAmount: 0
+      returnAmount: 0,
+      lastActiveDays: 0
     },
     totalFeeUSD: 0,
     totalFeeDESO: 0,
@@ -88,7 +89,8 @@ export const distributionTemplateModel = () => {
       filterUsers: false,
       filterAmountIs: '',
       filterAmount: 0,
-      returnAmount: 0
+      returnAmount: 0,
+      lastActiveDays: 0
     }
   }
 }

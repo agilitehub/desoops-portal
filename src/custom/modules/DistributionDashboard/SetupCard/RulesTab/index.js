@@ -64,11 +64,18 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
         newState.returnAmount = rootState.returnAmount
       }
 
+      if (propType === 'lastActiveDays') {
+        newState.lastActiveDays = propValue
+      } else {
+        newState.lastActiveDays = rootState.lastActiveDays
+      }
+
       // If rootState.filterUsers is true and newState.filterUsers is set to false, then we can run updateHolders
       if (rootState.filterUsers && !newState.filterUsers) {
         runUpdateHolders = true
         newState.filterAmount = null
         newState.returnAmount = null
+        newState.lastActiveDays = null
         newState.filterAmountIs = '>'
       } else if (newState.filterUsers) {
         runUpdateHolders = true
@@ -201,7 +208,7 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
           <Row>
             <Col span={24} style={{ paddingTop: 3, paddingBottom: 3 }}>
               <span style={styleProps.fieldLabel}>
-                <b>Return only top</b>
+                <b>Return Only Top</b>
               </span>
             </Col>
             <Col>
@@ -214,6 +221,27 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
                 style={{ width: 200 }}
                 onChange={(returnAmount) => {
                   handleFilterUsers('returnAmount', returnAmount)
+                }}
+              />
+            </Col>
+          </Row>
+          <Divider style={styleProps.divider} />
+          <Row>
+            <Col span={24} style={{ paddingTop: 3, paddingBottom: 3 }}>
+              <span style={styleProps.fieldLabel}>
+                <b>Last Active at least</b>
+              </span>
+            </Col>
+            <Col>
+              <InputNumber
+                disabled={rootState.isExecuting}
+                addonAfter='day(s) ago'
+                min={0}
+                value={rootState.lastActiveDays}
+                placeholder='10'
+                style={{ width: 200 }}
+                onChange={(lastActiveDays) => {
+                  handleFilterUsers('lastActiveDays', lastActiveDays)
                 }}
               />
             </Col>

@@ -167,7 +167,10 @@ const processHodlerConditions = (hodlers, conditions) => {
     let selectedTableKeys = []
 
     try {
-      if (!conditions.filterUsers || (conditions.filterAmount === null && conditions.returnAmount === null)) {
+      if (
+        !conditions.filterUsers ||
+        (conditions.filterAmount === null && conditions.returnAmount === null && conditions.lastActiveDays === null)
+      ) {
         // Step 2: If `conditions` is an empty object, set the `isVisible` property of all entries in the `hodlers` array to `true`.
         hodlers.forEach((hodler) => {
           hodler.isVisible = true
@@ -201,6 +204,11 @@ const processHodlerConditions = (hodlers, conditions) => {
           // Next, if there is a conditions.returnAmount, the hodler.isVisible is only true if the holder's index in the array is less than the conditions.returnAmount
           if (conditions.returnAmount !== null && conditions.returnAmount !== 0) {
             hodler.isVisible = hodler.isVisible && index < conditions.returnAmount
+          }
+
+          // Next, if there is a conditions.lastActiveDays, the hodler.isVisible is only true if the holder's lastTransactionTimestamp in the array is less than or equal the conditions.lastActiveDays
+          if (conditions.lastActiveDays !== null && conditions.lastActiveDays !== 0) {
+            hodler.isVisible = hodler.isVisible && hodler.lastActiveDays <= conditions.lastActiveDays
           }
 
           if (hodler.isVisible) {
@@ -304,6 +312,7 @@ export const prepDistributionTransaction = async (
     distTransaction.rules.filterAmountIs = rootState.filterAmountIs
     distTransaction.rules.filterAmount = rootState.filterAmount || 0
     distTransaction.rules.returnAmount = rootState.returnAmount || 0
+    distTransaction.rules.lastActiveDays = rootState.lastActiveDays || 0
 
     distTransaction.totalFeeUSD = summaryState.totalFeeUSD
     distTransaction.totalFeeDESO = summaryState.totalFeeDESO
@@ -359,6 +368,7 @@ export const prepDistributionTemplate = async (desoData, rootState, name, rulesE
     transaction.rules.filterAmountIs = rootState.filterAmountIs
     transaction.rules.filterAmount = rootState.filterAmount || 0
     transaction.rules.returnAmount = rootState.returnAmount || 0
+    transaction.rules.lastActiveDays = rootState.lastActiveDays || 0
 
     if (transaction.distributeTo === Enums.values.CUSTOM) {
       transaction.customList = rootState.customListModal.userList

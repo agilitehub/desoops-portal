@@ -15,6 +15,7 @@ import { desoUserModel } from '../../../lib/data-models'
 import { SortAscendingOutlined } from '@ant-design/icons'
 import { SEARCH_PROFILES } from 'custom/lib/graphql-models'
 import { useApolloClient } from '@apollo/client'
+import { calculateDaysSinceLastActive } from 'custom/lib/utils'
 
 const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfirm, onCancel }) => {
   const [search, setSearch] = useState([])
@@ -68,6 +69,7 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
             publicKey: entry.value,
             username: entry.label,
             tokenBalance: 1,
+            lastActiveDays: entry.title,
             profilePicUrl: await generateProfilePicUrl(entry.value)
           }
 
@@ -84,6 +86,7 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
           publicKey: entry.value,
           username: entry.label,
           tokenBalance: 1,
+          lastActiveDays: entry.title,
           profilePicUrl: await generateProfilePicUrl(entry.value)
         }
 
@@ -142,7 +145,8 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
             return {
               key: entry.publicKey,
               label: entry.username,
-              value: entry.publicKey
+              value: entry.publicKey,
+              title: calculateDaysSinceLastActive(entry.account.transactionStats.latestTransactionTimestamp)
             }
           })
 

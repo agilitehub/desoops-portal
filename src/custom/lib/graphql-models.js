@@ -44,6 +44,11 @@ export const SEARCH_PROFILES = gql`
       nodes {
         username
         publicKey
+        account {
+          transactionStats {
+            latestTransactionTimestamp
+          }
+        }
       }
     }
   }
@@ -90,6 +95,9 @@ export const GET_NFT_ENTRIES = gql`
         owner {
           username
           publicKey
+          transactionStats {
+            latestTransactionTimestamp
+          }
         }
       }
     }

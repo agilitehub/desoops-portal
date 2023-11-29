@@ -80,6 +80,10 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
                 style={{ color: theme.twitterBootstrap.primary, fontSize: 12 }}
               >{`Ownership: ${entry.percentOwnershipLabel}% - Amount: ${estimatedPaymentLabel}`}</span>
               <br />
+              <span
+                style={{ color: theme.twitterBootstrap.primary, fontSize: 12 }}
+              >{`Last Active: ${entry.lastActiveDays} day(s) ago`}</span>
+              <br />
               <span style={{ color: '#FFA07A', fontSize: 14 }}>Status: </span>
               {entry.paymentStatus === Enums.paymentStatuses.SUCCESS ? (
                 <CheckCircleOutlined style={{ fontSize: 14, color: theme.twitterBootstrap.success }} />
@@ -103,7 +107,7 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
         title: 'User (Token Balance)',
         dataIndex: 'username',
         key: 'username',
-        width: '40%',
+        width: '30%',
         render: (value, entry) => {
           return (
             <div>
@@ -126,7 +130,7 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
         title: '% Ownership -> Est Payment',
         dataIndex: 'percentOwnershipLabel',
         key: 'percentOwnershipLabel',
-        width: '40%',
+        width: '30%',
         render: (value, entry) => {
           let estimatedPaymentLabel = entry.estimatedPaymentLabel
 
@@ -152,6 +156,16 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
               </span>
             </>
           )
+        }
+      },
+      {
+        title: 'Last Active',
+        dataIndex: 'lastActiveDays',
+        key: 'lastActiveDays',
+        width: '20%',
+        render: (value) => {
+          let tmpVal = value || 'Unknown'
+          return <span style={{ color: theme.twitterBootstrap.primary }}>{`${tmpVal} day(s) ago`}</span>
         }
       },
       {
