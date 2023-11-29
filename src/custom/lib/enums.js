@@ -22,7 +22,8 @@ const Enums = {
     FOLLOWERS: 'Followers',
     FOLLOWING: 'Following',
     SELECTED_USERS: 'Selected Users in Table',
-    DESO_ESSENTIALS_PLAYLIST_URL: 'https://www.youtube.com/playlist?list=PLuSeo-NlSN_lXF3wXTmLxnsQQsyIqlb8r'
+    DESO_ESSENTIALS_PLAYLIST_URL: 'https://www.youtube.com/playlist?list=PLuSeo-NlSN_lXF3wXTmLxnsQQsyIqlb8r',
+    DESOOPS_VIDEO_URL: 'https://www.youtube.com/watch?v=PAQELCazfs8'
   },
   paymentTypes: {
     DESO: '$DESO',

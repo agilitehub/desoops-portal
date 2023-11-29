@@ -21,6 +21,8 @@ const reducer = (state, newState) => ({ ...state, ...newState })
 const Login = () => {
   const [state, setState] = useReducer(reducer, {
     openVideoModal: false,
+    videoUrl: '',
+    videoModalTitle: '',
     openHeroSwapModal: false
   })
 
@@ -37,8 +39,20 @@ const Login = () => {
     }
   }
 
-  const handleWatchIntroduction = () => {
-    setState({ openVideoModal: true })
+  const handleWatchIntroductionDeSoOps = () => {
+    const videoUrl = Enums.values.DESOOPS_VIDEO_URL
+    const videoModalTitle = 'Introduction To DeSoOps'
+    const openVideoModal = true
+
+    setState({ openVideoModal, videoUrl, videoModalTitle })
+  }
+
+  const handleWatchIntroductionDeSo = () => {
+    const videoUrl = Enums.values.DESO_ESSENTIALS_PLAYLIST_URL
+    const videoModalTitle = 'DeSo Essentials'
+    const openVideoModal = true
+
+    setState({ openVideoModal, videoUrl, videoModalTitle })
   }
 
   const handleLaunchHeroSwap = () => {
@@ -76,24 +90,28 @@ const Login = () => {
                       <img src={logo} alt='DeSoOps Portal' style={{ width: styleProps.logoWidth }} />
                       <h1 style={{ marginTop: -20 }}> PORTAL SIGN-IN</h1>
                     </center>
-                    {/* {!state.loading ? ( */}
-                    <Row justify='center' style={{ marginBottom: 20 }}>
+                    <Row justify='center' style={{ marginBottom: 10 }}>
                       <Col>
-                        <span>
-                          New to DeSo?
-                          <Button
-                            type='link'
-                            style={{ cursor: 'pointer', color: token.colorPrimary, fontSize: 17 }}
-                            onClick={handleWatchIntroduction}
-                          >
-                            {' '}
-                            Watch Introduction
-                          </Button>
-                        </span>
+                        <Button
+                          type='link'
+                          style={{ cursor: 'pointer', color: token.colorPrimary, fontSize: 17 }}
+                          onClick={handleWatchIntroductionDeSoOps}
+                        >
+                          Watch Introduction To DeSoOps
+                        </Button>
                       </Col>
                     </Row>
-                    {/* // ) : null} */}
-
+                    <Row justify='center' style={{ marginBottom: 20 }}>
+                      <Col>
+                        <Button
+                          type='link'
+                          style={{ cursor: 'pointer', color: token.colorPrimary, fontSize: 17 }}
+                          onClick={handleWatchIntroductionDeSo}
+                        >
+                          Watch Introduction To DeSo
+                        </Button>
+                      </Col>
+                    </Row>
                     <Row justify='space-around' gutter={[12, 12]}>
                       <Col
                         span={24}
@@ -145,8 +163,8 @@ const Login = () => {
       </Row>
       <VideoModal
         isOpen={state.openVideoModal}
-        title='DeSo Essentials'
-        url={Enums.values.DESO_ESSENTIALS_PLAYLIST_URL}
+        title={state.videoModalTitle}
+        url={state.videoUrl}
         onCloseModal={() => setState({ openVideoModal: false })}
       />
       <HeroSwapModal isOpen={state.openHeroSwapModal} onCloseModal={() => setState({ openHeroSwapModal: false })} />
