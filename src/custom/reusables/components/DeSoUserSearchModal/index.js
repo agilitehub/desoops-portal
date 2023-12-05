@@ -26,7 +26,7 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
     if (isOpen) {
       // Map through rootState.customListModal.userList and create new array of key, label, value
       const options = rootState.customListModal.userList.map((entry) => {
-        return { key: entry.publicKey, label: entry.username, value: entry.publicKey }
+        return { key: entry.publicKey, label: entry.username, value: `${entry.publicKey}~${entry.lastActiveDays}` }
       })
 
       setSearch(options)
@@ -39,59 +39,28 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
   const handleConfirm = async () => {
     let userList = []
     let newEntry = null
+    let publicKey = null
+    let lastActiveDays = null
+    let tmpData = null
 
-    // If there are entries in rootState.customListModal.userList, then compare...
-    // with the new list and remove any entries that are not in the new list.
-    // If there are new entries in the new list, add them to...
-    // ...rootState.customListModal.userList initiating using desoUserModel()
+    for (const entry of search) {
+      tmpData = entry.value.split('~')
+      publicKey = tmpData[0]
+      lastActiveDays = tmpData[1]
 
-    if (rootState.customListModal.userList.length > 0) {
-      userList = cloneDeep(rootState.customListModal.userList)
+      newEntry = desoUserModel()
 
-      for (const entry of userList) {
-        const found = search.find((item) => item.value === entry.publicKey)
-
-        if (!found) {
-          // Remove entry from userList
-          userList = userList.filter((item) => item.publicKey !== entry.publicKey)
-        }
+      newEntry = {
+        ...newEntry,
+        isCustom: true,
+        publicKey,
+        username: entry.label,
+        tokenBalance: 1,
+        lastActiveDays,
+        profilePicUrl: await generateProfilePicUrl(publicKey)
       }
 
-      for (const entry of search) {
-        const found = userList.find((item) => item.publicKey === entry.value)
-
-        if (!found) {
-          newEntry = desoUserModel()
-
-          newEntry = {
-            ...newEntry,
-            isCustom: true,
-            publicKey: entry.value,
-            username: entry.label,
-            tokenBalance: 1,
-            lastActiveDays: entry.title,
-            profilePicUrl: await generateProfilePicUrl(entry.value)
-          }
-
-          userList.push(newEntry)
-        }
-      }
-    } else {
-      for (const entry of search) {
-        newEntry = desoUserModel()
-
-        newEntry = {
-          ...newEntry,
-          isCustom: true,
-          publicKey: entry.value,
-          username: entry.label,
-          tokenBalance: 1,
-          lastActiveDays: entry.title,
-          profilePicUrl: await generateProfilePicUrl(entry.value)
-        }
-
-        userList.push(newEntry)
-      }
+      userList.push(newEntry)
     }
 
     onConfirm(userList)
@@ -146,8 +115,9 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
             return {
               key: entry.publicKey,
               label: entry.username,
-              value: entry.publicKey,
-              title: calculateDaysSinceLastActive(entry.account.transactionStats.latestTransactionTimestamp)
+              value: `${entry.publicKey}~${calculateDaysSinceLastActive(
+                entry.account.transactionStats.latestTransactionTimestamp
+              )}`
             }
           })
 

@@ -163,7 +163,7 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
         dataIndex: 'lastActiveDays',
         key: 'lastActiveDays',
         width: '20%',
-        render: (value) => {
+        render: (value, entry) => {
           let tmpVal =
             value === 0
               ? 'Today'
