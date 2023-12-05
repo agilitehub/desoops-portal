@@ -112,7 +112,8 @@ const CoreApp = () => {
             if (!data1) {
               gqlProps = {
                 variables: {
-                  publicKey: currentUser.PublicKeyBase58Check
+                  publicKey: currentUser.PublicKeyBase58Check,
+                  orderBy: 'BALANCE_NANOS_DESC'
                 }
               }
 

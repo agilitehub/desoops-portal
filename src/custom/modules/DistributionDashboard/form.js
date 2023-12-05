@@ -278,9 +278,11 @@ const _BatchTransactionsForm = () => {
     setState({ loading: true, distributeDeSoUser })
 
     gqlProps.publicKey = distributeDeSoUser[0].key
+    gqlProps.orderBy = 'BALANCE_NANOS_DESC'
 
     if (state.distributeTo === Enums.values.CREATOR) {
       gqlProps.filter = { isDaoCoin: { in: false } }
+
       gqlData = await client.query({ query: GET_HODLERS, variables: gqlProps })
       const { ccHodlers } = await getCCHodlersAndBalance(
         distributeDeSoUser[0].key,

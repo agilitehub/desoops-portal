@@ -106,10 +106,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
       switch (item.key) {
         case Enums.values.SELECTED_USERS:
           // Return a list of usernames from rootState.finalHodlers.username and only where isActive and isVisible are true
-          userList = rootState.finalHodlers
-            .filter((item) => item.isActive && item.isVisible)
-            .map((item) => item.username)
-
+          userList = rootState.finalHodlers.filter((item) => item.isActive && item.isVisible)
           userList = await prepUsersForClipboard(userList)
           break
         case Enums.values.FOLLOWERS:

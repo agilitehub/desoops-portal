@@ -1,14 +1,14 @@
 import { gql } from '@apollo/client'
 
 export const GQL_GET_INITIAL_DESO_DATA = gql`
-  query AccountByPublicKey($publicKey: String!) {
+  query AccountByPublicKey($publicKey: String!, $orderBy: [TokenBalancesOrderBy!]) {
     accountByPublicKey(publicKey: $publicKey) {
       publicKey
       username
       desoBalance {
         balanceNanos
       }
-      tokenBalancesAsCreator {
+      tokenBalancesAsCreator(orderBy: $orderBy) {
         nodes {
           balanceNanos
           isDaoCoin
@@ -39,8 +39,8 @@ export const GQL_GET_INITIAL_DESO_DATA = gql`
 `
 
 export const SEARCH_PROFILES = gql`
-  query Profiles($filter: ProfileFilter, $first: Int!) {
-    profiles(filter: $filter, first: $first) {
+  query Profiles($filter: ProfileFilter, $first: Int!, $orderBy: [ProfilesOrderBy!]) {
+    profiles(filter: $filter, first: $first, orderBy: $orderBy) {
       nodes {
         username
         publicKey
@@ -55,9 +55,9 @@ export const SEARCH_PROFILES = gql`
 `
 
 export const GET_HODLERS = gql`
-  query AccountByPublicKey($publicKey: String!, $filter: TokenBalanceFilter) {
+  query AccountByPublicKey($publicKey: String!, $filter: TokenBalanceFilter, $orderBy: [TokenBalancesOrderBy!]) {
     accountByPublicKey(publicKey: $publicKey) {
-      tokenBalancesAsCreator(filter: $filter) {
+      tokenBalancesAsCreator(filter: $filter, orderBy: $orderBy) {
         nodes {
           balanceNanos
           isDaoCoin

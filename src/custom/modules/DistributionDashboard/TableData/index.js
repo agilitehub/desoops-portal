@@ -164,8 +164,13 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
         key: 'lastActiveDays',
         width: '20%',
         render: (value) => {
-          let tmpVal = value || 'Unknown'
-          return <span style={{ color: theme.twitterBootstrap.primary }}>{`${tmpVal} day(s) ago`}</span>
+          let tmpVal =
+            value === 0
+              ? 'Today'
+              : value !== undefined && value !== null && value !== ''
+              ? `${value} day(s) ago`
+              : 'Unknown'
+          return <span style={{ color: theme.twitterBootstrap.primary }}>{tmpVal}</span>
         }
       },
       {

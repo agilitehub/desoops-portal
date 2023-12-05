@@ -145,6 +145,7 @@ const GeneralTab = ({
         setFetching(true)
 
         const gqlProps = {
+          orderBy: 'USERNAME_ASC',
           filter: {
             username: {
               includesInsensitive: value

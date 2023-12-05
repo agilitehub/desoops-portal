@@ -376,6 +376,23 @@ export const processFollowersOrFollowing = (followType, data) => {
           result.push(newEntry)
         }
 
+        // Sort result by lastActiveDays descending, then by username ascending
+        result.sort((a, b) => {
+          if (a.lastActiveDays < b.lastActiveDays) {
+            return 1
+          } else if (a.lastActiveDays > b.lastActiveDays) {
+            return -1
+          } else {
+            if (a.username.toLowerCase() < b.username.toLowerCase()) {
+              return -1
+            } else if (a.username.toLowerCase() > b.username.toLowerCase()) {
+              return 1
+            } else {
+              return 0
+            }
+          }
+        })
+
         resolve(result)
       } catch (e) {
         console.error(e)
@@ -418,10 +435,27 @@ export const processNFTs = (nftPost, nftEntries) => {
           newEntry.lastActiveDays = calculateDaysSinceLastActive(
             entry.owner.transactionStats.latestTransactionTimestamp
           )
-          newEntry.tokenBalance = 1
 
+          newEntry.tokenBalance = 1
           nftHodlers.push(newEntry)
         }
+
+        // Sort nftHodlers by tokenBalance descending, then by username ascending
+        nftHodlers.sort((a, b) => {
+          if (a.tokenBalance < b.tokenBalance) {
+            return 1
+          } else if (a.tokenBalance > b.tokenBalance) {
+            return -1
+          } else {
+            if (a.username.toLowerCase() < b.username.toLowerCase()) {
+              return -1
+            } else if (a.username.toLowerCase() > b.username.toLowerCase()) {
+              return 1
+            } else {
+              return 0
+            }
+          }
+        })
 
         resolve({ nftMetaData, nftHodlers })
       } catch (e) {
