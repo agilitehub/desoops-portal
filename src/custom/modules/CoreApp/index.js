@@ -8,7 +8,7 @@ import React, { useContext, useEffect, useReducer } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DeSoIdentityContext } from 'react-deso-protocol'
 import { isMobile, isTablet } from 'react-device-detect'
-import { useLazyQuery } from '@apollo/client'
+import { useApolloClient } from '@apollo/client'
 import { Spin } from 'antd'
 
 // App Components
@@ -48,8 +48,7 @@ const CoreApp = () => {
   const dispatch = useDispatch()
   const desoData = useSelector((state) => state.custom.desoData)
   const { currentUser, isLoading } = useContext(DeSoIdentityContext)
-  const [getInitialDeSoData, { loading: loading1, error: error1, data: data1 }] =
-    useLazyQuery(GQL_GET_INITIAL_DESO_DATA)
+  const client = useApolloClient()
   const [state, setState] = useReducer(reducer, initialState)
 
   // Determine Device Type
@@ -57,23 +56,6 @@ const CoreApp = () => {
     const isSmartphone = isMobile && !isTablet
     dispatch(setDeviceType({ isMobile, isTablet, isSmartphone }))
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Finalize DeSo Object once we have the user's DeSo data via GraphQL
-  useEffect(() => {
-    const init = async () => {
-      let tmpdata = null
-
-      if (!loading1 && !error1 && data1) {
-        // Finalize the DeSo Data Object for the current User
-        tmpdata = await getDeSoData(desoData, data1)
-        dispatch(setDeSoData(tmpdata))
-        setState({ initializing: false })
-      }
-    }
-
-    init()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading1, error1, data1])
 
   // Determine the State of the page and what loads
   useEffect(() => {
@@ -84,6 +66,7 @@ const CoreApp = () => {
       let tmpTemplates = null
       let newState = null
       let gqlProps = null
+      let gqlData = null
 
       try {
         newState = await renderApp(currentUser, isLoading, state)
@@ -109,22 +92,15 @@ const CoreApp = () => {
             dispatch(setDistributionTemplates(tmpTemplates))
 
             // Next, we need to fetch the rest of the user's DeSo data
-            if (!data1) {
-              gqlProps = {
-                variables: {
-                  publicKey: currentUser.PublicKeyBase58Check,
-                  orderBy: 'BALANCE_NANOS_DESC'
-                }
-              }
-
-              getInitialDeSoData(gqlProps)
-            } else {
-              // We already have the user's DeSo data via GraphQL
-              // Finalize the DeSo Data Object for the current User
-              const tmpDeSoData = await getDeSoData(desoData, data1)
-              dispatch(setDeSoData(tmpDeSoData))
-              setState({ initializing: false })
+            gqlProps = {
+              publicKey: currentUser.PublicKeyBase58Check,
+              orderBy: 'BALANCE_NANOS_DESC'
             }
+
+            gqlData = await client.query({ query: GQL_GET_INITIAL_DESO_DATA, variables: gqlProps })
+            const tmpDeSoData = await getDeSoData(desoData, gqlData.data)
+            dispatch(setDeSoData(tmpDeSoData))
+            setState({ initializing: false })
 
             break
         }

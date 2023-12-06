@@ -169,7 +169,9 @@ const processHodlerConditions = (hodlers, conditions) => {
     try {
       if (
         !conditions.filterUsers ||
-        (conditions.filterAmount === null && conditions.returnAmount === null && conditions.lastActiveDays === null)
+        (conditions.filterAmount === null &&
+          (conditions.returnAmount === null || conditions.returnAmount === undefined) &&
+          (conditions.lastActiveDays === null || conditions.lastActiveDays === undefined))
       ) {
         // Step 2: If `conditions` is an empty object, set the `isVisible` property of all entries in the `hodlers` array to `true`.
         hodlers.forEach((hodler) => {
@@ -202,12 +204,20 @@ const processHodlerConditions = (hodlers, conditions) => {
           }
 
           // Next, if there is a conditions.returnAmount, the hodler.isVisible is only true if the holder's index in the array is less than the conditions.returnAmount
-          if (conditions.returnAmount !== null && conditions.returnAmount !== 0) {
+          if (
+            conditions.returnAmount !== null &&
+            conditions.returnAmount !== 0 &&
+            conditions.returnAmount !== undefined
+          ) {
             hodler.isVisible = hodler.isVisible && index < conditions.returnAmount
           }
 
           // Next, if there is a conditions.lastActiveDays, the hodler.isVisible is only true if the holder's lastTransactionTimestamp in the array is less than or equal the conditions.lastActiveDays
-          if (conditions.lastActiveDays !== null && conditions.lastActiveDays !== 0) {
+          if (
+            conditions.lastActiveDays !== null &&
+            conditions.lastActiveDays !== undefined &&
+            conditions.lastActiveDays !== 0
+          ) {
             hodler.isVisible = hodler.isVisible && hodler.lastActiveDays <= conditions.lastActiveDays
           }
 

@@ -103,7 +103,10 @@ export const getDeSoData = async (desoData, gqlData) => {
     newDeSoData.profile.profilePicUrl = await generateProfilePicUrl(newDeSoData.profile.publicKey)
 
     // Fetch the current price of DeSo
-    desoBalance = gqlData.accountByPublicKey.desoBalance.balanceNanos / Enums.values.NANO_VALUE
+    if (gqlData.accountByPublicKey.desoBalance !== null) {
+      desoBalance = gqlData.accountByPublicKey.desoBalance.balanceNanos / Enums.values.NANO_VALUE
+    }
+
     newDeSoData.desoPrice = await getDeSoPricing(newDeSoData.desoPrice)
 
     // We need to loop through the tokenBalancesAsCreator array to find the DAO and CC Balances

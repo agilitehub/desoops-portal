@@ -26,7 +26,7 @@ import {
   getConfigData,
   updateDistributionTemplate
 } from '../../lib/agilite-controller'
-import { useApolloClient, useLazyQuery } from '@apollo/client'
+import { useApolloClient } from '@apollo/client'
 import { GET_HODLERS, GQL_GET_INITIAL_DESO_DATA } from 'custom/lib/graphql-models'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
@@ -39,8 +39,6 @@ const _BatchTransactionsForm = () => {
   const client = useApolloClient()
   const [state, setState] = useReducer(reducer, distributionDashboardState(configData.feePerTransactionUSD))
   const { isTablet, isSmartphone, isMobile } = useSelector((state) => state.custom.userAgent)
-
-  const [refreshDeSoData, { loading: loading2, error: error2, data: data2 }] = useLazyQuery(GQL_GET_INITIAL_DESO_DATA)
 
   const styleProps = {
     divider: { margin: '4px 0', borderBlockStart: 0 },
@@ -67,22 +65,6 @@ const _BatchTransactionsForm = () => {
 
     setState({ rulesEnabled, distributionAmountEnabled })
   }, [state.distributeTo, state.distributionType, state.tokenToUse]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    const init = async () => {
-      let tmpdata = null
-
-      if (!loading2 && !error2 && data2) {
-        // Finalize the DeSo Data Object for the current User
-        tmpdata = await getDeSoData(desoData, data2)
-        dispatch(setDeSoData(tmpdata))
-        setState({ isExecuting: false })
-      }
-    }
-
-    init()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading2, error2, data2])
 
   // Use Effect to monitor state.rulesEnabled and if truthy and a distribution template has been selected...
   // ...check to see if any changes have been made to the template and if so, ...
@@ -134,6 +116,8 @@ const _BatchTransactionsForm = () => {
 
   const handleRefreshDashboard = async () => {
     let gqlProps = null
+    let gqlData = null
+    let tmpdata = null
 
     try {
       setState({ isExecuting: true })
@@ -144,12 +128,16 @@ const _BatchTransactionsForm = () => {
 
       // Get the rest of the DeSo Data
       gqlProps = {
-        variables: {
-          publicKey: desoData.profile.publicKey
-        }
+        publicKey: desoData.profile.publicKey
       }
 
-      refreshDeSoData(gqlProps)
+      gqlData = await client.query({ query: GQL_GET_INITIAL_DESO_DATA, variables: gqlProps })
+
+      // Finalize the DeSo Data Object for the current User
+      tmpdata = await getDeSoData(desoData, gqlData.data)
+      dispatch(setDeSoData(tmpdata))
+      setState({ isExecuting: false })
+
       return
     } catch (e) {
       message.error(e)
