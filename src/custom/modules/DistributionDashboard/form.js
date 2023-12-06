@@ -128,10 +128,11 @@ const _BatchTransactionsForm = () => {
 
       // Get the rest of the DeSo Data
       gqlProps = {
-        publicKey: desoData.profile.publicKey
+        publicKey: desoData.profile.publicKey,
+        orderBy: 'BALANCE_NANOS_DESC'
       }
 
-      gqlData = await client.query({ query: GQL_GET_INITIAL_DESO_DATA, variables: gqlProps })
+      gqlData = await client.query({ query: GQL_GET_INITIAL_DESO_DATA, variables: gqlProps, fetchPolicy: 'no-cache' })
 
       // Finalize the DeSo Data Object for the current User
       tmpdata = await getDeSoData(desoData, gqlData.data)
@@ -271,7 +272,7 @@ const _BatchTransactionsForm = () => {
     if (state.distributeTo === Enums.values.CREATOR) {
       gqlProps.filter = { isDaoCoin: { in: false } }
 
-      gqlData = await client.query({ query: GET_HODLERS, variables: gqlProps })
+      gqlData = await client.query({ query: GET_HODLERS, variables: gqlProps, fetchPolicy: 'no-cache' })
       const { ccHodlers } = await getCCHodlersAndBalance(
         distributeDeSoUser[0].key,
         gqlData.data.accountByPublicKey.tokenBalancesAsCreator.nodes
@@ -279,7 +280,7 @@ const _BatchTransactionsForm = () => {
       tmpHodlers = ccHodlers
     } else {
       gqlProps.filter = { isDaoCoin: { in: true } }
-      gqlData = await client.query({ query: GET_HODLERS, variables: gqlProps })
+      gqlData = await client.query({ query: GET_HODLERS, variables: gqlProps, fetchPolicy: 'no-cache' })
       const { daoHodlers } = await getDAOHodlersAndBalance(
         distributeDeSoUser[0].key,
         gqlData.data.accountByPublicKey.tokenBalancesAsCreator.nodes
@@ -383,6 +384,9 @@ const _BatchTransactionsForm = () => {
           break
         case Enums.values.CUSTOM:
           tmpHodlers = cloneDeep(template.customList)
+          break
+        case Enums.values.NFT:
+          tmpHodlers = cloneDeep(template.nftHodlers)
           break
       }
 

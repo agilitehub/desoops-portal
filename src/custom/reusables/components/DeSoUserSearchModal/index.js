@@ -105,7 +105,7 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
           first: Enums.defaults.USER_SEARCH_NUM_TO_FETCH
         }
 
-        client.query({ query: SEARCH_PROFILES, variables: gqlProps }).then((newOptions) => {
+        client.query({ query: SEARCH_PROFILES, variables: gqlProps, fetchPolicy: 'no-cache' }).then((newOptions) => {
           if (fetchId !== fetchRef.current) {
             // for fetch callback order
             return

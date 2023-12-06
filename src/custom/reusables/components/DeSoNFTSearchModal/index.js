@@ -82,7 +82,7 @@ const DeSoNFTSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfir
         }
       }
 
-      nftPost = await client.query({ query: GET_NFT_POST, variables: gqlProps })
+      nftPost = await client.query({ query: GET_NFT_POST, variables: gqlProps, fetchPolicy: 'no-cache' })
 
       // Check if a valid NFT was returned
       if (!nftPost.data.nfts.nodes.length === 0) throw new Error(errMsgDefault)
@@ -102,7 +102,7 @@ const DeSoNFTSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfir
         }
       }
 
-      nftEntries = await client.query({ query: GET_NFT_ENTRIES, variables: gqlProps })
+      nftEntries = await client.query({ query: GET_NFT_ENTRIES, variables: gqlProps, fetchPolicy: 'no-cache' })
       nftEntries = nftEntries.data.nfts.nodes
 
       const { nftMetaData, nftHodlers } = await processNFTs(nftPost, nftEntries)

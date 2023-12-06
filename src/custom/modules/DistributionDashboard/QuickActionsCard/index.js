@@ -126,12 +126,12 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
 
             // Update State that we received followers/following
             if (item.key === Enums.values.FOLLOWERS) {
-              userList = await client.query({ query: GET_FOLLOWERS, variables: gqlProps })
+              userList = await client.query({ query: GET_FOLLOWERS, variables: gqlProps, fetchPolicy: 'no-cache' })
               userList = userList.data.accountByPublicKey.followers.nodes
               userList = await processFollowersOrFollowing(item.key, userList)
               dispatch(updateFollowers({ data: userList }))
             } else {
-              userList = await client.query({ query: GET_FOLLOWING, variables: gqlProps })
+              userList = await client.query({ query: GET_FOLLOWING, variables: gqlProps, fetchPolicy: 'no-cache' })
               userList = userList.data.accountByPublicKey.following.nodes
               userList = await processFollowersOrFollowing(item.key, userList)
               dispatch(updateFollowing({ data: userList }))

@@ -82,6 +82,9 @@ export const distributionTemplateModel = () => {
     tokenToUse: '',
     distributionAmount: 0,
     nftId: '',
+    nftImageUrl: '',
+    nftDescription: '',
+    nftHodlers: [],
     customList: [],
     rules: {
       enabled: true,

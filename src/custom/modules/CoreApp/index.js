@@ -97,7 +97,11 @@ const CoreApp = () => {
               orderBy: 'BALANCE_NANOS_DESC'
             }
 
-            gqlData = await client.query({ query: GQL_GET_INITIAL_DESO_DATA, variables: gqlProps })
+            gqlData = await client.query({
+              query: GQL_GET_INITIAL_DESO_DATA,
+              variables: gqlProps,
+              fetchPolicy: 'no-cache'
+            })
             const tmpDeSoData = await getDeSoData(desoData, gqlData.data)
             dispatch(setDeSoData(tmpDeSoData))
             setState({ initializing: false })

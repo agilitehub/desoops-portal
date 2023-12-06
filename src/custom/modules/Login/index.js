@@ -48,7 +48,7 @@ const Login = () => {
   }
 
   const handleWatchIntroductionDeSo = () => {
-    const videoUrl = Enums.values.DESO_ESSENTIALS_PLAYLIST_URL
+    const videoUrl = Enums.values.DESO_VIDEO_URL
     const videoModalTitle = 'DeSo Essentials'
     const openVideoModal = true
 

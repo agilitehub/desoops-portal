@@ -370,8 +370,11 @@ export const prepDistributionTemplate = async (desoData, rootState, name, rulesE
     transaction.distributionType = rootState.distributionType
     transaction.distributionAmount = rootState.distributionAmount
     transaction.tokenToUse = rootState.tokenToUse
-    transaction.nftId = rootState.nftMetaData.id || ''
 
+    transaction.nftId = rootState.nftMetaData.id || ''
+    transaction.nftImageUrl = rootState.nftMetaData.imageUrl || ''
+    transaction.nftDescription = rootState.nftMetaData.description || ''
+    transaction.nftHodlers = rootState.nftHodlers || []
     transaction.rules.enabled = rulesEnabled
     transaction.rules.spreadAmountBasedOn = rootState.spreadAmountBasedOn
     transaction.rules.filterUsers = rootState.filterUsers
