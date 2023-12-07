@@ -122,6 +122,9 @@ export const getDeSoData = async (desoData, gqlData) => {
     for (const entry of tmpGQLData.nodes) {
       newEntry = await createUserEntry(entry)
 
+      // Skip if newEntry is null, because it means the user is invalid
+      if (newEntry === null) continue
+
       if (entry.isDaoCoin) {
         daoHodlings.push(newEntry)
       } else {
@@ -184,6 +187,10 @@ export const getDAOHodlersAndBalance = (publicKey, data) => {
           if (!entry.isDaoCoin) continue
 
           newEntry = await createUserEntry(entry)
+
+          // Skip if newEntry is null, because it means the user is invalid
+          if (newEntry === null) continue
+
           if (newEntry.publicKey === publicKey) {
             daoBalance = newEntry.tokenBalance
           } else {
@@ -254,6 +261,7 @@ export const createUserEntry = (entry) => {
       let newEntry = null
       let tokenBalance = 0
       let tmpEntry = null
+      let lastActiveDays = null
 
       try {
         tokenBalance = entry.balanceNanos / Enums.values.NANO_VALUE
@@ -263,9 +271,17 @@ export const createUserEntry = (entry) => {
         newEntry = desoUserModel()
         tmpEntry = entry.holder || entry.creator
 
+        // If there's no Username, then the user is invalid
+        if (!tmpEntry.username) return resolve(null)
+
+        // Check first if lastActiveTimestamp is null before calculating days
+        if (tmpEntry.transactionStats.latestTransactionTimestamp !== null) {
+          lastActiveDays = calculateDaysSinceLastActive(tmpEntry.transactionStats.latestTransactionTimestamp)
+        }
+
         newEntry.publicKey = tmpEntry.publicKey
         newEntry.username = tmpEntry.username
-        newEntry.lastActiveDays = calculateDaysSinceLastActive(tmpEntry.transactionStats.latestTransactionTimestamp)
+        newEntry.lastActiveDays = lastActiveDays
         newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
         newEntry.tokenBalance = tokenBalance
 
@@ -289,6 +305,9 @@ export const getCCHodlersAndBalance = (publicKey, data) => {
           if (entry.isDaoCoin) continue
 
           newEntry = await createUserEntry(entry)
+
+          // Skip if newEntry is null, because it means the user is invalid
+          if (newEntry === null) continue
 
           if (newEntry.publicKey === publicKey) {
             ccBalance = newEntry.tokenBalance
@@ -367,6 +386,9 @@ export const processFollowersOrFollowing = (followType, data) => {
           } else {
             tmpEntry = entry.followee
           }
+
+          // If there's no Username, then the user is invalid
+          if (!tmpEntry.username) continue
 
           newEntry = desoUserModel()
 
