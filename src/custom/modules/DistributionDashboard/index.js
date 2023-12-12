@@ -1,7 +1,7 @@
 import React, { lazy, Suspense, memo } from 'react'
 import { Spin } from 'antd'
 
-const Dashboard = lazy(() => import('./form'))
+const Dashboard = lazy(() => import('./Dashboard/index'))
 
 const _DistributionDashboard = () => {
   return (

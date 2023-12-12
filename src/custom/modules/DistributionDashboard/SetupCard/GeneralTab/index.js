@@ -211,6 +211,8 @@ const GeneralTab = ({
             <Select.Option value={Enums.values.CREATOR}>Creator Coin Holders</Select.Option>
             <Select.Option value={Enums.values.DAO}>DAO Coin Holders</Select.Option>
             <Select.Option value={Enums.values.NFT}>NFT Owners</Select.Option>
+            <Select.Option value={Enums.values.FOLLOWERS}>Followers</Select.Option>
+            <Select.Option value={Enums.values.FOLLOWING}>Following</Select.Option>
             <Select.Option value={Enums.values.CUSTOM}>Custom List</Select.Option>
           </Select>
         </Col>

@@ -5,27 +5,27 @@ import { DeepDiff } from 'deep-diff'
 import { Row, Col, message, Divider } from 'antd'
 
 // Custom Components
-import ContainerCard from '../../reusables/components/ContainerCard'
-import WalletOverviewCard from './WalletOverviewCard'
-import SetupCard from './SetupCard'
-import QuickActionsCard from './QuickActionsCard'
-import SummaryCard from './SummaryCard'
-import TableData from './TableData'
+import ContainerCard from '../../../reusables/components/ContainerCard'
+import WalletOverviewCard from '../WalletOverviewCard'
+import SetupCard from '../SetupCard'
+import QuickActionsCard from '../QuickActionsCard'
+import SummaryCard from '../SummaryCard'
+import TableData from '../TableData'
 
 // Custom Utils
-import Enums from '../../lib/enums'
-import { calculateEstimatedPayment, prepDistributionTemplate, setupHodlers, updateHodlers } from './controller'
-import { customListModal, distributionDashboardState, paymentModal } from './data-models'
-import { setDeSoData, setConfigData, setDistributionTemplates } from '../../reducer'
+import Enums from '../../../lib/enums'
+import { calculateEstimatedPayment, prepDistributionTemplate, setupHodlers, updateHodlers } from '../controller'
+import { customListModal, distributionDashboardState, paymentModal } from '../data-models'
+import { setDeSoData, setConfigData, setDistributionTemplates } from '../../../reducer'
 import { cloneDeep } from 'lodash'
-import { getCCHodlersAndBalance, getDAOHodlersAndBalance, getDeSoData } from '../../lib/deso-controller-graphql'
-import PaymentModal from './PaymentModal'
+import { getCCHodlersAndBalance, getDAOHodlersAndBalance, getDeSoData } from '../../../lib/deso-controller-graphql'
+import PaymentModal from '../PaymentModal'
 import {
   createDistributionTemplate,
   deleteDistributionTemplate,
   getConfigData,
   updateDistributionTemplate
-} from '../../lib/agilite-controller'
+} from '../../../lib/agilite-controller'
 import { useApolloClient } from '@apollo/client'
 import { GET_HODLERS, GQL_GET_INITIAL_DESO_DATA } from 'custom/lib/graphql-models'
 
