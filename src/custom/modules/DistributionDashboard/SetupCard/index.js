@@ -1,10 +1,10 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { Card, Tabs, Button, Image } from 'antd'
+import { Card, Tabs, Button } from 'antd'
 import GeneralTab from './GeneralTab'
 import RulesTab from './RulesTab'
 import Enums from '../../../lib/enums'
-import { UsergroupAddOutlined, FileAddOutlined, SaveOutlined } from '@ant-design/icons'
+import { UsergroupAddOutlined, FileAddOutlined, SaveOutlined, EnterOutlined } from '@ant-design/icons'
 import DeSoNFTSearchModal from '../../../reusables/components/DeSoNFTSearchModal'
 import DeSoUserSearchModal from '../../../reusables/components/DeSoUserSearchModal'
 import SelectTemplateModal from '../SelectTemplateModal'
@@ -30,20 +30,6 @@ const SetupCard = ({
   isLoading
 }) => {
   const distributionTemplates = useSelector((state) => state.custom.distributionTemplates)
-
-  const handleButtonClick = () => {
-    switch (rootState.distributeTo) {
-      case Enums.values.NFT:
-        setRootState({ openNftSearch: true })
-        break
-      case Enums.values.CUSTOM:
-        setRootState({ customListModal: { ...rootState.customListModal, isOpen: true } })
-        break
-      case Enums.values.EMPTY_STRING:
-        setRootState({ selectTemplateModal: { ...rootState.selectTemplateModal, isOpen: true } })
-        break
-    }
-  }
 
   const handleCancelNFT = () => {
     setRootState({ openNftSearch: false })
@@ -72,26 +58,20 @@ const SetupCard = ({
   const renderTabBarExtraContent = () => {
     let tabBarExtraContent = null
 
-    if (rootState.distributeTo === Enums.values.NFT) {
-      const nftIcon = rootState.nftMetaData.id ? (
-        <Image src={rootState.nftMetaData.imageUrl} style={styleProps.nftIcon} preview={false} />
-      ) : null
-
+    if (rootState.rulesEnabled && !rootState.isExecuting && templateNameModal.id && templateNameModal.isModified) {
       tabBarExtraContent = (
-        <Button style={styleProps.tabButton} onClick={handleButtonClick} icon={nftIcon}>
-          Select NFT
+        <Button icon={<SaveOutlined />} style={styleProps.tabButton} onClick={() => handleSaveSetup()}>
+          Update Setup
         </Button>
       )
-    } else if (rootState.distributeTo === Enums.values.CUSTOM) {
+    } else if (rootState.rulesEnabled && !rootState.isExecuting && !templateNameModal.id) {
       tabBarExtraContent = (
-        <Button style={styleProps.tabButton} onClick={handleButtonClick} icon={<UsergroupAddOutlined />}>
-          Manage List
-        </Button>
-      )
-    } else if (rootState.distributeTo === Enums.values.EMPTY_STRING) {
-      tabBarExtraContent = (
-        <Button style={styleProps.tabButton} onClick={handleButtonClick} icon={<FileAddOutlined />}>
-          Load Setup
+        <Button
+          icon={<SaveOutlined />}
+          style={styleProps.tabButton}
+          onClick={() => handleSaveSetup(templateNameModal.id)}
+        >
+          Save Setup
         </Button>
       )
     }
@@ -138,13 +118,13 @@ const SetupCard = ({
       fontSize: deviceType.isSmartphone ? 14 : 16,
       marginBottom: deviceType.isSmartphone ? 3 : 0
     },
-    btnSaveActive: {
-      color: '#188EFF',
-      borderColor: '#188EFF',
+    btnRunActive: {
+      color: '#29A745',
+      borderColor: '#29A745',
       backgroundColor: 'white',
       marginTop: 20
     },
-    btnSaveInactive: {
+    btnRunInactive: {
       color: '#D5D5D5',
       borderColor: '#D5D5D5',
       backgroundColor: 'white',
@@ -190,41 +170,16 @@ const SetupCard = ({
           items={tabItems}
         />
         <center>
-          {templateNameModal.id ? (
-            <Button
-              size={deviceType.isTablet ? 'large' : 'medium'}
-              type='primary'
-              icon={<SaveOutlined />}
-              style={
-                !rootState.rulesEnabled ||
-                rootState.isExecuting ||
-                !templateNameModal.isModified ||
-                !templateNameModal.id
-                  ? styleProps.btnUpdateInactive
-                  : styleProps.btnUpdateActive
-              }
-              onClick={() => handleSaveSetup()}
-              disabled={
-                !rootState.rulesEnabled ||
-                rootState.isExecuting ||
-                !templateNameModal.isModified ||
-                !templateNameModal.id
-              }
-            >
-              Update Setup
-            </Button>
-          ) : null}
           <Button
-            size={deviceType.isTablet ? 'large' : 'medium'}
-            type='primary'
-            icon={<SaveOutlined />}
+            size='large'
+            icon={<EnterOutlined />}
             style={
-              !rootState.rulesEnabled || rootState.isExecuting ? styleProps.btnSaveInactive : styleProps.btnSaveActive
+              !rootState.rulesEnabled || rootState.isExecuting ? styleProps.btnRunInactive : styleProps.btnRunActive
             }
             onClick={() => handleSaveSetup(templateNameModal.id)}
             disabled={!rootState.rulesEnabled || rootState.isExecuting}
           >
-            {templateNameModal.id ? 'Save As...' : 'Save Setup'}
+            Run
           </Button>
           {templateNameModal.id ? (
             <div style={{ display: 'block', marginTop: 5 }}>

@@ -529,6 +529,7 @@ const _BatchTransactionsForm = () => {
                       onRefreshDashboard={handleRefreshDashboard}
                       rootState={state}
                       deviceType={deviceType}
+                      setRootState={setState}
                     />
                   </Col>
                 </Row>

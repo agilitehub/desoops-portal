@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Row, Col, Select, Divider, Space, Image, Switch, Spin } from 'antd'
+import { Row, Col, Select, Divider, Space, Image, Switch, Spin, Button } from 'antd'
 import { useApolloClient } from '@apollo/client'
 import Enums from '../../../../lib/enums'
 
@@ -7,14 +7,15 @@ import Enums from '../../../../lib/enums'
 import { debounce } from 'lodash'
 import { Link } from 'react-scroll'
 import { SEARCH_PROFILES } from 'custom/lib/graphql-models'
+import { UsergroupAddOutlined } from '@ant-design/icons'
 
 const styleParams = {
   labelColXS: 24,
   labelColSM: 12,
-  labelColMD: 9,
+  labelColMD: 7,
   valueColXS: 24,
   valueColSM: 12,
-  valueColMD: 15,
+  valueColMD: 17,
   colRightXS: 24
 }
 
@@ -26,7 +27,8 @@ const GeneralTab = ({
   onDistributeDeSoUser,
   onDistributionType,
   onTokenToUse,
-  desoProfile
+  desoProfile,
+  setRootState
 }) => {
   const client = useApolloClient()
 
@@ -42,7 +44,19 @@ const GeneralTab = ({
     fieldLabel: { fontSize: deviceType.isSmartphone ? 14 : 16, fontWeight: 'bold' },
     labelColStyle: { marginTop: deviceType.isSmartphone ? 0 : 4 },
     divider: { margin: deviceType.isMobile ? '3px 0' : '7px 0' },
-    searchField: { width: '100%', fontSize: 16 }
+    searchField: { width: '100%', fontSize: 16 },
+    nftIcon: {
+      borderRadius: 5,
+      // marginLeft: deviceType.isSmartphone ? -10 : -15,
+      marginTop: deviceType.isSmartphone ? -0 : -3,
+      width: 25,
+      height: 25
+    },
+    linkButton: {
+      color: '#188EFF',
+      fontSize: deviceType.isSmartphone ? 14 : 16,
+      marginLeft: deviceType.isSmartphone ? -8 : 0
+    }
   }
 
   // Create a useEffect that manages the state of what fields get displayed or hidden
@@ -189,6 +203,14 @@ const GeneralTab = ({
     )
   }
 
+  const handleManageList = () => {
+    setRootState({ customListModal: { ...rootState.customListModal, isOpen: true } })
+  }
+
+  const handleSelectNFT = () => {
+    setRootState({ openNftSearch: true })
+  }
+
   return (
     <>
       <Row>
@@ -201,20 +223,46 @@ const GeneralTab = ({
           <span style={styleProps.fieldLabel}>Distribute to:</span>
         </Col>
         <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
-          <Select
-            disabled={rootState.isExecuting}
-            onChange={(value) => onDistributeTo(value)}
-            value={rootState.distributeTo}
-            style={styleProps.select}
-          >
-            <Select.Option value={Enums.values.EMPTY_STRING}>- Select -</Select.Option>
-            <Select.Option value={Enums.values.CREATOR}>Creator Coin Holders</Select.Option>
-            <Select.Option value={Enums.values.DAO}>DAO Coin Holders</Select.Option>
-            <Select.Option value={Enums.values.NFT}>NFT Owners</Select.Option>
-            <Select.Option value={Enums.values.FOLLOWERS}>Followers</Select.Option>
-            <Select.Option value={Enums.values.FOLLOWING}>Following</Select.Option>
-            <Select.Option value={Enums.values.CUSTOM}>Custom List</Select.Option>
-          </Select>
+          <Space size={0}>
+            <Select
+              disabled={rootState.isExecuting}
+              onChange={(value) => onDistributeTo(value)}
+              value={rootState.distributeTo}
+              style={styleProps.select}
+            >
+              <Select.Option value={Enums.values.EMPTY_STRING}>- Select -</Select.Option>
+              <Select.Option value={Enums.values.CREATOR}>Creator Coin Holders</Select.Option>
+              <Select.Option value={Enums.values.DAO}>DAO Coin Holders</Select.Option>
+              <Select.Option value={Enums.values.NFT}>NFT Owners</Select.Option>
+              <Select.Option value={Enums.values.FOLLOWERS}>Followers</Select.Option>
+              <Select.Option value={Enums.values.FOLLOWING}>Following</Select.Option>
+              <Select.Option value={Enums.values.CUSTOM}>Custom List</Select.Option>
+            </Select>
+            {rootState.distributeTo === Enums.values.CUSTOM ? (
+              <Button
+                type='link'
+                onClick={handleManageList}
+                style={styleProps.linkButton}
+                icon={<UsergroupAddOutlined />}
+              >
+                Manage List
+              </Button>
+            ) : null}
+            {rootState.distributeTo === Enums.values.NFT ? (
+              <Button
+                type='link'
+                onClick={handleSelectNFT}
+                style={styleProps.linkButton}
+                icon={
+                  rootState.nftMetaData.id ? (
+                    <Image src={rootState.nftMetaData.imageUrl} style={styleProps.nftIcon} preview={false} />
+                  ) : null
+                }
+              >
+                Select NFT
+              </Button>
+            ) : null}
+          </Space>
         </Col>
       </Row>
       {showMyHodlers ? (
@@ -280,7 +328,7 @@ const GeneralTab = ({
               md={styleParams.labelColMD}
               style={styleProps.labelColStyle}
             >
-              <span style={styleProps.fieldLabel}>Type of distribution:</span>
+              <span style={styleProps.fieldLabel}>Distribution type:</span>
             </Col>
             <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
               <Select
