@@ -30,7 +30,7 @@ import {
 import { getConfigData, getDistributionTemplates } from 'custom/lib/agilite-controller'
 
 import { renderApp } from './controller'
-import { getDeSoPricing, getDeSoData } from 'custom/lib/deso-controller-graphql'
+import { getDeSoPricing, getInitialDeSoData } from 'custom/lib/deso-controller-graphql'
 import { GQL_GET_INITIAL_DESO_DATA } from 'custom/lib/graphql-models'
 
 import './style.sass'
@@ -93,8 +93,7 @@ const CoreApp = () => {
 
             // Next, we need to fetch the rest of the user's DeSo data
             gqlProps = {
-              publicKey: currentUser.PublicKeyBase58Check,
-              orderBy: 'BALANCE_NANOS_DESC'
+              publicKey: currentUser.PublicKeyBase58Check
             }
 
             gqlData = await client.query({
@@ -102,7 +101,8 @@ const CoreApp = () => {
               variables: gqlProps,
               fetchPolicy: 'no-cache'
             })
-            const tmpDeSoData = await getDeSoData(desoData, gqlData.data)
+
+            const tmpDeSoData = await getInitialDeSoData(desoData, gqlData.data)
             dispatch(setDeSoData(tmpDeSoData))
             setState({ initializing: false })
 

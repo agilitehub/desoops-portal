@@ -139,6 +139,16 @@ export const randomize = (input, separator = ' ', x = 1, performance = false, du
   })
 }
 
+// Create a function that sorts an array of objects by a key value
+export const sortByKey = (array, key) => {
+  return array.sort((a, b) => {
+    const x = a[key]
+    const y = b[key]
+
+    return x < y ? -1 : x > y ? 1 : 0
+  })
+}
+
 // PRIVATE FUNCTIONS
 const shuffle = (array) => {
   return new Promise((resolve, reject) => {

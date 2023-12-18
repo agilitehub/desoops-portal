@@ -12,7 +12,7 @@ import BigNumber from 'bignumber.js'
 
 import Enums from './enums'
 import { desoUserModel } from './data-models'
-import { calculateDaysSinceLastActive, cleanString, hexToInt } from './utils'
+import { calculateDaysSinceLastActive, cleanString, hexToInt, sortByKey } from './utils'
 import nftLogo from '../assets/nft-default-logo.png'
 
 const desoConfigure = {
@@ -81,14 +81,7 @@ export const changeDeSoLimit = async (desoLimitNanos) => {
   })
 }
 
-/**
- * Finalizes the DeSo Data Object based on the returned GQL data and the DeSo Price
- *
- * @param {object} currentUser - The DeSo User Objecgt.
- * @param {object} desoData - The current desoData Redux state.
- * @returns {object} A promise that resolves a new instance of the desoData Redux state, or rejects when an error occurs.
- */
-export const getDeSoData = async (desoData, gqlData) => {
+export const getDeSoDataOld = async (desoData, gqlData) => {
   const daoHodlings = []
   const ccHodlings = []
   let newEntry = null
@@ -131,6 +124,83 @@ export const getDeSoData = async (desoData, gqlData) => {
         ccHodlings.push(newEntry)
       }
     }
+
+    // Finalize Data
+    newDeSoData.profile.desoBalanceUSD = Math.floor(desoBalance * newDeSoData.desoPrice * 100) / 100
+    newDeSoData.profile.desoBalance = Math.floor(desoBalance * 10000) / 10000
+    newDeSoData.profile.daoBalance = daoBalance
+    newDeSoData.profile.ccBalance = ccBalance
+    newDeSoData.profile.daoHodlers = daoHodlers
+    newDeSoData.profile.ccHodlers = ccHodlers
+    newDeSoData.profile.daoHodlings = daoHodlings
+    newDeSoData.profile.ccHodlings = ccHodlings
+
+    return newDeSoData
+  } catch (e) {
+    return e
+  }
+}
+
+export const getInitialDeSoData = async (desoData, gqlData) => {
+  const daoHodlers = []
+  const ccHodlers = []
+
+  let ccHodlings = []
+  let daoHodlings = []
+  let newEntry = null
+  let desoBalance = 0
+  let daoBalance = 0
+  let ccBalance = 0
+  let newDeSoData = null
+  let tmpGQLData = null
+  let ownEntryCC = null
+  let ownEntryDAO = null
+
+  try {
+    newDeSoData = cloneDeep(desoData)
+    newDeSoData.profile.publicKey = gqlData.accountByPublicKey.publicKey
+    newDeSoData.profile.username = gqlData.accountByPublicKey.username
+    newDeSoData.profile.profilePicUrl = await generateProfilePicUrl(newDeSoData.profile.publicKey)
+
+    // Fetch the current price of DeSo
+    if (gqlData.accountByPublicKey.desoBalance !== null) {
+      desoBalance = gqlData.accountByPublicKey.desoBalance.balanceNanos / Enums.values.NANO_VALUE
+    }
+
+    newDeSoData.desoPrice = await getDeSoPricing(newDeSoData.desoPrice)
+
+    // Next, we need to loop through the tokenBalancesAsHodler array to find the DAO and CC Balances
+    // and then create hodlings arrays, but we also need to separate our own balances
+    tmpGQLData = gqlData.accountByPublicKey.tokenBalances
+
+    for (const entry of tmpGQLData.nodes) {
+      newEntry = await createUserEntry(entry)
+
+      // Skip if newEntry is null, because it means the user is invalid
+      if (newEntry === null) continue
+
+      if (entry.isDaoCoin) {
+        if (newEntry.publicKey === newDeSoData.profile.publicKey) {
+          daoBalance = newEntry.tokenBalance
+          ownEntryDAO = newEntry
+        } else {
+          daoHodlings.push(newEntry)
+        }
+      } else {
+        if (newEntry.publicKey === newDeSoData.profile.publicKey) {
+          ccBalance = newEntry.tokenBalance
+          ownEntryCC = newEntry
+        } else {
+          ccHodlings.push(newEntry)
+        }
+      }
+    }
+
+    // Sort hodling Arrays by username ascending, then if ownEntries are not null, add it to the beginning of the arrays
+    ccHodlings = sortByKey(ccHodlings, 'username')
+    daoHodlings = sortByKey(daoHodlings, 'username')
+    if (ownEntryDAO) daoHodlings.unshift(ownEntryDAO)
+    if (ownEntryCC) ccHodlings.unshift(ownEntryCC)
 
     // Finalize Data
     newDeSoData.profile.desoBalanceUSD = Math.floor(desoBalance * newDeSoData.desoPrice * 100) / 100
@@ -275,7 +345,7 @@ export const createUserEntry = (entry) => {
         if (!tmpEntry.username) return resolve(null)
 
         // Check first if lastActiveTimestamp is null before calculating days
-        if (tmpEntry.transactionStats.latestTransactionTimestamp !== null) {
+        if (tmpEntry.transactionStats && tmpEntry.transactionStats.latestTransactionTimestamp !== null) {
           lastActiveDays = calculateDaysSinceLastActive(tmpEntry.transactionStats.latestTransactionTimestamp)
         }
 

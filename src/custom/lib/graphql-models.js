@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 
-export const GQL_GET_INITIAL_DESO_DATA = gql`
+export const GQL_GET_INITIAL_DESO_DATA_OLD = gql`
   query AccountByPublicKey($publicKey: String!, $orderBy: [TokenBalancesOrderBy!]) {
     accountByPublicKey(publicKey: $publicKey) {
       publicKey
@@ -31,6 +31,28 @@ export const GQL_GET_INITIAL_DESO_DATA = gql`
             transactionStats {
               latestTransactionTimestamp
             }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const GQL_GET_INITIAL_DESO_DATA = gql`
+  query AccountByPublicKey($publicKey: String!) {
+    accountByPublicKey(publicKey: $publicKey) {
+      publicKey
+      username
+      desoBalance {
+        balanceNanos
+      }
+      tokenBalances {
+        nodes {
+          isDaoCoin
+          balanceNanos
+          creator {
+            username
+            publicKey
           }
         }
       }

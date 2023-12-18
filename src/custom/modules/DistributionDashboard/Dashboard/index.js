@@ -18,7 +18,11 @@ import { calculateEstimatedPayment, prepDistributionTemplate, setupHodlers, upda
 import { customListModal, distributionDashboardState, paymentModal } from '../data-models'
 import { setDeSoData, setConfigData, setDistributionTemplates } from '../../../reducer'
 import { cloneDeep } from 'lodash'
-import { getCCHodlersAndBalance, getDAOHodlersAndBalance, getDeSoData } from '../../../lib/deso-controller-graphql'
+import {
+  getCCHodlersAndBalance,
+  getDAOHodlersAndBalance,
+  getInitialDeSoData
+} from '../../../lib/deso-controller-graphql'
 import PaymentModal from '../PaymentModal'
 import {
   createDistributionTemplate,
@@ -135,7 +139,7 @@ const _BatchTransactionsForm = () => {
       gqlData = await client.query({ query: GQL_GET_INITIAL_DESO_DATA, variables: gqlProps, fetchPolicy: 'no-cache' })
 
       // Finalize the DeSo Data Object for the current User
-      tmpdata = await getDeSoData(desoData, gqlData.data)
+      tmpdata = await getInitialDeSoData(desoData, gqlData.data)
       dispatch(setDeSoData(tmpdata))
       setState({ isExecuting: false })
 
