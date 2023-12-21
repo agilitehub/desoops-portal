@@ -5,66 +5,25 @@ import Enums from '../../lib/enums'
 import { distributionTemplateModel, distributionTransactionModel } from '../../lib/data-models'
 import { cloneDeep } from 'lodash'
 
-export const setupHodlers = (hodlers) => {
-  return new Promise(async (resolve, reject) => {
-    const selectedTableKeys = []
-    let percentResult = null
+export const setupHodlers = async (hodlers, rootState, desoData) => {
+  const selectedTableKeys = []
+  let percentResult = null
 
-    try {
-      // Default all entries in Table to be selected
-      for (let i = 0; i < hodlers.length; i++) {
-        selectedTableKeys.push(hodlers[i].username)
-      }
+  try {
+    const filterResult = await processHodlerConditions(cloneDeep(hodlers), rootState)
 
-      percentResult = await calculatePercentages(hodlers)
-      resolve({ finalHodlers: percentResult.hodlers, selectedTableKeys, tokenTotal: percentResult.tokenTotal })
-    } catch (e) {
-      reject(e)
-    }
-  })
-}
+    percentResult = await calculatePercentages(filterResult.hodlers)
+    percentResult.hodlers = await calculateEstimatedPayment(
+      rootState.distributionAmount,
+      percentResult.hodlers,
+      rootState,
+      desoData
+    )
 
-export const updateHodlers = (
-  hodlers,
-  selectedTableKeys,
-  conditions,
-  distributionAmount,
-  spreadAmountBasedOn,
-  desoPrice
-) => {
-  return new Promise(async (resolve, reject) => {
-    let result = null
-
-    try {
-      // If conditions are passed in, either as an empty Object or a populated Object, we need to first process the `hodlers` array
-      // If conditions is an empty object, we need to set all entries to be visible by populating the `isVisible` property
-      // If conditions is a populated object, we need to set all entries to be inactive by populating the `isVisible` property...
-      // ...by using conditions.filterAmountIs to check if the tokenBalance in each entry is >, <, >=, or <= conditions.filterAmount
-      if (conditions) {
-        result = await processHodlerConditions(hodlers, conditions)
-        // Hodlers does not need to be set here as it is already set in processHodlerConditions
-        selectedTableKeys = result.selectedTableKeys
-      }
-
-      // Disable entries from the `hodlers` array where there's no match in the `selectedTableKeys` array.
-      hodlers = hodlers.map((entry) => {
-        if (!selectedTableKeys.includes(entry.username)) {
-          entry.isActive = false
-        } else {
-          entry.isActive = true
-        }
-
-        return entry
-      })
-
-      result = await calculatePercentages(hodlers)
-      await calculateEstimatedPayment(hodlers, distributionAmount, spreadAmountBasedOn, desoPrice)
-
-      resolve({ finalHodlers: hodlers, selectedTableKeys, tokenTotal: result.tokenTotal })
-    } catch (e) {
-      reject(e)
-    }
-  })
+    return { finalHodlers: percentResult.hodlers, selectedTableKeys, tokenTotal: percentResult.tokenTotal }
+  } catch (e) {
+    return e
+  }
 }
 
 export const calculatePercentages = (hodlers, sortOrder = 'desc') => {
@@ -111,127 +70,136 @@ export const calculatePercentages = (hodlers, sortOrder = 'desc') => {
   })
 }
 
-export const calculateEstimatedPayment = (hodlers, amount, spreadAmountBasedOn, desoPrice) => {
-  return new Promise((resolve, reject) => {
-    let estimatedPaymentToken = null
-    let estimatedPaymentUSD = null
-    let activeHodlers = 0
+export const calculateEstimatedPayment = (distributionAmount, hodlers, rootState, desoData) => {
+  let estimatedPaymentToken = null
+  let estimatedPaymentUSD = null
+  let activeHodlers = 0
+  let desoPrice = null
 
-    try {
-      // Count the number of active hodlers based on the `isActive` property being set to true
-      activeHodlers = hodlers.reduce((total, entry) => {
-        if (entry.isActive) return total + 1
-        return total
-      }, 0)
+  try {
+    // Ignore if there is no amount
+    if (distributionAmount === '') return hodlers
+    if (rootState.distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
 
-      // Calculate the estimated payment for each hodler
-      hodlers.forEach((hodler) => {
+    // Count the number of active hodlers based on the `isActive` property being set to true
+    activeHodlers = hodlers.reduce((total, entry) => {
+      if (entry.isActive) return total + 1
+      return total
+    }, 0)
+
+    // Calculate the estimated payment for each hodler
+    hodlers.forEach((hodler) => {
+      estimatedPaymentToken = 0
+
+      if (distributionAmount === '' || !hodler.isActive) {
         estimatedPaymentToken = 0
-
-        if (amount === '' || !hodler.isActive) {
-          estimatedPaymentToken = 0
-          estimatedPaymentUSD = 0
-        } else if (spreadAmountBasedOn === 'Equal Spread') {
-          // Calculate the estimated payment based on an equal distribution
-          estimatedPaymentToken = amount / activeHodlers
-        } else if (spreadAmountBasedOn === 'Ownership') {
-          // Calculate the estimated payment based on percentage ownership
-          estimatedPaymentToken = (amount * hodler.percentOwnership) / 100
-        }
-
-        // Update the estimated payment in tokens
-        hodler.estimatedPaymentToken = estimatedPaymentToken
-
-        // Calculate the estimated payment in USD if desoPrice is provided
-        if (desoPrice !== null && amount !== '') {
-          estimatedPaymentUSD = estimatedPaymentToken * desoPrice
-        } else {
-          estimatedPaymentUSD = 0
-        }
-
-        hodler.estimatedPaymentUSD = Math.floor(estimatedPaymentUSD * 1000) / 1000
-
-        // Round the estimated payment in tokens to 3 decimal places
-        hodler.estimatedPaymentLabel = Math.floor(estimatedPaymentToken * 10000) / 10000
-      })
-
-      resolve(hodlers)
-    } catch (e) {
-      reject(e)
-    }
-  })
-}
-
-const processHodlerConditions = (hodlers, conditions) => {
-  return new Promise((resolve, reject) => {
-    let selectedTableKeys = []
-
-    try {
-      if (
-        !conditions.filterUsers ||
-        (conditions.filterAmount === null &&
-          (conditions.returnAmount === null || conditions.returnAmount === undefined) &&
-          (conditions.lastActiveDays === null || conditions.lastActiveDays === undefined))
-      ) {
-        // Step 2: If `conditions` is an empty object, set the `isVisible` property of all entries in the `hodlers` array to `true`.
-        hodlers.forEach((hodler) => {
-          hodler.isVisible = true
-        })
-
-        // Reset the `selectedTableKeys` array to include all entries in the `hodlers` array
-        selectedTableKeys = hodlers.map((hodler) => hodler.username)
-      } else {
-        // Step 3: If filterUsers is true, first default the `isVisible` property of all entries in the `hodlers` array to `false`.
-        hodlers.forEach((hodler) => {
-          hodler.isVisible = false
-        })
-
-        // Step 4: Set the `isVisible` property of each entry in the `hodlers` array based on whether the `tokenBalance` property is greater than, less than, equal to, or not equal to `conditions.filterAmount`.
-        hodlers.forEach((hodler, index) => {
-          switch (conditions.filterAmountIs) {
-            case '>':
-              hodler.isVisible = hodler.tokenBalance > conditions.filterAmount
-              break
-            case '<':
-              hodler.isVisible = hodler.tokenBalance < conditions.filterAmount
-              break
-            case '>=':
-              hodler.isVisible = hodler.tokenBalance >= conditions.filterAmount
-              break
-            case '<=':
-              hodler.isVisible = hodler.tokenBalance <= conditions.filterAmount
-              break
-          }
-
-          // Next, if there is a conditions.returnAmount, the hodler.isVisible is only true if the holder's index in the array is less than the conditions.returnAmount
-          if (
-            conditions.returnAmount !== null &&
-            conditions.returnAmount !== 0 &&
-            conditions.returnAmount !== undefined
-          ) {
-            hodler.isVisible = hodler.isVisible && index < conditions.returnAmount
-          }
-
-          // Next, if there is a conditions.lastActiveDays, the hodler.isVisible is only true if the holder's lastTransactionTimestamp in the array is less than or equal the conditions.lastActiveDays
-          if (
-            conditions.lastActiveDays !== null &&
-            conditions.lastActiveDays !== undefined &&
-            conditions.lastActiveDays !== 0
-          ) {
-            hodler.isVisible = hodler.isVisible && hodler.lastActiveDays <= conditions.lastActiveDays
-          }
-
-          if (hodler.isVisible) {
-            selectedTableKeys.push(hodler.username)
-          }
-        })
+        estimatedPaymentUSD = 0
+      } else if (rootState.spreadAmountBasedOn === 'Equal Spread') {
+        // Calculate the estimated payment based on an equal distribution
+        estimatedPaymentToken = distributionAmount / activeHodlers
+      } else if (rootState.spreadAmountBasedOn === 'Ownership') {
+        // Calculate the estimated payment based on percentage ownership
+        estimatedPaymentToken = (distributionAmount * hodler.percentOwnership) / 100
       }
 
-      resolve({ hodlers, selectedTableKeys })
-    } catch (e) {
-      reject(e)
+      // Update the estimated payment in tokens
+      hodler.estimatedPaymentToken = estimatedPaymentToken
+
+      // Calculate the estimated payment in USD if desoPrice is provided
+      if (desoPrice !== null && distributionAmount !== '') {
+        estimatedPaymentUSD = estimatedPaymentToken * desoPrice
+      } else {
+        estimatedPaymentUSD = 0
+      }
+
+      hodler.estimatedPaymentUSD = Math.floor(estimatedPaymentUSD * 1000) / 1000
+
+      // Round the estimated payment in tokens to 3 decimal places
+      hodler.estimatedPaymentLabel = Math.floor(estimatedPaymentToken * 10000) / 10000
+    })
+
+    return hodlers
+  } catch (e) {
+    return e
+  }
+}
+
+export const processHodlerConditions = async (hodlers, rootState) => {
+  let selectedTableKeys = []
+
+  try {
+    const conditions = {
+      filterUsers: rootState.filterUsers,
+      filterAmountIs: rootState.filterAmountIs,
+      filterAmount: rootState.filterAmount,
+      returnAmount: rootState.returnAmount,
+      lastActiveDays: rootState.lastActiveDays
     }
-  })
+
+    if (
+      !conditions.filterUsers ||
+      (conditions.filterAmount === null &&
+        (conditions.returnAmount === null || conditions.returnAmount === undefined) &&
+        (conditions.lastActiveDays === null || conditions.lastActiveDays === undefined))
+    ) {
+      // Step 2: If `conditions` is an empty object, set the `isVisible` property of all entries in the `hodlers` array to `true`.
+      hodlers.forEach((hodler) => {
+        hodler.isVisible = true
+      })
+
+      // Reset the `selectedTableKeys` array to include all entries in the `hodlers` array
+      selectedTableKeys = hodlers.map((hodler) => hodler.username)
+    } else {
+      // Step 3: If filterUsers is true, first default the `isVisible` property of all entries in the `hodlers` array to `false`.
+      hodlers.forEach((hodler) => {
+        hodler.isVisible = false
+      })
+
+      // Step 4: Set the `isVisible` property of each entry in the `hodlers` array based on whether the `tokenBalance` property is greater than, less than, equal to, or not equal to `conditions.filterAmount`.
+      hodlers.forEach((hodler, index) => {
+        switch (conditions.filterAmountIs) {
+          case '>':
+            hodler.isVisible = hodler.tokenBalance > conditions.filterAmount
+            break
+          case '<':
+            hodler.isVisible = hodler.tokenBalance < conditions.filterAmount
+            break
+          case '>=':
+            hodler.isVisible = hodler.tokenBalance >= conditions.filterAmount
+            break
+          case '<=':
+            hodler.isVisible = hodler.tokenBalance <= conditions.filterAmount
+            break
+        }
+
+        // Next, if there is a conditions.returnAmount, the hodler.isVisible is only true if the holder's index in the array is less than the conditions.returnAmount
+        if (
+          conditions.returnAmount !== null &&
+          conditions.returnAmount !== 0 &&
+          conditions.returnAmount !== undefined
+        ) {
+          hodler.isVisible = hodler.isVisible && index < conditions.returnAmount
+        }
+
+        // Next, if there is a conditions.lastActiveDays, the hodler.isVisible is only true if the holder's lastTransactionTimestamp in the array is less than or equal the conditions.lastActiveDays
+        if (
+          conditions.lastActiveDays !== null &&
+          conditions.lastActiveDays !== undefined &&
+          conditions.lastActiveDays !== 0
+        ) {
+          hodler.isVisible = hodler.isVisible && hodler.lastActiveDays <= conditions.lastActiveDays
+        }
+
+        if (hodler.isVisible) {
+          selectedTableKeys.push(hodler.username)
+        }
+      })
+    }
+
+    return { hodlers, selectedTableKeys }
+  } catch (e) {
+    return e
+  }
 }
 
 export const getHodlers = (Username, IsDAOCoin, fetchHodlings) => {
@@ -405,6 +373,7 @@ export const slimRootState = async (rootState) => {
   delete slimRootState.isExecuting
   delete slimRootState.activeRulesTab
   delete slimRootState.distributionAmountEnabled
+  delete slimRootState.originalHodlers
   delete slimRootState.finalHodlers
   delete slimRootState.selectedTableKeys
   delete slimRootState.tokenTotal

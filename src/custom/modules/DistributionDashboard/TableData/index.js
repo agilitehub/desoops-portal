@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Table, Popover, Image, App } from 'antd'
 import { CheckCircleOutlined, CloseCircleOutlined, ReloadOutlined } from '@ant-design/icons'
-import { cloneDeep } from 'lodash'
 
 import theme from '../../../../core/utils/theme'
-import { updateHodlers } from '../controller'
+import { setupHodlers } from '../controller'
 import Enums from '../../../lib/enums'
 import { copyTextToClipboard } from '../../../lib/utils'
 
@@ -12,18 +11,13 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
   const [tableData, setTableData] = useState([])
   const { message } = App.useApp()
 
-  const handleSelectionChange = async (changedSelectedTableKeys) => {
-    const tmpHodlers = cloneDeep(rootState.finalHodlers)
-    const tmpSelectedTableKeys = cloneDeep(changedSelectedTableKeys)
-
-    const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(
-      tmpHodlers,
-      tmpSelectedTableKeys,
-      null,
-      rootState.distributionAmount,
-      rootState.spreadAmountBasedOn,
-      desoData.desoPrice
+  const handleSelectionChange = async () => {
+    const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(
+      rootState.finalHodlers,
+      rootState,
+      desoData
     )
+
     setRootState({ selectedTableKeys, finalHodlers, tokenTotal })
   }
 

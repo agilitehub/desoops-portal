@@ -4,8 +4,7 @@
 
 import React from 'react'
 import { Row, Col, Select, Divider, InputNumber, Radio, Switch, message } from 'antd'
-import { calculateEstimatedPayment, updateHodlers } from '../../controller'
-import Enums from '../../../../lib/enums'
+import { calculateEstimatedPayment, setupHodlers } from '../../controller'
 import { cloneDeep } from 'lodash'
 
 const styleParams = {
@@ -36,8 +35,6 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
 
     let newState = {}
     let runUpdateHolders = false
-    let tmpHodlers = null
-    let tmpSelectedTableKeys = null
 
     try {
       if (propType === 'filterUsers') {
@@ -82,16 +79,10 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
       }
 
       if (runUpdateHolders) {
-        tmpHodlers = cloneDeep(rootState.finalHodlers)
-        tmpSelectedTableKeys = cloneDeep(rootState.selectedTableKeys)
-
-        const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(
-          tmpHodlers,
-          tmpSelectedTableKeys,
-          newState,
-          rootState.distributionAmount,
-          rootState.spreadAmountBasedOn,
-          desoData.desoPrice
+        const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(
+          rootState.originalHodlers,
+          rootState,
+          desoData
         )
 
         newState.finalHodlers = finalHodlers
@@ -108,22 +99,14 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
   const handleSpreadAmountBasedOn = async (e) => {
     const spreadAmountBasedOn = e.target.value
     let tmpHodlers = null
-    let desoPrice = null
 
-    // If rootState.distributionAmount is not empty...
-    //...we need to run calculateEstimatedPayment() to update the estimatedPaymentToken and estimatedPaymentUSD values
-    if (rootState.distributionAmount !== null) {
-      tmpHodlers = cloneDeep(rootState.finalHodlers)
-      if (rootState.distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
-      await calculateEstimatedPayment(tmpHodlers, rootState.distributionAmount, spreadAmountBasedOn, desoPrice)
+    tmpHodlers = cloneDeep(rootState.finalHodlers)
+    await calculateEstimatedPayment(rootState.distributionAmount, tmpHodlers, rootState, desoData)
 
-      setRootState({
-        spreadAmountBasedOn,
-        finalHodlers: tmpHodlers
-      })
-    } else {
-      setRootState({ spreadAmountBasedOn })
-    }
+    setRootState({
+      spreadAmountBasedOn,
+      finalHodlers: tmpHodlers
+    })
   }
 
   return (

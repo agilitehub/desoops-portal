@@ -3,8 +3,7 @@ import { useSelector } from 'react-redux'
 import { Card, Tabs, Button } from 'antd'
 import GeneralTab from './GeneralTab'
 import RulesTab from './RulesTab'
-import Enums from '../../../lib/enums'
-import { UsergroupAddOutlined, FileAddOutlined, SaveOutlined, EnterOutlined } from '@ant-design/icons'
+import { SaveOutlined } from '@ant-design/icons'
 import DeSoNFTSearchModal from '../../../reusables/components/DeSoNFTSearchModal'
 import DeSoUserSearchModal from '../../../reusables/components/DeSoUserSearchModal'
 import SelectTemplateModal from '../SelectTemplateModal'
@@ -118,18 +117,6 @@ const SetupCard = ({
       fontSize: deviceType.isSmartphone ? 14 : 16,
       marginBottom: deviceType.isSmartphone ? 3 : 0
     },
-    btnRunActive: {
-      color: '#29A745',
-      borderColor: '#29A745',
-      backgroundColor: 'white',
-      marginTop: 20
-    },
-    btnRunInactive: {
-      color: '#D5D5D5',
-      borderColor: '#D5D5D5',
-      backgroundColor: 'white',
-      marginTop: 20
-    },
     btnUpdateActive: {
       color: '#188EFF',
       borderColor: '#188EFF',
@@ -170,17 +157,6 @@ const SetupCard = ({
           items={tabItems}
         />
         <center>
-          <Button
-            size='large'
-            icon={<EnterOutlined />}
-            style={
-              !rootState.rulesEnabled || rootState.isExecuting ? styleProps.btnRunInactive : styleProps.btnRunActive
-            }
-            onClick={() => handleSaveSetup(templateNameModal.id)}
-            disabled={!rootState.rulesEnabled || rootState.isExecuting}
-          >
-            Run
-          </Button>
           {templateNameModal.id ? (
             <div style={{ display: 'block', marginTop: 5 }}>
               <span style={{ fontSize: 14, color: '#FF7F50' }}>{`Current Setup: ${templateNameModal.name}`}</span>

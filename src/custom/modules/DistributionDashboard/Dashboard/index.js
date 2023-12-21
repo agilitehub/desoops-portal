@@ -14,14 +14,15 @@ import TableData from '../TableData'
 
 // Custom Utils
 import Enums from '../../../lib/enums'
-import { calculateEstimatedPayment, prepDistributionTemplate, setupHodlers, updateHodlers } from '../controller'
+import { calculateEstimatedPayment, prepDistributionTemplate, setupHodlers } from '../controller'
 import { customListModal, distributionDashboardState, paymentModal } from '../data-models'
 import { setDeSoData, setConfigData, setDistributionTemplates } from '../../../reducer'
 import { cloneDeep } from 'lodash'
 import {
   getCCHodlersAndBalance,
   getDAOHodlersAndBalance,
-  getInitialDeSoData
+  getInitialDeSoData,
+  processTokenHodlers
 } from '../../../lib/deso-controller-graphql'
 import PaymentModal from '../PaymentModal'
 import {
@@ -31,7 +32,8 @@ import {
   updateDistributionTemplate
 } from '../../../lib/agilite-controller'
 import { useApolloClient } from '@apollo/client'
-import { GET_HODLERS, GQL_GET_INITIAL_DESO_DATA } from 'custom/lib/graphql-models'
+import { GET_HODLERS, GQL_GET_INITIAL_DESO_DATA, GQL_GET_TOKEN_HOLDERS } from 'custom/lib/graphql-models'
+import { buildGQLProps } from 'custom/lib/utils'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
@@ -150,9 +152,11 @@ const _BatchTransactionsForm = () => {
   }
 
   const handleDistributeTo = async (distributeTo) => {
-    let tmpHodlers = null
     let myHodlers = true
     let distributeDeSoUser = []
+    let hodlerData = null
+    let gqlProps = null
+    let gqlData = null
 
     try {
       // If user selects the current value, do nothing
@@ -171,22 +175,37 @@ const _BatchTransactionsForm = () => {
         return
       }
 
-      setState({ loading: true })
+      // Once we get here, we need to fetch the hodlers for the selected option
+      setState({ isExecuting: true, loading: true })
 
-      // Fetch Hodlers that need to be set up
+      // Next, we need to fetch the rest of the user's DeSo data
+      gqlProps = await buildGQLProps(distributeTo, desoData)
+
       switch (distributeTo) {
         case Enums.values.DAO:
-          tmpHodlers = JSON.parse(JSON.stringify(desoData.profile.daoHodlers))
-          break
         case Enums.values.CREATOR:
-          tmpHodlers = JSON.parse(JSON.stringify(desoData.profile.ccHodlers))
+          gqlData = await client.query({
+            query: GQL_GET_TOKEN_HOLDERS,
+            variables: gqlProps,
+            fetchPolicy: 'no-cache'
+          })
+
+          hodlerData = await processTokenHodlers(gqlData.data, state, desoData)
           break
       }
 
-      const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(tmpHodlers)
+      // Update State
+      setState({
+        originalHodlers: hodlerData.originalHodlers,
+        finalHodlers: hodlerData.finalHodlers,
+        tokenTotal: hodlerData.tokenTotal,
+        selectedTableKeys: hodlerData.selectedTableKeys,
+        isExecuting: false,
+        loading: false
+      })
 
       // Update State
-      setState({ distributeTo, myHodlers, distributeDeSoUser, finalHodlers, tokenTotal, selectedTableKeys })
+      setState({ distributeTo, myHodlers, distributeDeSoUser })
     } catch (e) {
       console.error(e)
     }
@@ -195,28 +214,7 @@ const _BatchTransactionsForm = () => {
   }
 
   const handleDistributionType = async (distributionType) => {
-    const tmpHodlers = cloneDeep(state.finalHodlers)
-    const tmpSelectedTableKeys = cloneDeep(state.selectedTableKeys)
-    const tmpConditions = {
-      filterUsers: false,
-      filterAmountIs: '>',
-      filterAmount: null,
-      returnAmount: null,
-      lastActiveDays: null
-    }
-
-    const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(
-      tmpHodlers,
-      tmpSelectedTableKeys,
-      tmpConditions,
-      ''
-    )
-
     setState({
-      ...tmpConditions,
-      finalHodlers,
-      selectedTableKeys,
-      tokenTotal,
       distributionType,
       tokenToUse: Enums.values.EMPTY_STRING,
       tokenToUseLabel: Enums.values.EMPTY_STRING,
@@ -227,7 +225,7 @@ const _BatchTransactionsForm = () => {
 
   const handleDistributeMyHodlers = async (myHodlers) => {
     setState({ loading: true })
-    let tmpHodlers = []
+    let originalHodlers = []
     let distributeDeSoUser = []
     let distributionAmount = null
 
@@ -235,21 +233,22 @@ const _BatchTransactionsForm = () => {
     if (myHodlers) {
       switch (state.distributeTo) {
         case Enums.values.DAO:
-          tmpHodlers = cloneDeep(desoData.profile.daoHodlers)
+          originalHodlers = cloneDeep(desoData.profile.daoHodlers)
 
           break
         case Enums.values.CREATOR:
-          tmpHodlers = cloneDeep(desoData.profile.ccHodlers)
+          originalHodlers = cloneDeep(desoData.profile.ccHodlers)
           break
       }
     }
 
-    const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(tmpHodlers)
+    const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(originalHodlers, state, desoData)
 
     // Update State
     setState({
       myHodlers,
       distributeDeSoUser,
+      originalHodlers,
       finalHodlers,
       tokenTotal,
       selectedTableKeys,
@@ -260,11 +259,11 @@ const _BatchTransactionsForm = () => {
 
   const handleDistributeDeSoUser = async (distributeDeSoUser) => {
     const gqlProps = {}
-    let tmpHodlers = null
+    let originalHodlers = null
     let gqlData = null
 
     if (distributeDeSoUser.length === 0) {
-      setState({ distributeDeSoUser, finalHodlers: [], tokenTotal: 0, selectedTableKeys: [] })
+      setState({ distributeDeSoUser, originalHodlers: [], finalHodlers: [], tokenTotal: 0, selectedTableKeys: [] })
       return
     }
 
@@ -281,7 +280,7 @@ const _BatchTransactionsForm = () => {
         distributeDeSoUser[0].key,
         gqlData.data.accountByPublicKey.tokenBalancesAsCreator.nodes
       )
-      tmpHodlers = ccHodlers
+      originalHodlers = ccHodlers
     } else {
       gqlProps.filter = { isDaoCoin: { in: true } }
       gqlData = await client.query({ query: GET_HODLERS, variables: gqlProps, fetchPolicy: 'no-cache' })
@@ -289,18 +288,18 @@ const _BatchTransactionsForm = () => {
         distributeDeSoUser[0].key,
         gqlData.data.accountByPublicKey.tokenBalancesAsCreator.nodes
       )
-      tmpHodlers = daoHodlers
+      originalHodlers = daoHodlers
     }
 
-    const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(tmpHodlers)
+    const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(originalHodlers, state)
 
     // Update State
-    setState({ finalHodlers, tokenTotal, selectedTableKeys, loading: false })
+    setState({ originalHodlers, finalHodlers, tokenTotal, selectedTableKeys, loading: false })
   }
 
   const handleTokenToUse = async (tokenToUse, tokenToUseLabel) => {
     const finalHodlers = cloneDeep(state.finalHodlers)
-    await calculateEstimatedPayment(finalHodlers, '')
+    await calculateEstimatedPayment(null, finalHodlers, state, desoData)
     setState({ finalHodlers, tokenToUse, tokenToUseLabel, distributionAmount: null })
   }
 
@@ -311,10 +310,19 @@ const _BatchTransactionsForm = () => {
       nftHodlers = cloneDeep(nftHodlers)
       nftHodlers.sort((a, b) => b.tokenBalance - a.tokenBalance)
 
-      const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(nftHodlers)
+      const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(nftHodlers, state)
 
       // Update States
-      setState({ finalHodlers, tokenTotal, selectedTableKeys, nftMetaData, nftHodlers, nftUrl, openNftSearch: false })
+      setState({
+        originalHodlers: nftHodlers,
+        finalHodlers,
+        tokenTotal,
+        selectedTableKeys,
+        nftMetaData,
+        nftHodlers,
+        nftUrl,
+        openNftSearch: false
+      })
     } catch (e) {
       console.error(e)
       message.error(e.message)
@@ -325,9 +333,10 @@ const _BatchTransactionsForm = () => {
 
   const handleConfirmCustomList = async (userList) => {
     try {
-      const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(userList)
+      const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(userList, state)
 
       setState({
+        originalHodlers: userList,
         finalHodlers,
         tokenTotal,
         selectedTableKeys,
@@ -344,7 +353,7 @@ const _BatchTransactionsForm = () => {
   const handleSelectTemplate = async (id) => {
     try {
       setState({ loading: true })
-      let tmpHodlers = []
+      let tmpHodlers = null
 
       // Clone a copy of the state
       const tmpState = cloneDeep(state)
@@ -381,50 +390,26 @@ const _BatchTransactionsForm = () => {
       // Fetch Hodlers that need to be set up
       switch (tmpState.distributeTo) {
         case Enums.values.DAO:
-          tmpHodlers = cloneDeep(desoData.profile.daoHodlers)
+          tmpHodlers = desoData.profile.daoHodlers
           break
         case Enums.values.CREATOR:
-          tmpHodlers = cloneDeep(desoData.profile.ccHodlers)
+          tmpHodlers = desoData.profile.ccHodlers
           break
         case Enums.values.CUSTOM:
-          tmpHodlers = cloneDeep(template.customList)
+          tmpHodlers = template.customList
           break
         case Enums.values.NFT:
-          tmpHodlers = cloneDeep(template.nftHodlers)
+          tmpHodlers = template.nftHodlers
           break
       }
 
-      const setupResult = await setupHodlers(tmpHodlers)
+      const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(tmpHodlers, state, desoData)
 
-      const tmpConditions = {
-        filterUsers: tmpState.filterUsers,
-        filterAmountIs: tmpState.filterAmountIs,
-        filterAmount: tmpState.filterAmount,
-        returnAmount: tmpState.returnAmount,
-        lastActiveDays: tmpState.lastActiveDays
-      }
-
-      const { finalHodlers, selectedTableKeys, tokenTotal } = await updateHodlers(
-        setupResult.finalHodlers,
-        setupResult.selectedTableKeys,
-        tmpConditions
-      )
-
-      if (tmpState.distributionAmount) {
-        await calculateEstimatedPayment(
-          finalHodlers,
-          tmpState.distributionAmount,
-          tmpState.spreadAmountBasedOn,
-          desoData.desoPrice
-        )
-      }
-
-      tmpState.finalHodlers = finalHodlers
-      tmpState.selectedTableKeys = selectedTableKeys
-      tmpState.tokenTotal = tokenTotal
-
-      // Update the state with the new state
-      setState(tmpState)
+      setState({
+        finalHodlers,
+        selectedTableKeys,
+        tokenTotal
+      })
     } catch (e) {
       console.error(e)
       message.error(e.message)

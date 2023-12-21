@@ -14,6 +14,7 @@ import Enums from './enums'
 import { desoUserModel } from './data-models'
 import { calculateDaysSinceLastActive, cleanString, hexToInt, sortByKey } from './utils'
 import nftLogo from '../assets/nft-default-logo.png'
+import { setupHodlers } from 'custom/modules/DistributionDashboard/controller'
 
 const desoConfigure = {
   appName: process.env.REACT_APP_NAME,
@@ -136,6 +137,34 @@ export const getDeSoDataOld = async (desoData, gqlData) => {
     newDeSoData.profile.ccHodlings = ccHodlings
 
     return newDeSoData
+  } catch (e) {
+    return e
+  }
+}
+
+export const processTokenHodlers = async (gqlData, rootState, desoData) => {
+  const originalHodlers = []
+  let newEntry = null
+
+  try {
+    // We need to loop through the tokenBalancesAsCreator array to find the DAO and CC Balances
+    // But we also need to separate our own balances, and then create holders arrays
+    gqlData = gqlData.accountByPublicKey.tokenBalancesAsCreator.nodes
+
+    for (const entry of gqlData) {
+      // Ignore if entry belongs to current logged in account
+      if (entry.holder.publicKey === desoData.profile.publicKey) continue
+
+      newEntry = await createUserEntry(entry)
+
+      // Skip if newEntry is null, because it means the user is invalid
+      if (newEntry === null) continue
+      originalHodlers.push(newEntry)
+    }
+
+    const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(originalHodlers, rootState, desoData)
+
+    return { originalHodlers, finalHodlers, selectedTableKeys, tokenTotal }
   } catch (e) {
     return e
   }

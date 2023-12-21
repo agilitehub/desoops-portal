@@ -1,3 +1,5 @@
+import Enums from './enums'
+
 /**
  * Copies the provided text to the clipboard.
  *
@@ -149,6 +151,49 @@ export const sortByKey = (array, key) => {
   })
 }
 
+// Create a function that builds the GQL props based on the setup and rules provided
+export const buildGQLProps = async (distributeTo, desoData) => {
+  const gqlProps = {}
+
+  try {
+    // Determine Distribute To
+    switch (distributeTo) {
+      case Enums.values.DAO:
+      case Enums.values.CREATOR:
+        gqlProps.publicKey = desoData.profile.publicKey
+        gqlProps.orderBy = 'BALANCE_NANOS_DESC'
+
+        gqlProps.condition = {
+          isDaoCoin: distributeTo === Enums.values.DAO
+        }
+
+        // // Check Rules
+        // if (rootState.filterUsers) {
+        //   // First determine Filter Amount
+        //   _determineGQLFilterAmount(
+        //     gqlProps,
+        //     rootState.filterAmount,
+        //     rootState.filterAmountIs,
+        //     rootState.distributeTo === Enums.values.DAO
+        //   )
+
+        //   // Determine Return Amount
+        //   _determineGQLReturnAmount(gqlProps, rootState.returnAmount)
+
+        //   // Determine Last Active Days
+        //   _determineGQLLactActiveDays(gqlProps, rootState.lastActiveDays)
+        // }
+
+        break
+    }
+
+    return gqlProps
+  } catch (e) {
+    console.error(e)
+    return e
+  }
+}
+
 // PRIVATE FUNCTIONS
 const shuffle = (array) => {
   return new Promise((resolve, reject) => {
@@ -192,3 +237,52 @@ const getRandomUniqueValues = (array, x) => {
     }
   })
 }
+
+// const _determineGQLFilterAmount = (gqlProps, filterAmount, filterAmountIs, isDAO) => {
+//   let tokenBalance = null
+
+//   if (filterAmount) {
+//     gqlProps.filter.balanceNanos = {}
+//     tokenBalance = filterAmount * Enums.values.NANO_VALUE
+//     if (isDAO) tokenBalance = tokenBalance * Enums.values.NANO_VALUE
+
+//     switch (filterAmountIs) {
+//       case '>':
+//         gqlProps.filter.balanceNanos.greaterThan = tokenBalance
+//         break
+//       case '<':
+//         gqlProps.filter.balanceNanos.lessThan = tokenBalance
+//         break
+//       case '>=':
+//         gqlProps.filter.balanceNanos.greaterThanOrEqualTo = tokenBalance
+//         break
+//       case '<=':
+//         gqlProps.filter.balanceNanos.lessThanOrEqualTo = tokenBalance
+//         break
+//     }
+//   }
+// }
+
+// const _determineGQLReturnAmount = (gqlProps, returnAmount) => {
+//   if (returnAmount) {
+//     gqlProps.first = returnAmount
+//   }
+// }
+
+// const _determineGQLLactActiveDays = (gqlProps, lastActiveDays) => {
+//   // Using the current date, use the lastActiveDays to determine the timestamp to pass to GQL
+//   // Timestamp to be in the following format: "yyyy-mm-dd"
+//   let timestamp = new Date()
+//   timestamp.setDate(timestamp.getDate() - lastActiveDays)
+//   timestamp = timestamp.toISOString().split('T')[0]
+
+//   if (lastActiveDays) {
+//     gqlProps.filter.holder = {
+//       transactionStats: {
+//         latestTransactionTimestamp: {
+//           greaterThanOrEqualTo: timestamp
+//         }
+//       }
+//     }
+//   }
+// }

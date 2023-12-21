@@ -235,13 +235,11 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
   }
 
   const handleDistributionAmount = async (distributionAmount) => {
-    let desoPrice = null
     let finalHodlers = null
 
     // We need to update the estimatedPaymentToken and estimatedPaymentUSD values
     finalHodlers = cloneDeep(rootState.finalHodlers)
-    if (rootState.distributionType === CoreEnums.paymentTypes.DESO) desoPrice = desoData.desoPrice
-    await calculateEstimatedPayment(finalHodlers, distributionAmount, rootState.spreadAmountBasedOn, desoPrice)
+    await calculateEstimatedPayment(distributionAmount, finalHodlers, rootState, desoData)
     setRootState({ distributionAmount, finalHodlers })
   }
 
