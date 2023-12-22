@@ -196,7 +196,13 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
       loading={rootState.loading}
       style={{ width: '100%' }}
       columns={tableColumns}
-      pagination={false}
+      pagination={{
+        position: ['topRight', 'bottomRight'],
+        defaultPageSize: 50,
+        size: 'small',
+        showLessItems: true,
+        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+      }}
     />
   )
 }
