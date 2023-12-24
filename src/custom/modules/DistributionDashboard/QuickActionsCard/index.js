@@ -1,13 +1,6 @@
 import React, { useReducer } from 'react'
 import { App, Card, Button, Dropdown, Modal, Row, Col } from 'antd'
-import {
-  DownOutlined,
-  UserOutlined,
-  ReloadOutlined,
-  CopyOutlined,
-  RollbackOutlined,
-  UploadOutlined
-} from '@ant-design/icons'
+import { DownOutlined, UserOutlined, ReloadOutlined, CopyOutlined, RollbackOutlined } from '@ant-design/icons'
 import { copyTextToClipboard } from '../../../lib/utils'
 import RandomizeDialogContent from './RandomizeDialog'
 import Enums from '../../../lib/enums'
@@ -46,20 +39,14 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
     headStyle: { minHeight: deviceType.isSmartphone ? 30 : 40 },
     bodyStyle: { height: deviceType.isSmartphone ? 58 : deviceType.isTablet ? 70 : 75 },
     actionWrapper: { marginTop: deviceType.isSmartphone ? -5 : -3 },
-    iconLoad: { color: '#188EFF', borderColor: '#188EFF', backgroundColor: 'white' },
     iconReset: { color: '#DC3847', borderColor: '#DC3847', backgroundColor: 'white' },
     iconRefresh: { color: '#FFC20E', borderColor: '#FFC20E', backgroundColor: 'white' },
     iconCopy: { color: '#800080', borderColor: '#800080', backgroundColor: 'white' },
-    labelLoad: { color: '#188EFF', fontSize: deviceType.isSmartphone ? 12 : 16 },
     labelReset: { color: '#DC3847', fontSize: deviceType.isSmartphone ? 12 : 16 },
     labelRefresh: { color: '#FFC20E', fontSize: deviceType.isSmartphone ? 12 : 16 },
     labelCopy: { color: '#800080', fontSize: deviceType.isSmartphone ? 12 : 16 },
     iconSwap: { color: '#4CAF50', borderColor: '#4CAF50', backgroundColor: 'white' },
     labelSwap: { color: '#4CAF50', fontSize: deviceType.isSmartphone ? 12 : 16 }
-  }
-
-  const handleLoadSetup = () => {
-    setRootState({ selectTemplateModal: { ...rootState.selectTemplateModal, isOpen: true } })
   }
 
   const handleResetDashboard = () => {
@@ -219,19 +206,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
       headStyle={styleProps.headStyle}
     >
       <Row style={{ textAlign: 'center' }}>
-        <Col span={5}>
-          <Col span={24} style={styleProps.actionWrapper}>
-            <Button
-              shape='circle'
-              style={styleProps.iconLoad}
-              icon={<UploadOutlined />}
-              disabled={rootState.isExecuting}
-              onClick={handleLoadSetup}
-            />
-            <div style={styleProps.labelLoad}>Load</div>
-          </Col>
-        </Col>
-        <Col span={5}>
+        <Col span={6}>
           <Col span={24} style={styleProps.actionWrapper}>
             <Button
               shape='circle'
@@ -244,7 +219,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
             <div style={styleProps.labelReset}>Reset</div>
           </Col>
         </Col>
-        <Col span={5}>
+        <Col span={6}>
           <Col span={24} style={styleProps.actionWrapper}>
             <Button
               shape='circle'
@@ -257,7 +232,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
             <div style={styleProps.labelRefresh}>Refresh</div>
           </Col>
         </Col>
-        <Col span={5}>
+        <Col span={6}>
           <Col span={24} style={styleProps.actionWrapper}>
             <Dropdown
               menu={{ items: dropdownItems, onClick: handleCopyToClipboard }}
@@ -271,7 +246,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
             <div style={styleProps.labelCopy}>Copy</div>
           </Col>
         </Col>
-        <Col span={4}>
+        <Col span={6}>
           <Col span={24} style={styleProps.actionWrapper}>
             <Button
               shape='circle'

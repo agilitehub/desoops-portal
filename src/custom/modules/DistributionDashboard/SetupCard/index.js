@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux'
 import { Card, Tabs, Button } from 'antd'
 import GeneralTab from './GeneralTab'
 import RulesTab from './RulesTab'
-import { SaveOutlined } from '@ant-design/icons'
+import { SaveOutlined, UploadOutlined } from '@ant-design/icons'
 import DeSoNFTSearchModal from '../../../reusables/components/DeSoNFTSearchModal'
 import DeSoUserSearchModal from '../../../reusables/components/DeSoUserSearchModal'
 import SelectTemplateModal from '../SelectTemplateModal'
@@ -46,6 +46,10 @@ const SetupCard = ({
     setRootState({ templateNameModal: { ...templateNameModal, isOpen: false, forceNew: false } })
   }
 
+  const handleLoadSetup = () => {
+    setRootState({ selectTemplateModal: { ...rootState.selectTemplateModal, isOpen: true } })
+  }
+
   const handleSaveSetup = (forceNew) => {
     if (!templateNameModal.id || forceNew) {
       setRootState({ templateNameModal: { ...templateNameModal, isOpen: true, forceNew } })
@@ -57,7 +61,22 @@ const SetupCard = ({
   const renderTabBarExtraContent = () => {
     let tabBarExtraContent = null
 
-    if (rootState.rulesEnabled && !rootState.isExecuting && templateNameModal.id && templateNameModal.isModified) {
+    if (!rootState.distributeTo) {
+      tabBarExtraContent = (
+        <Button
+          icon={<UploadOutlined />}
+          style={styleProps.tabButton}
+          onClick={() => handleLoadSetup(templateNameModal.id)}
+        >
+          Load Setup
+        </Button>
+      )
+    } else if (
+      rootState.rulesEnabled &&
+      !rootState.isExecuting &&
+      templateNameModal.id &&
+      templateNameModal.isModified
+    ) {
       tabBarExtraContent = (
         <Button icon={<SaveOutlined />} style={styleProps.tabButton} onClick={() => handleSaveSetup()}>
           Update Setup
