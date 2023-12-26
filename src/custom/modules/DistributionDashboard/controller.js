@@ -202,7 +202,7 @@ export const processHodlerConditions = async (hodlers, rootState) => {
       })
 
       // Step 4: Set the `isVisible` property of each entry in the `hodlers` array based on whether the `tokenBalance` property is greater than, less than, equal to, or not equal to `conditions.filterAmount`.
-      hodlers.forEach((hodler, index) => {
+      hodlers.forEach((hodler) => {
         switch (conditions.filterAmountIs) {
           case '>':
             hodler.isVisible = hodler.tokenBalance > conditions.filterAmount
@@ -218,15 +218,6 @@ export const processHodlerConditions = async (hodlers, rootState) => {
             break
         }
 
-        // Next, if there is a conditions.returnAmount, the hodler.isVisible is only true if the holder's index in the array is less than the conditions.returnAmount
-        if (
-          conditions.returnAmount !== null &&
-          conditions.returnAmount !== 0 &&
-          conditions.returnAmount !== undefined
-        ) {
-          hodler.isVisible = hodler.isVisible && index < conditions.returnAmount
-        }
-
         // Next, if there is a conditions.lastActiveDays, the hodler.isVisible is only true if the holder's lastTransactionTimestamp in the array is less than or equal the conditions.lastActiveDays
         if (
           conditions.lastActiveDays !== null &&
@@ -240,6 +231,22 @@ export const processHodlerConditions = async (hodlers, rootState) => {
           selectedTableKeys.push(hodler.username)
         }
       })
+
+      // Now, if there is a conditions.returnAmount, the hodler.isVisible is only true if the holder's index in the array is less than the conditions.returnAmount
+      if (conditions.returnAmount !== null && conditions.returnAmount !== 0 && conditions.returnAmount !== undefined) {
+        // Set all hodlers.isVisible to false except the top x in the array based on the conditions.returnAmount
+        // Also populate the Table Keys
+
+        hodlers = hodlers.filter((hodler) => hodler.isVisible)
+
+        hodlers.forEach((hodler, index) => {
+          if (index >= conditions.returnAmount) {
+            hodler.isVisible = false
+          } else {
+            selectedTableKeys.push(hodler.username)
+          }
+        })
+      }
     }
 
     return { hodlers, selectedTableKeys }

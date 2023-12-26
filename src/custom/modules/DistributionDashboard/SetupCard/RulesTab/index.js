@@ -33,55 +33,27 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
     // if filterUsers is false, then we can run the updateHolders function
     // The final step is to update the rootState with with either the current rootState values or the new values from updateHolders and propType/propValue
 
-    let newState = {}
-    let runUpdateHolders = false
+    let runSetupHolders = false
 
     try {
-      if (propType === 'filterUsers') {
-        newState.filterUsers = propValue
-      } else {
-        newState.filterUsers = rootState.filterUsers
-      }
-
-      if (propType === 'filterAmountIs') {
-        newState.filterAmountIs = propValue
-      } else {
-        newState.filterAmountIs = rootState.filterAmountIs
-      }
-
-      if (propType === 'filterAmount') {
-        newState.filterAmount = propValue
-      } else {
-        newState.filterAmount = rootState.filterAmount
-      }
-
-      if (propType === 'returnAmount') {
-        newState.returnAmount = propValue
-      } else {
-        newState.returnAmount = rootState.returnAmount
-      }
-
-      if (propType === 'lastActiveDays') {
-        newState.lastActiveDays = propValue
-      } else {
-        newState.lastActiveDays = rootState.lastActiveDays
-      }
+      let newState = cloneDeep(rootState)
+      newState[propType] = propValue
 
       // If rootState.filterUsers is true and newState.filterUsers is set to false, then we can run updateHolders
       if (rootState.filterUsers && !newState.filterUsers) {
-        runUpdateHolders = true
+        runSetupHolders = true
         newState.filterAmount = null
         newState.returnAmount = null
         newState.lastActiveDays = null
         newState.filterAmountIs = '>'
       } else if (newState.filterUsers) {
-        runUpdateHolders = true
+        runSetupHolders = true
       }
 
-      if (runUpdateHolders) {
+      if (runSetupHolders) {
         const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(
           rootState.originalHodlers,
-          rootState,
+          newState,
           desoData
         )
 
