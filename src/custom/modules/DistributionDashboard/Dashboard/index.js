@@ -132,18 +132,33 @@ const _BatchTransactionsForm = () => {
       const tmpConfigData = await getConfigData()
       dispatch(setConfigData(tmpConfigData))
 
-      // Get the rest of the DeSo Data
+      // Get the rest of the DeSo Data for the current User
       gqlProps = {
-        publicKey: desoData.profile.publicKey,
-        orderBy: 'BALANCE_NANOS_DESC'
+        publicKey: desoData.profile.publicKey
       }
 
-      gqlData = await client.query({ query: GQL_GET_INITIAL_DESO_DATA, variables: gqlProps, fetchPolicy: 'no-cache' })
+      gqlData = await client.query({
+        query: GQL_GET_INITIAL_DESO_DATA,
+        variables: gqlProps,
+        fetchPolicy: 'no-cache'
+      })
 
-      // Finalize the DeSo Data Object for the current User
       tmpdata = await getInitialDeSoData(desoData, gqlData.data)
+
+      // Fetch DeSo data based on the Dashboard configurations
+      const dashboardData = await fetchUsersFromDeSo(state.distributeTo, state)
+
+      // Update State and Redux Store
       dispatch(setDeSoData(tmpdata))
-      setState({ isExecuting: false })
+
+      setState({
+        originalHodlers: dashboardData.originalHodlers,
+        finalHodlers: dashboardData.finalHodlers,
+        tokenTotal: dashboardData.tokenTotal,
+        selectedTableKeys: dashboardData.selectedTableKeys,
+        isExecuting: false,
+        loading: false
+      })
 
       return
     } catch (e) {
