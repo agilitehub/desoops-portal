@@ -154,9 +154,6 @@ const _BatchTransactionsForm = () => {
   const handleDistributeTo = async (distributeTo, force = false) => {
     let myHodlers = true
     let distributeDeSoUser = []
-    let hodlerData = null
-    let gqlProps = null
-    let gqlData = null
 
     try {
       // If user selects the current value, do nothing
@@ -178,24 +175,13 @@ const _BatchTransactionsForm = () => {
       // Once we get here, we need to fetch the hodlers for the selected option
       setState({ distributeTo, isExecuting: true, loading: true })
 
-      // Next, we need to fetch the rest of the user's DeSo data
-      gqlProps = await buildGQLProps(distributeTo, desoData.profile.publicKey, desoData)
-
-      switch (distributeTo) {
-        case Enums.values.DAO:
-        case Enums.values.CREATOR:
-          gqlData = await client.query({
-            query: GQL_GET_TOKEN_HOLDERS,
-            variables: gqlProps,
-            fetchPolicy: 'no-cache'
-          })
-
-          hodlerData = await processTokenHodlers(gqlData.data, state, desoData)
-          break
-      }
+      const hodlerData = await fetchUsersFromDeSo(distributeTo, state)
 
       // Update State
       setState({
+        distributeTo,
+        myHodlers,
+        distributeDeSoUser,
         originalHodlers: hodlerData.originalHodlers,
         finalHodlers: hodlerData.finalHodlers,
         tokenTotal: hodlerData.tokenTotal,
@@ -203,9 +189,6 @@ const _BatchTransactionsForm = () => {
         isExecuting: false,
         loading: false
       })
-
-      // Update State
-      setState({ distributeTo, myHodlers, distributeDeSoUser })
     } catch (e) {
       console.error(e)
     }
@@ -343,20 +326,23 @@ const _BatchTransactionsForm = () => {
 
   const handleSelectTemplate = async (id) => {
     try {
-      setState({ loading: true })
-      let tmpHodlers = null
+      setState({
+        loading: true,
+        isExecuting: true,
+        selectTemplateModal: {
+          ...state.selectTemplateModal,
+          isOpen: false
+        }
+      })
 
-      // Clone a copy of the state
       const tmpState = cloneDeep(state)
-
-      // fetch the selected template using id
       const template = distributionTemplates.find((template) => template._id === id)
 
       // update the state props using the selected template
       tmpState.distributeTo = template.distributeTo
+      tmpState.distributionType = template.distributionType
       tmpState.myHodlers = template.myHodlers
       tmpState.distributeDeSoUser = template.distributeDeSoUser
-      tmpState.distributionType = template.distributionType
       tmpState.tokenToUse = template.tokenToUse
       tmpState.distributionAmount = template.distributionAmount
       tmpState.rulesEnabled = template.rules.enabled
@@ -378,29 +364,17 @@ const _BatchTransactionsForm = () => {
       tmpState.templateNameModal.isModified = false
       tmpState.selectTemplateModal.isOpen = false
 
-      // Fetch Hodlers that need to be set up
-      switch (tmpState.distributeTo) {
-        case Enums.values.DAO:
-          tmpHodlers = desoData.profile.daoHodlers
-          break
-        case Enums.values.CREATOR:
-          tmpHodlers = desoData.profile.ccHodlers
-          break
-        case Enums.values.CUSTOM:
-          tmpHodlers = template.customList
-          break
-        case Enums.values.NFT:
-          tmpHodlers = template.nftHodlers
-          break
-      }
+      const hodlerData = await fetchUsersFromDeSo(template.distributeTo, tmpState)
 
-      const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(tmpHodlers, state, desoData)
+      tmpState.originalHodlers = hodlerData.originalHodlers
+      tmpState.finalHodlers = hodlerData.finalHodlers
+      tmpState.tokenTotal = hodlerData.tokenTotal
+      tmpState.selectedTableKeys = hodlerData.selectedTableKeys
+      tmpState.loading = false
+      tmpState.isExecuting = false
 
-      setState({
-        finalHodlers,
-        selectedTableKeys,
-        tokenTotal
-      })
+      // Update State
+      setState(tmpState)
     } catch (e) {
       console.error(e)
       message.error(e.message)
@@ -491,6 +465,34 @@ const _BatchTransactionsForm = () => {
     setState({ paymentModal: paymentModal() })
   }
 
+  const fetchUsersFromDeSo = async (distributeTo, rootState) => {
+    let hodlerData = null
+    let gqlProps = null
+    let gqlData = null
+
+    try {
+      // Next, we need to fetch the rest of the user's DeSo data
+      gqlProps = await buildGQLProps(distributeTo, desoData.profile.publicKey, desoData)
+
+      switch (distributeTo) {
+        case Enums.values.DAO:
+        case Enums.values.CREATOR:
+          gqlData = await client.query({
+            query: GQL_GET_TOKEN_HOLDERS,
+            variables: gqlProps,
+            fetchPolicy: 'no-cache'
+          })
+
+          hodlerData = await processTokenHodlers(gqlData.data, rootState, desoData)
+          break
+      }
+
+      return hodlerData
+    } catch (e) {
+      return e
+    }
+  }
+
   return (
     <>
       <Row justify='center' gutter={[12, 12]}>
@@ -550,11 +552,9 @@ const _BatchTransactionsForm = () => {
               </Col>
             </Row>
             <Divider style={styleProps.divider} />
-            {state.distributeTo ? (
-              <Row>
-                <TableData desoData={desoData} rootState={state} setRootState={setState} deviceType={deviceType} />
-              </Row>
-            ) : null}
+            <Row>
+              <TableData desoData={desoData} rootState={state} setRootState={setState} deviceType={deviceType} />
+            </Row>
           </ContainerCard>
         </Col>
       </Row>
