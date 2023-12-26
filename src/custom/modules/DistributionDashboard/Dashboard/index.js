@@ -151,7 +151,7 @@ const _BatchTransactionsForm = () => {
     }
   }
 
-  const handleDistributeTo = async (distributeTo) => {
+  const handleDistributeTo = async (distributeTo, force = false) => {
     let myHodlers = true
     let distributeDeSoUser = []
     let hodlerData = null
@@ -160,7 +160,7 @@ const _BatchTransactionsForm = () => {
 
     try {
       // If user selects the current value, do nothing
-      if (distributeTo === state.distributeTo) return
+      if (!force && distributeTo === state.distributeTo) return
 
       // Reset Dashboard State, as all values depend on this selection, especially if user selects nothing
       resetState()
@@ -176,7 +176,7 @@ const _BatchTransactionsForm = () => {
       }
 
       // Once we get here, we need to fetch the hodlers for the selected option
-      setState({ isExecuting: true, loading: true })
+      setState({ distributeTo, isExecuting: true, loading: true })
 
       // Next, we need to fetch the rest of the user's DeSo data
       gqlProps = await buildGQLProps(distributeTo, desoData)
@@ -224,37 +224,21 @@ const _BatchTransactionsForm = () => {
   }
 
   const handleDistributeMyHodlers = async (myHodlers) => {
-    setState({ loading: true })
-    let originalHodlers = []
-    let distributeDeSoUser = []
-    let distributionAmount = null
-
     // Fetch Own Hodlers that need to be set up if checked
     if (myHodlers) {
-      switch (state.distributeTo) {
-        case Enums.values.DAO:
-          originalHodlers = cloneDeep(desoData.profile.daoHodlers)
-
-          break
-        case Enums.values.CREATOR:
-          originalHodlers = cloneDeep(desoData.profile.ccHodlers)
-          break
-      }
+      await handleDistributeTo(state.distributeTo, true)
+    } else {
+      // Update State
+      setState({
+        myHodlers,
+        distributeDeSoUser: [],
+        originalHodlers: [],
+        finalHodlers: [],
+        tokenTotal: 0,
+        selectedTableKeys: [],
+        distributionAmount: null
+      })
     }
-
-    const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(originalHodlers, state, desoData)
-
-    // Update State
-    setState({
-      myHodlers,
-      distributeDeSoUser,
-      originalHodlers,
-      finalHodlers,
-      tokenTotal,
-      selectedTableKeys,
-      distributionAmount,
-      loading: false
-    })
   }
 
   const handleDistributeDeSoUser = async (distributeDeSoUser) => {

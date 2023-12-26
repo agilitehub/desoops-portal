@@ -475,7 +475,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
   }
 
   return (
-    <Card title={<span style={styleProps.title}>Step 3: Distribution Summary</span>} size='small'>
+    <Card title={<span style={styleProps.title}>Step 2: Distribution Summary</span>} size='small'>
       <Row>
         <Col
           xs={styleParams.labelColXS}
