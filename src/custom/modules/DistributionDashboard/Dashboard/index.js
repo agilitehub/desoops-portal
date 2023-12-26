@@ -32,7 +32,7 @@ import {
   updateDistributionTemplate
 } from '../../../lib/agilite-controller'
 import { useApolloClient } from '@apollo/client'
-import { GET_HODLERS, GQL_GET_INITIAL_DESO_DATA, GQL_GET_TOKEN_HOLDERS } from 'custom/lib/graphql-models'
+import { GQL_GET_INITIAL_DESO_DATA, GQL_GET_TOKEN_HOLDERS } from 'custom/lib/graphql-models'
 import { buildGQLProps } from 'custom/lib/utils'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
@@ -179,7 +179,7 @@ const _BatchTransactionsForm = () => {
       setState({ distributeTo, isExecuting: true, loading: true })
 
       // Next, we need to fetch the rest of the user's DeSo data
-      gqlProps = await buildGQLProps(distributeTo, desoData)
+      gqlProps = await buildGQLProps(distributeTo, desoData.profile.publicKey, desoData)
 
       switch (distributeTo) {
         case Enums.values.DAO:
@@ -242,7 +242,7 @@ const _BatchTransactionsForm = () => {
   }
 
   const handleDistributeDeSoUser = async (distributeDeSoUser) => {
-    const gqlProps = {}
+    let gqlProps = null
     let originalHodlers = null
     let gqlData = null
 
@@ -253,29 +253,26 @@ const _BatchTransactionsForm = () => {
 
     setState({ loading: true, distributeDeSoUser })
 
-    gqlProps.publicKey = distributeDeSoUser[0].key
-    gqlProps.orderBy = 'BALANCE_NANOS_DESC'
+    gqlProps = await buildGQLProps(state.distributeTo, distributeDeSoUser[0].key, desoData)
+    gqlData = await client.query({ query: GQL_GET_TOKEN_HOLDERS, variables: gqlProps, fetchPolicy: 'no-cache' })
 
     if (state.distributeTo === Enums.values.CREATOR) {
-      gqlProps.filter = { isDaoCoin: { in: false } }
-
-      gqlData = await client.query({ query: GET_HODLERS, variables: gqlProps, fetchPolicy: 'no-cache' })
       const { ccHodlers } = await getCCHodlersAndBalance(
         distributeDeSoUser[0].key,
         gqlData.data.accountByPublicKey.tokenBalancesAsCreator.nodes
       )
+
       originalHodlers = ccHodlers
     } else {
-      gqlProps.filter = { isDaoCoin: { in: true } }
-      gqlData = await client.query({ query: GET_HODLERS, variables: gqlProps, fetchPolicy: 'no-cache' })
       const { daoHodlers } = await getDAOHodlersAndBalance(
         distributeDeSoUser[0].key,
         gqlData.data.accountByPublicKey.tokenBalancesAsCreator.nodes
       )
+
       originalHodlers = daoHodlers
     }
 
-    const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(originalHodlers, state)
+    const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(originalHodlers, state, desoData)
 
     // Update State
     setState({ originalHodlers, finalHodlers, tokenTotal, selectedTableKeys, loading: false })
@@ -294,7 +291,7 @@ const _BatchTransactionsForm = () => {
       nftHodlers = cloneDeep(nftHodlers)
       nftHodlers.sort((a, b) => b.tokenBalance - a.tokenBalance)
 
-      const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(nftHodlers, state)
+      const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(nftHodlers, state, desoData)
 
       // Update States
       setState({
@@ -317,7 +314,7 @@ const _BatchTransactionsForm = () => {
 
   const handleConfirmCustomList = async (userList) => {
     try {
-      const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(userList, state)
+      const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(userList, state, desoData)
 
       setState({
         originalHodlers: userList,

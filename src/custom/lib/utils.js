@@ -152,7 +152,7 @@ export const sortByKey = (array, key) => {
 }
 
 // Create a function that builds the GQL props based on the setup and rules provided
-export const buildGQLProps = async (distributeTo, desoData) => {
+export const buildGQLProps = async (distributeTo, publickKey, desoData) => {
   const gqlProps = {}
 
   try {
@@ -160,29 +160,12 @@ export const buildGQLProps = async (distributeTo, desoData) => {
     switch (distributeTo) {
       case Enums.values.DAO:
       case Enums.values.CREATOR:
-        gqlProps.publicKey = desoData.profile.publicKey
+        gqlProps.publicKey = publickKey
         gqlProps.orderBy = 'BALANCE_NANOS_DESC'
 
         gqlProps.condition = {
           isDaoCoin: distributeTo === Enums.values.DAO
         }
-
-        // // Check Rules
-        // if (rootState.filterUsers) {
-        //   // First determine Filter Amount
-        //   _determineGQLFilterAmount(
-        //     gqlProps,
-        //     rootState.filterAmount,
-        //     rootState.filterAmountIs,
-        //     rootState.distributeTo === Enums.values.DAO
-        //   )
-
-        //   // Determine Return Amount
-        //   _determineGQLReturnAmount(gqlProps, rootState.returnAmount)
-
-        //   // Determine Last Active Days
-        //   _determineGQLLactActiveDays(gqlProps, rootState.lastActiveDays)
-        // }
 
         break
     }

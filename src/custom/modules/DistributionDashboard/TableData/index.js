@@ -3,7 +3,7 @@ import { Table, Popover, Image, App } from 'antd'
 import { CheckCircleOutlined, CloseCircleOutlined, ReloadOutlined } from '@ant-design/icons'
 
 import theme from '../../../../core/utils/theme'
-import { setupHodlers } from '../controller'
+import { updateTableSelection } from '../controller'
 import Enums from '../../../lib/enums'
 import { copyTextToClipboard } from '../../../lib/utils'
 
@@ -11,11 +11,12 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
   const [tableData, setTableData] = useState([])
   const { message } = App.useApp()
 
-  const handleSelectionChange = async () => {
-    const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(
+  const handleSelectionChange = async (updatedKeys) => {
+    const { finalHodlers, tokenTotal, selectedTableKeys } = await updateTableSelection(
       rootState.finalHodlers,
       rootState,
-      desoData
+      desoData,
+      updatedKeys
     )
 
     setRootState({ selectedTableKeys, finalHodlers, tokenTotal })

@@ -302,7 +302,7 @@ const GeneralTab = ({
               style={styleProps.labelColStyle}
             >
               <span style={styleProps.fieldLabel}>
-                <b>Search DeSo User</b>
+                <b>Search DeSo User:</b>
               </span>
             </Col>
             <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>

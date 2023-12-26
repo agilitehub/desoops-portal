@@ -96,26 +96,6 @@ export const SEARCH_PROFILES = gql`
   }
 `
 
-export const GET_HODLERS = gql`
-  query AccountByPublicKey($publicKey: String!, $filter: TokenBalanceFilter, $orderBy: [TokenBalancesOrderBy!]) {
-    accountByPublicKey(publicKey: $publicKey) {
-      tokenBalancesAsCreator(filter: $filter, orderBy: $orderBy) {
-        nodes {
-          balanceNanos
-          isDaoCoin
-          holder {
-            username
-            publicKey
-            transactionStats {
-              latestTransactionTimestamp
-            }
-          }
-        }
-      }
-    }
-  }
-`
-
 export const GET_NFT_POST = gql`
   query Profiles($filter: NftFilter, $first: Int) {
     nfts(filter: $filter, first: $first) {

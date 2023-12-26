@@ -6,11 +6,11 @@ import { distributionTemplateModel, distributionTransactionModel } from '../../l
 import { cloneDeep } from 'lodash'
 
 export const setupHodlers = async (hodlers, rootState, desoData) => {
-  const selectedTableKeys = []
-  let percentResult = null
-
   try {
-    const filterResult = await processHodlerConditions(cloneDeep(hodlers), rootState)
+    let percentResult = null
+    let tmpHodlers = cloneDeep(hodlers)
+
+    const filterResult = await processHodlerConditions(tmpHodlers, rootState, desoData)
 
     percentResult = await calculatePercentages(filterResult.hodlers)
     percentResult.hodlers = await calculateEstimatedPayment(
@@ -20,7 +20,45 @@ export const setupHodlers = async (hodlers, rootState, desoData) => {
       desoData
     )
 
-    return { finalHodlers: percentResult.hodlers, selectedTableKeys, tokenTotal: percentResult.tokenTotal }
+    return {
+      finalHodlers: percentResult.hodlers,
+      selectedTableKeys: filterResult.selectedTableKeys,
+      tokenTotal: percentResult.tokenTotal
+    }
+  } catch (e) {
+    return e
+  }
+}
+
+export const updateTableSelection = async (hodlers, rootState, desoData, selectedTableKeys) => {
+  try {
+    let percentResult = null
+    let tmpHodlers = cloneDeep(hodlers)
+
+    // Disable entries from the `hodlers` array where there's no match in the `selectedTableKeys` array.
+    tmpHodlers = tmpHodlers.map((entry) => {
+      if (!selectedTableKeys.includes(entry.username)) {
+        entry.isActive = false
+      } else {
+        entry.isActive = true
+      }
+
+      return entry
+    })
+
+    percentResult = await calculatePercentages(tmpHodlers)
+    percentResult.hodlers = await calculateEstimatedPayment(
+      rootState.distributionAmount,
+      percentResult.hodlers,
+      rootState,
+      desoData
+    )
+
+    return {
+      finalHodlers: percentResult.hodlers,
+      selectedTableKeys,
+      tokenTotal: percentResult.tokenTotal
+    }
   } catch (e) {
     return e
   }
