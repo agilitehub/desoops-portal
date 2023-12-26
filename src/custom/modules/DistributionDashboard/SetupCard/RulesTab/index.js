@@ -98,10 +98,15 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
 
   const handleSpreadAmountBasedOn = async (e) => {
     const spreadAmountBasedOn = e.target.value
-    let tmpHodlers = null
+    let tmpHodlers = cloneDeep(rootState.finalHodlers)
 
-    tmpHodlers = cloneDeep(rootState.finalHodlers)
-    await calculateEstimatedPayment(rootState.distributionAmount, tmpHodlers, rootState, desoData)
+    await calculateEstimatedPayment(
+      rootState.distributionAmount,
+      rootState.distributionType,
+      spreadAmountBasedOn,
+      tmpHodlers,
+      desoData
+    )
 
     setRootState({
       spreadAmountBasedOn,

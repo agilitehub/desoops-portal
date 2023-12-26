@@ -15,8 +15,9 @@ export const setupHodlers = async (hodlers, rootState, desoData) => {
     percentResult = await calculatePercentages(filterResult.hodlers)
     percentResult.hodlers = await calculateEstimatedPayment(
       rootState.distributionAmount,
+      rootState.distributionType,
+      rootState.spreadAmountBasedOn,
       percentResult.hodlers,
-      rootState,
       desoData
     )
 
@@ -49,8 +50,9 @@ export const updateTableSelection = async (hodlers, rootState, desoData, selecte
     percentResult = await calculatePercentages(tmpHodlers)
     percentResult.hodlers = await calculateEstimatedPayment(
       rootState.distributionAmount,
+      rootState.distributionType,
+      rootState.spreadAmountBasedOn,
       percentResult.hodlers,
-      rootState,
       desoData
     )
 
@@ -108,7 +110,13 @@ export const calculatePercentages = (hodlers, sortOrder = 'desc') => {
   })
 }
 
-export const calculateEstimatedPayment = (distributionAmount, hodlers, rootState, desoData) => {
+export const calculateEstimatedPayment = (
+  distributionAmount,
+  distributionType,
+  spreadAmountBasedOn,
+  hodlers,
+  desoData
+) => {
   let estimatedPaymentToken = null
   let estimatedPaymentUSD = null
   let activeHodlers = 0
@@ -117,7 +125,7 @@ export const calculateEstimatedPayment = (distributionAmount, hodlers, rootState
   try {
     // Ignore if there is no amount
     if (distributionAmount === '') return hodlers
-    if (rootState.distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
+    if (distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
 
     // Count the number of active hodlers based on the `isActive` property being set to true
     activeHodlers = hodlers.reduce((total, entry) => {
@@ -132,10 +140,10 @@ export const calculateEstimatedPayment = (distributionAmount, hodlers, rootState
       if (distributionAmount === '' || !hodler.isActive) {
         estimatedPaymentToken = 0
         estimatedPaymentUSD = 0
-      } else if (rootState.spreadAmountBasedOn === 'Equal Spread') {
+      } else if (spreadAmountBasedOn === 'Equal Spread') {
         // Calculate the estimated payment based on an equal distribution
         estimatedPaymentToken = distributionAmount / activeHodlers
-      } else if (rootState.spreadAmountBasedOn === 'Ownership') {
+      } else if (spreadAmountBasedOn === 'Ownership') {
         // Calculate the estimated payment based on percentage ownership
         estimatedPaymentToken = (distributionAmount * hodler.percentOwnership) / 100
       }
