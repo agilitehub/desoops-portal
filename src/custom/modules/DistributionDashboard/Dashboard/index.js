@@ -14,7 +14,7 @@ import TableData from '../TableData'
 
 // Custom Utils
 import Enums from '../../../lib/enums'
-import { calculateEstimatedPayment, prepDistributionTemplate, setupHodlers } from '../controller'
+import { prepDistributionTemplate, setupHodlers } from '../controller'
 import { customListModal, distributionDashboardState, paymentModal } from '../data-models'
 import { setDeSoData, setConfigData, setDistributionTemplates } from '../../../reducer'
 import { cloneDeep } from 'lodash'
@@ -279,9 +279,19 @@ const _BatchTransactionsForm = () => {
   }
 
   const handleTokenToUse = async (tokenToUse, tokenToUseLabel) => {
-    const finalHodlers = cloneDeep(state.finalHodlers)
-    await calculateEstimatedPayment(null, finalHodlers, state, desoData)
-    setState({ finalHodlers, tokenToUse, tokenToUseLabel, distributionAmount: null })
+    const tmpState = cloneDeep(state)
+
+    tmpState.tokenToUse = tokenToUse
+    tmpState.tokenToUseLabel = tokenToUseLabel
+
+    const tmpHodlers = cloneDeep(state.originalHodlers)
+    const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(tmpHodlers, tmpState, desoData)
+
+    tmpState.finalHodlers = finalHodlers
+    tmpState.tokenTotal = tokenTotal
+    tmpState.selectedTableKeys = selectedTableKeys
+
+    setState(tmpState)
   }
 
   const handleConfirmNFT = async (nftMetaData, nftHodlers, nftUrl) => {
