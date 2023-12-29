@@ -23,6 +23,7 @@ import {
   getDAOHodlersAndBalance,
   getInitialDeSoData,
   processCustomList,
+  processNFTEntries,
   processTokenHodlers
 } from '../../../lib/deso-controller-graphql'
 import PaymentModal from '../PaymentModal'
@@ -33,7 +34,12 @@ import {
   updateDistributionTemplate
 } from '../../../lib/agilite-controller'
 import { useApolloClient } from '@apollo/client'
-import { FETCH_MULTIPLE_PROFILES, GQL_GET_INITIAL_DESO_DATA, GQL_GET_TOKEN_HOLDERS } from 'custom/lib/graphql-models'
+import {
+  FETCH_MULTIPLE_PROFILES,
+  GET_NFT_ENTRIES,
+  GQL_GET_INITIAL_DESO_DATA,
+  GQL_GET_TOKEN_HOLDERS
+} from 'custom/lib/graphql-models'
 import { buildGQLProps } from 'custom/lib/utils'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
@@ -293,12 +299,22 @@ const _BatchTransactionsForm = () => {
     setState(tmpState)
   }
 
-  const handleConfirmNFT = async (nftMetaData, nftHodlers, nftUrl) => {
+  const handleConfirmNFT = async (nftMetaData, nftUrl) => {
     try {
-      setState({ loading: true })
+      let nftEntries = null
+      let nftHodlers = null
 
-      nftHodlers = cloneDeep(nftHodlers)
-      nftHodlers.sort((a, b) => b.tokenBalance - a.tokenBalance)
+      setState({ loading: true, isExecuting: true, openNftSearch: false })
+
+      const gqlProps = {
+        condition: {
+          nftPostHash: nftMetaData.id
+        }
+      }
+
+      nftEntries = await client.query({ query: GET_NFT_ENTRIES, variables: gqlProps, fetchPolicy: 'no-cache' })
+      nftEntries = nftEntries.data.nfts.nodes
+      nftHodlers = await processNFTEntries(desoData.profile.publicKey, nftEntries)
 
       const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(nftHodlers, state, desoData)
 
@@ -311,7 +327,9 @@ const _BatchTransactionsForm = () => {
         nftMetaData,
         nftHodlers,
         nftUrl,
-        openNftSearch: false
+        openNftSearch: false,
+        loading: false,
+        isExecuting: false
       })
     } catch (e) {
       console.error(e)
@@ -377,6 +395,9 @@ const _BatchTransactionsForm = () => {
       const template = distributionTemplates.find((template) => template._id === id)
       let hodlerData = null
       let publicKeys = null
+      let gqlProps = null
+      let nftEntries = null
+      let nftHodlers = null
 
       // update the state props using the selected template
       tmpState.distributeTo = template.distributeTo
@@ -407,7 +428,7 @@ const _BatchTransactionsForm = () => {
           publicKeys = template.customList.map((item) => item.publicKey)
 
           // Refetch all data to ensure we have the latest
-          const gqlProps = {
+          gqlProps = {
             filter: {
               publicKey: {
                 in: publicKeys
@@ -422,13 +443,37 @@ const _BatchTransactionsForm = () => {
           })
 
           hodlerData = await processCustomList(gqlData.data, tmpState, desoData)
-
           tmpState.customListModal.userList = hodlerData.finalHodlers
+
+          break
+        case Enums.values.NFT:
+          gqlProps = {
+            condition: {
+              nftPostHash: template.nftId
+            }
+          }
+
+          nftEntries = await client.query({ query: GET_NFT_ENTRIES, variables: gqlProps, fetchPolicy: 'no-cache' })
+          nftEntries = nftEntries.data.nfts.nodes
+          nftHodlers = await processNFTEntries(desoData.profile.publicKey, nftEntries)
+          hodlerData = await setupHodlers(nftHodlers, state, desoData)
+
+          tmpState.nftId = template.nftId
+
+          tmpState.nftMetaData = {
+            id: template.nftId,
+            imageUrl: template.nftImageUrl,
+            description: template.nftDescription
+          }
+
+          tmpState.nftHodlers = hodlerData.finalHodlers
+          tmpState.nftUrl = template.nftUrl
 
           break
         default:
           hodlerData = await fetchUsersFromDeSo(template.distributeTo, tmpState)
       }
+
       tmpState.originalHodlers = hodlerData.originalHodlers
       tmpState.finalHodlers = hodlerData.finalHodlers
       tmpState.tokenTotal = hodlerData.tokenTotal
@@ -532,6 +577,9 @@ const _BatchTransactionsForm = () => {
     let hodlerData = null
     let gqlProps = null
     let gqlData = null
+    let publicKeys = null
+    let nftEntries = null
+    let nftHodlers = null
 
     try {
       // Next, we need to fetch the rest of the user's DeSo data
@@ -547,6 +595,41 @@ const _BatchTransactionsForm = () => {
           })
 
           hodlerData = await processTokenHodlers(gqlData.data, rootState, desoData)
+          break
+        case Enums.values.CUSTOM:
+          // Build the list of public keys
+          publicKeys = rootState.customListModal.userList.map((item) => item.publicKey)
+
+          // Refetch all data to ensure we have the latest
+          gqlProps = {
+            filter: {
+              publicKey: {
+                in: publicKeys
+              }
+            }
+          }
+
+          gqlData = await client.query({
+            query: FETCH_MULTIPLE_PROFILES,
+            variables: gqlProps,
+            fetchPolicy: 'no-cache'
+          })
+
+          hodlerData = await processCustomList(gqlData.data, rootState, desoData)
+
+          break
+        case Enums.values.NFT:
+          gqlProps = {
+            condition: {
+              nftPostHash: rootState.nftMetaData.id
+            }
+          }
+
+          nftEntries = await client.query({ query: GET_NFT_ENTRIES, variables: gqlProps, fetchPolicy: 'no-cache' })
+          nftEntries = nftEntries.data.nfts.nodes
+          nftHodlers = await processNFTEntries(desoData.profile.publicKey, nftEntries)
+          hodlerData = await setupHodlers(nftHodlers, rootState, desoData)
+
           break
       }
 

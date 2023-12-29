@@ -7,10 +7,10 @@
 import React, { useEffect, useReducer } from 'react'
 // import PropTypes from 'prop-types'
 import { Row, Modal, Col, Input, Spin, Image, Divider, message } from 'antd'
-import { processNFTs } from '../../../lib/deso-controller-graphql'
+import { processNFTPost } from '../../../lib/deso-controller-graphql'
 import { desoNFTSearchModal } from './data-models'
 import { useApolloClient } from '@apollo/client'
-import { GET_NFT_ENTRIES, GET_NFT_POST } from 'custom/lib/graphql-models'
+import { GET_NFT_POST } from 'custom/lib/graphql-models'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
@@ -35,9 +35,8 @@ const DeSoNFTSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfir
 
     // let nftDomain = null
     let nftRoute = null
-    let nftId = null
+    let postHash = null
     let nftPost = null
-    let nftEntries = null
     let gqlProps = null
 
     try {
@@ -64,7 +63,7 @@ const DeSoNFTSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfir
       // Validate the domain is correct as a switch statement
       // nftDomain = urlSplit[2]
       nftRoute = urlSplit[3]
-      nftId = urlSplit[4]
+      postHash = urlSplit[4]
 
       // check if nftRoute = 'nft' or 'posts'
       if (!['nft', 'posts'].includes(nftRoute)) {
@@ -75,38 +74,19 @@ const DeSoNFTSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfir
       setState({ isExecuting: true, nftMetaData: {}, nftHodlers: [], nftUrl })
 
       gqlProps = {
-        filter: {
-          nftPostHash: {
-            equalTo: nftId
-          }
-        }
+        postHash
       }
 
       nftPost = await client.query({ query: GET_NFT_POST, variables: gqlProps, fetchPolicy: 'no-cache' })
 
       // Check if a valid NFT was returned
-      if (!nftPost.data.nfts.nodes.length === 0) throw new Error(errMsgDefault)
-      nftPost = nftPost.data.nfts.nodes[0]
+      if (!nftPost.data.post) throw new Error(errMsgDefault)
+      if (!nftPost.data.post.isNft) throw new Error(errMsgDefault)
 
-      // If we get here, we have a valid NFT, fetch the entries
-      gqlProps = {
-        filter: {
-          nftPostHash: {
-            equalTo: nftId
-          },
-          owner: {
-            publicKey: {
-              notEqualTo: publicKey
-            }
-          }
-        }
-      }
+      nftPost = nftPost.data.post
+      const nftMetaData = await processNFTPost(nftPost, postHash)
 
-      nftEntries = await client.query({ query: GET_NFT_ENTRIES, variables: gqlProps, fetchPolicy: 'no-cache' })
-      nftEntries = nftEntries.data.nfts.nodes
-
-      const { nftMetaData, nftHodlers } = await processNFTs(nftPost, nftEntries)
-      setState({ nftMetaData, nftHodlers, isExecuting: false })
+      setState({ nftMetaData, isExecuting: false })
     } catch (e) {
       setState({ isExecuting: false })
       message.error(errMsgDefault)
@@ -118,13 +98,10 @@ const DeSoNFTSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfir
     if (!state.nftMetaData.id) {
       message.error('No valid NFT found. Please try again.')
       return
-    } else if (!state.nftHodlers.length) {
-      message.error('No Hodlers found for this NFT. Please revise.')
-      return
     }
 
     // If we get here, we have a valid NFT and Hodlers
-    onConfirmNFT(state.nftMetaData, state.nftHodlers, state.nftUrl)
+    onConfirmNFT(state.nftMetaData, state.nftUrl)
   }
 
   return (

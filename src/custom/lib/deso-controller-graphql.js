@@ -581,21 +581,38 @@ export const processFollowersOrFollowing = (followType, data) => {
   })
 }
 
-export const processNFTs = (nftPost, nftEntries) => {
+export const processNFTPost = (nftPost, postHash) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       let nftMetaData = null
+
+      try {
+        nftMetaData = {
+          id: postHash,
+          imageUrl: nftPost.imageUrls.length > 0 ? nftPost.imageUrls[0] : nftLogo,
+          description: cleanString(nftPost.body, 100)
+        }
+
+        resolve(nftMetaData)
+      } catch (e) {
+        console.error(e)
+        reject(e)
+      }
+    })()
+  })
+}
+
+export const processNFTEntries = (publicKey, nftEntries) => {
+  return new Promise((resolve, reject) => {
+    ;(async () => {
       let nftHodlers = []
       let newEntry = null
 
       try {
-        nftMetaData = {
-          id: nftPost.id,
-          imageUrl: nftPost.post.imageUrls.length > 0 ? nftPost.post.imageUrls[0] : nftLogo,
-          description: cleanString(nftPost.post.body, 100)
-        }
-
         for (const entry of nftEntries) {
+          // Ignore if NFT is owned by current user
+          if (entry.owner.publicKey === publicKey) continue
+
           // Check if the user is already in the hodlers list
           const userIndex = nftHodlers.findIndex((item) => item.publicKey === entry.owner.publicKey)
 
@@ -636,7 +653,7 @@ export const processNFTs = (nftPost, nftEntries) => {
           }
         })
 
-        resolve({ nftMetaData, nftHodlers })
+        resolve(nftHodlers)
       } catch (e) {
         console.error(e)
         reject(e)

@@ -113,22 +113,18 @@ export const FETCH_MULTIPLE_PROFILES = gql`
 `
 
 export const GET_NFT_POST = gql`
-  query Profiles($filter: NftFilter, $first: Int) {
-    nfts(filter: $filter, first: $first) {
-      nodes {
-        post {
-          body
-          imageUrls
-        }
-        id
-      }
+  query Profiles($postHash: String!) {
+    post(postHash: $postHash) {
+      body
+      imageUrls
+      isNft
     }
   }
 `
 
 export const GET_NFT_ENTRIES = gql`
-  query Profiles($filter: NftFilter) {
-    nfts(filter: $filter) {
+  query Profiles($condition: NftCondition) {
+    nfts(condition: $condition) {
       nodes {
         owner {
           username

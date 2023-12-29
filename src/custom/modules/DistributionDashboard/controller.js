@@ -22,6 +22,7 @@ export const setupHodlers = async (hodlers, rootState, desoData) => {
     )
 
     return {
+      originalHodlers: hodlers,
       finalHodlers: percentResult.hodlers,
       selectedTableKeys: filterResult.selectedTableKeys,
       tokenTotal: percentResult.tokenTotal
@@ -393,6 +394,7 @@ export const prepDistributionTemplate = async (desoData, rootState, name, rulesE
     transaction.tokenToUse = rootState.tokenToUse
 
     transaction.nftId = rootState.nftMetaData.id || ''
+    transaction.nftUrl = rootState.nftUrl || ''
     transaction.nftImageUrl = rootState.nftMetaData.imageUrl || ''
     transaction.nftDescription = rootState.nftMetaData.description || ''
     transaction.nftHodlers = rootState.nftHodlers || []
