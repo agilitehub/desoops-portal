@@ -31,7 +31,7 @@ const Enums = {
     CREATOR: 'CC'
   },
   defaults: {
-    USER_SEARCH_NUM_TO_FETCH: 20,
+    USER_SEARCH_NUM_TO_FETCH: 50,
     UPDATE_DESO_PRICE_INTERVAL_SEC: 30000
   },
   paymentStatuses: {

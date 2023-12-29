@@ -8,14 +8,12 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Row, Modal, Col, Spin, Select, Divider, Button } from 'antd'
-import { generateProfilePicUrl } from '../../../lib/deso-controller-graphql'
 import { cloneDeep, debounce } from 'lodash'
 import Enums from '../../../lib/enums'
-import { desoUserModel } from '../../../lib/data-models'
 import { SortAscendingOutlined } from '@ant-design/icons'
 import { SEARCH_PROFILES } from 'custom/lib/graphql-models'
 import { useApolloClient } from '@apollo/client'
-import { calculateDaysSinceLastActive } from 'custom/lib/utils'
+import { sortByKey } from 'custom/lib/utils'
 
 const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfirm, onCancel }) => {
   const [search, setSearch] = useState([])
@@ -26,7 +24,7 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
     if (isOpen) {
       // Map through rootState.customListModal.userList and create new array of key, label, value
       const options = rootState.customListModal.userList.map((entry) => {
-        return { key: entry.publicKey, label: entry.username, value: `${entry.publicKey}~${entry.lastActiveDays}` }
+        return { key: entry.publicKey, label: entry.username, value: entry.publicKey }
       })
 
       setSearch(options)
@@ -38,29 +36,9 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
 
   const handleConfirm = async () => {
     let userList = []
-    let newEntry = null
-    let publicKey = null
-    let lastActiveDays = null
-    let tmpData = null
 
     for (const entry of search) {
-      tmpData = entry.value.split('~')
-      publicKey = tmpData[0]
-      lastActiveDays = tmpData[1]
-
-      newEntry = desoUserModel()
-
-      newEntry = {
-        ...newEntry,
-        isCustom: true,
-        publicKey,
-        username: entry.label,
-        tokenBalance: 1,
-        lastActiveDays,
-        profilePicUrl: await generateProfilePicUrl(publicKey)
-      }
-
-      userList.push(newEntry)
+      userList.push(entry.value)
     }
 
     onConfirm(userList)
@@ -69,17 +47,7 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
   // Create a function to sort the list by username ascending
   const sortList = () => {
     const userList = cloneDeep(search)
-
-    userList.sort((a, b) => {
-      if (a.label.toLowerCase() < b.label.toLowerCase()) {
-        return -1
-      }
-      if (a.label.toLowerCase() > b.label.toLowerCase()) {
-        return 1
-      }
-      return 0
-    })
-
+    sortByKey(userList, 'label')
     setSearch(userList)
   }
 
@@ -96,13 +64,13 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
         setFetching(true)
 
         const gqlProps = {
-          orderBy: 'USERNAME_ASC',
           filter: {
             username: {
               includesInsensitive: value
             }
           },
-          first: Enums.defaults.USER_SEARCH_NUM_TO_FETCH
+          first: Enums.defaults.USER_SEARCH_NUM_TO_FETCH,
+          orderBy: 'USERNAME_ASC'
         }
 
         client.query({ query: SEARCH_PROFILES, variables: gqlProps, fetchPolicy: 'no-cache' }).then((newOptions) => {
@@ -115,9 +83,7 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
             return {
               key: entry.publicKey,
               label: entry.username,
-              value: `${entry.publicKey}~${calculateDaysSinceLastActive(
-                entry.account.transactionStats.latestTransactionTimestamp
-              )}`
+              value: entry.publicKey
             }
           })
 
@@ -125,6 +91,7 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
           setFetching(false)
         })
       }
+
       return debounce(loadOptions, debounceTimeout)
     }, [debounceTimeout])
     return (

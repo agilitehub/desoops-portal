@@ -22,6 +22,7 @@ import {
   getCCHodlersAndBalance,
   getDAOHodlersAndBalance,
   getInitialDeSoData,
+  processCustomList,
   processTokenHodlers
 } from '../../../lib/deso-controller-graphql'
 import PaymentModal from '../PaymentModal'
@@ -32,7 +33,7 @@ import {
   updateDistributionTemplate
 } from '../../../lib/agilite-controller'
 import { useApolloClient } from '@apollo/client'
-import { GQL_GET_INITIAL_DESO_DATA, GQL_GET_TOKEN_HOLDERS } from 'custom/lib/graphql-models'
+import { FETCH_MULTIPLE_PROFILES, GQL_GET_INITIAL_DESO_DATA, GQL_GET_TOKEN_HOLDERS } from 'custom/lib/graphql-models'
 import { buildGQLProps } from 'custom/lib/utils'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
@@ -320,23 +321,45 @@ const _BatchTransactionsForm = () => {
     setState({ loading: false })
   }
 
-  const handleConfirmCustomList = async (userList) => {
+  const handleConfirmCustomList = async (publicKeys) => {
     try {
-      const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(userList, state, desoData)
+      setState({ loading: true, isExecuting: true, customListModal: { ...state.customListModal, isOpen: false } })
+
+      // Refetch all data to ensure we have the latest
+      const gqlProps = {
+        filter: {
+          publicKey: {
+            in: publicKeys
+          }
+        }
+      }
+
+      const gqlData = await client.query({
+        query: FETCH_MULTIPLE_PROFILES,
+        variables: gqlProps,
+        fetchPolicy: 'no-cache'
+      })
+
+      const { originalHodlers, finalHodlers, tokenTotal, selectedTableKeys } = await processCustomList(
+        gqlData.data,
+        state,
+        desoData
+      )
 
       setState({
-        originalHodlers: userList,
+        originalHodlers,
         finalHodlers,
         tokenTotal,
         selectedTableKeys,
-        customListModal: { ...state.customListModal, isOpen: false, userList }
+        customListModal: { ...state.customListModal, userList: finalHodlers, isOpen: false },
+        loading: false,
+        isExecuting: false
       })
     } catch (e) {
       console.error(e)
       message.error(e.message)
+      setState({ loading: false, isExecuting: false })
     }
-
-    setState({ loading: false })
   }
 
   const handleSelectTemplate = async (id) => {
@@ -352,6 +375,8 @@ const _BatchTransactionsForm = () => {
 
       const tmpState = cloneDeep(state)
       const template = distributionTemplates.find((template) => template._id === id)
+      let hodlerData = null
+      let publicKeys = null
 
       // update the state props using the selected template
       tmpState.distributeTo = template.distributeTo
@@ -368,19 +393,42 @@ const _BatchTransactionsForm = () => {
       tmpState.returnAmount = template.rules.returnAmount
       tmpState.lastActiveDays = template.rules.lastActiveDays
 
-      if (template.distributeTo === Enums.values.CUSTOM) {
-        tmpState.customListModal = customListModal()
-        tmpState.customListModal.userList = template.customList
-      }
-
       // Update tmpState.templateNameModal and close Select Template Modal
       tmpState.templateNameModal.id = template._id
       tmpState.templateNameModal.name = template.name
       tmpState.templateNameModal.isModified = false
       tmpState.selectTemplateModal.isOpen = false
 
-      const hodlerData = await fetchUsersFromDeSo(template.distributeTo, tmpState)
+      switch (template.distributeTo) {
+        case Enums.values.CUSTOM:
+          tmpState.customListModal = customListModal()
 
+          // Build the list of public keys
+          publicKeys = template.customList.map((item) => item.publicKey)
+
+          // Refetch all data to ensure we have the latest
+          const gqlProps = {
+            filter: {
+              publicKey: {
+                in: publicKeys
+              }
+            }
+          }
+
+          const gqlData = await client.query({
+            query: FETCH_MULTIPLE_PROFILES,
+            variables: gqlProps,
+            fetchPolicy: 'no-cache'
+          })
+
+          hodlerData = await processCustomList(gqlData.data, tmpState, desoData)
+
+          tmpState.customListModal.userList = hodlerData.finalHodlers
+
+          break
+        default:
+          hodlerData = await fetchUsersFromDeSo(template.distributeTo, tmpState)
+      }
       tmpState.originalHodlers = hodlerData.originalHodlers
       tmpState.finalHodlers = hodlerData.finalHodlers
       tmpState.tokenTotal = hodlerData.tokenTotal

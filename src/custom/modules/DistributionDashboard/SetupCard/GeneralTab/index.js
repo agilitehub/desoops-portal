@@ -159,13 +159,13 @@ const GeneralTab = ({
         setFetching(true)
 
         const gqlProps = {
-          orderBy: 'USERNAME_ASC',
           filter: {
             username: {
               includesInsensitive: value
             }
           },
-          first: Enums.defaults.USER_SEARCH_NUM_TO_FETCH
+          first: Enums.defaults.USER_SEARCH_NUM_TO_FETCH,
+          orderBy: 'USERNAME_ASC'
         }
 
         client.query({ query: SEARCH_PROFILES, variables: gqlProps, fetchPolicy: 'no-cache' }).then((newOptions) => {
@@ -186,6 +186,7 @@ const GeneralTab = ({
           setFetching(false)
         })
       }
+
       return debounce(loadOptions, debounceTimeout)
     }, [debounceTimeout])
     return (

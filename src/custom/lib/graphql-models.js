@@ -81,11 +81,27 @@ export const GQL_GET_TOKEN_HOLDERS = gql`
 `
 
 export const SEARCH_PROFILES = gql`
-  query Profiles($filter: ProfileFilter, $first: Int!, $orderBy: [ProfilesOrderBy!]) {
+  query Profiles($filter: ProfileFilter, $first: Int, $orderBy: [ProfilesOrderBy!]) {
     profiles(filter: $filter, first: $first, orderBy: $orderBy) {
       nodes {
-        username
         publicKey
+        username
+        account {
+          transactionStats {
+            latestTransactionTimestamp
+          }
+        }
+      }
+    }
+  }
+`
+
+export const FETCH_MULTIPLE_PROFILES = gql`
+  query Profiles($filter: ProfileFilter) {
+    profiles(filter: $filter) {
+      nodes {
+        publicKey
+        username
         account {
           transactionStats {
             latestTransactionTimestamp

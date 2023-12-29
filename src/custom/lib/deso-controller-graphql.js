@@ -170,6 +170,32 @@ export const processTokenHodlers = async (gqlData, rootState, desoData) => {
   }
 }
 
+export const processCustomList = async (gqlData, rootState, desoData) => {
+  const originalHodlers = []
+  let newEntry = null
+
+  try {
+    // We need to loop through the tokenBalancesAsCreator array to find the DAO and CC Balances
+    // But we also need to separate our own balances, and then create holders arrays
+    gqlData = gqlData.profiles.nodes
+
+    for (const entry of gqlData) {
+      newEntry = await createCustomUserEntry(entry)
+
+      // Skip if newEntry is null, because it means the user is invalid
+      if (newEntry === null) continue
+      originalHodlers.push(newEntry)
+    }
+
+    sortByKey(originalHodlers, 'username')
+    const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(originalHodlers, rootState, desoData)
+
+    return { originalHodlers, finalHodlers, selectedTableKeys, tokenTotal }
+  } catch (e) {
+    return e
+  }
+}
+
 export const getInitialDeSoData = async (desoData, gqlData) => {
   const daoHodlers = []
   const ccHodlers = []
@@ -380,6 +406,35 @@ export const createUserEntry = (entry) => {
 
         newEntry.publicKey = tmpEntry.publicKey
         newEntry.username = tmpEntry.username
+        newEntry.lastActiveDays = lastActiveDays
+        newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
+        newEntry.tokenBalance = tokenBalance
+
+        resolve(newEntry)
+      } catch (e) {
+        reject(e)
+      }
+    })()
+  })
+}
+
+export const createCustomUserEntry = (entry) => {
+  return new Promise((resolve, reject) => {
+    ;(async () => {
+      const tokenBalance = 1
+      let newEntry = null
+      let lastActiveDays = null
+
+      try {
+        newEntry = desoUserModel()
+
+        // Check first if lastActiveTimestamp is null before calculating days
+        if (entry.account.transactionStats && entry.account.transactionStats.latestTransactionTimestamp !== null) {
+          lastActiveDays = calculateDaysSinceLastActive(entry.account.transactionStats.latestTransactionTimestamp)
+        }
+
+        newEntry.publicKey = entry.publicKey
+        newEntry.username = entry.username
         newEntry.lastActiveDays = lastActiveDays
         newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
         newEntry.tokenBalance = tokenBalance
