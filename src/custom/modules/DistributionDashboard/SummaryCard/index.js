@@ -64,8 +64,8 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
       const estimateDurationMinutes = (noOfPaymentTransactions * configData.estimateTimePerTransactionSeconds) / 60
       const estimateDurationLabel = estimateDurationMinutes < 1 ? '< 1' : Math.ceil(estimateDurationMinutes)
 
-      let desoOpsFeeUSD = noOfPaymentTransactions * rootState.feePerTransactionUSD
-      let desoOpsFeeDESO = desoOpsFeeUSD / desoData.desoPrice
+      let desoOpsFeeUSD = 0
+      let desoOpsFeeDESO = 0
       let desoOpsFeeDESOLabel = 0
 
       let totalFeeUSD = 0
@@ -84,8 +84,15 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
       let warningMsg = null
       let tokenToDistribute = ''
 
-      if (isNaN(desoOpsFeeUSD)) desoOpsFeeUSD = 0
       if (isNaN(distributionAmount)) distributionAmount = 0
+
+      // Determine DESO Ops Fee - It's free if the actual account is DeSoOps
+      if (desoData.profile.publicKey !== CoreEnums.values.DESO_OPS_PUBLIC_KEY) {
+        desoOpsFeeDESO = desoOpsFeeUSD / desoData.desoPrice
+        desoOpsFeeUSD = noOfPaymentTransactions * rootState.feePerTransactionUSD
+      }
+
+      if (isNaN(desoOpsFeeUSD)) desoOpsFeeUSD = 0
 
       if (isNaN(desoOpsFeeDESO)) {
         desoOpsFeeDESO = 0

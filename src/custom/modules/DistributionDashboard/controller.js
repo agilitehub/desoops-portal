@@ -192,31 +192,37 @@ export const processHodlerConditions = async (hodlers, rootState) => {
       // Step 2: If `conditions` is an empty object, set the `isVisible` property of all entries in the `hodlers` array to `true`.
       hodlers.forEach((hodler) => {
         hodler.isVisible = true
+        hodler.isActive = true
       })
 
       // Reset the `selectedTableKeys` array to include all entries in the `hodlers` array
       selectedTableKeys = hodlers.map((hodler) => hodler.username)
     } else {
-      // Step 3: If filterUsers is true, first default the `isVisible` property of all entries in the `hodlers` array to `false`.
+      // Step 3: If filterUsers is true, first default the `isVisible` property of all entries in the `hodlers` array to `true`.
       hodlers.forEach((hodler) => {
-        hodler.isVisible = false
+        hodler.isVisible = true
+        hodler.isActive = true
       })
 
       // Step 4: Set the `isVisible` property of each entry in the `hodlers` array based on whether the `tokenBalance` property is greater than, less than, equal to, or not equal to `conditions.filterAmount`.
       hodlers.forEach((hodler) => {
-        switch (conditions.filterAmountIs) {
-          case '>':
-            hodler.isVisible = hodler.tokenBalance > conditions.filterAmount
-            break
-          case '<':
-            hodler.isVisible = hodler.tokenBalance < conditions.filterAmount
-            break
-          case '>=':
-            hodler.isVisible = hodler.tokenBalance >= conditions.filterAmount
-            break
-          case '<=':
-            hodler.isVisible = hodler.tokenBalance <= conditions.filterAmount
-            break
+        if (conditions.filterAmount !== null) {
+          switch (conditions.filterAmountIs) {
+            case '>':
+              hodler.isVisible = hodler.tokenBalance > conditions.filterAmount
+              break
+            case '<':
+              hodler.isVisible = hodler.tokenBalance < conditions.filterAmount
+              break
+            case '>=':
+              hodler.isVisible = hodler.tokenBalance >= conditions.filterAmount
+              break
+            case '<=':
+              hodler.isVisible = hodler.tokenBalance <= conditions.filterAmount
+              break
+          }
+
+          hodler.isActive = hodler.isVisible
         }
 
         // Next, if there is a conditions.lastActiveDays, the hodler.isVisible is only true if the holder's lastTransactionTimestamp in the array is less than or equal the conditions.lastActiveDays
@@ -226,6 +232,7 @@ export const processHodlerConditions = async (hodlers, rootState) => {
           conditions.lastActiveDays !== 0
         ) {
           hodler.isVisible = hodler.isVisible && hodler.lastActiveDays <= conditions.lastActiveDays
+          hodler.isActive = hodler.isVisible
         }
 
         if (hodler.isVisible) {
@@ -237,12 +244,13 @@ export const processHodlerConditions = async (hodlers, rootState) => {
       if (conditions.returnAmount !== null && conditions.returnAmount !== 0 && conditions.returnAmount !== undefined) {
         // Set all hodlers.isVisible to false except the top x in the array based on the conditions.returnAmount
         // Also populate the Table Keys
-
+        selectedTableKeys = []
         hodlers = hodlers.filter((hodler) => hodler.isVisible)
 
         hodlers.forEach((hodler, index) => {
           if (index >= conditions.returnAmount) {
             hodler.isVisible = false
+            hodler.isActive = false
           } else {
             selectedTableKeys.push(hodler.username)
           }

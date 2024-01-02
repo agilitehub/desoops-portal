@@ -19,8 +19,6 @@ import { customListModal, distributionDashboardState, paymentModal } from '../da
 import { setDeSoData, setConfigData, setDistributionTemplates } from '../../../reducer'
 import { cloneDeep } from 'lodash'
 import {
-  getCCHodlersAndBalance,
-  getDAOHodlersAndBalance,
   getInitialDeSoData,
   processCustomList,
   processNFTEntries,
@@ -36,6 +34,8 @@ import {
 import { useApolloClient } from '@apollo/client'
 import {
   FETCH_MULTIPLE_PROFILES,
+  GET_FOLLOWERS,
+  GET_FOLLOWING,
   GET_NFT_ENTRIES,
   GQL_GET_INITIAL_DESO_DATA,
   GQL_GET_TOKEN_HOLDERS
@@ -131,6 +131,61 @@ const _BatchTransactionsForm = () => {
     let gqlProps = null
     let gqlData = null
     let tmpdata = null
+    let publicKey = null
+
+    try {
+      setState({ isExecuting: true })
+
+      // First we retrieve configurations from Agilit-e
+      const tmpConfigData = await getConfigData()
+      dispatch(setConfigData(tmpConfigData))
+
+      // Now we need to determine which public key to use based on myHodlers
+      if (!state.myHodlers && state.distributeDeSoUser) {
+        publicKey = state.distributeDeSoUser[0].key
+      } else {
+        publicKey = desoData.profile.publicKey
+      }
+
+      // Get the rest of the DeSo Data for the current User
+      gqlProps = {
+        publicKey: desoData.profile.publicKey
+      }
+
+      gqlData = await client.query({
+        query: GQL_GET_INITIAL_DESO_DATA,
+        variables: gqlProps,
+        fetchPolicy: 'no-cache'
+      })
+
+      tmpdata = await getInitialDeSoData(desoData, gqlData.data)
+
+      // Fetch DeSo data based on the Dashboard configurations
+      const dashboardData = await fetchUsersFromDeSo(state.distributeTo, publicKey, state)
+
+      // Update State and Redux Store
+      dispatch(setDeSoData(tmpdata))
+
+      setState({
+        originalHodlers: dashboardData.originalHodlers,
+        finalHodlers: dashboardData.finalHodlers,
+        tokenTotal: dashboardData.tokenTotal,
+        selectedTableKeys: dashboardData.selectedTableKeys,
+        isExecuting: false,
+        loading: false
+      })
+
+      return
+    } catch (e) {
+      message.error(e)
+    }
+  }
+
+  const handlePostDistributionRefresh = async () => {
+    let gqlProps = null
+    let gqlData = null
+    let tmpdata = null
+    let publicKey = null
 
     try {
       setState({ isExecuting: true })
@@ -152,17 +207,10 @@ const _BatchTransactionsForm = () => {
 
       tmpdata = await getInitialDeSoData(desoData, gqlData.data)
 
-      // Fetch DeSo data based on the Dashboard configurations
-      const dashboardData = await fetchUsersFromDeSo(state.distributeTo, state)
-
       // Update State and Redux Store
       dispatch(setDeSoData(tmpdata))
 
       setState({
-        originalHodlers: dashboardData.originalHodlers,
-        finalHodlers: dashboardData.finalHodlers,
-        tokenTotal: dashboardData.tokenTotal,
-        selectedTableKeys: dashboardData.selectedTableKeys,
         isExecuting: false,
         loading: false
       })
@@ -197,7 +245,7 @@ const _BatchTransactionsForm = () => {
       // Once we get here, we need to fetch the hodlers for the selected option
       setState({ distributeTo, isExecuting: true, loading: true })
 
-      const hodlerData = await fetchUsersFromDeSo(distributeTo, state)
+      const hodlerData = await fetchUsersFromDeSo(distributeTo, desoData.profile.publicKey, state)
 
       // Update State
       setState({
@@ -247,40 +295,22 @@ const _BatchTransactionsForm = () => {
   }
 
   const handleDistributeDeSoUser = async (distributeDeSoUser) => {
-    let gqlProps = null
-    let originalHodlers = null
-    let gqlData = null
-
     if (distributeDeSoUser.length === 0) {
       setState({ distributeDeSoUser, originalHodlers: [], finalHodlers: [], tokenTotal: 0, selectedTableKeys: [] })
       return
     }
 
-    setState({ loading: true, distributeDeSoUser })
+    setState({ loading: true, isExecuting: true, distributeDeSoUser })
+    const hodlerData = await fetchUsersFromDeSo(state.distributeTo, distributeDeSoUser[0].key, state)
 
-    gqlProps = await buildGQLProps(state.distributeTo, distributeDeSoUser[0].key, desoData)
-    gqlData = await client.query({ query: GQL_GET_TOKEN_HOLDERS, variables: gqlProps, fetchPolicy: 'no-cache' })
-
-    if (state.distributeTo === Enums.values.CREATOR) {
-      const { ccHodlers } = await getCCHodlersAndBalance(
-        distributeDeSoUser[0].key,
-        gqlData.data.accountByPublicKey.tokenBalancesAsCreator.nodes
-      )
-
-      originalHodlers = ccHodlers
-    } else {
-      const { daoHodlers } = await getDAOHodlersAndBalance(
-        distributeDeSoUser[0].key,
-        gqlData.data.accountByPublicKey.tokenBalancesAsCreator.nodes
-      )
-
-      originalHodlers = daoHodlers
-    }
-
-    const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(originalHodlers, state, desoData)
-
-    // Update State
-    setState({ originalHodlers, finalHodlers, tokenTotal, selectedTableKeys, loading: false })
+    setState({
+      originalHodlers: hodlerData.originalHodlers,
+      finalHodlers: hodlerData.finalHodlers,
+      tokenTotal: hodlerData.tokenTotal,
+      selectedTableKeys: hodlerData.selectedTableKeys,
+      loading: false,
+      isExecuting: false
+    })
   }
 
   const handleTokenToUse = async (tokenToUse, tokenToUseLabel) => {
@@ -471,7 +501,7 @@ const _BatchTransactionsForm = () => {
 
           break
         default:
-          hodlerData = await fetchUsersFromDeSo(template.distributeTo, tmpState)
+          hodlerData = await fetchUsersFromDeSo(template.distributeTo, desoData.profile.publicKey, tmpState)
       }
 
       tmpState.originalHodlers = hodlerData.originalHodlers
@@ -488,7 +518,7 @@ const _BatchTransactionsForm = () => {
       message.error(e.message)
     }
 
-    setState({ loading: false })
+    setState({ loading: false, isExecuting: false })
   }
 
   const handleSetTemplateName = async (tmpName) => {
@@ -573,7 +603,7 @@ const _BatchTransactionsForm = () => {
     setState({ paymentModal: paymentModal() })
   }
 
-  const fetchUsersFromDeSo = async (distributeTo, rootState) => {
+  const fetchUsersFromDeSo = async (distributeTo, publicKey, tmpState) => {
     let hodlerData = null
     let gqlProps = null
     let gqlData = null
@@ -583,7 +613,7 @@ const _BatchTransactionsForm = () => {
 
     try {
       // Next, we need to fetch the rest of the user's DeSo data
-      gqlProps = await buildGQLProps(distributeTo, desoData.profile.publicKey, desoData)
+      gqlProps = await buildGQLProps(distributeTo, publicKey, desoData)
 
       switch (distributeTo) {
         case Enums.values.DAO:
@@ -594,11 +624,32 @@ const _BatchTransactionsForm = () => {
             fetchPolicy: 'no-cache'
           })
 
-          hodlerData = await processTokenHodlers(gqlData.data, rootState, desoData)
+          hodlerData = await processTokenHodlers(distributeTo, gqlData.data, tmpState, desoData)
+
+          break
+        case Enums.values.FOLLOWERS:
+          gqlData = await client.query({
+            query: GET_FOLLOWERS,
+            variables: gqlProps,
+            fetchPolicy: 'no-cache'
+          })
+
+          hodlerData = await processTokenHodlers(distributeTo, gqlData.data, tmpState, desoData)
+
+          break
+        case Enums.values.FOLLOWING:
+          gqlData = await client.query({
+            query: GET_FOLLOWING,
+            variables: gqlProps,
+            fetchPolicy: 'no-cache'
+          })
+
+          hodlerData = await processTokenHodlers(distributeTo, gqlData.data, tmpState, desoData)
+
           break
         case Enums.values.CUSTOM:
           // Build the list of public keys
-          publicKeys = rootState.customListModal.userList.map((item) => item.publicKey)
+          publicKeys = tmpState.customListModal.userList.map((item) => item.publicKey)
 
           // Refetch all data to ensure we have the latest
           gqlProps = {
@@ -615,22 +666,30 @@ const _BatchTransactionsForm = () => {
             fetchPolicy: 'no-cache'
           })
 
-          hodlerData = await processCustomList(gqlData.data, rootState, desoData)
+          hodlerData = await processCustomList(gqlData.data, tmpState, desoData)
 
           break
         case Enums.values.NFT:
           gqlProps = {
             condition: {
-              nftPostHash: rootState.nftMetaData.id
+              nftPostHash: tmpState.nftMetaData.id
             }
           }
 
           nftEntries = await client.query({ query: GET_NFT_ENTRIES, variables: gqlProps, fetchPolicy: 'no-cache' })
           nftEntries = nftEntries.data.nfts.nodes
-          nftHodlers = await processNFTEntries(desoData.profile.publicKey, nftEntries)
-          hodlerData = await setupHodlers(nftHodlers, rootState, desoData)
+          nftHodlers = await processNFTEntries(publicKey, nftEntries)
+          hodlerData = await setupHodlers(nftHodlers, tmpState, desoData)
 
           break
+        default:
+          // No Distribute To option selected Return defaults
+          hodlerData = {
+            originalHodlers: [],
+            finalHodlers: [],
+            tokenTotal: 0,
+            selectedTableKeys: []
+          }
       }
 
       return hodlerData
@@ -690,7 +749,7 @@ const _BatchTransactionsForm = () => {
                       configData={configData}
                       rootState={state}
                       setRootState={setState}
-                      onRefreshDashboard={handleRefreshDashboard}
+                      onRefreshDashboard={handlePostDistributionRefresh}
                       deviceType={deviceType}
                     />
                   </Col>

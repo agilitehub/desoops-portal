@@ -69,7 +69,11 @@ const GeneralTab = ({
     if (rootState.distributeTo !== Enums.values.EMPTY_STRING) {
       tmpShowDistributionType = true
 
-      if ([Enums.values.CREATOR, Enums.values.DAO].includes(rootState.distributeTo)) {
+      if (
+        [Enums.values.CREATOR, Enums.values.DAO, Enums.values.FOLLOWERS, Enums.values.FOLLOWING].includes(
+          rootState.distributeTo
+        )
+      ) {
         tmpShowMyHodlers = true
 
         if (!rootState.myHodlers) {

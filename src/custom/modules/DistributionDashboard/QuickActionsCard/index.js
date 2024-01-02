@@ -1,18 +1,12 @@
 import React, { useReducer } from 'react'
-import { App, Card, Button, Dropdown, Modal, Row, Col } from 'antd'
-import { DownOutlined, UserOutlined, ReloadOutlined, CopyOutlined, RollbackOutlined } from '@ant-design/icons'
+import { App, Card, Button, Modal, Row, Col } from 'antd'
+import { ReloadOutlined, CopyOutlined, RollbackOutlined } from '@ant-design/icons'
 import { copyTextToClipboard } from '../../../lib/utils'
 import RandomizeDialogContent from './RandomizeDialog'
-import Enums from '../../../lib/enums'
-import { processFollowersOrFollowing } from '../../../lib/deso-controller-graphql'
 import { prepUsersForClipboard } from '../controller'
-import { updateFollowers, updateFollowing } from '../../../reducer'
-import { useDispatch } from 'react-redux'
 import HeroSwapModal from '../../../reusables/components/HeroSwapModal'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBitcoinSign } from '@fortawesome/free-solid-svg-icons'
-import { useApolloClient } from '@apollo/client'
-import { GET_FOLLOWERS, GET_FOLLOWING } from 'custom/lib/graphql-models'
 
 const initialState = {
   ctcLoading: false,
@@ -29,10 +23,8 @@ const initialState = {
 const reducer = (state, newState) => ({ ...state, ...newState })
 
 const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, rootState, deviceType, setRootState }) => {
-  const dispatch = useDispatch()
   const { modal, message } = App.useApp()
   const [state, setState] = useReducer(reducer, initialState)
-  const client = useApolloClient()
 
   const styleProps = {
     title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
@@ -95,58 +87,21 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
     setState({ openHeroSwapModal: true })
   }
 
-  const handleCopyToClipboard = async (item) => {
+  const handleCopyToClipboard = async () => {
     let userList = null
-    let alreadyFetched = false
-    let gqlProps = null
 
     try {
       setState({ ctcLoading: true })
 
-      switch (item.key) {
-        case Enums.values.SELECTED_USERS:
-          // Return a list of usernames from rootState.finalHodlers.username and only where isActive and isVisible are true
-          userList = rootState.finalHodlers.filter((item) => item.isActive && item.isVisible)
-          userList = await prepUsersForClipboard(userList)
-          break
-        case Enums.values.FOLLOWERS:
-        case Enums.values.FOLLOWING:
-          if (item.key === Enums.values.FOLLOWERS) {
-            alreadyFetched = desoData.fetchedFollowers
-            userList = desoData.profile.followers
-          } else {
-            alreadyFetched = desoData.fetchedFollowing
-            userList = desoData.profile.following
-          }
-
-          if (!alreadyFetched) {
-            gqlProps = {
-              publicKey: desoData.profile.publicKey
-            }
-
-            // Update State that we received followers/following
-            if (item.key === Enums.values.FOLLOWERS) {
-              userList = await client.query({ query: GET_FOLLOWERS, variables: gqlProps, fetchPolicy: 'no-cache' })
-              userList = userList.data.accountByPublicKey.followers.nodes
-              userList = await processFollowersOrFollowing(item.key, userList)
-              dispatch(updateFollowers({ data: userList }))
-            } else {
-              userList = await client.query({ query: GET_FOLLOWING, variables: gqlProps, fetchPolicy: 'no-cache' })
-              userList = userList.data.accountByPublicKey.following.nodes
-              userList = await processFollowersOrFollowing(item.key, userList)
-              dispatch(updateFollowing({ data: userList }))
-            }
-          }
-
-          userList = await prepUsersForClipboard(userList)
-          break
-      }
+      // Return a list of usernames from rootState.finalHodlers.username and only where isActive and isVisible are true
+      userList = rootState.finalHodlers.filter((item) => item.isActive && item.isVisible)
+      userList = await prepUsersForClipboard(userList)
 
       if (userList.length > 0) {
         await copyTextToClipboard(userList.data)
-        message.success(`${userList.length} ${item.key} copied to clipboard`)
+        message.success(`${userList.length} user(s) copied to clipboard`)
       } else {
-        message.warning(`No ${item.key} to copy to clipboard`)
+        message.warning('No user(s) to copy to clipboard')
       }
 
       setState({ ctcLoading: false })
@@ -156,14 +111,6 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
       setState({ ctcLoading: false })
     }
   }
-
-  // const handleLoadRandomizeDialog = (item) => {
-  //   setState({
-  //     returnLoading: true,
-  //     loadRandomizeModal: true,
-  //     randomUserKey: item.key
-  //   })
-  // }
 
   const handleCloseRandomizeDialog = () => {
     setState({
@@ -179,24 +126,6 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
       randomUsers
     })
   }
-
-  const dropdownItems = [
-    {
-      label: Enums.values.SELECTED_USERS,
-      key: Enums.values.SELECTED_USERS,
-      icon: <UserOutlined />
-    },
-    {
-      label: Enums.values.FOLLOWERS,
-      key: Enums.values.FOLLOWERS,
-      icon: <UserOutlined />
-    },
-    {
-      label: Enums.values.FOLLOWING,
-      key: Enums.values.FOLLOWING,
-      icon: <UserOutlined />
-    }
-  ]
 
   return (
     <Card
@@ -234,16 +163,14 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
         </Col>
         <Col span={6}>
           <Col span={24} style={styleProps.actionWrapper}>
-            <Dropdown
-              menu={{ items: dropdownItems, onClick: handleCopyToClipboard }}
-              icon={<DownOutlined />}
+            <Button
+              shape='circle'
+              style={styleProps.iconCopy}
+              icon={<CopyOutlined onClick={handleCopyToClipboard} />}
               loading={state.ctcLoading}
               disabled={state.ctcLoading || rootState.isExecuting}
-              trigger={['click']}
-            >
-              <Button shape='circle' style={styleProps.iconCopy} icon={<CopyOutlined />} loading={state.ctcLoading} />
-            </Dropdown>
-            <div style={styleProps.labelCopy}>Copy</div>
+            />
+            <div style={styleProps.labelCopy}>Copy Users</div>
           </Col>
         </Col>
         <Col span={6}>

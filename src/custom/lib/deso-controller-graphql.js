@@ -82,84 +82,53 @@ export const changeDeSoLimit = async (desoLimitNanos) => {
   })
 }
 
-export const getDeSoDataOld = async (desoData, gqlData) => {
-  const daoHodlings = []
-  const ccHodlings = []
-  let newEntry = null
-  let desoBalance = 0
-  let newDeSoData = null
-  let tmpGQLData = null
-
-  try {
-    newDeSoData = cloneDeep(desoData)
-    newDeSoData.profile.publicKey = gqlData.accountByPublicKey.publicKey
-    newDeSoData.profile.username = gqlData.accountByPublicKey.username
-    newDeSoData.profile.profilePicUrl = await generateProfilePicUrl(newDeSoData.profile.publicKey)
-
-    // Fetch the current price of DeSo
-    if (gqlData.accountByPublicKey.desoBalance !== null) {
-      desoBalance = gqlData.accountByPublicKey.desoBalance.balanceNanos / Enums.values.NANO_VALUE
-    }
-
-    newDeSoData.desoPrice = await getDeSoPricing(newDeSoData.desoPrice)
-
-    // We need to loop through the tokenBalancesAsCreator array to find the DAO and CC Balances
-    // But we also need to separate our own balances, and then create holders arrays
-    tmpGQLData = gqlData.accountByPublicKey.tokenBalancesAsCreator.nodes
-    const { daoHodlers, daoBalance } = await getDAOHodlersAndBalance(newDeSoData.profile.publicKey, tmpGQLData)
-    const { ccHodlers, ccBalance } = await getCCHodlersAndBalance(newDeSoData.profile.publicKey, tmpGQLData)
-
-    // Next, we need to loop through the tokenBalancesAsHodler array to find the DAO and CC Balances
-    // and then create hodlings arrays
-    tmpGQLData = gqlData.accountByPublicKey.tokenBalances
-
-    for (const entry of tmpGQLData.nodes) {
-      newEntry = await createUserEntry(entry)
-
-      // Skip if newEntry is null, because it means the user is invalid
-      if (newEntry === null) continue
-
-      if (entry.isDaoCoin) {
-        daoHodlings.push(newEntry)
-      } else {
-        ccHodlings.push(newEntry)
-      }
-    }
-
-    // Finalize Data
-    newDeSoData.profile.desoBalanceUSD = Math.floor(desoBalance * newDeSoData.desoPrice * 100) / 100
-    newDeSoData.profile.desoBalance = Math.floor(desoBalance * 10000) / 10000
-    newDeSoData.profile.daoBalance = daoBalance
-    newDeSoData.profile.ccBalance = ccBalance
-    newDeSoData.profile.daoHodlers = daoHodlers
-    newDeSoData.profile.ccHodlers = ccHodlers
-    newDeSoData.profile.daoHodlings = daoHodlings
-    newDeSoData.profile.ccHodlings = ccHodlings
-
-    return newDeSoData
-  } catch (e) {
-    return e
-  }
-}
-
-export const processTokenHodlers = async (gqlData, rootState, desoData) => {
+export const processTokenHodlers = async (distributeTo, gqlData, rootState, desoData) => {
   const originalHodlers = []
   let newEntry = null
+  let userEntry = null
 
   try {
     // We need to loop through the tokenBalancesAsCreator array to find the DAO and CC Balances
     // But we also need to separate our own balances, and then create holders arrays
-    gqlData = gqlData.accountByPublicKey.tokenBalancesAsCreator.nodes
+    switch (distributeTo) {
+      case Enums.values.DAO:
+      case Enums.values.CREATOR:
+        gqlData = gqlData.accountByPublicKey.tokenBalancesAsCreator.nodes
+        break
+      case Enums.values.FOLLOWERS:
+        gqlData = gqlData.accountByPublicKey.followers.nodes
+        break
+      case Enums.values.FOLLOWING:
+        gqlData = gqlData.accountByPublicKey.following.nodes
+        break
+    }
 
-    for (const entry of gqlData) {
+    for (let entry of gqlData) {
+      switch (distributeTo) {
+        case Enums.values.DAO:
+        case Enums.values.CREATOR:
+          userEntry = entry.holder
+          break
+        case Enums.values.FOLLOWERS:
+          userEntry = entry.follower
+          break
+        case Enums.values.FOLLOWING:
+          userEntry = entry.followee
+          break
+      }
+
       // Ignore if entry belongs to current logged in account
-      if (entry.holder.publicKey === desoData.profile.publicKey) continue
+      if (userEntry.publicKey === desoData.profile.publicKey) continue
 
-      newEntry = await createUserEntry(entry)
+      newEntry = await createUserEntry(entry, userEntry)
 
       // Skip if newEntry is null, because it means the user is invalid
       if (newEntry === null) continue
       originalHodlers.push(newEntry)
+    }
+
+    if ([Enums.values.FOLLOWERS, Enums.values.FOLLOWING].includes(distributeTo)) {
+      sortByKey(originalHodlers, 'username')
     }
 
     const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(originalHodlers, rootState, desoData)
@@ -229,7 +198,7 @@ export const getInitialDeSoData = async (desoData, gqlData) => {
     tmpGQLData = gqlData.accountByPublicKey.tokenBalances
 
     for (const entry of tmpGQLData.nodes) {
-      newEntry = await createUserEntry(entry)
+      newEntry = await createUserEntry(entry, entry.creator)
 
       // Skip if newEntry is null, because it means the user is invalid
       if (newEntry === null) continue
@@ -311,7 +280,7 @@ export const getDAOHodlersAndBalance = (publicKey, data) => {
         for (const entry of data) {
           if (!entry.isDaoCoin) continue
 
-          newEntry = await createUserEntry(entry)
+          newEntry = await createUserEntry(entry, entry.holder)
 
           // Skip if newEntry is null, because it means the user is invalid
           if (newEntry === null) continue
@@ -380,12 +349,11 @@ export const getDAOHodlings = (publicKey) => {
   })
 }
 
-export const createUserEntry = (entry) => {
+export const createUserEntry = (entry, userEntry) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       let newEntry = null
       let tokenBalance = 0
-      let tmpEntry = null
       let lastActiveDays = null
 
       try {
@@ -393,19 +361,21 @@ export const createUserEntry = (entry) => {
         if (entry.isDaoCoin) tokenBalance = tokenBalance / Enums.values.NANO_VALUE
         tokenBalance = Math.floor(tokenBalance * 10000) / 10000
 
+        // If tokenBalance is NaN, then default to 1
+        if (isNaN(tokenBalance)) tokenBalance = 1
+
         newEntry = desoUserModel()
-        tmpEntry = entry.holder || entry.creator
 
         // If there's no Username, then the user is invalid
-        if (!tmpEntry.username) return resolve(null)
+        if (!userEntry || (userEntry && !userEntry.username)) return resolve(null)
 
         // Check first if lastActiveTimestamp is null before calculating days
-        if (tmpEntry.transactionStats && tmpEntry.transactionStats.latestTransactionTimestamp !== null) {
-          lastActiveDays = calculateDaysSinceLastActive(tmpEntry.transactionStats.latestTransactionTimestamp)
+        if (userEntry.transactionStats && userEntry.transactionStats.latestTransactionTimestamp !== null) {
+          lastActiveDays = calculateDaysSinceLastActive(userEntry.transactionStats.latestTransactionTimestamp)
         }
 
-        newEntry.publicKey = tmpEntry.publicKey
-        newEntry.username = tmpEntry.username
+        newEntry.publicKey = userEntry.publicKey
+        newEntry.username = userEntry.username
         newEntry.lastActiveDays = lastActiveDays
         newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
         newEntry.tokenBalance = tokenBalance
@@ -458,7 +428,7 @@ export const getCCHodlersAndBalance = (publicKey, data) => {
         for (const entry of data) {
           if (entry.isDaoCoin) continue
 
-          newEntry = await createUserEntry(entry)
+          newEntry = await createUserEntry(entry, entry.holder)
 
           // Skip if newEntry is null, because it means the user is invalid
           if (newEntry === null) continue

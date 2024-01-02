@@ -168,6 +168,10 @@ export const buildGQLProps = async (distributeTo, publickKey, desoData) => {
         }
 
         break
+      case Enums.values.FOLLOWERS:
+      case Enums.values.FOLLOWING:
+        gqlProps.publicKey = publickKey
+        break
     }
 
     return gqlProps

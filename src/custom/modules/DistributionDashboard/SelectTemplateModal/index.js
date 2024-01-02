@@ -97,8 +97,8 @@ const SelectTemplateModal = ({
             <Col span={24}>
               <center>
                 <p>
-                  You do not have any saved Setup templates. At the bottom of the "Setup & Config" Section, you will
-                  have an option to save the current setup as a template once enough configurations have been provided.
+                  You do not have any saved Setup Templates. At the top of the "Setup & Config" Section, you will have
+                  an option to save the current setup as a template once enough configurations have been provided.
                 </p>
               </center>
             </Col>
