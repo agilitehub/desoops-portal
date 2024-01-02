@@ -1,7 +1,7 @@
 {
   "name": "desoops-portal",
   "description": "A management hub for Content Creators on the DeSo platform",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "scripts": {
     "start": "craco start",
     "build": "craco build",

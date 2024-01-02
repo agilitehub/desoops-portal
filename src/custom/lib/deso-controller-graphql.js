@@ -366,8 +366,16 @@ export const createUserEntry = (entry, userEntry) => {
 
         newEntry = desoUserModel()
 
-        // If there's no Username, then the user is invalid
-        if (!userEntry || (userEntry && !userEntry.username)) return resolve(null)
+        // There has to be a User object to be balid
+        if (!userEntry) return resolve(null)
+
+        // If there's no username, we need to use the public key in the following format
+        if (!userEntry.username) {
+          userEntry.username = `${userEntry.publicKey.substring(0, 5)}...${userEntry.publicKey.substring(
+            userEntry.publicKey.length - 5,
+            userEntry.publicKey.length
+          )}`
+        }
 
         // Check first if lastActiveTimestamp is null before calculating days
         if (userEntry.transactionStats && userEntry.transactionStats.latestTransactionTimestamp !== null) {

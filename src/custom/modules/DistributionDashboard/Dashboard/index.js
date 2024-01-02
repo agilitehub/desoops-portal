@@ -185,7 +185,6 @@ const _BatchTransactionsForm = () => {
     let gqlProps = null
     let gqlData = null
     let tmpdata = null
-    let publicKey = null
 
     try {
       setState({ isExecuting: true })
