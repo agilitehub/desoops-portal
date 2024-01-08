@@ -46,6 +46,20 @@ const Enums = {
     LAUNCH: 'launch',
     LOGIN: 'login'
   },
+  coinSwap: {
+    heroSwap: {
+      title: 'HeroSwap',
+      url: 'https://heroswap.com/widget',
+      depositTicker: 'DESO',
+      destinationTicker: 'DUSD'
+    },
+    stealthEX: {
+      title: 'StealthEX',
+      id: 'stealthex-widget',
+      url: 'https://stealthex.io/widget',
+      affiliateId: '1ad31d1b-1404-49dc-bf92-9287bc7703cd'
+    }
+  },
   spinnerMessages: {
     INIT: 'Initializing DeSoOps Portal...',
     SIGNING_IN: 'Signing In...'

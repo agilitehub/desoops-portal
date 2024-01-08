@@ -207,7 +207,8 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
     configData.estimateTimePerTransactionSeconds,
     configData.desoGasFeesSendDESONanos,
     configData.desoGasFeesSendCCNanos,
-    configData.desoGasFeesSendDAONanos
+    configData.desoGasFeesSendDAONanos,
+    desoData.profile.publicKey
   ])
 
   useEffect(() => {

@@ -37,6 +37,7 @@ const GeneralTab = ({
   const [showDeSoUser, setShowDeSoUser] = useState(false)
   const [showDistributionType, setShowDistributionType] = useState(false)
   const [showTokenToUse, setShowTokenToUse] = useState(false)
+  const [myHoldersLabel, setMyHoldersLabel] = useState('')
 
   const styleProps = {
     select: { width: 200 },
@@ -65,6 +66,7 @@ const GeneralTab = ({
     let tmpShowDeSoUser = false
     let tmpShowDistributionType = false
     let tmpShowTokenToUse = false
+    let tmpMyHoldersLabel = ''
 
     if (rootState.distributeTo !== Enums.values.EMPTY_STRING) {
       tmpShowDistributionType = true
@@ -75,6 +77,19 @@ const GeneralTab = ({
         )
       ) {
         tmpShowMyHodlers = true
+
+        switch (rootState.distributeTo) {
+          case Enums.values.CREATOR:
+          case Enums.values.DAO:
+            tmpMyHoldersLabel = 'My Holders?'
+            break
+          case Enums.values.FOLLOWERS:
+            tmpMyHoldersLabel = 'My Followers?'
+            break
+          case Enums.values.FOLLOWING:
+            tmpMyHoldersLabel = 'My Following?'
+            break
+        }
 
         if (!rootState.myHodlers) {
           tmpShowDeSoUser = true
@@ -98,6 +113,7 @@ const GeneralTab = ({
     setShowDeSoUser(tmpShowDeSoUser)
     setShowDistributionType(tmpShowDistributionType)
     setShowTokenToUse(tmpShowTokenToUse)
+    setMyHoldersLabel(tmpMyHoldersLabel)
   }, [
     rootState.distributeTo,
     rootState.myHodlers,
@@ -281,7 +297,7 @@ const GeneralTab = ({
               style={styleProps.labelColStyle}
             >
               <span style={styleProps.fieldLabel}>
-                <b>My Holders?</b>
+                <b>{myHoldersLabel}</b>
               </span>
             </Col>
             <Col xs={styleParams.col1XS}>

@@ -4,7 +4,7 @@ import { ReloadOutlined, CopyOutlined, RollbackOutlined } from '@ant-design/icon
 import { copyTextToClipboard } from '../../../lib/utils'
 import RandomizeDialogContent from './RandomizeDialog'
 import { prepUsersForClipboard } from '../controller'
-import HeroSwapModal from '../../../reusables/components/HeroSwapModal'
+import CoinSwapModal from '../../../reusables/components/CoinSwapModal'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBitcoinSign } from '@fortawesome/free-solid-svg-icons'
 
@@ -14,7 +14,7 @@ const initialState = {
   refreshLoading: false,
   returnLoading: false,
   loadRandomizeModal: false,
-  openHeroSwapModal: false,
+  openCoinSwapModal: false,
   randomUserKey: null,
   randomizeInProgress: false,
   randomUsers: 0
@@ -84,7 +84,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
   }
 
   const handleCoinSwap = () => {
-    setState({ openHeroSwapModal: true })
+    setState({ openCoinSwapModal: true })
   }
 
   const handleCopyToClipboard = async () => {
@@ -232,8 +232,8 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
           randomUserKey={state.randomUserKey}
         />
       </Modal>
-      {state.openHeroSwapModal && (
-        <HeroSwapModal isOpen={state.openHeroSwapModal} onCloseModal={() => setState({ openHeroSwapModal: false })} />
+      {state.openCoinSwapModal && (
+        <CoinSwapModal isOpen={state.openCoinSwapModal} onCloseModal={() => setState({ openCoinSwapModal: false })} />
       )}
     </Card>
   )

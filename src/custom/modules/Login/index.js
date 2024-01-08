@@ -11,7 +11,7 @@ import VideoModal from '../../reusables/components/VideoModal'
 import Enums from '../../lib/enums'
 import { useSelector } from 'react-redux'
 import { getDeSoConfig } from '../../lib/deso-controller-graphql'
-import HeroSwapModal from '../../reusables/components/HeroSwapModal'
+import CoinSwapModal from '../../reusables/components/CoinSwapModal'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 configure(getDeSoConfig())
@@ -23,7 +23,7 @@ const Login = () => {
     openVideoModal: false,
     videoUrl: '',
     videoModalTitle: '',
-    openHeroSwapModal: false
+    openCoinSwapModal: false
   })
 
   const { token } = theme.useToken()
@@ -55,8 +55,8 @@ const Login = () => {
     setState({ openVideoModal, videoUrl, videoModalTitle })
   }
 
-  const handleLaunchHeroSwap = () => {
-    setState({ openHeroSwapModal: true })
+  const handleLaunchCoinSwap = () => {
+    setState({ openCoinSwapModal: true })
   }
 
   const styleProps = {
@@ -124,7 +124,7 @@ const Login = () => {
                           </div>
                           <span className={styles.text}>SIGN IN WITH DESO</span>
                         </button>
-                        <button className={styles.coinSwapButton} onClick={handleLaunchHeroSwap}>
+                        <button className={styles.coinSwapButton} onClick={handleLaunchCoinSwap}>
                           <div className={styles.icon}>
                             <FontAwesomeIcon style={{ fontSize: 20 }} icon={faBitcoinSign} />
                           </div>
@@ -167,7 +167,7 @@ const Login = () => {
         url={state.videoUrl}
         onCloseModal={() => setState({ openVideoModal: false })}
       />
-      <HeroSwapModal isOpen={state.openHeroSwapModal} onCloseModal={() => setState({ openHeroSwapModal: false })} />
+      <CoinSwapModal isOpen={state.openCoinSwapModal} onCloseModal={() => setState({ openCoinSwapModal: false })} />
     </>
   )
 }
