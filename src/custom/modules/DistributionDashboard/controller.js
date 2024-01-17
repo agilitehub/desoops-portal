@@ -369,6 +369,7 @@ export const prepDistributionTransaction = async (
         isActive: hodler.isActive,
         isVisible: hodler.isVisible,
         isError: hodler.isError,
+        isKnownError: hodler.isKnownError,
         errorMessage: hodler.errorMessage,
         tokenBalance: hodler.tokenBalance,
         estimatedPaymentToken: hodler.estimatedPaymentToken,
