@@ -71,12 +71,13 @@ const Enums = {
   transactionErrors: [
     {
       qry: 'NEED_BLOCKS',
-      message: 'A DeSo error occurred while processing your transaction (NEED_BLOCKS). Wait a few seconds and try again'
+      message:
+        'A DeSo error occurred while processing your transaction (NEED_BLOCKS). Wait at least 30 seconds and try again.'
     },
     {
       qry: 'Problem getting block for blockhash',
       message:
-        'A DeSo error occurred while processing your transaction (Problem getting block for blockhash). Wait a few seconds and try again'
+        'A DeSo error occurred while processing your transaction (Problem getting block for blockhash). Wait at least 30 seconds and try again.'
     }
   ]
 }

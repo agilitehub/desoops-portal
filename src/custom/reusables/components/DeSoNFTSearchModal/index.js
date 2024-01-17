@@ -159,8 +159,3 @@ const DeSoNFTSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfir
 }
 
 export default DeSoNFTSearchModal
-
-// TODO: Add Prop Types for this component
-// DeSoNFTSearchModal.propTypes = {
-//   tip: PropTypes.string
-// }

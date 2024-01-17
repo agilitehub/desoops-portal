@@ -8,7 +8,7 @@ import { cloneDeep } from 'lodash'
 
 const { Text } = Typography
 
-const PaymentModal = ({ props, onPaymentDone }) => {
+const PaymentModal = ({ props, onPaymentDone, onRetryExecute }) => {
   const { message } = App.useApp()
   const [tipIndex, setTipIndex] = useState(0)
   const [retrying, setRetrying] = useState(false)
@@ -30,11 +30,10 @@ const PaymentModal = ({ props, onPaymentDone }) => {
   // Create a useEffect to separate errors array into two arrays: known and unknown
   useEffect(() => {
     const errors = cloneDeep(props.errors)
+    const knownErrors = []
+    const unknownErrors = []
 
     if (errors.length > 0) {
-      const knownErrors = []
-      const unknownErrors = []
-
       errors.forEach((error) => {
         const knownError = CoreEnums.transactionErrors.find((transactionError) => {
           return error.errorMessage.toLowerCase().includes(transactionError.qry.toLowerCase())
@@ -48,15 +47,15 @@ const PaymentModal = ({ props, onPaymentDone }) => {
           unknownErrors.push(error)
         }
       })
-
-      setKnownErrors(knownErrors)
-      setUnknownErrors(unknownErrors)
     }
+
+    setKnownErrors(knownErrors)
+    setUnknownErrors(unknownErrors)
   }, [props.errors])
 
   const handleRetryFailedTransactions = async () => {
     setRetrying(true)
-    // await props.retryFailedTransactions()
+    await onRetryExecute()
     setRetrying(false)
   }
 
@@ -144,7 +143,7 @@ const PaymentModal = ({ props, onPaymentDone }) => {
                   itemLayout='horizontal'
                   header={
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontSize: 16 }}>Error Report: </span>
+                      <span style={{ fontSize: 16 }}>Error Report (Can retry): </span>
                       <Button
                         style={{
                           color: '#17A2B8',
@@ -199,7 +198,7 @@ const PaymentModal = ({ props, onPaymentDone }) => {
                   itemLayout='horizontal'
                   header={
                     <div>
-                      <span style={{ fontSize: 16 }}>Unknown Errors: </span>
+                      <span style={{ fontSize: 16 }}>Unknown Errors (Cannot retry): </span>
                     </div>
                   }
                   dataSource={unknownErrors}
@@ -248,10 +247,10 @@ const PaymentModal = ({ props, onPaymentDone }) => {
   )
 }
 
-const app = ({ props, onPaymentDone }) => {
+const app = ({ props, onPaymentDone, onRetryExecute }) => {
   return (
     <App>
-      <PaymentModal props={props} onPaymentDone={onPaymentDone} />
+      <PaymentModal props={props} onPaymentDone={onPaymentDone} onRetryExecute={onRetryExecute} />
     </App>
   )
 }

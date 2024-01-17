@@ -318,22 +318,13 @@ export const prepUsersForClipboard = (userList) => {
   })
 }
 
-export const prepDistributionTransaction = async (
-  desoData,
-  rootState,
-  summaryState,
-  finalHodlers,
-  paymentModal,
-  isUpdate,
-  startedAt
-) => {
+export const prepDistributionTransaction = async (desoData, rootState, summaryState, finalHodlers, paymentModal) => {
   let distTransaction = null
 
   try {
     distTransaction = distributionTransactionModel()
 
-    distTransaction.startedAt = startedAt || new Date()
-    if (isUpdate) distTransaction.completedAt = new Date()
+    distTransaction.startedAt = new Date()
 
     distTransaction.publicKey = desoData.profile.publicKey
     distTransaction.desoPriceUSD = desoData.desoPrice
@@ -363,6 +354,39 @@ export const prepDistributionTransaction = async (
     distTransaction.remainingCount = paymentModal.remainingCount
 
     // Loop through finalHodlers and add a subset of each entry to the recipients array
+    for (const hodler of finalHodlers) {
+      distTransaction.recipients.push({
+        publicKey: hodler.publicKey,
+        isActive: hodler.isActive,
+        isVisible: hodler.isVisible,
+        isError: hodler.isError,
+        isKnownError: hodler.isKnownError,
+        errorMessage: hodler.errorMessage,
+        tokenBalance: hodler.tokenBalance,
+        estimatedPaymentToken: hodler.estimatedPaymentToken,
+        estimatedPaymentUSD: hodler.estimatedPaymentUSD,
+        percentOwnership: hodler.percentOwnership
+      })
+    }
+
+    return distTransaction
+  } catch (e) {
+    throw new Error(e)
+  }
+}
+
+export const prepDistributionTransactionUpdate = async (distTransaction, finalHodlers, paymentModal) => {
+  try {
+    distTransaction.completedAt = new Date()
+
+    distTransaction.paymentCount = paymentModal.paymentCount
+    distTransaction.successCount = paymentModal.successCount
+    distTransaction.failCount = paymentModal.failCount
+    distTransaction.remainingCount = paymentModal.remainingCount
+
+    // Loop through finalHodlers and add a subset of each entry to the recipients array
+    distTransaction.recipients = []
+
     for (const hodler of finalHodlers) {
       distTransaction.recipients.push({
         publicKey: hodler.publicKey,

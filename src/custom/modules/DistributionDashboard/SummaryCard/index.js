@@ -4,7 +4,12 @@ import { cloneDeep } from 'lodash'
 import { RightCircleOutlined } from '@ant-design/icons'
 
 import CoreEnums from '../../../lib/enums'
-import { calculateEstimatedPayment, prepDistributionTransaction, slimRootState } from '../controller'
+import {
+  calculateEstimatedPayment,
+  prepDistributionTransaction,
+  prepDistributionTransactionUpdate,
+  slimRootState
+} from '../controller'
 import { distributionSummaryState } from '../data-models'
 import Enums from '../enums'
 import { changeDeSoLimit, sendCreatorCoins, sendDAOTokens, sendDESO } from '../../../lib/deso-controller-graphql'
@@ -354,6 +359,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
       await sendDESO(desoData.profile.publicKey, CoreEnums.values.DESO_OPS_PUBLIC_KEY, state.totalFeeDESO)
 
       // Update the Payment Modal
+      paymentModal.distTransaction = agiliteResponse
       paymentModal.status = Enums.paymentStatuses.EXECUTING
       paymentModal.progressPercent = 20
       setRootState({ paymentModal })
@@ -390,8 +396,6 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
               )
               break
           }
-
-          // TODO: Force known and unknown errors for testing
         } catch (e) {
           hodler.isError = true
           hodler.errorMessage = e.message
@@ -439,21 +443,14 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
         paymentModal.errors = finalHodlers.filter((hodler) => hodler.isError)
       } else {
         paymentModal.status = Enums.paymentStatuses.SUCCESS
+        paymentModal.errors = []
       }
 
-      distTransaction = await prepDistributionTransaction(
-        desoData,
-        slimState,
-        state,
-        finalHodlers,
-        paymentModal,
-        true,
-        distTransaction.startedAt
-      )
+      distTransaction = await prepDistributionTransactionUpdate(agiliteResponse, finalHodlers, paymentModal)
 
       await updateDistributionTransaction(agiliteResponse._id, distTransaction)
       window.removeEventListener('beforeunload', handleBeforeUnload)
-      setRootState({ paymentModal })
+      setRootState({ paymentModal, isExecuting: false })
     } catch (e) {
       console.error(e)
 
@@ -464,15 +461,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
 
       if (executeInCatch) {
         try {
-          distTransaction = await prepDistributionTransaction(
-            desoData,
-            slimState,
-            state,
-            finalHodlers,
-            paymentModal,
-            true,
-            distTransaction.startedAt
-          )
+          distTransaction = await prepDistributionTransactionUpdate(agiliteResponse, finalHodlers, paymentModal)
 
           distTransaction.isError = true
           distTransaction.errorDetails = {

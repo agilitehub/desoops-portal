@@ -14,7 +14,9 @@ import TableData from '../TableData'
 
 // Custom Utils
 import Enums from '../../../lib/enums'
-import { prepDistributionTemplate, setupHodlers } from '../controller'
+import DashboardEnums from '../enums'
+
+import { prepDistributionTemplate, prepDistributionTransactionUpdate, setupHodlers } from '../controller'
 import { customListModal, distributionDashboardState, paymentModal } from '../data-models'
 import { setDeSoData, setConfigData, setDistributionTemplates } from '../../../reducer'
 import { cloneDeep } from 'lodash'
@@ -22,14 +24,18 @@ import {
   getInitialDeSoData,
   processCustomList,
   processNFTEntries,
-  processTokenHodlers
+  processTokenHodlers,
+  sendCreatorCoins,
+  sendDAOTokens,
+  sendDESO
 } from '../../../lib/deso-controller-graphql'
 import PaymentModal from '../PaymentModal'
 import {
   createDistributionTemplate,
   deleteDistributionTemplate,
   getConfigData,
-  updateDistributionTemplate
+  updateDistributionTemplate,
+  updateDistributionTransaction
 } from '../../../lib/agilite-controller'
 import { useApolloClient } from '@apollo/client'
 import {
@@ -40,7 +46,7 @@ import {
   GQL_GET_INITIAL_DESO_DATA,
   GQL_GET_TOKEN_HOLDERS
 } from 'custom/lib/graphql-models'
-import { buildGQLProps } from 'custom/lib/utils'
+import { buildGQLProps, randomize } from 'custom/lib/utils'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
@@ -697,6 +703,192 @@ const _BatchTransactionsForm = () => {
     }
   }
 
+  const handleRetryExecute = async () => {
+    let status = DashboardEnums.paymentStatuses.PREPARING
+    let tips = await randomize(configData.tips, null, configData.tips.length)
+    let progressPercent = 10
+    let paymentModal = null
+    let finalHodlers = null
+    let paymentCount = 0
+    let successCount = 0
+    let failCount = 0
+    let remainingCount = paymentCount
+    let executeInCatch = false
+    let errorHodlersCount = null
+
+    try {
+      // Flag all hodlers setting paymentStatus = CoreEnums.paymentStatuses.QUEUED where isKnownError = true
+      // Also create array of hodlers who have known errors
+      finalHodlers = cloneDeep(state.finalHodlers)
+
+      for (const hodler of finalHodlers) {
+        if (hodler.isKnownError) {
+          hodler.paymentStatus = DashboardEnums.paymentStatuses.QUEUED
+          errorHodlersCount++
+        }
+      }
+
+      // Start execution and update Root State
+      setState({
+        isExecuting: true,
+        paymentModal,
+        finalHodlers
+      })
+
+      // Prep the Payment Modal, by incrementing the remainingCount, decrementing the failCount
+      paymentModal = cloneDeep(state.paymentModal)
+
+      paymentCount = paymentModal.paymentCount
+      successCount = paymentModal.successCount
+      failCount = paymentModal.failCount - errorHodlersCount
+      remainingCount = paymentModal.remainingCount + errorHodlersCount
+
+      paymentModal = {
+        ...paymentModal,
+        paymentCount,
+        successCount,
+        failCount,
+        remainingCount,
+        isOpen: true,
+        status,
+        tips,
+        progressPercent
+      }
+
+      executeInCatch = true
+
+      // Update the Payment Modal
+      paymentModal.status = DashboardEnums.paymentStatuses.EXECUTING
+      paymentModal.progressPercent = 20
+      setState({ paymentModal })
+
+      // Loop through state.holdersToPay and for each one, distribute the tokens using a for-of loop
+      for (const hodler of finalHodlers) {
+        // Pay the hodler
+        try {
+          // Ignore hodlers that are not active or visible and don't have a known error
+          if (!hodler.isActive || !hodler.isVisible || !hodler.isKnownError) continue
+
+          hodler.isError = false
+          hodler.errorMessage = ''
+          hodler.isKnownError = false
+          hodler.paymentStatus = DashboardEnums.paymentStatuses.IN_PROGRESS
+
+          setState({ finalHodlers })
+
+          switch (state.distributionType) {
+            case Enums.paymentTypes.DESO:
+              await sendDESO(desoData.profile.publicKey, hodler.publicKey, hodler.estimatedPaymentToken)
+              break
+            case Enums.paymentTypes.DAO:
+              await sendDAOTokens(
+                desoData.profile.publicKey,
+                hodler.publicKey,
+                state.tokenToUse,
+                hodler.estimatedPaymentToken
+              )
+
+              break
+            case Enums.paymentTypes.CREATOR:
+              await sendCreatorCoins(
+                desoData.profile.publicKey,
+                hodler.publicKey,
+                state.tokenToUse,
+                hodler.estimatedPaymentToken
+              )
+              break
+          }
+        } catch (e) {
+          hodler.isError = true
+          hodler.errorMessage = e.message
+
+          // Use Enums.transactionErrors Determine if the error is known or not, and populate isKnownError
+          const knownError = Enums.transactionErrors.find((error) =>
+            e.message.toLowerCase().includes(error.qry.toLowerCase())
+          )
+
+          if (knownError) {
+            hodler.isKnownError = true
+          }
+        }
+
+        // Update the Payment Modal
+        if (!hodler.isError) {
+          successCount++
+          remainingCount--
+          paymentModal.successCount = successCount
+          paymentModal.remainingCount = remainingCount
+          hodler.paymentStatus = Enums.paymentStatuses.SUCCESS
+        } else {
+          failCount++
+          remainingCount--
+          paymentModal.failCount = failCount
+          paymentModal.remainingCount = remainingCount
+          hodler.paymentStatus = Enums.paymentStatuses.FAILED
+        }
+
+        paymentModal.progressPercent = Math.floor(20 + (70 * (successCount + failCount)) / paymentCount)
+        setState({ paymentModal, finalHodlers })
+      }
+
+      // If there were any errors, add them to errors array and change the payment status
+      paymentModal.progressPercent = 100
+
+      if (failCount > 0) {
+        paymentModal.status = DashboardEnums.paymentStatuses.ERROR_PAYMENT_TRANSACTION
+        paymentModal.errors = finalHodlers.filter((hodler) => hodler.isError)
+      } else {
+        paymentModal.status = DashboardEnums.paymentStatuses.SUCCESS
+        paymentModal.errors = []
+      }
+
+      paymentModal.distTransaction = await prepDistributionTransactionUpdate(
+        paymentModal.distTransaction,
+        finalHodlers,
+        paymentModal
+      )
+      await updateDistributionTransaction(paymentModal.distTransaction._id, paymentModal.distTransaction)
+
+      setState({ paymentModal, isExecuting: false })
+    } catch (e) {
+      console.error(e)
+
+      // We need to post the error to Agilit-e and notify the user
+      paymentModal.status = DashboardEnums.paymentStatuses.ERROR
+      paymentModal.progressPercent = 100
+      paymentModal.isError = true
+
+      if (executeInCatch) {
+        try {
+          paymentModal.distTransaction = await prepDistributionTransactionUpdate(
+            paymentModal.distTransaction,
+            finalHodlers,
+            paymentModal
+          )
+
+          paymentModal.distTransaction.isError = true
+          paymentModal.distTransaction.errorDetails = {
+            message: e.message,
+            stack: e.stack
+          }
+
+          await updateDistributionTransaction(paymentModal.distTransaction._id, paymentModal.distTransaction)
+        } catch (e) {
+          // If we get here, we have serious problems
+          console.error('We have serious problems if this error occurred')
+          console.error(e)
+        }
+      }
+
+      setState({
+        isExecuting: false,
+        paymentModal
+      })
+
+      message.error(e.message)
+    }
+  }
+
   return (
     <>
       <Row justify='center' gutter={[12, 12]}>
@@ -762,7 +954,7 @@ const _BatchTransactionsForm = () => {
           </ContainerCard>
         </Col>
       </Row>
-      <PaymentModal props={state.paymentModal} onPaymentDone={handlePaymentDone} />
+      <PaymentModal props={state.paymentModal} onPaymentDone={handlePaymentDone} onRetryExecute={handleRetryExecute} />
     </>
   )
 }

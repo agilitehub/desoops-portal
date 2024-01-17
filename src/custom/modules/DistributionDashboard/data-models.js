@@ -69,6 +69,7 @@ export const paymentModal = () => {
     failCount: 0,
     remainingCount: 0,
     progressPercent: 0,
+    distTransaction: null,
     tips: [],
     errors: []
   }
