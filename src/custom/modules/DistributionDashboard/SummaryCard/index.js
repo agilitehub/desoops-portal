@@ -390,9 +390,20 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
               )
               break
           }
+
+          // TODO: Force known and unknown errors for testing
         } catch (e) {
           hodler.isError = true
           hodler.errorMessage = e.message
+
+          // Use Enums.transactionErrors Determine if the error is known or not, and populate isKnownError
+          const knownError = CoreEnums.transactionErrors.find((error) =>
+            e.message.toLowerCase().includes(error.qry.toLowerCase())
+          )
+
+          if (knownError) {
+            hodler.isKnownError = true
+          }
         }
 
         // Update the Payment Modal

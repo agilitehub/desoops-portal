@@ -67,7 +67,18 @@ const Enums = {
   messages: {
     UNKNOWN_ERROR: 'Unknown Error Occured. Please check console',
     NOT_NFT_CREATOR: 'You are not the creator of this NFT. Please revise'
-  }
+  },
+  transactionErrors: [
+    {
+      qry: 'NEED_BLOCKS',
+      message: 'A DeSo error occurred while processing your transaction (NEED_BLOCKS). Wait a few seconds and try again'
+    },
+    {
+      qry: 'Problem getting block for blockhash',
+      message:
+        'A DeSo error occurred while processing your transaction (Problem getting block for blockhash). Wait a few seconds and try again'
+    }
+  ]
 }
 
 export default Enums

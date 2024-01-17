@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import { App, Button, Col, Image, List, Modal, Progress, Row, Typography } from 'antd'
-import { CheckCircleOutlined, CloseOutlined, SyncOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined, CloseOutlined, ReloadOutlined, SyncOutlined } from '@ant-design/icons'
 import Enums from '../enums'
+import CoreEnums from '../../../lib/enums'
 import { copyTextToClipboard } from '../../../lib/utils'
+import { cloneDeep } from 'lodash'
 
 const { Text } = Typography
 
 const PaymentModal = ({ props, onPaymentDone }) => {
-  const [tipIndex, setTipIndex] = useState(0)
   const { message } = App.useApp()
+  const [tipIndex, setTipIndex] = useState(0)
+  const [retrying, setRetrying] = useState(false)
+  const [knownErrors, setKnownErrors] = useState([])
+  const [unknownErrors, setUnknownErrors] = useState([])
 
   useEffect(() => {
     let interval = null
@@ -21,6 +26,39 @@ const PaymentModal = ({ props, onPaymentDone }) => {
 
     return () => (interval ? clearInterval(interval) : null)
   }, [tipIndex, props.isOpen]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Create a useEffect to separate errors array into two arrays: known and unknown
+  useEffect(() => {
+    const errors = cloneDeep(props.errors)
+
+    if (errors.length > 0) {
+      const knownErrors = []
+      const unknownErrors = []
+
+      errors.forEach((error) => {
+        const knownError = CoreEnums.transactionErrors.find((transactionError) => {
+          return error.errorMessage.toLowerCase().includes(transactionError.qry.toLowerCase())
+        })
+
+        if (knownError) {
+          error.displayMessage = knownError.message
+          knownErrors.push(error)
+        } else {
+          error.displayMessage = error.errorMessage
+          unknownErrors.push(error)
+        }
+      })
+
+      setKnownErrors(knownErrors)
+      setUnknownErrors(unknownErrors)
+    }
+  }, [props.errors])
+
+  const handleRetryFailedTransactions = async () => {
+    setRetrying(true)
+    // await props.retryFailedTransactions()
+    setRetrying(false)
+  }
 
   return (
     <Modal open={props.isOpen} footer={null} closable={false} title={props.status}>
@@ -99,13 +137,30 @@ const PaymentModal = ({ props, onPaymentDone }) => {
                 </Button>
               </center>
             </Col>
-            {props.errors.length > 0 ? (
+            {knownErrors.length > 0 ? (
               <Col span={24}>
                 <List
                   size='small'
                   itemLayout='horizontal'
-                  header='Error Report'
-                  dataSource={props.errors}
+                  header={
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontSize: 16 }}>Error Report: </span>
+                      <Button
+                        style={{
+                          color: '#17A2B8',
+                          borderColor: '#17A2B8',
+                          backgroundColor: 'white'
+                        }}
+                        size='small'
+                        icon={<ReloadOutlined />}
+                        loading={retrying}
+                        onClick={handleRetryFailedTransactions}
+                      >
+                        Retry Failed
+                      </Button>
+                    </div>
+                  }
+                  dataSource={knownErrors}
                   renderItem={(entry) => (
                     <List.Item>
                       <List.Item.Meta
@@ -128,7 +183,49 @@ const PaymentModal = ({ props, onPaymentDone }) => {
                             }}
                           >
                             <span style={{ fontSize: 12, fontWeight: 'bold' }}>{`${entry.username} - `}</span>{' '}
-                            <span style={{ fontSize: 12 }}>{entry.errorMessage}</span>
+                            <span style={{ fontSize: 12 }}>{entry.displayMessage}</span>
+                          </div>
+                        }
+                      />
+                    </List.Item>
+                  )}
+                />
+              </Col>
+            ) : null}
+            {unknownErrors.length > 0 ? (
+              <Col span={24}>
+                <List
+                  size='small'
+                  itemLayout='horizontal'
+                  header={
+                    <div>
+                      <span style={{ fontSize: 16 }}>Unknown Errors: </span>
+                    </div>
+                  }
+                  dataSource={unknownErrors}
+                  renderItem={(entry) => (
+                    <List.Item>
+                      <List.Item.Meta
+                        avatar={
+                          <Image
+                            src={entry.profilePicUrl}
+                            width={20}
+                            height={20}
+                            style={{ borderRadius: '50%', marginTop: -3 }}
+                            fallback='https://openfund.com/images/ghost-profile-image.svg'
+                            preview={false}
+                          />
+                        }
+                        description={
+                          <div
+                            style={{ cursor: 'pointer' }}
+                            onClick={async (e) => {
+                              await copyTextToClipboard(entry.estimatedPaymentToken)
+                              message.success(`Full payment value for ${entry.username} copied to clipboard`)
+                            }}
+                          >
+                            <span style={{ fontSize: 12, fontWeight: 'bold' }}>{`${entry.username} - `}</span>{' '}
+                            <span style={{ fontSize: 12 }}>{entry.displayMessage}</span>
                           </div>
                         }
                       />
