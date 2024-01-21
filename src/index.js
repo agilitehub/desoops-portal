@@ -1,5 +1,5 @@
 import React from 'react'
-import { Provider, useSelector } from 'react-redux'
+import { Provider } from 'react-redux'
 import { createRoot } from 'react-dom/client'
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
@@ -9,7 +9,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 // Utilities
 import { initAgilite } from 'custom/lib/agilite-controller'
 import Store from 'store'
-import Core from 'core/components/core'
+import App from 'custom/modules/CoreApp'
 import Enums from 'custom/lib/enums'
 
 // Import default Stylesheet for application
@@ -51,10 +51,6 @@ if (process.env.REACT_APP_FIREBASE_ENABLED === Enums.values.YES) {
 }
 
 // Initialize App
-const App = () => {
-  const state = useSelector((state) => state.core)
-  return <Core state={state} />
-}
 const root = createRoot(document.getElementById(Enums.values.DIV_ROOT))
 
 root.render(

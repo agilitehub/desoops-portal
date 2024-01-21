@@ -1,6 +1,6 @@
 import React, { useReducer } from 'react'
 import { identity, configure } from 'deso-protocol'
-import { Col, Row, message, theme, Card, Button } from 'antd'
+import { Col, Row, message, Card, Button } from 'antd'
 import { faCheckCircle, faBitcoinSign } from '@fortawesome/free-solid-svg-icons'
 import { LoginOutlined } from '@ant-design/icons'
 
@@ -26,7 +26,6 @@ const Login = () => {
     openCoinSwapModal: false
   })
 
-  const { token } = theme.useToken()
   const { isTablet, isSmartphone } = useSelector((state) => state.custom.userAgent)
 
   const handleLogin = async () => {
@@ -94,7 +93,7 @@ const Login = () => {
                       <Col>
                         <Button
                           type='link'
-                          style={{ cursor: 'pointer', color: token.colorPrimary, fontSize: 17 }}
+                          style={{ cursor: 'pointer', color: '#188EFF', fontSize: 17 }}
                           onClick={handleWatchIntroductionDeSoOps}
                         >
                           Watch Introduction To DeSoOps
@@ -105,7 +104,7 @@ const Login = () => {
                       <Col>
                         <Button
                           type='link'
-                          style={{ cursor: 'pointer', color: token.colorPrimary, fontSize: 17 }}
+                          style={{ cursor: 'pointer', color: '#188EFF', fontSize: 17 }}
                           onClick={handleWatchIntroductionDeSo}
                         >
                           Watch Introduction To DeSo

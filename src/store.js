@@ -6,7 +6,6 @@ import { composeWithDevTools } from 'redux-devtools-extension'
 import Enums from 'custom/lib/enums'
 
 // Reducers
-import coreReducer from 'core/utils/reducer'
 import customReducer from 'custom/reducer'
 
 const devTools =
@@ -15,7 +14,6 @@ const devTools =
     : composeWithDevTools(applyMiddleware(Thunk))
 
 const reducers = {
-  core: coreReducer.reducer,
   custom: customReducer
 }
 

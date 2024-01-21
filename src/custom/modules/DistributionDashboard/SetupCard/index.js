@@ -128,7 +128,7 @@ const SetupCard = ({
 
   const styleProps = {
     title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
-    headStyle: { minHeight: deviceType.isSmartphone ? 30 : 40 },
+    headStyle: { background: '#DDE6ED', minHeight: deviceType.isSmartphone ? 30 : 40 },
     tabButton: {
       color: '#188EFF',
       borderColor: '#188EFF',

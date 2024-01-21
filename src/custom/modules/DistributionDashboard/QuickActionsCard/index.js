@@ -28,7 +28,7 @@ const QuickActionsCard = ({ desoData, onResetDashboard, onRefreshDashboard, root
 
   const styleProps = {
     title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
-    headStyle: { minHeight: deviceType.isSmartphone ? 30 : 40 },
+    headStyle: { background: '#DDE6ED', minHeight: deviceType.isSmartphone ? 30 : 40 },
     bodyStyle: { height: deviceType.isSmartphone ? 58 : deviceType.isTablet ? 70 : 75 },
     actionWrapper: { marginTop: deviceType.isSmartphone ? -5 : -3 },
     iconReset: { color: '#DC3847', borderColor: '#DC3847', backgroundColor: 'white' },

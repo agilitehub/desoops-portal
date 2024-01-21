@@ -488,7 +488,11 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
   }
 
   return (
-    <Card title={<span style={styleProps.title}>Step 2: Distribution Summary</span>} size='small'>
+    <Card
+      title={<span style={styleProps.title}>Step 2: Distribution Summary</span>}
+      size='small'
+      headStyle={{ background: '#DDE6ED' }}
+    >
       <Row>
         <Col
           xs={styleParams.labelColXS}
@@ -632,7 +636,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
           </Row>
         </>
       ) : null}
-      <Divider style={{ margin: '10px 0' }} />
+      <Divider style={{ margin: '5px 0px 15px' }} />
       <Row justify='center'>
         <Col>
           <Button
@@ -650,7 +654,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
       </Row>
       {state.warningMessages.length > 0 ? (
         <>
-          <Divider style={{ margin: '10px 0' }} />
+          <Divider style={{ margin: '5px 0px 15px' }} />
           <Row justify='center'>
             <Col xs={24} md={18}>
               <Alert

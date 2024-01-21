@@ -9,7 +9,7 @@ const WalletOverviewCard = ({ desoProfile, deviceType }) => {
 
   const styleProps = {
     title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
-    headStyle: { minHeight: deviceType.isSmartphone ? 30 : 40 },
+    headStyle: { background: '#DDE6ED', minHeight: deviceType.isSmartphone ? 30 : 40 },
     bodyStyle: { height: deviceType.isSmartphone ? 58 : deviceType.isTablet ? 70 : 75 },
     rowWrapper: { textAlign: 'center', marginTop: deviceType.isSmartphone ? 0 : deviceType.isTablet ? 4 : 4 },
     divWrapper: {

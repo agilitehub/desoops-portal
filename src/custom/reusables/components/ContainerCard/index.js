@@ -3,16 +3,14 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Card, theme } from 'antd'
+import { Card } from 'antd'
 
 const ContainerCard = ({ title, deviceType, children }) => {
-  const { token } = theme.useToken()
-
   const styleProps = {
     card: { width: '100%', overflow: 'hidden', marginTop: 10 },
     title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
-    headStyle: { backgroundColor: token.colorSecondaryLight, minHeight: deviceType.isSmartphone ? 30 : 40 },
-    bodyStyle: { padding: 4, background: token.colorInputBg }
+    headStyle: { backgroundColor: '#FFA07A', minHeight: deviceType.isSmartphone ? 30 : 40 },
+    bodyStyle: { padding: 4, background: '#EDEDED' }
   }
 
   return (
