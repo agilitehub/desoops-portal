@@ -1,103 +1,11 @@
-// CSS RESET
-html, body, div, span, applet, object, iframe,h1, h2, h3, h4, h5,
-h6, p, blockquote, pre,a, abbr, acronym, address, big,
-cite, code,del, dfn, em, img, ins, kbd, q, s, samp,small,
-strike, strong, sub, sup, tt, var,b, u, i, center,dl, dt,
-dd, ol, ul, li,fieldset, form, label, legend,table, caption,
-tbody, tfoot, thead, tr, th, td,article, aside, canvas, details,
-embed, figure, figcaption, footer, header, hgroup, menu, nav,
-output, ruby, section, summary,time, mark, audio, video
+@import 'styles/helpers.sass'
+@import 'styles/ant-design-overrides.sass'
+
+body
     margin: 0
-    padding: 0
-    border: 0
-    vertical-align: baseline
-html
-    -ms-text-size-adjust: 100%
-    -webkit-text-size-adjust: 100%
-img,fieldset, a img
-    border: none
-p
-    display: block
-    margin-block-start: unset
-    margin-block-end: 1em
-    margin-inline-start: 0px
-    margin-inline-end: 0px
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-textarea
-    -webkit-appearance: none
-input[type="submit"],
-button
-    background: none
-    cursor: pointer
-    &::-moz-focus-inner
-        padding: 0
-        border: 0
-textarea
-    overflow: auto
-input, button
-    margin: 0
-    padding: 0
-    border: 0
-div, input, textarea, select,button,
-h1,h2,h3,h4,h5,h6,a,span,a:focus
-    outline: none
-ul,ol
-    list-style-type: none
-table
-    border-spacing: 0
-    border-collapse: collapse
-    width: 100%
-html
-    box-sizing: border-box
-*, *:before, *:after
-    box-sizing: inherit
+    font-family: 'Roboto', sans-serif
+    font-size: 16px
 
-@media (prefers-reduced-motion: reduce)
-    *
-        transition: none !important
-
-// Media Queries
-=xxl
-  @media only screen and (min-width: "1600px")
-      @content
-=xl
-  @media only screen and (min-width: "1200px") and (max-width: "1599px")
-      @content
-=lg
-  @media only screen and (min-width: "992px") and (max-width: "1199px")
-      @content 
-=md
-  @media only screen and (min-width: "768px") and (max-width: "991px")
-      @content
-=sm
-  @media only screen and (min-width: "576px") and (max-width: "767px")
-      @content
-=xs
-  @media only screen and (max-width: "575px")
-      @content
-
-// Ant Design Overrides  
-.ant-tabs-tab
-    +xs
-        font-size: 14px !important
-        padding: 5px 0 !important
-.ant-tabs-nav-list
-    +xs
-        margin-top: -10px
-.ant-tabs-nav
-    +xs
-        margin-bottom: 5px !important
-.ant-radio-button-wrapper
-    +xs
-        font-size: 14px
-.ant-table-cell
-    +xs
-        padding: 5px 10px 5px 5px !important
-.ant-table-selection-column
-    +xs
-        vertical-align: middle
-.ant-drawer-body
-    +xs
-        padding: 0 !important
+th, span
+    font-family: 'Roboto', sans-serif
+    font-size: 16px

@@ -7,16 +7,16 @@ import { DeSoIdentityProvider } from 'react-deso-protocol'
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 
 // Utilities
-import { initAgilite } from './custom/lib/agilite-controller'
-import Store from './store'
-import Core from './core/components/core'
-import Enums from './custom/lib/enums'
+import { initAgilite } from 'custom/lib/agilite-controller'
+import Store from 'store'
+import Core from 'core/components/core'
+import Enums from 'custom/lib/enums'
 
 // Import default Stylesheet for application
-import './index.sass'
+import 'index.sass'
 
 // Nullify console outputs for production
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === Enums.values.ENV_PRODUCTION) {
   console.error = function () {}
   console.log = function () {}
   console.warn = function () {}
@@ -25,7 +25,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Init Apollo Client
 const client = new ApolloClient({
-  uri: process.env.REACT_APP_GQL_API_URL,
+  uri: Enums.values.GQL_API_URL,
   cache: new InMemoryCache()
 })
 

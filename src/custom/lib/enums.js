@@ -23,7 +23,8 @@ const Enums = {
     FOLLOWING: 'Following',
     SELECTED_USERS: 'Selected Users in Table',
     DESO_VIDEO_URL: 'https://www.youtube.com/watch?v=5jHXBYUb7X4',
-    DESOOPS_VIDEO_URL: 'https://www.youtube.com/watch?v=PAQELCazfs8'
+    DESOOPS_VIDEO_URL: 'https://www.youtube.com/watch?v=PAQELCazfs8',
+    GQL_API_URL: 'https://graphql-prod.deso.com/graphql'
   },
   paymentTypes: {
     DESO: '$DESO',
