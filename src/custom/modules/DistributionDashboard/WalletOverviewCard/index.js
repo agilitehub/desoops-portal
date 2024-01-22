@@ -17,7 +17,7 @@ const WalletOverviewCard = ({ desoProfile, deviceType }) => {
       paddingTop: 2,
       paddingBottom: 2,
       borderRadius: '5px',
-      fontSize: deviceType.isSmartphone ? 12 : deviceType.isTablet ? 13 : 14
+      fontSize: deviceType.isSmartphone ? 11 : deviceType.isTablet ? 13 : 14
     },
     backgroundColor: '#FFA07A',
     textColor: '#F3F3F3'

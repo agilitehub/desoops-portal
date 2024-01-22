@@ -12,9 +12,12 @@ export const GQL_GET_INITIAL_DESO_DATA = gql`
         nodes {
           isDaoCoin
           balanceNanos
+          creatorPkid
           creator {
             username
-            publicKey
+            transactionStats {
+              latestTransactionTimestamp
+            }
           }
         }
       }
@@ -29,9 +32,9 @@ export const GQL_GET_TOKEN_HOLDERS = gql`
         nodes {
           balanceNanos
           isDaoCoin
+          hodlerPkid
           holder {
             username
-            publicKey
             transactionStats {
               latestTransactionTimestamp
             }
@@ -88,9 +91,9 @@ export const GET_NFT_ENTRIES = gql`
   query Profiles($condition: NftCondition) {
     nfts(condition: $condition) {
       nodes {
+        ownerPkid
         owner {
           username
-          publicKey
           transactionStats {
             latestTransactionTimestamp
           }
@@ -105,9 +108,9 @@ export const GET_FOLLOWERS = gql`
     accountByPublicKey(publicKey: $publicKey) {
       followers {
         nodes {
+          followerPkid
           follower {
             username
-            publicKey
             transactionStats {
               latestTransactionTimestamp
             }
@@ -123,9 +126,9 @@ export const GET_FOLLOWING = gql`
     accountByPublicKey(publicKey: $publicKey) {
       following {
         nodes {
+          followedPkid
           followee {
             username
-            publicKey
             transactionStats {
               latestTransactionTimestamp
             }

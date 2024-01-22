@@ -107,13 +107,16 @@ export const processTokenHodlers = async (distributeTo, gqlData, rootState, deso
       switch (distributeTo) {
         case Enums.values.DAO:
         case Enums.values.CREATOR:
-          userEntry = entry.holder
+          userEntry = entry.holder || {}
+          userEntry.publicKey = entry.hodlerPkid
           break
         case Enums.values.FOLLOWERS:
-          userEntry = entry.follower
+          userEntry = entry.follower || {}
+          userEntry.publicKey = entry.followerPkid
           break
         case Enums.values.FOLLOWING:
-          userEntry = entry.followee
+          userEntry = entry.followee || {}
+          userEntry.publicKey = entry.followedPkid
           break
       }
 
@@ -135,7 +138,7 @@ export const processTokenHodlers = async (distributeTo, gqlData, rootState, deso
 
     return { originalHodlers, finalHodlers, selectedTableKeys, tokenTotal }
   } catch (e) {
-    return e
+    return new Error(e)
   }
 }
 
@@ -198,6 +201,8 @@ export const getInitialDeSoData = async (desoData, gqlData) => {
     tmpGQLData = gqlData.accountByPublicKey.tokenBalances
 
     for (const entry of tmpGQLData.nodes) {
+      if (!entry.creator) entry.creator = {}
+      entry.creator.publicKey = entry.creatorPkid
       newEntry = await createUserEntry(entry, entry.creator)
 
       // Skip if newEntry is null, because it means the user is invalid
@@ -366,7 +371,7 @@ export const createUserEntry = (entry, userEntry) => {
 
         newEntry = desoUserModel()
 
-        // There has to be a User object to be balid
+        // There has to be a User object to be valid
         if (!userEntry) return resolve(null)
 
         // If there's no username, we need to use the public key in the following format
@@ -589,6 +594,8 @@ export const processNFTEntries = (publicKey, nftEntries) => {
       try {
         for (const entry of nftEntries) {
           // Ignore if NFT is owned by current user
+          if (!entry.owner) entry.owner = {}
+          entry.owner.publicKey = entry.ownerPkid
           if (entry.owner.publicKey === publicKey) continue
 
           // Check if the user is already in the hodlers list
