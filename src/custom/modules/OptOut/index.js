@@ -3,14 +3,12 @@ import { identity, configure } from 'deso-protocol'
 import { useLoaderData } from 'react-router-dom'
 import { useApolloClient } from '@apollo/client'
 import { Col, Row, message, Card, Button } from 'antd'
-import { faCheckCircle, faBitcoinSign } from '@fortawesome/free-solid-svg-icons'
 import { LoginOutlined } from '@ant-design/icons'
 
 // Utils
 import Enums from '../../lib/enums'
 import { useSelector } from 'react-redux'
 import { getDeSoConfig } from '../../lib/deso-controller-graphql'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Toolbar from 'custom/modules/Toolbar'
 
 import Spinner from 'custom/reusables/components/Spinner'
@@ -19,7 +17,8 @@ import { createOptOutProfile, getOptOutProfile, updateOptOutProfile } from 'cust
 import { optOutModel } from 'custom/lib/data-models'
 import Completion from './Completion'
 
-import './style.sass'
+import logo from 'custom/assets/deso-ops-logo-full.png'
+import styles from './style.module.sass'
 
 configure(getDeSoConfig())
 
@@ -206,68 +205,52 @@ const OptOut = () => {
     }
   }
 
-  const styleProps = {
-    rowMarginTop: isTablet ? -100 : isSmartphone ? -20 : -100,
-    contentBorderRadius: isSmartphone ? 12 : 30,
-    bulletPointFontSize: isSmartphone ? 14 : 16,
-    logoWidth: isSmartphone ? 200 : 300
-  }
-
   return (
     <>
       <Toolbar />
-      <Row className='wrapper'>
+      <Row className={styles.wrapper}>
         <Col span={24}>
-          <Row justify='center'>
-            <Col span={24}>
-              <Card type='inner' size='small' className='card'>
-                <Row justify='center' style={{ marginTop: styleProps.rowMarginTop }}>
-                  <Col
-                    className='card-content'
-                    style={{
-                      borderRadius: styleProps.contentBorderRadius
-                    }}
-                    xs={24}
-                    sm={22}
-                    md={16}
-                    lg={14}
-                    xl={12}
-                    xxl={10}
-                  >
-                    <center>
-                      <h1>OPT-OUT OF DESO-OPS NOTIFICATIONS</h1>
-                    </center>
-                    {state.renderState === Enums.appRenderState.PREP ? (
-                      <Spinner tip={Enums.spinnerMessages.PREP} />
-                    ) : null}
+          <Card type='inner' size='small' className={styles.card}>
+            <Row>
+              <Col span={24}>
+                <center>
+                  <img src={logo} alt='DeSoOps Portal' className={styles.logo} />
+                  <span className={styles.header}>OPT-OUT NOTIFICATIONS</span>
+                </center>
+                {state.renderState === Enums.appRenderState.PREP ? <Spinner tip={Enums.spinnerMessages.PREP} /> : null}
 
-                    {state.renderState === Enums.appRenderState.LOADING ? (
-                      <Spinner tip={Enums.spinnerMessages.LOADING} />
-                    ) : null}
+                {state.renderState === Enums.appRenderState.LOADING ? (
+                  <Spinner tip={Enums.spinnerMessages.LOADING} />
+                ) : null}
 
-                    {state.renderState === Enums.appRenderState.INIT ? (
-                      <Spinner tip={Enums.spinnerMessages.INIT_REQUEST} />
-                    ) : null}
+                {state.renderState === Enums.appRenderState.INIT ? (
+                  <Spinner tip={Enums.spinnerMessages.INIT_REQUEST} />
+                ) : null}
 
-                    {state.renderState === Enums.appRenderState.COMPLETION ? <Completion rootState={state} /> : null}
+                {state.renderState === Enums.appRenderState.COMPLETION ? <Completion rootState={state} /> : null}
 
-                    {state.renderState === Enums.appRenderState.LOGIN ? (
-                      <Row justify='space-around' gutter={[12, 12]}>
-                        <Col span={24} className='btn-wrapper' style={{ display: 'flex', justifyContent: 'center' }}>
-                          <button className='btn-signin' onClick={handleLogin}>
-                            <div className='icon'>
-                              <LoginOutlined style={{ fontSize: 20 }} />
-                            </div>
-                            <span className='text'>SIGN IN WITH DESO</span>
-                          </button>
-                        </Col>
-                      </Row>
-                    ) : null}
-                  </Col>
-                </Row>
-              </Card>
-            </Col>
-          </Row>
+                {state.renderState === Enums.appRenderState.LOGIN ? (
+                  <Row>
+                    <Col span={24}>
+                      <center>
+                        <p className={styles.paragraph}>
+                          You will need to sign to your DeSo account to Opt-Out of receiving notifications from DeSoOps.
+                        </p>
+                      </center>
+                    </Col>
+                    <Col span={24} className={styles.btnWrapper}>
+                      <button onClick={handleLogin}>
+                        <div className={styles.icon}>
+                          <LoginOutlined style={{ fontSize: 20 }} />
+                        </div>
+                        <span className={styles.text}>SIGN IN WITH DESO</span>
+                      </button>
+                    </Col>
+                  </Row>
+                ) : null}
+              </Col>
+            </Row>
+          </Card>
         </Col>
       </Row>
     </>

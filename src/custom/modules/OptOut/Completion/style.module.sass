@@ -1,37 +1,20 @@
 @import 'styles/helpers.sass'
 
-.header-success
-  font-size: 24px
-  color: #4CAF50
-
-.header-conflict
-  font-size: 24px
-  color: #ff7f50
-
-.header-error
-  font-size: 24px
-  color: #DC3645
-
-.wrapper
-  justify-content: center
-  min-height: 100vh
-  margin-top: 100px
-
 .card
   border: none
   background: none
-  padding-top: 24px
-  padding-bottom: 24px
 
-.card-content
-    padding-top: 20px,
-    padding-bottom: 20px,
+.paragraph
+  font-size: 18px
+  +xs
+    font-size: 16px
 
-.btn-wrapper
+.btnWrapper
   display: flex
   justify-content: center
+  margin-top: 20px
 
-  button
+  a
     display: flex
     flex-direction: row
     align-items: center
@@ -41,7 +24,6 @@
     border-radius: 8px
     border: 1px rgba(0, 0, 0, 0) solid
     cursor: pointer
-
     .icon
       font-size: 20px
       margin-left: 10px
@@ -49,18 +31,31 @@
         font-size: 16px
         margin-left: 5px
     .text
-      font-size: 16px
+      font-size: 18px
       +xs
         font-size: 14px
 
-.btn-signin
+.btnDashboard
   color: white
   background: #188EFF
   margin-right: 10px
+  &:hover
+    color: white
 
-.btn-coin-swap
-  color: white
-  background: #4CAF50
+.headerSuccess
+  font-size: 22px
+  color: #4CAF50
+  +xs
+    font-size: 19px
 
-.check-color
-  color:#ff7f50
+.headerConflict
+  font-size: 22px
+  color: #ff7f50
+  +xs
+    font-size: 19px
+
+.headerError
+  font-size: 22px
+  color: #DC3645
+  +xs
+    font-size: 19px

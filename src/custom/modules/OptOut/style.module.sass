@@ -2,25 +2,31 @@
 
 .wrapper
   justify-content: center
-  min-height: 100vh
-  margin-top: 100px
 
 .card
   border: none
   background: none
-  padding-top: 24px
-  padding-bottom: 24px
 
-.card-content
-    padding-top: 20px,
-    padding-bottom: 20px,
-    background: rgba(255,255,255, 0.95)
+.logo
+  width: 200px
+  height: 200px
+  +xs
+    width: 200px
 
-.btn-wrapper
+.header
+  font-size: 24px
+  font-weight: bold
+  display: block
+
+.btnWrapper
+  margin-top: 20px
   display: flex
   justify-content: center
 
   button
+    color: white
+    background: #188EFF
+    margin-right: 10px
     display: flex
     flex-direction: row
     align-items: center
@@ -42,14 +48,7 @@
       +xs
         font-size: 14px
 
-.btn-signin
-  color: white
-  background: #188EFF
-  margin-right: 10px
-
-.btn-coin-swap
-  color: white
-  background: #4CAF50
-
-.check-color
-  color:#ff7f50
+.paragraph
+  font-size: 18px
+  +xs
+    font-size: 16px
