@@ -27,7 +27,7 @@ import {
   setDeSoPrice,
   setDistributionTemplates
 } from 'custom/reducer'
-import { getConfigData, getDistributionTemplates } from 'custom/lib/agilite-controller'
+import { getConfigData, getDistributionTemplates, getOptOutTemplate } from 'custom/lib/agilite-controller'
 
 import { renderApp } from './controller'
 import { getDeSoPricing, getInitialDeSoData } from 'custom/lib/deso-controller-graphql'
@@ -63,6 +63,7 @@ const CoreApp = () => {
     // and sets it in the Redux store.
     const init = async () => {
       let tmpConfigData = null
+      let tmpOptOutTemplate = null
       let tmpTemplates = null
       let newState = null
       let gqlProps = null
@@ -85,6 +86,8 @@ const CoreApp = () => {
             setState(newState)
             // Retrieve configurations from Agilit-e
             tmpConfigData = await getConfigData()
+            tmpOptOutTemplate = await getOptOutTemplate()
+            tmpConfigData.optOutTemplate = tmpOptOutTemplate
             dispatch(setConfigData(tmpConfigData))
 
             // Retrieve Distribution Templates from Agilit-e

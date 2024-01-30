@@ -34,6 +34,7 @@ import {
   createDistributionTemplate,
   deleteDistributionTemplate,
   getConfigData,
+  getOptOutTemplate,
   updateDistributionTemplate,
   updateDistributionTransaction
 } from '../../../lib/agilite-controller'
@@ -144,6 +145,8 @@ const _BatchTransactionsForm = () => {
 
       // First we retrieve configurations from Agilit-e
       const tmpConfigData = await getConfigData()
+      const tmpOptOutTemplate = await getOptOutTemplate()
+      tmpConfigData.optOutTemplate = tmpOptOutTemplate
       dispatch(setConfigData(tmpConfigData))
 
       // Now we need to determine which public key to use based on myHodlers
@@ -197,6 +200,8 @@ const _BatchTransactionsForm = () => {
 
       // First we retrieve configurations from Agilit-e
       const tmpConfigData = await getConfigData()
+      const tmpOptOutTemplate = await getOptOutTemplate()
+      tmpConfigData.optOutTemplate = tmpOptOutTemplate
       dispatch(setConfigData(tmpConfigData))
 
       // Get the rest of the DeSo Data for the current User
