@@ -6,6 +6,8 @@ export const desoUserModel = () => {
     isError: false,
     isKnownError: false,
     isCustom: false,
+    optedOut: false,
+    hasUsername: true,
     errorMessage: '',
     publicKey: '',
     username: '',

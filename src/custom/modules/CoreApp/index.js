@@ -96,7 +96,6 @@ const CoreApp = () => {
             tmpConfigData.optOutTemplate = tmpOptOutTemplate
             tmpOptOutProfile = await getOptOutProfile({ publicKey: currentUser.PublicKeyBase58Check })
             tmpConfigData.optOutProfile = tmpOptOutProfile
-            console.log(tmpConfigData)
             dispatch(setConfigData(tmpConfigData))
 
             // Retrieve Distribution Templates from Agilit-e
@@ -114,7 +113,7 @@ const CoreApp = () => {
               fetchPolicy: 'no-cache'
             })
 
-            const tmpDeSoData = await getInitialDeSoData(desoData, gqlData.data)
+            const tmpDeSoData = await getInitialDeSoData(desoData, gqlData.data, tmpConfigData)
             dispatch(setDeSoData(tmpDeSoData))
             setState({ initializing: false })
 

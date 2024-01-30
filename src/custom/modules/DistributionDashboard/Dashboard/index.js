@@ -170,7 +170,7 @@ const _BatchTransactionsForm = () => {
         fetchPolicy: 'no-cache'
       })
 
-      tmpdata = await getInitialDeSoData(desoData, gqlData.data)
+      tmpdata = await getInitialDeSoData(desoData, gqlData.data, tmpConfigData)
 
       // Fetch DeSo data based on the Dashboard configurations
       const dashboardData = await fetchUsersFromDeSo(state.distributeTo, publicKey, state)
@@ -220,7 +220,7 @@ const _BatchTransactionsForm = () => {
         fetchPolicy: 'no-cache'
       })
 
-      tmpdata = await getInitialDeSoData(desoData, gqlData.data)
+      tmpdata = await getInitialDeSoData(desoData, gqlData.data, tmpConfigData)
 
       // Update State and Redux Store
       dispatch(setDeSoData(tmpdata))
@@ -406,7 +406,8 @@ const _BatchTransactionsForm = () => {
       const { originalHodlers, finalHodlers, tokenTotal, selectedTableKeys } = await processCustomList(
         gqlData.data,
         state,
-        desoData
+        desoData,
+        configData
       )
 
       setState({
@@ -487,7 +488,7 @@ const _BatchTransactionsForm = () => {
             fetchPolicy: 'no-cache'
           })
 
-          hodlerData = await processCustomList(gqlData.data, tmpState, desoData)
+          hodlerData = await processCustomList(gqlData.data, tmpState, desoData, configData)
           tmpState.customListModal.userList = hodlerData.finalHodlers
 
           break
@@ -639,7 +640,7 @@ const _BatchTransactionsForm = () => {
             fetchPolicy: 'no-cache'
           })
 
-          hodlerData = await processTokenHodlers(distributeTo, gqlData.data, tmpState, desoData)
+          hodlerData = await processTokenHodlers(distributeTo, gqlData.data, tmpState, desoData, configData)
 
           break
         case Enums.values.FOLLOWERS:
@@ -649,7 +650,7 @@ const _BatchTransactionsForm = () => {
             fetchPolicy: 'no-cache'
           })
 
-          hodlerData = await processTokenHodlers(distributeTo, gqlData.data, tmpState, desoData)
+          hodlerData = await processTokenHodlers(distributeTo, gqlData.data, tmpState, desoData, configData)
 
           break
         case Enums.values.FOLLOWING:
@@ -659,7 +660,7 @@ const _BatchTransactionsForm = () => {
             fetchPolicy: 'no-cache'
           })
 
-          hodlerData = await processTokenHodlers(distributeTo, gqlData.data, tmpState, desoData)
+          hodlerData = await processTokenHodlers(distributeTo, gqlData.data, tmpState, desoData, configData)
 
           break
         case Enums.values.CUSTOM:
@@ -681,7 +682,7 @@ const _BatchTransactionsForm = () => {
             fetchPolicy: 'no-cache'
           })
 
-          hodlerData = await processCustomList(gqlData.data, tmpState, desoData)
+          hodlerData = await processCustomList(gqlData.data, tmpState, desoData, configData)
 
           break
         case Enums.values.NFT:

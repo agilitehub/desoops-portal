@@ -82,7 +82,7 @@ export const changeDeSoLimit = async (desoLimitNanos) => {
   })
 }
 
-export const processTokenHodlers = async (distributeTo, gqlData, rootState, desoData) => {
+export const processTokenHodlers = async (distributeTo, gqlData, rootState, desoData, configData) => {
   const originalHodlers = []
   let newEntry = null
   let userEntry = null
@@ -122,8 +122,7 @@ export const processTokenHodlers = async (distributeTo, gqlData, rootState, deso
 
       // Ignore if entry belongs to current logged in account
       if (userEntry.publicKey === desoData.profile.publicKey) continue
-
-      newEntry = await createUserEntry(entry, userEntry)
+      newEntry = await createUserEntry(entry, userEntry, configData.optOutProfile)
 
       // Skip if newEntry is null, because it means the user is invalid
       if (newEntry === null) continue
@@ -142,7 +141,7 @@ export const processTokenHodlers = async (distributeTo, gqlData, rootState, deso
   }
 }
 
-export const processCustomList = async (gqlData, rootState, desoData) => {
+export const processCustomList = async (gqlData, rootState, desoData, configData) => {
   const originalHodlers = []
   let newEntry = null
 
@@ -152,7 +151,7 @@ export const processCustomList = async (gqlData, rootState, desoData) => {
     gqlData = gqlData.profiles.nodes
 
     for (const entry of gqlData) {
-      newEntry = await createCustomUserEntry(entry)
+      newEntry = await createCustomUserEntry(entry, configData.optOutProfile)
 
       // Skip if newEntry is null, because it means the user is invalid
       if (newEntry === null) continue
@@ -168,7 +167,7 @@ export const processCustomList = async (gqlData, rootState, desoData) => {
   }
 }
 
-export const getInitialDeSoData = async (desoData, gqlData) => {
+export const getInitialDeSoData = async (desoData, gqlData, configData) => {
   const daoHodlers = []
   const ccHodlers = []
 
@@ -203,7 +202,7 @@ export const getInitialDeSoData = async (desoData, gqlData) => {
     for (const entry of tmpGQLData.nodes) {
       if (!entry.creator) entry.creator = {}
       entry.creator.publicKey = entry.creatorPkid
-      newEntry = await createUserEntry(entry, entry.creator)
+      newEntry = await createUserEntry(entry, entry.creator, configData.optOutProfile)
 
       // Skip if newEntry is null, because it means the user is invalid
       if (newEntry === null) continue
@@ -274,37 +273,6 @@ export const generateProfilePicUrl = async (publicKey = '') => {
   return `https://blockproducer.deso.org/api/v0/get-single-profile-picture/${publicKey}`
 }
 
-export const getDAOHodlersAndBalance = (publicKey, data) => {
-  return new Promise((resolve, reject) => {
-    ;(async () => {
-      let newEntry = null
-      let daoHodlers = []
-      let daoBalance = 0
-
-      try {
-        for (const entry of data) {
-          if (!entry.isDaoCoin) continue
-
-          newEntry = await createUserEntry(entry, entry.holder)
-
-          // Skip if newEntry is null, because it means the user is invalid
-          if (newEntry === null) continue
-
-          if (newEntry.publicKey === publicKey) {
-            daoBalance = newEntry.tokenBalance
-          } else {
-            daoHodlers.push(newEntry)
-          }
-        }
-
-        resolve({ daoHodlers, daoBalance })
-      } catch (e) {
-        reject(e)
-      }
-    })()
-  })
-}
-
 /**
  * Uses the User's public key to fetch all DeSo Users who the User owns DAO Tokens for.
  *
@@ -354,7 +322,7 @@ export const getDAOHodlings = (publicKey) => {
   })
 }
 
-export const createUserEntry = (entry, userEntry) => {
+export const createUserEntry = (entry, userEntry, optOutProfile) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       let newEntry = null
@@ -376,6 +344,8 @@ export const createUserEntry = (entry, userEntry) => {
 
         // If there's no username, we need to use the public key in the following format
         if (!userEntry.username) {
+          newEntry.hasUsername = false
+
           userEntry.username = `${userEntry.publicKey.substring(0, 5)}...${userEntry.publicKey.substring(
             userEntry.publicKey.length - 5,
             userEntry.publicKey.length
@@ -385,6 +355,15 @@ export const createUserEntry = (entry, userEntry) => {
         // Check first if lastActiveTimestamp is null before calculating days
         if (userEntry.transactionStats && userEntry.transactionStats.latestTransactionTimestamp !== null) {
           lastActiveDays = calculateDaysSinceLastActive(userEntry.transactionStats.latestTransactionTimestamp)
+        }
+
+        // Finally, we need to check if the user has opted out. Check optOutProfile.recipients[].publicKey to see if the user is in the list
+        if (optOutProfile) {
+          const optOutIndex = optOutProfile.recipients.findIndex((item) => item.publicKey === userEntry.publicKey)
+
+          if (optOutIndex > -1) {
+            newEntry.optedOut = true
+          }
         }
 
         newEntry.publicKey = userEntry.publicKey
@@ -401,7 +380,7 @@ export const createUserEntry = (entry, userEntry) => {
   })
 }
 
-export const createCustomUserEntry = (entry) => {
+export const createCustomUserEntry = (entry, optOutProfile) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       const tokenBalance = 1
@@ -416,6 +395,15 @@ export const createCustomUserEntry = (entry) => {
           lastActiveDays = calculateDaysSinceLastActive(entry.account.transactionStats.latestTransactionTimestamp)
         }
 
+        // Finally, we need to check if the user has opted out. Check optOutProfile.recipients[].publicKey to see if the user is in the list
+        if (optOutProfile) {
+          const optOutIndex = optOutProfile.recipients.findIndex((item) => item.publicKey === entry.publicKey)
+
+          if (optOutIndex > -1) {
+            newEntry.optedOut = true
+          }
+        }
+
         newEntry.publicKey = entry.publicKey
         newEntry.username = entry.username
         newEntry.lastActiveDays = lastActiveDays
@@ -423,37 +411,6 @@ export const createCustomUserEntry = (entry) => {
         newEntry.tokenBalance = tokenBalance
 
         resolve(newEntry)
-      } catch (e) {
-        reject(e)
-      }
-    })()
-  })
-}
-
-export const getCCHodlersAndBalance = (publicKey, data) => {
-  return new Promise((resolve, reject) => {
-    ;(async () => {
-      let newEntry = null
-      let ccHodlers = []
-      let ccBalance = 0
-
-      try {
-        for (const entry of data) {
-          if (entry.isDaoCoin) continue
-
-          newEntry = await createUserEntry(entry, entry.holder)
-
-          // Skip if newEntry is null, because it means the user is invalid
-          if (newEntry === null) continue
-
-          if (newEntry.publicKey === publicKey) {
-            ccBalance = newEntry.tokenBalance
-          } else {
-            ccHodlers.push(newEntry)
-          }
-        }
-
-        resolve({ ccHodlers, ccBalance })
       } catch (e) {
         reject(e)
       }

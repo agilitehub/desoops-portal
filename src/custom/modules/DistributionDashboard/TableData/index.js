@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Table, Popover, Image, App } from 'antd'
-import { CheckCircleOutlined, CloseCircleOutlined, ReloadOutlined } from '@ant-design/icons'
+import { Table, Image, App } from 'antd'
+import { CheckCircleOutlined } from '@ant-design/icons'
 
 import theme from '../../../../core/utils/theme'
 import { updateTableSelection } from '../controller'
@@ -79,18 +79,10 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
                 style={{ color: theme.twitterBootstrap.primary, fontSize: 12 }}
               >{`Last Active: ${entry.lastActiveDays} day(s) ago`}</span>
               <br />
-              <span style={{ color: '#FFA07A', fontSize: 14 }}>Status: </span>
-              {entry.paymentStatus === Enums.paymentStatuses.SUCCESS ? (
-                <CheckCircleOutlined style={{ fontSize: 14, color: theme.twitterBootstrap.success }} />
-              ) : entry.isError ? (
-                <Popover content={<p>{entry.errorMessage}</p>} title='Payment Error'>
-                  <CloseCircleOutlined style={{ fontSize: 14, color: theme.twitterBootstrap.danger }} />
-                </Popover>
-              ) : entry.paymentStatus === Enums.paymentStatuses.IN_PROGRESS ? (
-                <ReloadOutlined style={{ fontSize: 14, color: theme.twitterBootstrap.primary }} spin />
-              ) : (
-                <span style={{ color: theme.twitterBootstrap.info, fontSize: 14 }}>{entry.paymentStatus}</span>
-              )}
+
+              {entry.optedOut ? (
+                <span style={{ color: theme.twitterBootstrap.danger, fontSize: 12 }}>Opted Out</span>
+              ) : null}
             </>
           )
         }
@@ -102,7 +94,7 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
         title: 'User (Token Balance)',
         dataIndex: 'username',
         key: 'username',
-        width: '30%',
+        width: '35%',
         render: (value, entry) => {
           return (
             <div>
@@ -164,22 +156,15 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
         }
       },
       {
-        title: 'Status',
-        dataIndex: 'paymentStatus',
-        key: 'paymentStatus',
-        render: (value, entry) => {
-          if (value === Enums.paymentStatuses.SUCCESS) {
-            return <CheckCircleOutlined style={{ fontSize: 20, color: theme.twitterBootstrap.success }} />
-          } else if (entry.isError) {
+        title: 'Opted Out?',
+        dataIndex: 'optedOut',
+        key: 'optedOut',
+        width: '15%',
+        render: (value) => {
+          if (value) {
             return (
-              <Popover content={<p>{entry.errorMessage}</p>} title='Payment Error'>
-                <CloseCircleOutlined style={{ fontSize: 20, color: theme.twitterBootstrap.danger }} />
-              </Popover>
+              <CheckCircleOutlined style={{ fontSize: 18, color: theme.twitterBootstrap.danger, marginLeft: 10 }} />
             )
-          } else if (value === Enums.paymentStatuses.IN_PROGRESS) {
-            return <ReloadOutlined style={{ fontSize: 20, color: theme.twitterBootstrap.primary }} spin />
-          } else {
-            return <span style={{ color: theme.twitterBootstrap.info }}>{value}</span>
           }
         }
       }
