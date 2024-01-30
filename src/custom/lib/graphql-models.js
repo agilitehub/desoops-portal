@@ -61,6 +61,18 @@ export const SEARCH_PROFILES = gql`
   }
 `
 
+export const FETCH_SINGLE_PROFILE = gql`
+  query AccountByUsername($publicKey: String!) {
+    accountByPublicKey(publicKey: $publicKey) {
+      username
+      publicKey
+      transactionStats {
+        latestTransactionTimestamp
+      }
+    }
+  }
+`
+
 export const FETCH_MULTIPLE_PROFILES = gql`
   query Profiles($filter: ProfileFilter) {
     profiles(filter: $filter) {

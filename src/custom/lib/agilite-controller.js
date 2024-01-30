@@ -81,3 +81,28 @@ export const deleteDistributionTemplate = async (id) => {
 
   return response.data
 }
+
+export const getOptOutProfile = async (qry) => {
+  const response = await agilite.Connectors.execute('opt_out_profiles', 'find_one', {
+    qry: JSON.stringify(qry)
+  })
+
+  return response.data
+}
+
+export const createOptOutProfile = async (data) => {
+  const response = await agilite.Connectors.execute('opt_out_profiles', 'create', {
+    data: JSON.stringify(data)
+  })
+
+  return response.data
+}
+
+export const updateOptOutProfile = async (id, data) => {
+  const response = await agilite.Connectors.execute('opt_out_profiles', 'update_by_id', {
+    id,
+    data: JSON.stringify(data)
+  })
+
+  return response.data
+}

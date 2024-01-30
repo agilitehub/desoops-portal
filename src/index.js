@@ -5,11 +5,14 @@ import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
 import { DeSoIdentityProvider } from 'react-deso-protocol'
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 // Utilities
 import { initAgilite } from 'custom/lib/agilite-controller'
 import Store from 'store'
 import App from 'custom/modules/CoreApp'
+import OptOut, { loader as optOutLoader } from 'custom/modules/OptOut'
+import ErrorPage from 'custom/modules/ErrorPage'
 import Enums from 'custom/lib/enums'
 
 // Import default Stylesheet for application
@@ -50,6 +53,20 @@ if (process.env.REACT_APP_FIREBASE_ENABLED === Enums.values.YES) {
   tmpAnalytics = getAnalytics(app)
 }
 
+// Initialize Router
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <App />
+    // errorElement: <ErrorPage />
+  },
+  {
+    path: 'optout/:publicKey',
+    element: <OptOut />,
+    loader: optOutLoader
+  }
+])
+
 // Initialize App
 const root = createRoot(document.getElementById(Enums.values.DIV_ROOT))
 
@@ -57,7 +74,7 @@ root.render(
   <Provider store={Store}>
     <ApolloProvider client={client}>
       <DeSoIdentityProvider>
-        <App />
+        <RouterProvider router={router} />
       </DeSoIdentityProvider>
     </ApolloProvider>
   </Provider>

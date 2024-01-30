@@ -101,3 +101,17 @@ export const distributionTemplateModel = () => {
     }
   }
 }
+
+export const optOutModel = (publicKey = '', optOutKey = '') => {
+  return {
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    publicKey: publicKey,
+    recipients: [
+      {
+        publicKey: optOutKey,
+        timestamp: new Date()
+      }
+    ]
+  }
+}
