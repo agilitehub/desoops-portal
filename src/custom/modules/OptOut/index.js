@@ -185,9 +185,7 @@ const OptOut = () => {
 
             if (response) {
               // Check publicKey in response.recipients array to see if the user has already been opted out
-              optOutEntry = response.recipients.find(
-                (recipient) => recipient.publicKey === state.identityState.currentUser.PublicKeyBase58Check
-              )
+              optOutEntry = response.recipients.find((recipient) => recipient.publicKey === desoData.profile.publicKey)
 
               if (optOutEntry) {
                 // User has already been opted out
@@ -198,9 +196,8 @@ const OptOut = () => {
               } else {
                 // User has not been opted out. Add them to the recipients array
                 response.recipients.push({
-                  publicKey: state.identityState.currentUser.PublicKeyBase58Check,
-                  username: state.identityState.currentUser.Username,
-                  optOutDate: new Date()
+                  publicKey: desoData.profile.publicKey,
+                  timestamp: new Date()
                 })
 
                 // Update the OptOut Profile in Agilit-e
@@ -213,7 +210,7 @@ const OptOut = () => {
               }
             } else {
               // Create OptOut Profile in Agilit-e
-              optOutProfile = optOutModel(gqlData.publicKey, state.identityState.currentUser.PublicKeyBase58Check)
+              optOutProfile = optOutModel(gqlData.publicKey, desoData.profile.publicKey)
               response = await createOptOutProfile(optOutProfile)
 
               setState({

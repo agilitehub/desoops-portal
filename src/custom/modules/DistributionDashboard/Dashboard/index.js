@@ -34,6 +34,7 @@ import {
   createDistributionTemplate,
   deleteDistributionTemplate,
   getConfigData,
+  getOptOutProfile,
   getOptOutTemplate,
   updateDistributionTemplate,
   updateDistributionTransaction
@@ -147,6 +148,8 @@ const _BatchTransactionsForm = () => {
       const tmpConfigData = await getConfigData()
       const tmpOptOutTemplate = await getOptOutTemplate()
       tmpConfigData.optOutTemplate = tmpOptOutTemplate
+      const tmpOptOutProfile = await getOptOutProfile({ publicKey: desoData.profile.publicKey })
+      tmpConfigData.optOutProfile = tmpOptOutProfile
       dispatch(setConfigData(tmpConfigData))
 
       // Now we need to determine which public key to use based on myHodlers
@@ -202,6 +205,8 @@ const _BatchTransactionsForm = () => {
       const tmpConfigData = await getConfigData()
       const tmpOptOutTemplate = await getOptOutTemplate()
       tmpConfigData.optOutTemplate = tmpOptOutTemplate
+      const tmpOptOutProfile = await getOptOutProfile({ publicKey: desoData.profile.publicKey })
+      tmpConfigData.optOutProfile = tmpOptOutProfile
       dispatch(setConfigData(tmpConfigData))
 
       // Get the rest of the DeSo Data for the current User

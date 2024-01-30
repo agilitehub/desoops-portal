@@ -27,7 +27,12 @@ import {
   setDeSoPrice,
   setDistributionTemplates
 } from 'custom/reducer'
-import { getConfigData, getDistributionTemplates, getOptOutTemplate } from 'custom/lib/agilite-controller'
+import {
+  getConfigData,
+  getDistributionTemplates,
+  getOptOutProfile,
+  getOptOutTemplate
+} from 'custom/lib/agilite-controller'
 
 import { renderApp } from './controller'
 import { getDeSoPricing, getInitialDeSoData } from 'custom/lib/deso-controller-graphql'
@@ -64,6 +69,7 @@ const CoreApp = () => {
     const init = async () => {
       let tmpConfigData = null
       let tmpOptOutTemplate = null
+      let tmpOptOutProfile = null
       let tmpTemplates = null
       let newState = null
       let gqlProps = null
@@ -88,6 +94,9 @@ const CoreApp = () => {
             tmpConfigData = await getConfigData()
             tmpOptOutTemplate = await getOptOutTemplate()
             tmpConfigData.optOutTemplate = tmpOptOutTemplate
+            tmpOptOutProfile = await getOptOutProfile({ publicKey: currentUser.PublicKeyBase58Check })
+            tmpConfigData.optOutProfile = tmpOptOutProfile
+            console.log(tmpConfigData)
             dispatch(setConfigData(tmpConfigData))
 
             // Retrieve Distribution Templates from Agilit-e

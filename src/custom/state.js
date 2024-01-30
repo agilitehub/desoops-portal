@@ -27,7 +27,8 @@ const configData = {
   desoGasFeesSendDAONanos: 0,
   desoGasFeesSendCCNanos: 0,
   tips: [],
-  optOutTemplate: ''
+  optOutTemplate: '',
+  optOutProfile: null
 }
 
 const userAgent = {
