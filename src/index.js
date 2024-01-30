@@ -12,7 +12,6 @@ import { initAgilite } from 'custom/lib/agilite-controller'
 import Store from 'store'
 import App from 'custom/modules/CoreApp'
 import OptOut, { loader as optOutLoader } from 'custom/modules/OptOut'
-import ErrorPage from 'custom/modules/ErrorPage'
 import Enums from 'custom/lib/enums'
 
 // Import default Stylesheet for application

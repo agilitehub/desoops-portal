@@ -2,13 +2,13 @@ import React, { useEffect, useReducer } from 'react'
 import { identity, configure } from 'deso-protocol'
 import { useLoaderData } from 'react-router-dom'
 import { useApolloClient } from '@apollo/client'
-import { Col, Row, message, Card, Button } from 'antd'
+import { Col, Row, message, Card } from 'antd'
 import { LoginOutlined } from '@ant-design/icons'
 
 // Utils
 import Enums from '../../lib/enums'
-import { useSelector } from 'react-redux'
-import { getDeSoConfig } from '../../lib/deso-controller-graphql'
+import { useDispatch, useSelector } from 'react-redux'
+import { generateProfilePicUrl, getDeSoConfig } from '../../lib/deso-controller-graphql'
 import Toolbar from 'custom/modules/Toolbar'
 
 import Spinner from 'custom/reusables/components/Spinner'
@@ -19,6 +19,8 @@ import Completion from './Completion'
 
 import logo from 'custom/assets/deso-ops-logo-full.png'
 import styles from './style.module.sass'
+import { cloneDeep } from 'lodash'
+import { setDeSoData } from 'custom/reducer'
 
 configure(getDeSoConfig())
 
@@ -29,17 +31,15 @@ export async function loader({ params }) {
 }
 
 const OptOut = () => {
-  const { params } = useLoaderData()
-  const { isTablet, isSmartphone } = useSelector((state) => state.custom.userAgent)
+  const dispatch = useDispatch()
+  const desoData = useSelector((state) => state.custom.desoData)
   const client = useApolloClient()
+  const { params } = useLoaderData()
 
   const [state, setState] = useReducer(reducer, {
     identityState: null,
     renderState: Enums.appRenderState.PREP,
-    loadingInitiated: false,
-    userReturned: false,
     optOutStatus: null,
-    optOutReponse: '',
     username: null,
     publicKey: null
   })
@@ -52,6 +52,10 @@ const OptOut = () => {
 
   useEffect(() => {
     const init = async () => {
+      let newDeSoData = null
+      let gqlProps = null
+      let gqlData = null
+
       try {
         // We need to confirm that a valid Public Key was provided in the URL
         if (!params.publicKey) {
@@ -77,12 +81,44 @@ const OptOut = () => {
           state.identityState.currentUser &&
           state.renderState === Enums.appRenderState.PREP
         ) {
+          gqlProps = { publicKey: state.identityState.currentUser.publicKey }
+
+          gqlData = await client.query({
+            query: FETCH_SINGLE_PROFILE,
+            variables: gqlProps,
+            fetchPolicy: 'no-cache'
+          })
+
+          gqlData = gqlData.data.accountByPublicKey
+
+          newDeSoData = cloneDeep(desoData)
+          newDeSoData.profile.publicKey = gqlData.publicKey
+          newDeSoData.profile.username = gqlData.username
+          newDeSoData.profile.profilePicUrl = await generateProfilePicUrl(newDeSoData.profile.publicKey)
+
+          dispatch(setDeSoData(newDeSoData))
           setState({ renderState: Enums.appRenderState.INIT })
         } else if (
           state.identityState.event === 'LOGIN_END' &&
           state.identityState.currentUser &&
           state.renderState === Enums.appRenderState.LOGIN
         ) {
+          gqlProps = { publicKey: state.identityState.currentUser.publicKey }
+
+          gqlData = await client.query({
+            query: FETCH_SINGLE_PROFILE,
+            variables: gqlProps,
+            fetchPolicy: 'no-cache'
+          })
+
+          gqlData = gqlData.data.accountByPublicKey
+
+          newDeSoData = cloneDeep(desoData)
+          newDeSoData.profile.publicKey = gqlData.publicKey
+          newDeSoData.profile.username = gqlData.username
+          newDeSoData.profile.profilePicUrl = await generateProfilePicUrl(newDeSoData.profile.publicKey)
+
+          dispatch(setDeSoData(newDeSoData))
           setState({ renderState: Enums.appRenderState.INIT })
         }
       } catch (e) {
@@ -93,7 +129,8 @@ const OptOut = () => {
     setTimeout(() => {
       init()
     }, 500)
-  }, [state.identityState, state.renderState, params.publicKey])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.identityState, state.renderState])
 
   // First thing we need to do is check if the user is logged in
   useEffect(() => {
