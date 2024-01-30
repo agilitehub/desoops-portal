@@ -61,7 +61,7 @@ const router = createBrowserRouter([
     // errorElement: <ErrorPage />
   },
   {
-    path: 'optout/:publicKey',
+    path: 'optout/:publicKey?',
     element: <OptOut />,
     loader: optOutLoader
   }

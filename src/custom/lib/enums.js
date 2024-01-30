@@ -42,10 +42,13 @@ const Enums = {
     FAILED: 'Failed'
   },
   appRenderState: {
+    PREP: 'prep',
     INIT: 'init',
     SIGNING_IN: 'signingIn',
     LAUNCH: 'launch',
-    LOGIN: 'login'
+    LOGIN: 'login',
+    LOADING: 'loading',
+    COMPLETION: 'completion'
   },
   coinSwap: {
     heroSwap: {
@@ -62,7 +65,10 @@ const Enums = {
     }
   },
   spinnerMessages: {
+    PREP: 'Preparing...',
     INIT: 'Initializing DeSoOps Portal...',
+    LOADING: 'Loading...',
+    INIT_REQUEST: 'Initializing Request...',
     SIGNING_IN: 'Signing In...'
   },
   messages: {
