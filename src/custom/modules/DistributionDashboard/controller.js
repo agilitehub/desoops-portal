@@ -318,6 +318,16 @@ export const prepUsersForClipboard = (userList) => {
   })
 }
 
+export const generateOptOutLink = async (publicKey) => {
+  try {
+    // Using the current url, generate a link to the opt-out page
+    const url = `${window.location.origin}/optout/${publicKey}`
+    return url
+  } catch (e) {
+    return e
+  }
+}
+
 export const prepDistributionTransaction = async (desoData, rootState, summaryState, finalHodlers, paymentModal) => {
   let distTransaction = null
 

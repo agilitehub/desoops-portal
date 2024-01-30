@@ -20,8 +20,13 @@ export const getConfigData = async () => {
 }
 
 export const getOptOutTemplate = async () => {
-  const response = await agilite.Templates.execute('opt_out_template')
-  return response.data
+  const response = await agilite.Templates.getData(['opt_out_template'])
+
+  if (response.data && response.data.length > 0) {
+    return response.data[0].data.data
+  } else {
+    return ''
+  }
 }
 
 // Create a function that creates a new Distribution Transaction in Agilit-e

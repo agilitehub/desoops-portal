@@ -914,6 +914,7 @@ const _BatchTransactionsForm = () => {
                   <Col xs={24} md={12}>
                     <QuickActionsCard
                       desoData={desoData}
+                      configData={configData}
                       onResetDashboard={resetState}
                       onRefreshDashboard={handleRefreshDashboard}
                       rootState={state}
