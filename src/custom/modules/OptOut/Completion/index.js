@@ -22,11 +22,11 @@ const Completion = ({ rootState }) => {
         switch (rootState.optOutStatus) {
           case 'SUCCESS':
             headerClass = 'headerSuccess'
-            headerMessage = `You have successfully Opted-Out of DeSoOps Notifications from user - @${rootState.username}`
+            headerMessage = `You have successfully Opted Out of DeSoOps tagging via user - @${rootState.username}`
             break
           case 'CONFLICT':
             headerClass = 'headerConflict'
-            headerMessage = `You have already Opted-Out of DeSoOps Notifications from user - @${rootState.username}`
+            headerMessage = `You have already Opted Out of DeSoOps tagging via user - @${rootState.username}`
             break
           case 'NO_PUBLIC_KEY':
             headerClass = 'headerError'

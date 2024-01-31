@@ -249,7 +249,7 @@ const OptOut = () => {
               <Col span={24}>
                 <center>
                   <img src={logo} alt='DeSoOps Portal' className={styles.logo} />
-                  <span className={styles.header}>OPT-OUT NOTIFICATIONS</span>
+                  <span className={styles.header}>OPT OUT OF DESO OPS TAGGING</span>
                 </center>
                 {state.renderState === Enums.appRenderState.PREP ? <Spinner tip={Enums.spinnerMessages.PREP} /> : null}
 
@@ -268,7 +268,8 @@ const OptOut = () => {
                     <Col span={24}>
                       <center>
                         <p className={styles.paragraph}>
-                          You will need to sign to your DeSo account to Opt-Out of receiving notifications from DeSoOps.
+                          You will need to sign into your DeSo account to Opt Out of receiving notifications via DeSoOps
+                          tagging.
                         </p>
                       </center>
                     </Col>

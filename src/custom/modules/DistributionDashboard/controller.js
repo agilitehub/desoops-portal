@@ -320,7 +320,7 @@ export const prepUsersForClipboard = (userList) => {
 
 export const generateOptOutLink = async (publicKey) => {
   try {
-    // Using the current url, generate a link to the opt-out page
+    // Using the current url, generate a link to the opt out page
     const url = `${window.location.origin}/optout/${publicKey}`
     return url
   } catch (e) {

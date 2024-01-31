@@ -1,6 +1,6 @@
 import React, { useReducer } from 'react'
 import { App, Card, Button, Modal, Row, Col } from 'antd'
-import { ReloadOutlined, CopyOutlined, RollbackOutlined, StopOutlined } from '@ant-design/icons'
+import { ReloadOutlined, CopyOutlined, RollbackOutlined, LinkOutlined } from '@ant-design/icons'
 import { copyTextToClipboard } from '../../../lib/utils'
 import RandomizeDialogContent from './RandomizeDialog'
 import { generateOptOutLink, prepUsersForClipboard } from '../controller'
@@ -30,7 +30,7 @@ const QuickActionsCard = ({ desoData, configData, onResetDashboard, onRefreshDas
   const styleProps = {
     title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
     headStyle: { background: '#DDE6ED', minHeight: deviceType.isSmartphone ? 30 : 40 },
-    bodyStyle: { height: deviceType.isSmartphone ? 58 : deviceType.isTablet ? 70 : 75 },
+    bodyStyle: { height: deviceType.isTablet ? 70 : 75 },
     actionWrapper: { marginTop: deviceType.isSmartphone ? -5 : -3 },
     iconReset: { color: '#17A2B8', borderColor: '#17A2B8', backgroundColor: 'white' },
     iconRefresh: { color: '#FFC20E', borderColor: '#FFC20E', backgroundColor: 'white' },
@@ -207,12 +207,12 @@ const QuickActionsCard = ({ desoData, configData, onResetDashboard, onRefreshDas
             <Button
               shape='circle'
               style={styleProps.iconOptOut}
-              icon={<StopOutlined />}
+              icon={<LinkOutlined />}
               loading={state.ctcLoading}
               disabled={state.ctcLoading || rootState.isExecuting}
               onClick={handleOptOutLink}
             />
-            <div style={styleProps.labelOptOut}>Opt Out</div>
+            <div style={styleProps.labelOptOut}>Opt Out Link</div>
           </Col>
         </Col>
         <Col span={4}>
