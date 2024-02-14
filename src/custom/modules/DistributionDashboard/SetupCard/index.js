@@ -8,6 +8,7 @@ import DeSoNFTSearchModal from '../../../reusables/components/DeSoNFTSearchModal
 import DeSoUserSearchModal from '../../../reusables/components/DeSoUserSearchModal'
 import SelectTemplateModal from '../SelectTemplateModal'
 import TemplateNameModal from '../TemplateNameModal'
+import DiamondOptionsModal from 'custom/reusables/components/DiamondOptionsModal'
 
 const SetupCard = ({
   desoData,
@@ -25,6 +26,7 @@ const SetupCard = ({
   onEditTemplate,
   onDeleteTemplate,
   onSetTemplateName,
+  onConfirmDiamondOptions,
   deviceType,
   isLoading
 }) => {
@@ -56,6 +58,10 @@ const SetupCard = ({
     } else {
       onSetTemplateName()
     }
+  }
+
+  const handleCancelDiamondOptionsModal = () => {
+    setRootState({ diamondOptionsModal: { ...rootState.diamondOptionsModal, isOpen: false } })
   }
 
   const renderTabBarExtraContent = () => {
@@ -227,6 +233,16 @@ const SetupCard = ({
           distributionTemplates={distributionTemplates}
           onSetTemplateName={onSetTemplateName}
           onCancel={handleCancelTemplateNameModal}
+        />
+      ) : null}
+      {rootState.diamondOptionsModal.isOpen ? (
+        <DiamondOptionsModal
+          isOpen={rootState.diamondOptionsModal.isOpen}
+          deviceType={deviceType}
+          rootState={rootState}
+          desoData={desoData}
+          onConfirm={onConfirmDiamondOptions}
+          onCancel={handleCancelDiamondOptionsModal}
         />
       ) : null}
     </>

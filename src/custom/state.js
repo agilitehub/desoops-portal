@@ -18,7 +18,8 @@ const desoData = {
   },
   fetchedFollowers: false,
   fetchedFollowing: false,
-  desoPrice: 0
+  desoPrice: 0,
+  diamondLevels: null
 }
 
 const configData = {

@@ -33,7 +33,8 @@ export const distributionDashboardState = (feePerTransactionUSD) => {
     customListModal: customListModal(),
     paymentModal: paymentModal(),
     selectTemplateModal: selectTemplateModal(),
-    templateNameModal: templateNameModal()
+    templateNameModal: templateNameModal(),
+    diamondOptionsModal: diamondOptionsModal()
   }
 }
 
@@ -97,5 +98,14 @@ export const templateNameModal = (isOpen = false) => {
     name: '',
     isModified: true,
     forceNew: false
+  }
+}
+
+export const diamondOptionsModal = (isOpen = false) => {
+  return {
+    isOpen,
+    noOfDiamonds: 1,
+    noOfPosts: 20,
+    skipHours: null
   }
 }

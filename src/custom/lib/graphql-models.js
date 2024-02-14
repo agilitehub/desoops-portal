@@ -150,3 +150,12 @@ export const GET_FOLLOWING = gql`
     }
   }
 `
+export const GET_POSTS = gql`
+  query Posts($condition: PostCondition, $filter: PostFilter, $orderBy: [PostsOrderBy!], $first: Int) {
+    posts(condition: $condition, filter: $filter, orderBy: $orderBy, first: $first) {
+      nodes {
+        postHash
+      }
+    }
+  }
+`

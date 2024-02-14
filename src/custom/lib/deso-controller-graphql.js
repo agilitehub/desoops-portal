@@ -6,7 +6,9 @@ import {
   getExchangeRates,
   sendDeso,
   transferDeSoToken,
-  transferCreatorCoin
+  transferCreatorCoin,
+  sendDiamonds,
+  getAppState
 } from 'deso-protocol'
 import BigNumber from 'bignumber.js'
 
@@ -57,6 +59,15 @@ export const desoLogin = async () => {
     return await identity.login()
   } catch (e) {
     return e
+  }
+}
+
+// TODO: Implement this function
+export const diamondPosts = async () => {
+  try {
+    return await sendDiamonds({})
+  } catch (e) {
+    throw e
   }
 }
 
@@ -194,6 +205,7 @@ export const getInitialDeSoData = async (desoData, gqlData, configData) => {
     }
 
     newDeSoData.desoPrice = await getDeSoPricing(newDeSoData.desoPrice)
+    newDeSoData.diamondLevels = await getDiamondLevels()
 
     // Next, we need to loop through the tokenBalancesAsHodler array to find the DAO and CC Balances
     // and then create hodlings arrays, but we also need to separate our own balances
@@ -260,6 +272,19 @@ export const getDeSoPricing = async (currDeSoPrice) => {
     return desoPrice
   } catch (e) {
     return currDeSoPrice
+  }
+}
+
+export const getDiamondLevels = async () => {
+  let appState = null
+  let diamondLevels = null
+
+  try {
+    appState = await getAppState()
+    diamondLevels = appState.DiamondLevelMap
+    return diamondLevels
+  } catch (e) {
+    throw e
   }
 }
 

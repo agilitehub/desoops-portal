@@ -17,6 +17,9 @@ const slice = createSlice({
     setDeSoPrice: (state, data) => {
       state.desoData.desoPrice = data.payload
     },
+    setDiamondLevels: (state, data) => {
+      state.desoData.setDiamondLevels = data.payload
+    },
     setConfigData: (state, data) => {
       state.configData = data.payload
     },
@@ -51,6 +54,7 @@ export const {
   updateFollowing,
   setDeviceType,
   setLeftMenu,
-  setDeSoPrice
+  setDeSoPrice,
+  setDiamondLevels
 } = slice.actions
 export default slice.reducer

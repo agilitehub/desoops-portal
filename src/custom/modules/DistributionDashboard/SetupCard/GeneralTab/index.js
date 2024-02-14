@@ -8,6 +8,8 @@ import { debounce } from 'lodash'
 import { Link } from 'react-scroll'
 import { SEARCH_PROFILES } from 'custom/lib/graphql-models'
 import { UsergroupAddOutlined } from '@ant-design/icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faGem } from '@fortawesome/free-regular-svg-icons'
 
 const styleParams = {
   labelColXS: 24,
@@ -232,6 +234,10 @@ const GeneralTab = ({
     setRootState({ openNftSearch: true })
   }
 
+  const handleDiamondOptions = () => {
+    setRootState({ diamondOptionsModal: { ...rootState.diamondOptionsModal, isOpen: true } })
+  }
+
   return (
     <>
       <Row>
@@ -360,9 +366,20 @@ const GeneralTab = ({
               >
                 <Select.Option value={Enums.values.EMPTY_STRING}>- Select -</Select.Option>
                 <Select.Option value={Enums.paymentTypes.DESO}>$DESO</Select.Option>
-                <Select.Option value={Enums.paymentTypes.DAO}>DAO Token</Select.Option>
                 <Select.Option value={Enums.paymentTypes.CREATOR}>Creator Coin</Select.Option>
+                <Select.Option value={Enums.paymentTypes.DAO}>DAO Token</Select.Option>
+                <Select.Option value={Enums.paymentTypes.DIAMONDS}>Diamonds</Select.Option>
               </Select>
+              {rootState.distributionType === Enums.paymentTypes.DIAMONDS ? (
+                <Button
+                  type='link'
+                  onClick={handleDiamondOptions}
+                  style={styleProps.linkButton}
+                  icon={<FontAwesomeIcon icon={faGem} />}
+                >
+                  Options
+                </Button>
+              ) : null}
             </Col>
           </Row>
         </>

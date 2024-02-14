@@ -17,7 +17,7 @@ import Enums from '../../../lib/enums'
 import DashboardEnums from '../enums'
 
 import { prepDistributionTemplate, prepDistributionTransactionUpdate, setupHodlers } from '../controller'
-import { customListModal, distributionDashboardState, paymentModal } from '../data-models'
+import { customListModal, diamondOptionsModal, distributionDashboardState, paymentModal } from '../data-models'
 import { setDeSoData, setConfigData, setDistributionTemplates } from '../../../reducer'
 import { cloneDeep } from 'lodash'
 import {
@@ -282,6 +282,12 @@ const _BatchTransactionsForm = () => {
   }
 
   const handleDistributionType = async (distributionType) => {
+    // Then, if user selects Diamonds, load modal instead
+    if (distributionType === Enums.paymentTypes.DIAMONDS) {
+      setState({ distributionType, diamondOptionsModal: diamondOptionsModal(true) })
+      return
+    }
+
     setState({
       distributionType,
       tokenToUse: Enums.values.EMPTY_STRING,
@@ -615,6 +621,17 @@ const _BatchTransactionsForm = () => {
     setState({ loading: false })
   }
 
+  const handleConfirmDiamondOptions = async (noOfDiamonds, noOfPosts, skipHours) => {
+    try {
+      setState({
+        diamondOptionsModal: { ...state.diamondOptionsModal, noOfDiamonds, noOfPosts, skipHours, isOpen: false }
+      })
+    } catch (e) {
+      console.error(e)
+      message.error(e.message)
+    }
+  }
+
   const handlePaymentDone = async () => {
     setState({ paymentModal: paymentModal() })
   }
@@ -941,6 +958,7 @@ const _BatchTransactionsForm = () => {
                       onSelectTemplate={handleSelectTemplate}
                       onDeleteTemplate={handleDeleteTemplate}
                       onSetTemplateName={handleSetTemplateName}
+                      onConfirmDiamondOptions={handleConfirmDiamondOptions}
                       deviceType={deviceType}
                       isLoading={state.loading}
                       distributionTemplates={distributionTemplates}

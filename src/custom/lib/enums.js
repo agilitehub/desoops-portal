@@ -29,7 +29,8 @@ const Enums = {
   paymentTypes: {
     DESO: '$DESO',
     DAO: 'DAO',
-    CREATOR: 'CC'
+    CREATOR: 'CC',
+    DIAMONDS: 'Diamonds'
   },
   defaults: {
     USER_SEARCH_NUM_TO_FETCH: 50,
