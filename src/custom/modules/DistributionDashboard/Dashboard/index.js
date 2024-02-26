@@ -621,7 +621,7 @@ const _BatchTransactionsForm = () => {
     setState({ loading: false })
   }
 
-  const handleConfirmDiamondOptions = async (noOfDiamonds, noOfPosts, skipHours) => {
+  const handleConfirmDiamondOptions = async (noOfPosts, noOfDiamonds, skipHours) => {
     try {
       setState({
         diamondOptionsModal: { ...state.diamondOptionsModal, noOfDiamonds, noOfPosts, skipHours, isOpen: false }

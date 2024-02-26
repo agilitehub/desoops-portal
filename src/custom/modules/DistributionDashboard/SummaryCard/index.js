@@ -66,9 +66,6 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
         (hodler) => hodler.isActive && hodler.isVisible
       ).length
 
-      const estimateDurationMinutes = (noOfPaymentTransactions * configData.estimateTimePerTransactionSeconds) / 60
-      const estimateDurationLabel = estimateDurationMinutes < 1 ? '< 1' : Math.ceil(estimateDurationMinutes)
-
       let desoOpsFeeUSD = 0
       let desoOpsFeeDESO = 0
       let desoOpsFeeDESOLabel = 0
@@ -187,8 +184,6 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
         totalFeeUSDLabel,
         totalFeeDESO,
         totalFeeDESOLabel,
-        estimateDurationMinutes,
-        estimateDurationLabel,
         amountExceeded,
         transactionFeeExceeded,
         warningMessages,
