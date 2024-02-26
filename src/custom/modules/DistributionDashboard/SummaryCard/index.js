@@ -93,8 +93,8 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
 
       // Determine DESO Ops Fee - It's free if the actual account is DeSoOps
       if (desoData.profile.publicKey !== CoreEnums.values.DESO_OPS_PUBLIC_KEY) {
-        desoOpsFeeDESO = desoOpsFeeUSD / desoData.desoPrice
         desoOpsFeeUSD = noOfPaymentTransactions * rootState.feePerTransactionUSD
+        desoOpsFeeDESO = desoOpsFeeUSD / desoData.desoPrice
       }
 
       if (isNaN(desoOpsFeeUSD)) desoOpsFeeUSD = 0
