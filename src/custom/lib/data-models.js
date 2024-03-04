@@ -92,6 +92,11 @@ export const distributionTemplateModel = () => {
     nftDescription: '',
     nftHodlers: [],
     customList: [],
+    diamondOptions: {
+      noOfDiamonds: 1,
+      noOfPosts: 20,
+      skipHours: null
+    },
     rules: {
       enabled: true,
       spreadAmountBasedOn: '',

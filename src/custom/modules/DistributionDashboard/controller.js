@@ -453,6 +453,14 @@ export const prepDistributionTemplate = async (desoData, rootState, name, rulesE
       transaction.customList = rootState.customListModal.userList
     }
 
+    if (transaction.distributionType === Enums.paymentTypes.DIAMONDS) {
+      transaction.diamondOptions = {
+        noOfDiamonds: rootState.diamondOptionsModal.noOfDiamonds,
+        noOfPosts: rootState.diamondOptionsModal.noOfPosts,
+        skipHours: rootState.diamondOptionsModal.skipHours
+      }
+    }
+
     return transaction
   } catch (e) {
     throw new Error(e)

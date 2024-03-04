@@ -62,10 +62,6 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
 
   useEffect(() => {
     try {
-      const noOfPaymentTransactions = rootState.finalHodlers.filter(
-        (hodler) => hodler.isActive && hodler.isVisible
-      ).length
-
       let desoOpsFeeUSD = 0
       let desoOpsFeeDESO = 0
       let desoOpsFeeDESOLabel = 0
@@ -75,6 +71,10 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
       let totalFeeDESO = 0
       let totalFeeDESOLabel = 0
 
+      let amountLabel = state.amountLabel
+      let amountReadOnly = state.amountReadOnly
+
+      let noOfPaymentTransactions = 0
       let desoGasFeesNanos = 0
       let distributionAmount = rootState.distributionAmount
       let amountExceeded = false
@@ -85,8 +85,28 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
       let executeDisabled = false
       let warningMsg = null
       let tokenToDistribute = ''
+      let diamondCost = 0
+      let diamondNanos = 0
+      let diamondTotal = 0
 
       if (isNaN(distributionAmount)) distributionAmount = 0
+
+      // Calculate the number of payment transactions
+      noOfPaymentTransactions = rootState.finalHodlers.filter((hodler) => hodler.isActive && hodler.isVisible).length
+
+      // If Distribution Type is Diamonds, apply additional logic
+      if (rootState.distributionType === CoreEnums.paymentTypes.DIAMONDS) {
+        noOfPaymentTransactions *= rootState.diamondOptionsModal.noOfPosts
+        amountLabel = 'Posts'
+        amountReadOnly = true
+
+        // Calculate the distribution amount based on diamond levels
+        diamondNanos = desoData.diamondLevels[rootState.diamondOptionsModal.noOfDiamonds]
+        diamondTotal = diamondNanos * rootState.diamondOptionsModal.noOfPosts
+        diamondCost = diamondTotal / 1e9
+
+        totalFeeDESO = diamondCost
+      }
 
       // Determine DESO Ops Fee - It's free if the actual account is DeSoOps
       if (desoData.profile.publicKey !== CoreEnums.values.DESO_OPS_PUBLIC_KEY) {
@@ -113,10 +133,14 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
         case CoreEnums.paymentTypes.DAO:
           desoGasFeesNanos = configData.desoGasFeesSendDAONanos * noOfPaymentTransactions
           break
+        case CoreEnums.paymentTypes.DIAMONDS:
+          desoGasFeesNanos =
+            configData.desoGasFeesSendDESONanos * noOfPaymentTransactions * rootState.diamondOptionsModal.noOfPosts
+          break
       }
 
       // Determine Total Cost
-      totalFeeDESO = desoOpsFeeDESO + desoGasFeesNanos / CoreEnums.values.NANO_VALUE
+      totalFeeDESO += desoOpsFeeDESO + desoGasFeesNanos / CoreEnums.values.NANO_VALUE
       totalFeeDESOLabel = Math.floor(totalFeeDESO * 10000) / 10000
       totalFeeUSD = totalFeeDESO * desoData.desoPrice
       totalFeeUSDLabel = Math.floor(totalFeeUSD * 10000) / 10000
@@ -130,6 +154,13 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
         if (totalFeeDESO + distributionAmount > desoData.profile.desoBalance) {
           amountExceeded = true
           warningMsg = 'The Amount exceeds your DESO Balance.'
+        }
+      } else if (rootState.distributionType === CoreEnums.paymentTypes.DIAMONDS) {
+        tokenToDistribute = `${CoreEnums.paymentTypes.DIAMONDS}`
+        isInFinalStage = true
+
+        if (totalFeeDESO > desoData.profile.desoBalance) {
+          amountExceeded = true
         }
       } else {
         if (rootState.tokenToUse) {
@@ -175,6 +206,8 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
       }
 
       setState({
+        amountLabel,
+        amountReadOnly,
         noOfPaymentTransactions,
         desoOpsFeeUSD,
         desoOpsFeeDESO,
@@ -194,12 +227,14 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
     } catch (e) {
       console.error(e)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     rootState.finalHodlers,
     rootState.tokenToUse,
     rootState.distributionType,
     rootState.feePerTransactionUSD,
     rootState.distributionAmount,
+    rootState.diamondOptionsModal,
     desoData.profile.desoBalance,
     desoData.profile.daoHodlings,
     desoData.profile.ccHodlings,
@@ -620,8 +655,9 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
             <Col xs={24} sm={styleParams.valueColSM} md={styleParams.valueColMD} lg={styleParams.valueColLG}>
               <InputNumber
                 status={state.amountExceeded ? 'error' : null}
-                addonBefore={rootState.distributionType}
+                addonBefore={state.amountLabel}
                 placeholder='0'
+                readOnly={state.amountReadOnly}
                 disabled={rootState.isExecuting || state.isExecuting}
                 value={rootState.distributionAmount}
                 style={{ width: deviceType.isSmartphone ? '100%' : 250 }}

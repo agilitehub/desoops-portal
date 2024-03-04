@@ -6,6 +6,7 @@ import React from 'react'
 import { Row, Col, Select, Divider, InputNumber, Radio, Switch, message } from 'antd'
 import { calculateEstimatedPayment, setupHodlers } from '../../controller'
 import { cloneDeep } from 'lodash'
+import Enums from 'custom/lib/enums'
 
 const styleParams = {
   col1XS: 24,
@@ -60,6 +61,20 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
         newState.finalHodlers = finalHodlers
         newState.selectedTableKeys = selectedTableKeys
         newState.tokenTotal = tokenTotal
+
+        if (rootState.distributionType === Enums.paymentTypes.DIAMONDS) {
+          newState.distributionAmount =
+            rootState.diamondOptionsModal.noOfPosts *
+            finalHodlers.filter((hodler) => hodler.isActive && hodler.isVisible).length
+
+          await calculateEstimatedPayment(
+            newState.distributionAmount,
+            newState.distributionType,
+            newState.spreadAmountBasedOn,
+            finalHodlers,
+            desoData
+          )
+        }
       }
 
       setRootState(newState)
@@ -100,7 +115,7 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
             value={rootState.spreadAmountBasedOn}
             buttonStyle='solid'
             onChange={handleSpreadAmountBasedOn}
-            disabled={rootState.isExecuting}
+            disabled={rootState.isExecuting || rootState.distributionType === Enums.paymentTypes.DIAMONDS}
           >
             <Radio.Button value={'Ownership'}>% Ownership</Radio.Button>
             <Radio.Button value={'Equal Spread'}>Equal Spread</Radio.Button>

@@ -16,7 +16,12 @@ import TableData from '../TableData'
 import Enums from '../../../lib/enums'
 import DashboardEnums from '../enums'
 
-import { prepDistributionTemplate, prepDistributionTransactionUpdate, setupHodlers } from '../controller'
+import {
+  calculateEstimatedPayment,
+  prepDistributionTemplate,
+  prepDistributionTransactionUpdate,
+  setupHodlers
+} from '../controller'
 import { customListModal, diamondOptionsModal, distributionDashboardState, paymentModal } from '../data-models'
 import { setDeSoData, setConfigData, setDistributionTemplates } from '../../../reducer'
 import { cloneDeep } from 'lodash'
@@ -445,6 +450,7 @@ const _BatchTransactionsForm = () => {
 
       const tmpState = cloneDeep(state)
       const template = distributionTemplates.find((template) => template._id === id)
+
       let hodlerData = null
       let publicKeys = null
       let gqlProps = null
@@ -524,6 +530,14 @@ const _BatchTransactionsForm = () => {
           break
         default:
           hodlerData = await fetchUsersFromDeSo(template.distributeTo, desoData.profile.publicKey, tmpState)
+      }
+
+      switch (template.distributionType) {
+        case Enums.paymentTypes.DIAMONDS:
+          tmpState.diamondOptionsModal.noOfDiamonds = template.diamondOptions.noOfDiamonds
+          tmpState.diamondOptionsModal.noOfPosts = template.diamondOptions.noOfPosts
+          tmpState.diamondOptionsModal.skipHours = template.diamondOptions.skipHours
+          break
       }
 
       tmpState.originalHodlers = hodlerData.originalHodlers
@@ -623,7 +637,25 @@ const _BatchTransactionsForm = () => {
 
   const handleConfirmDiamondOptions = async (noOfPosts, noOfDiamonds, skipHours) => {
     try {
+      // We need to auto determine the distribution amount and force some rules
+      let finalHodlers = cloneDeep(state.finalHodlers)
+      let distributionAmount = noOfPosts * finalHodlers.filter((hodler) => hodler.isActive && hodler.isVisible).length
+      let rulesEnabled = true
+      let spreadAmountBasedOn = 'Equal Spread'
+
+      await calculateEstimatedPayment(
+        distributionAmount,
+        state.distributionType,
+        spreadAmountBasedOn,
+        finalHodlers,
+        desoData
+      )
+
       setState({
+        distributionAmount,
+        finalHodlers,
+        rulesEnabled,
+        spreadAmountBasedOn,
         diamondOptionsModal: { ...state.diamondOptionsModal, noOfDiamonds, noOfPosts, skipHours, isOpen: false }
       })
     } catch (e) {
