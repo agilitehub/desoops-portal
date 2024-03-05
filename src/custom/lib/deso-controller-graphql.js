@@ -594,6 +594,15 @@ export const processNFTEntries = (publicKey, nftEntries) => {
 
           newEntry.publicKey = entry.owner.publicKey
           newEntry.username = entry.owner.username
+
+          if (!newEntry.username) {
+            newEntry.hasUsername = false
+            newEntry.username = `${newEntry.publicKey.substring(0, 5)}...${newEntry.publicKey.substring(
+              newEntry.publicKey.length - 5,
+              newEntry.publicKey.length
+            )}`
+          }
+
           newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
           newEntry.lastActiveDays = calculateDaysSinceLastActive(
             entry.owner.transactionStats.latestTransactionTimestamp
