@@ -106,6 +106,9 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
         diamondCost = diamondTotal / 1e9
 
         totalFeeDESO = diamondCost
+      } else {
+        amountLabel = ''
+        amountReadOnly = false
       }
 
       // Determine DESO Ops Fee - It's free if the actual account is DeSoOps
@@ -293,8 +296,13 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
 
   const handleConfirmExecute = () => {
     const tokenName = rootState.tokenToUseLabel ? `$${rootState.tokenToUseLabel} token(s)` : rootState.distributionType
-    let title = `Please confirm you are ready to distribute ${rootState.distributionAmount}`
-    title += ` ${tokenName} to ${state.noOfPaymentTransactions} users.`
+    const amount =
+      rootState.distributionType === CoreEnums.paymentTypes.DIAMONDS
+        ? tokenName
+        : `${rootState.distributionAmount} ${tokenName}`
+    const users = rootState.distributionType === CoreEnums.paymentTypes.DIAMONDS ? 'posts' : 'users'
+    let title = `Please confirm you are ready to distribute ${amount}`
+    title += ` to ${state.noOfPaymentTransactions} ${users}.`
     title += ' This operation cannot be undone.'
 
     modal.confirm({
