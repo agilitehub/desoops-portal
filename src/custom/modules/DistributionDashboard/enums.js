@@ -3,6 +3,7 @@
 const Enums = {
   paymentStatuses: {
     PREPARING: 'Preparing to execute payments...',
+    FETCHING_POSTS: 'Fetching posts to Diamond...',
     EXECUTING: 'Executing payments...',
     FINALIZING: 'Finalizing payments...',
     SUCCESS: 'Payments executed successfully!',

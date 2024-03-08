@@ -86,6 +86,10 @@ const Enums = {
       qry: 'Problem getting block for blockhash',
       message:
         'A DeSo error occurred while processing your transaction (Problem getting block for blockhash). Wait at least 30 seconds and try again.'
+    },
+    {
+      qry: 'DIAMONDS',
+      message: 'A DeSo error occurred while diamonding posts. Wait at least 30 seconds and try again.'
     }
   ]
 }

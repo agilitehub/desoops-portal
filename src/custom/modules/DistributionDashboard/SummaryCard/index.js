@@ -12,12 +12,21 @@ import {
 } from '../controller'
 import { distributionSummaryState } from '../data-models'
 import Enums from '../enums'
-import { changeDeSoLimit, sendCreatorCoins, sendDAOTokens, sendDESO } from '../../../lib/deso-controller-graphql'
+import {
+  changeDeSoLimit,
+  diamondPosts,
+  sendCreatorCoins,
+  sendDAOTokens,
+  sendDESO
+} from '../../../lib/deso-controller-graphql'
 import { randomize } from '../../../lib/utils'
 import { createDistributionTransaction, updateDistributionTransaction } from '../../../lib/agilite-controller'
 
 import './style.sass'
 import { identity } from 'deso-protocol'
+import { GET_POSTS } from 'custom/lib/graphql-models'
+import { useApolloClient } from '@apollo/client'
+import { diamondPostModel } from 'custom/lib/data-models'
 
 const styleParams = {
   labelColXS: 11,
@@ -37,6 +46,8 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
   const [state, setState] = useReducer(reducer, distributionSummaryState())
   const { modal, message } = App.useApp()
   const { desoPrice } = desoData
+  const client = useApolloClient()
+
   const styleProps = {
     title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
     divider: { margin: '7px 0' },
@@ -71,8 +82,8 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
       let totalFeeDESO = 0
       let totalFeeDESOLabel = 0
 
-      let amountLabel = state.amountLabel
-      let amountReadOnly = state.amountReadOnly
+      let amountLabel = ''
+      let amountReadOnly = false
 
       let noOfPaymentTransactions = 0
       let desoGasFeesNanos = 0
@@ -106,9 +117,6 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
         diamondCost = diamondTotal / 1e9
 
         totalFeeDESO = diamondCost
-      } else {
-        amountLabel = ''
-        amountReadOnly = false
       }
 
       // Determine DESO Ops Fee - It's free if the actual account is DeSoOps
@@ -337,6 +345,10 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
     let executeInCatch = false
     let newDeSoLimit = 0
     let desoTotal = state.totalFeeDESO
+    let gqlProps = null
+    let gqlData = null
+    let timestamp = null
+    let postsTotal = 0
 
     try {
       // Prompt user if they try to close the browser window
@@ -357,6 +369,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
       }
 
       // Prep the Payment Modal
+      desoTotal = state.totalFeeDESO // Reset the desoTotal to the original value
       paymentModal = cloneDeep(rootState.paymentModal)
 
       paymentModal = {
@@ -387,6 +400,72 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
         finalHodlers
       })
 
+      // If we are distributing Diamonds, we have to first fetch all Post Ids for each user based on the Diamond Options
+      if (rootState.distributionType === CoreEnums.paymentTypes.DIAMONDS) {
+        paymentModal.status = Enums.paymentStatuses.FETCHING_POSTS
+        paymentModal.progressPercent = 15
+        setRootState({ paymentModal })
+
+        // Generate a timestamp for the query based on the current time minus the rootState.diamondOptionsModal.skipHours
+        // Timestamp must be in the format of '2024-02-01 00:00:00.000Z'
+        timestamp = new Date()
+        timestamp.setHours(timestamp.getHours() - rootState.diamondOptionsModal.skipHours)
+        timestamp = timestamp.toISOString()
+
+        for (const hodler of finalHodlers) {
+          try {
+            // Reset the posts array
+            hodler.diamondPosts = []
+
+            // Ignore hodlers that are not active or visible
+            if (!hodler.isActive || !hodler.isVisible) continue
+
+            // Fetch the Posts for the user
+            gqlProps = {
+              condition: {
+                posterPublicKey: hodler.publicKey,
+                repostedPostHash: null
+              },
+              filter: {
+                timestamp: {
+                  lessThan: timestamp
+                },
+                parentPostExists: false
+              },
+              orderBy: 'TIMESTAMP_DESC',
+              first: rootState.diamondOptionsModal.noOfPosts
+            }
+
+            gqlData = await client.query({
+              query: GET_POSTS,
+              variables: gqlProps,
+              fetchPolicy: 'no-cache'
+            })
+
+            gqlData = gqlData.data.posts.nodes
+
+            for (const post of gqlData) {
+              postsTotal++
+              hodler.diamondPosts.push(diamondPostModel(post.postHash))
+            }
+          } catch (e) {
+            console.error(e)
+          }
+        }
+
+        // If the postsTotal is less than the state.noOfPaymentTransactions, we need to update the DeSoOps Fee
+        if (postsTotal < state.noOfPaymentTransactions) {
+          // Update the Payment Counts
+          paymentCount = postsTotal
+          remainingCount = postsTotal
+          paymentModal.paymentCount = paymentCount
+          paymentModal.remainingCount = remainingCount
+
+          // Calculate the new DeSoOps Fee
+          desoTotal = (desoTotal / state.noOfPaymentTransactions) * postsTotal
+        }
+      }
+
       // Prep and send the Distribution Transaction
       slimState = await slimRootState(rootState)
       distTransaction = await prepDistributionTransaction(desoData, slimState, state, finalHodlers, paymentModal)
@@ -394,13 +473,13 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
       executeInCatch = true
 
       // Pay the DeSoOps Transaction Fee
-      await sendDESO(desoData.profile.publicKey, CoreEnums.values.DESO_OPS_PUBLIC_KEY, state.totalFeeDESO)
+      await sendDESO(desoData.profile.publicKey, CoreEnums.values.DESO_OPS_PUBLIC_KEY, desoTotal)
 
       // Update the Payment Modal
       paymentModal.distTransaction = agiliteResponse
       paymentModal.status = Enums.paymentStatuses.EXECUTING
       paymentModal.progressPercent = 20
-      setRootState({ paymentModal })
+      setRootState({ paymentModal, noOfPaymentTransactions: postsTotal, totalFeeDESO: desoTotal })
 
       // Loop through state.holdersToPay and for each one, distribute the tokens using a for-of loop
       for (const hodler of finalHodlers) {
@@ -433,6 +512,66 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
                 hodler.estimatedPaymentToken
               )
               break
+            case CoreEnums.paymentTypes.DIAMONDS:
+              let hasErrors = null
+
+              for (const post of hodler.diamondPosts) {
+                hasErrors = false
+
+                try {
+                  await diamondPosts(
+                    desoData.profile.publicKey,
+                    hodler.publicKey,
+                    post.postHash,
+                    rootState.diamondOptionsModal.noOfDiamonds
+                  )
+                } catch (e) {
+                  // Check first if the error is because the user's post has already been diamonded.
+                  if (!e.message.includes('PostAlreadyHasSufficientDiamonds')) {
+                    hasErrors = true
+                    post.isError = true
+                    post.errorMessage = e.message
+
+                    // Use Enums.transactionErrors Determine if the error is known or not, and populate isKnownError
+                    const knownError = CoreEnums.transactionErrors.find((error) =>
+                      e.message.toLowerCase().includes(error.qry.toLowerCase())
+                    )
+
+                    if (knownError) {
+                      post.isKnownError = true
+                    }
+                  }
+                }
+
+                // Update the Payment Modal
+                if (!post.isError) {
+                  successCount++
+                  remainingCount--
+                  paymentModal.successCount = successCount
+                  paymentModal.remainingCount = remainingCount
+                } else {
+                  failCount++
+                  remainingCount--
+                  paymentModal.failCount = failCount
+                  paymentModal.remainingCount = remainingCount
+                }
+
+                paymentModal.progressPercent = Math.floor(20 + (70 * (successCount + failCount)) / paymentCount)
+                setRootState({ paymentModal })
+              }
+
+              if (hasErrors) {
+                hodler.paymentStatus = CoreEnums.paymentStatuses.FAILED
+                hodler.isError = true
+                hodler.errorMessage = 'DIAMONDS'
+                hodler.isKnownError = true
+              } else {
+                hodler.paymentStatus = CoreEnums.paymentStatuses.SUCCESS
+              }
+
+              setRootState({ finalHodlers })
+
+              break
           }
         } catch (e) {
           hodler.isError = true
@@ -448,23 +587,25 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
           }
         }
 
-        // Update the Payment Modal
-        if (!hodler.isError) {
-          successCount++
-          remainingCount--
-          paymentModal.successCount = successCount
-          paymentModal.remainingCount = remainingCount
-          hodler.paymentStatus = CoreEnums.paymentStatuses.SUCCESS
-        } else {
-          failCount++
-          remainingCount--
-          paymentModal.failCount = failCount
-          paymentModal.remainingCount = remainingCount
-          hodler.paymentStatus = CoreEnums.paymentStatuses.FAILED
-        }
+        // Update the Payment Modal, but ignore if the payment type is Diamonds
+        if (rootState.distributionType !== CoreEnums.paymentTypes.DIAMONDS) {
+          if (!hodler.isError) {
+            successCount++
+            remainingCount--
+            paymentModal.successCount = successCount
+            paymentModal.remainingCount = remainingCount
+            hodler.paymentStatus = CoreEnums.paymentStatuses.SUCCESS
+          } else {
+            failCount++
+            remainingCount--
+            paymentModal.failCount = failCount
+            paymentModal.remainingCount = remainingCount
+            hodler.paymentStatus = CoreEnums.paymentStatuses.FAILED
+          }
 
-        paymentModal.progressPercent = Math.floor(20 + (70 * (successCount + failCount)) / paymentCount)
-        setRootState({ paymentModal, finalHodlers })
+          paymentModal.progressPercent = Math.floor(20 + (70 * (successCount + failCount)) / paymentCount)
+          setRootState({ paymentModal, finalHodlers })
+        }
       }
 
       // Payments Completed, refresh the wallet and balances

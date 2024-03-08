@@ -20,7 +20,8 @@ export const desoUserModel = () => {
     estimatedPaymentLabel: 0,
     percentOwnership: 0,
     percentOwnershipLabel: '',
-    lastActiveDays: 0
+    lastActiveDays: 0,
+    diamondPosts: []
   }
 }
 
@@ -120,5 +121,14 @@ export const optOutModel = (publicKey = '', optOutKey = '') => {
         timestamp: new Date()
       }
     ]
+  }
+}
+
+export const diamondPostModel = (postHash = '') => {
+  return {
+    isError: false,
+    isKnownError: false,
+    errorMessage: '',
+    postHash
   }
 }

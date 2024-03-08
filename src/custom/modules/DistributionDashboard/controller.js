@@ -375,7 +375,8 @@ export const prepDistributionTransaction = async (desoData, rootState, summarySt
         tokenBalance: hodler.tokenBalance,
         estimatedPaymentToken: hodler.estimatedPaymentToken,
         estimatedPaymentUSD: hodler.estimatedPaymentUSD,
-        percentOwnership: hodler.percentOwnership
+        percentOwnership: hodler.percentOwnership,
+        diamondPosts: hodler.diamondPosts
       })
     }
 
@@ -408,7 +409,8 @@ export const prepDistributionTransactionUpdate = async (distTransaction, finalHo
         tokenBalance: hodler.tokenBalance,
         estimatedPaymentToken: hodler.estimatedPaymentToken,
         estimatedPaymentUSD: hodler.estimatedPaymentUSD,
-        percentOwnership: hodler.percentOwnership
+        percentOwnership: hodler.percentOwnership,
+        diamondPosts: hodler.diamondPosts
       })
     }
 

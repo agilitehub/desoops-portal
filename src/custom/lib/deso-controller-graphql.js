@@ -62,15 +62,6 @@ export const desoLogin = async () => {
   }
 }
 
-// TODO: Implement this function
-export const diamondPosts = async () => {
-  try {
-    return await sendDiamonds({})
-  } catch (e) {
-    throw e
-  }
-}
-
 /**
  * Logs the user out of DeSo blockchain.
  *
@@ -721,6 +712,24 @@ export const sendCreatorCoins = async (sender, recipient, creatorCoin, amount) =
       CreatorPublicKeyBase58Check: creatorCoin,
       ReceiverUsernameOrPublicKeyBase58Check: recipient,
       CreatorCoinToTransferNanos: Math.floor(amount * Enums.values.NANO_VALUE),
+      MinFeeRateNanosPerKB: 1000
+    })
+
+    return response
+  } catch (e) {
+    throw new Error(e)
+  }
+}
+
+export const diamondPosts = async (sender, recipient, postHash, noOfDiamonds) => {
+  let response = null
+
+  try {
+    response = await sendDiamonds({
+      SenderPublicKeyBase58Check: sender,
+      ReceiverPublicKeyBase58Check: recipient,
+      DiamondPostHashHex: postHash,
+      DiamondLevel: noOfDiamonds,
       MinFeeRateNanosPerKB: 1000
     })
 
