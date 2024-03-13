@@ -345,6 +345,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
     let executeInCatch = false
     let newDeSoLimit = 0
     let desoTotal = state.totalFeeDESO
+    let desoOpsFeeDESO = state.desoOpsFeeDESO
     let gqlProps = null
     let gqlData = null
     let timestamp = null
@@ -369,7 +370,6 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
       }
 
       // Prep the Payment Modal
-      desoTotal = state.totalFeeDESO // Reset the desoTotal to the original value
       paymentModal = cloneDeep(rootState.paymentModal)
 
       paymentModal = {
@@ -433,7 +433,15 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
                 parentPostExists: false
               },
               orderBy: 'TIMESTAMP_DESC',
-              first: rootState.diamondOptionsModal.noOfPosts
+              first: rootState.diamondOptionsModal.noOfPosts,
+              diamondsFilter2: {
+                diamondLevel: {
+                  greaterThanOrEqualTo: rootState.diamondOptionsModal.noOfDiamonds
+                },
+                senderPkid: {
+                  equalTo: desoData.profile.publicKey
+                }
+              }
             }
 
             gqlData = await client.query({
@@ -445,8 +453,10 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
             gqlData = gqlData.data.posts.nodes
 
             for (const post of gqlData) {
-              postsTotal++
-              hodler.diamondPosts.push(diamondPostModel(post.postHash))
+              if (post.diamonds.nodes.length === 0) {
+                postsTotal++
+                hodler.diamondPosts.push(diamondPostModel(post.postHash))
+              }
             }
           } catch (e) {
             console.error(e)
@@ -462,7 +472,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
           paymentModal.remainingCount = remainingCount
 
           // Calculate the new DeSoOps Fee
-          desoTotal = (desoTotal / state.noOfPaymentTransactions) * postsTotal
+          desoOpsFeeDESO = (postsTotal * rootState.feePerTransactionUSD) / desoData.desoPrice
         }
       }
 
@@ -473,13 +483,15 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
       executeInCatch = true
 
       // Pay the DeSoOps Transaction Fee
-      await sendDESO(desoData.profile.publicKey, CoreEnums.values.DESO_OPS_PUBLIC_KEY, desoTotal)
+      if (desoOpsFeeDESO > 0) {
+        await sendDESO(desoData.profile.publicKey, CoreEnums.values.DESO_OPS_PUBLIC_KEY, desoOpsFeeDESO)
+      }
 
       // Update the Payment Modal
       paymentModal.distTransaction = agiliteResponse
       paymentModal.status = Enums.paymentStatuses.EXECUTING
       paymentModal.progressPercent = 20
-      setRootState({ paymentModal, noOfPaymentTransactions: postsTotal, totalFeeDESO: desoTotal })
+      setRootState({ paymentModal })
 
       // Loop through state.holdersToPay and for each one, distribute the tokens using a for-of loop
       for (const hodler of finalHodlers) {
@@ -526,20 +538,17 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
                     rootState.diamondOptionsModal.noOfDiamonds
                   )
                 } catch (e) {
-                  // Check first if the error is because the user's post has already been diamonded.
-                  if (!e.message.includes('PostAlreadyHasSufficientDiamonds')) {
-                    hasErrors = true
-                    post.isError = true
-                    post.errorMessage = e.message
+                  hasErrors = true
+                  post.isError = true
+                  post.errorMessage = e.message
 
-                    // Use Enums.transactionErrors Determine if the error is known or not, and populate isKnownError
-                    const knownError = CoreEnums.transactionErrors.find((error) =>
-                      e.message.toLowerCase().includes(error.qry.toLowerCase())
-                    )
+                  // Use Enums.transactionErrors Determine if the error is known or not, and populate isKnownError
+                  const knownError = CoreEnums.transactionErrors.find((error) =>
+                    e.message.toLowerCase().includes(error.qry.toLowerCase())
+                  )
 
-                    if (knownError) {
-                      post.isKnownError = true
-                    }
+                  if (knownError) {
+                    post.isKnownError = true
                   }
                 }
 

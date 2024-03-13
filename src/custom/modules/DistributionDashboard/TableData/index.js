@@ -3,15 +3,18 @@ import { Table, Image, App } from 'antd'
 import { CheckCircleOutlined } from '@ant-design/icons'
 
 import theme from '../../../../core/utils/theme'
-import { updateTableSelection } from '../controller'
+import { calculateEstimatedPayment, updateTableSelection } from '../controller'
 import Enums from '../../../lib/enums'
 import { copyTextToClipboard } from '../../../lib/utils'
+import { cloneDeep } from 'lodash'
 
 const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
   const [tableData, setTableData] = useState([])
   const { message } = App.useApp()
 
   const handleSelectionChange = async (updatedKeys) => {
+    let newState = cloneDeep(rootState)
+
     const { finalHodlers, tokenTotal, selectedTableKeys } = await updateTableSelection(
       rootState.finalHodlers,
       rootState,
@@ -19,7 +22,25 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
       updatedKeys
     )
 
-    setRootState({ selectedTableKeys, finalHodlers, tokenTotal })
+    newState.finalHodlers = finalHodlers
+    newState.selectedTableKeys = selectedTableKeys
+    newState.tokenTotal = tokenTotal
+
+    if (rootState.distributionType === Enums.paymentTypes.DIAMONDS) {
+      newState.distributionAmount =
+        rootState.diamondOptionsModal.noOfPosts *
+        finalHodlers.filter((hodler) => hodler.isActive && hodler.isVisible).length
+
+      await calculateEstimatedPayment(
+        newState.distributionAmount,
+        newState.distributionType,
+        newState.spreadAmountBasedOn,
+        finalHodlers,
+        desoData
+      )
+    }
+
+    setRootState(newState)
   }
 
   // Create a useState and useEffect hook to monitor rootState.finalHodlers and update the table data array...

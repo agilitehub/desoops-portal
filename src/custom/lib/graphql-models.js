@@ -151,10 +151,21 @@ export const GET_FOLLOWING = gql`
   }
 `
 export const GET_POSTS = gql`
-  query Posts($condition: PostCondition, $filter: PostFilter, $orderBy: [PostsOrderBy!], $first: Int) {
+  query Posts(
+    $condition: PostCondition
+    $filter: PostFilter
+    $orderBy: [PostsOrderBy!]
+    $first: Int
+    $diamondsFilter2: DiamondFilter
+  ) {
     posts(condition: $condition, filter: $filter, orderBy: $orderBy, first: $first) {
       nodes {
         postHash
+        diamonds(filter: $diamondsFilter2) {
+          nodes {
+            diamondLevel
+          }
+        }
       }
     }
   }
