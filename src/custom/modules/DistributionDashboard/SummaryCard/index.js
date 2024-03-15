@@ -528,8 +528,6 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
               let hasErrors = null
 
               for (const post of hodler.diamondPosts) {
-                hasErrors = false
-
                 try {
                   await diamondPosts(
                     desoData.profile.publicKey,

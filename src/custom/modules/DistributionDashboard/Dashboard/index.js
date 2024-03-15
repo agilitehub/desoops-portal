@@ -26,6 +26,7 @@ import { customListModal, diamondOptionsModal, distributionDashboardState, payme
 import { setDeSoData, setConfigData, setDistributionTemplates } from '../../../reducer'
 import { cloneDeep } from 'lodash'
 import {
+  diamondPosts,
   getInitialDeSoData,
   processCustomList,
   processNFTEntries,
@@ -782,16 +783,24 @@ const _BatchTransactionsForm = () => {
       finalHodlers = cloneDeep(state.finalHodlers)
 
       for (const hodler of finalHodlers) {
-        if (hodler.isKnownError) {
-          hodler.paymentStatus = DashboardEnums.paymentStatuses.QUEUED
-          errorHodlersCount++
+        if (state.distributionType === Enums.paymentTypes.DIAMONDS) {
+          for (const post of hodler.diamondPosts) {
+            if (post.isKnownError) {
+              hodler.paymentStatus = Enums.paymentStatuses.QUEUED
+              errorHodlersCount++
+            }
+          }
+        } else {
+          if (hodler.isKnownError) {
+            hodler.paymentStatus = Enums.paymentStatuses.QUEUED
+            errorHodlersCount++
+          }
         }
       }
 
       // Start execution and update Root State
       setState({
         isExecuting: true,
-        paymentModal,
         finalHodlers
       })
 
@@ -832,7 +841,7 @@ const _BatchTransactionsForm = () => {
           hodler.isError = false
           hodler.errorMessage = ''
           hodler.isKnownError = false
-          hodler.paymentStatus = DashboardEnums.paymentStatuses.IN_PROGRESS
+          hodler.paymentStatus = Enums.paymentStatuses.IN_PROGRESS
 
           setState({ finalHodlers })
 
@@ -857,6 +866,68 @@ const _BatchTransactionsForm = () => {
                 hodler.estimatedPaymentToken
               )
               break
+            case Enums.paymentTypes.DIAMONDS:
+              let hasErrors = null
+
+              for (const post of hodler.diamondPosts) {
+                try {
+                  // Ignore posts that are not Known Errors
+                  if (!post.isKnownError) continue
+
+                  post.isError = false
+                  post.errorMessage = ''
+                  post.isKnownError = false
+
+                  await diamondPosts(
+                    desoData.profile.publicKey,
+                    hodler.publicKey,
+                    post.postHash,
+                    state.diamondOptionsModal.noOfDiamonds
+                  )
+                } catch (e) {
+                  hasErrors = true
+                  post.isError = true
+                  post.errorMessage = e.message
+
+                  // Use Enums.transactionErrors Determine if the error is known or not, and populate isKnownError
+                  const knownError = Enums.transactionErrors.find((error) =>
+                    e.message.toLowerCase().includes(error.qry.toLowerCase())
+                  )
+
+                  if (knownError) {
+                    post.isKnownError = true
+                  }
+                }
+
+                // Update the Payment Modal
+                if (!post.isError) {
+                  successCount++
+                  remainingCount--
+                  paymentModal.successCount = successCount
+                  paymentModal.remainingCount = remainingCount
+                } else {
+                  failCount++
+                  remainingCount--
+                  paymentModal.failCount = failCount
+                  paymentModal.remainingCount = remainingCount
+                }
+
+                paymentModal.progressPercent = Math.floor(20 + (70 * (successCount + failCount)) / paymentCount)
+                setState({ paymentModal })
+              }
+
+              if (hasErrors) {
+                hodler.paymentStatus = Enums.paymentStatuses.FAILED
+                hodler.isError = true
+                hodler.errorMessage = 'DIAMONDS'
+                hodler.isKnownError = true
+              } else {
+                hodler.paymentStatus = Enums.paymentStatuses.SUCCESS
+              }
+
+              setState({ finalHodlers })
+
+              break
           }
         } catch (e) {
           hodler.isError = true
@@ -872,19 +943,21 @@ const _BatchTransactionsForm = () => {
           }
         }
 
-        // Update the Payment Modal
-        if (!hodler.isError) {
-          successCount++
-          remainingCount--
-          paymentModal.successCount = successCount
-          paymentModal.remainingCount = remainingCount
-          hodler.paymentStatus = Enums.paymentStatuses.SUCCESS
-        } else {
-          failCount++
-          remainingCount--
-          paymentModal.failCount = failCount
-          paymentModal.remainingCount = remainingCount
-          hodler.paymentStatus = Enums.paymentStatuses.FAILED
+        // Update the Payment Modal, but ignore if the payment type is Diamonds
+        if (state.distributionType !== Enums.paymentTypes.DIAMONDS) {
+          if (!hodler.isError) {
+            successCount++
+            remainingCount--
+            paymentModal.successCount = successCount
+            paymentModal.remainingCount = remainingCount
+            hodler.paymentStatus = Enums.paymentStatuses.SUCCESS
+          } else {
+            failCount++
+            remainingCount--
+            paymentModal.failCount = failCount
+            paymentModal.remainingCount = remainingCount
+            hodler.paymentStatus = Enums.paymentStatuses.FAILED
+          }
         }
 
         paymentModal.progressPercent = Math.floor(20 + (70 * (successCount + failCount)) / paymentCount)
