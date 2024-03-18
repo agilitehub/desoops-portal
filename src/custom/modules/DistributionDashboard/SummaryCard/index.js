@@ -113,7 +113,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
 
         // Calculate the distribution amount based on diamond levels
         diamondNanos = desoData.diamondLevels[rootState.diamondOptionsModal.noOfDiamonds]
-        diamondTotal = diamondNanos * rootState.diamondOptionsModal.noOfPosts
+        diamondTotal = diamondNanos * noOfPaymentTransactions
         diamondCost = diamondTotal / 1e9
 
         totalFeeDESO = diamondCost
