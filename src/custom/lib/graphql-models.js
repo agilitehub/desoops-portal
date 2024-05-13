@@ -18,6 +18,9 @@ export const GQL_GET_INITIAL_DESO_DATA = gql`
             transactionStats {
               latestTransactionTimestamp
             }
+            desoBalance {
+              balanceNanos
+            }
           }
         }
       }
@@ -38,6 +41,9 @@ export const GQL_GET_TOKEN_HOLDERS = gql`
             transactionStats {
               latestTransactionTimestamp
             }
+            desoBalance {
+              balanceNanos
+            }
           }
         }
       }
@@ -55,6 +61,9 @@ export const SEARCH_PROFILES = gql`
           transactionStats {
             latestTransactionTimestamp
           }
+          desoBalance {
+            balanceNanos
+          }
         }
       }
     }
@@ -69,6 +78,9 @@ export const FETCH_SINGLE_PROFILE = gql`
       transactionStats {
         latestTransactionTimestamp
       }
+      desoBalance {
+        balanceNanos
+      }
     }
   }
 `
@@ -82,6 +94,9 @@ export const FETCH_MULTIPLE_PROFILES = gql`
         account {
           transactionStats {
             latestTransactionTimestamp
+          }
+          desoBalance {
+            balanceNanos
           }
         }
       }
@@ -109,6 +124,9 @@ export const GET_NFT_ENTRIES = gql`
           transactionStats {
             latestTransactionTimestamp
           }
+          desoBalance {
+            balanceNanos
+          }
         }
       }
     }
@@ -125,6 +143,9 @@ export const GET_FOLLOWERS = gql`
             username
             transactionStats {
               latestTransactionTimestamp
+            }
+            desoBalance {
+              balanceNanos
             }
           }
         }
@@ -143,6 +164,9 @@ export const GET_FOLLOWING = gql`
             username
             transactionStats {
               latestTransactionTimestamp
+            }
+            desoBalance {
+              balanceNanos
             }
           }
         }

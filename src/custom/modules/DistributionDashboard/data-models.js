@@ -19,6 +19,8 @@ export const distributionDashboardState = (feePerTransactionUSD) => {
     filterUsers: false,
     filterAmountIs: '>',
     filterAmount: null,
+    filterDeSoBalanceIs: '>',
+    filterDeSoBalance: null,
     returnAmount: null,
     lastActiveDays: null,
     originalHodlers: [],

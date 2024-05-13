@@ -11,6 +11,7 @@ export const desoUserModel = () => {
     errorMessage: '',
     publicKey: '',
     username: '',
+    desoBalance: 0,
     profilePicUrl: '',
     paymentStatus: '',
     tokenBalance: 0,
@@ -47,6 +48,8 @@ export const distributionTransactionModel = () => {
       filterUsers: false,
       filterAmountIs: '',
       filterAmount: 0,
+      filterDeSoBalanceIs: '',
+      filterDeSoBalance: 0,
       returnAmount: 0,
       lastActiveDays: 0
     },
@@ -104,6 +107,8 @@ export const distributionTemplateModel = () => {
       filterUsers: false,
       filterAmountIs: '',
       filterAmount: 0,
+      filterDeSoBalanceIs: '',
+      filterDeSoBalance: 0,
       returnAmount: 0,
       lastActiveDays: 0
     }

@@ -43,10 +43,12 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
       // If rootState.filterUsers is true and newState.filterUsers is set to false, then we can run updateHolders
       if (rootState.filterUsers && !newState.filterUsers) {
         runSetupHolders = true
+        newState.filterAmountIs = '>'
         newState.filterAmount = null
+        newState.filterDeSoBalanceIs = '>'
+        newState.filterDeSoBalance = null
         newState.returnAmount = null
         newState.lastActiveDays = null
-        newState.filterAmountIs = '>'
       } else if (newState.filterUsers) {
         runSetupHolders = true
       }
@@ -175,6 +177,42 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
                 style={{ width: 200 }}
                 onChange={(filterAmount) => {
                   handleFilterUsers('filterAmount', filterAmount)
+                }}
+              />
+            </Col>
+          </Row>
+          <Divider style={styleProps.divider} />
+          <Row>
+            <Col span={24} style={{ paddingTop: 3, paddingBottom: 3 }}>
+              <span style={styleProps.fieldLabel}>
+                <b>Where $DESO Balance is</b>
+              </span>
+            </Col>
+            <Col xs={6} sm={4} md={3} lg={5}>
+              <Select
+                disabled={rootState.isExecuting}
+                style={{ width: 70 }}
+                value={rootState.filterDeSoBalanceIs}
+                onChange={(filterDeSoBalanceIs) => {
+                  handleFilterUsers('filterDeSoBalanceIs', filterDeSoBalanceIs)
+                }}
+              >
+                <Select.Option value={'>'}>{'>'}</Select.Option>
+                <Select.Option value={'>='}>{'>='}</Select.Option>
+                <Select.Option value={'<'}>{'<'}</Select.Option>
+                <Select.Option value={'<='}>{'<='}</Select.Option>
+              </Select>
+            </Col>
+            <Col>
+              <InputNumber
+                disabled={rootState.isExecuting}
+                addonAfter='$DESO'
+                min={0}
+                value={rootState.filterDeSoBalance}
+                placeholder='0'
+                style={{ width: 200 }}
+                onChange={(filterDeSoBalance) => {
+                  handleFilterUsers('filterDeSoBalance', filterDeSoBalance)
                 }}
               />
             </Col>

@@ -132,6 +132,8 @@ const _BatchTransactionsForm = () => {
     state.filterUsers,
     state.filterAmountIs,
     state.filterAmount,
+    state.filterDeSoBalanceIs,
+    state.filterDeSoBalance,
     state.returnAmount,
     state.lastActiveDays,
     state.spreadAmountBasedOn
@@ -470,6 +472,8 @@ const _BatchTransactionsForm = () => {
       tmpState.filterUsers = template.rules.filterUsers
       tmpState.filterAmountIs = template.rules.filterAmountIs
       tmpState.filterAmount = template.rules.filterAmount
+      tmpState.filterDeSoBalanceIs = template.rules.filterDeSoBalanceIs
+      tmpState.filterDeSoBalance = template.rules.filterDeSoBalance
       tmpState.returnAmount = template.rules.returnAmount
       tmpState.lastActiveDays = template.rules.lastActiveDays
 

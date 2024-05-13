@@ -139,7 +139,8 @@ export const processTokenHodlers = async (distributeTo, gqlData, rootState, deso
 
     return { originalHodlers, finalHodlers, selectedTableKeys, tokenTotal }
   } catch (e) {
-    return new Error(e)
+    console.error(e)
+    throw e
   }
 }
 
@@ -343,6 +344,7 @@ export const createUserEntry = (entry, userEntry, optOutProfile) => {
     ;(async () => {
       let newEntry = null
       let tokenBalance = 0
+      let desoBalance = 0
       let lastActiveDays = null
 
       try {
@@ -352,6 +354,12 @@ export const createUserEntry = (entry, userEntry, optOutProfile) => {
 
         // If tokenBalance is NaN, then default to 1
         if (isNaN(tokenBalance)) tokenBalance = 1
+
+        // Determine DeSo Balance
+        if (userEntry.desoBalance) {
+          desoBalance = userEntry.desoBalance.balanceNanos / Enums.values.NANO_VALUE
+          if (isNaN(desoBalance)) desoBalance = 0
+        }
 
         newEntry = desoUserModel()
 
@@ -387,6 +395,7 @@ export const createUserEntry = (entry, userEntry, optOutProfile) => {
         newEntry.lastActiveDays = lastActiveDays
         newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
         newEntry.tokenBalance = tokenBalance
+        newEntry.desoBalance = desoBalance
 
         resolve(newEntry)
       } catch (e) {
@@ -402,8 +411,15 @@ export const createCustomUserEntry = (entry, optOutProfile) => {
       const tokenBalance = 1
       let newEntry = null
       let lastActiveDays = null
+      let desoBalance = 0
 
       try {
+        // Determine DeSo Balance
+        if (entry.account.desoBalance) {
+          desoBalance = entry.account.desoBalance.balanceNanos / Enums.values.NANO_VALUE
+          if (isNaN(desoBalance)) desoBalance = 0
+        }
+
         newEntry = desoUserModel()
 
         // Check first if lastActiveTimestamp is null before calculating days
@@ -425,6 +441,7 @@ export const createCustomUserEntry = (entry, optOutProfile) => {
         newEntry.lastActiveDays = lastActiveDays
         newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
         newEntry.tokenBalance = tokenBalance
+        newEntry.desoBalance = desoBalance
 
         resolve(newEntry)
       } catch (e) {
@@ -488,9 +505,11 @@ export const processFollowersOrFollowing = (followType, data) => {
       let errMsg = null
       let tmpEntry = null
       let newEntry = null
+      let lastActiveDays = null
 
       try {
         for (const entry of data) {
+          lastActiveDays = null
           if (followType === Enums.values.FOLLOWERS) {
             tmpEntry = entry.follower
           } else {
@@ -500,12 +519,16 @@ export const processFollowersOrFollowing = (followType, data) => {
           // If there's no Username, then the user is invalid
           if (!tmpEntry.username) continue
 
+          if (tmpEntry.transactionStats && tmpEntry.transactionStats.latestTransactionTimestamp !== null) {
+            lastActiveDays = calculateDaysSinceLastActive(tmpEntry.transactionStats.latestTransactionTimestamp)
+          }
+
           newEntry = desoUserModel()
 
           newEntry.publicKey = tmpEntry.publicKey
           newEntry.username = tmpEntry.username
           newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
-          newEntry.lastActiveDays = calculateDaysSinceLastActive(tmpEntry.transactionStats.latestTransactionTimestamp)
+          newEntry.lastActiveDays = lastActiveDays
           newEntry.tokenBalance = 1
 
           result.push(newEntry)
@@ -563,9 +586,11 @@ export const processNFTEntries = (publicKey, nftEntries) => {
     ;(async () => {
       let nftHodlers = []
       let newEntry = null
+      let lastActiveDays = null
 
       try {
         for (const entry of nftEntries) {
+          lastActiveDays = null
           // Ignore if NFT is owned by current user
           if (!entry.owner) entry.owner = {}
           entry.owner.publicKey = entry.ownerPkid
@@ -578,6 +603,10 @@ export const processNFTEntries = (publicKey, nftEntries) => {
             // User found. Increment token balance
             nftHodlers[userIndex].tokenBalance++
             continue
+          }
+
+          if (entry.owner.transactionStats && entry.owner.transactionStats.latestTransactionTimestamp !== null) {
+            lastActiveDays = calculateDaysSinceLastActive(entry.owner.transactionStats.latestTransactionTimestamp)
           }
 
           // User not found. Add to hodlers list
@@ -595,9 +624,7 @@ export const processNFTEntries = (publicKey, nftEntries) => {
           }
 
           newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
-          newEntry.lastActiveDays = calculateDaysSinceLastActive(
-            entry.owner.transactionStats.latestTransactionTimestamp
-          )
+          newEntry.lastActiveDays = lastActiveDays
 
           newEntry.tokenBalance = 1
           nftHodlers.push(newEntry)

@@ -179,13 +179,16 @@ export const processHodlerConditions = async (hodlers, rootState) => {
       filterUsers: rootState.filterUsers,
       filterAmountIs: rootState.filterAmountIs,
       filterAmount: rootState.filterAmount,
+      filterDeSoBalanceIs: rootState.filterDeSoBalanceIs,
+      filterDeSoBalance: rootState.filterDeSoBalance,
       returnAmount: rootState.returnAmount,
       lastActiveDays: rootState.lastActiveDays
     }
 
     if (
       !conditions.filterUsers ||
-      (conditions.filterAmount === null &&
+      ((conditions.filterAmount === null || conditions.filterAmount === undefined) &&
+        (conditions.filterDeSoBalance === null || conditions.filterDeSoBalance === undefined) &&
         (conditions.returnAmount === null || conditions.returnAmount === undefined) &&
         (conditions.lastActiveDays === null || conditions.lastActiveDays === undefined))
     ) {
@@ -225,13 +228,36 @@ export const processHodlerConditions = async (hodlers, rootState) => {
           hodler.isActive = hodler.isVisible
         }
 
+        if (conditions.filterDeSoBalance !== null) {
+          switch (conditions.filterDeSoBalanceIs) {
+            case '>':
+              hodler.isVisible = hodler.desoBalance > conditions.filterDeSoBalance
+              break
+            case '<':
+              hodler.isVisible = hodler.desoBalance < conditions.filterDeSoBalance
+              break
+            case '>=':
+              hodler.isVisible = hodler.desoBalance >= conditions.filterDeSoBalance
+              break
+            case '<=':
+              hodler.isVisible = hodler.desoBalance <= conditions.filterDeSoBalance
+              break
+          }
+
+          hodler.isActive = hodler.isVisible
+        }
+
         // Next, if there is a conditions.lastActiveDays, the hodler.isVisible is only true if the holder's lastTransactionTimestamp in the array is less than or equal the conditions.lastActiveDays
         if (
           conditions.lastActiveDays !== null &&
           conditions.lastActiveDays !== undefined &&
           conditions.lastActiveDays !== 0
         ) {
-          hodler.isVisible = hodler.isVisible && hodler.lastActiveDays <= conditions.lastActiveDays
+          hodler.isVisible =
+            hodler.isVisible &&
+            hodler.lastActiveDays !== null &&
+            hodler.lastActiveDays !== 0 &&
+            hodler.lastActiveDays <= conditions.lastActiveDays
           hodler.isActive = hodler.isVisible
         }
 
@@ -352,6 +378,8 @@ export const prepDistributionTransaction = async (desoData, rootState, summarySt
     distTransaction.rules.filterUsers = rootState.filterUsers
     distTransaction.rules.filterAmountIs = rootState.filterAmountIs
     distTransaction.rules.filterAmount = rootState.filterAmount || 0
+    distTransaction.rules.filterDeSoBalanceIs = rootState.filterDeSoBalanceIs
+    distTransaction.rules.filterDeSoBalance = rootState.filterDeSoBalance || 0
     distTransaction.rules.returnAmount = rootState.returnAmount || 0
     distTransaction.rules.lastActiveDays = rootState.lastActiveDays || 0
 
@@ -448,6 +476,8 @@ export const prepDistributionTemplate = async (desoData, rootState, name, rulesE
     transaction.rules.filterUsers = rootState.filterUsers
     transaction.rules.filterAmountIs = rootState.filterAmountIs
     transaction.rules.filterAmount = rootState.filterAmount || 0
+    transaction.rules.filterDeSoBalanceIs = rootState.filterDeSoBalanceIs
+    transaction.rules.filterDeSoBalance = rootState.filterDeSoBalance || 0
     transaction.rules.returnAmount = rootState.returnAmount || 0
     transaction.rules.lastActiveDays = rootState.lastActiveDays || 0
 
