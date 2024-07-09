@@ -43,6 +43,7 @@ export const distributionTransactionModel = () => {
     distributionAmount: 0,
     tokenToUse: '',
     nftId: '',
+    nftExtraData: null,
     rules: {
       spreadAmountBasedOn: '',
       filterUsers: false,
@@ -111,7 +112,9 @@ export const distributionTemplateModel = () => {
       filterDeSoBalance: 0,
       returnAmount: 0,
       lastActiveDays: 0
-    }
+    },
+    isPoll: false,
+    pollOptions: []
   }
 }
 

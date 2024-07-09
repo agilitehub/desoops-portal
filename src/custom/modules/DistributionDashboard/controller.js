@@ -470,6 +470,7 @@ export const prepDistributionTemplate = async (desoData, rootState, name, rulesE
     transaction.nftUrl = rootState.nftUrl || ''
     transaction.nftImageUrl = rootState.nftMetaData.imageUrl || ''
     transaction.nftDescription = rootState.nftMetaData.description || ''
+    transaction.nftExtraData = rootState.nftMetaData.extraData || ''
     transaction.nftHodlers = rootState.nftHodlers || []
     transaction.rules.enabled = rulesEnabled
     transaction.rules.spreadAmountBasedOn = rootState.spreadAmountBasedOn
@@ -480,6 +481,9 @@ export const prepDistributionTemplate = async (desoData, rootState, name, rulesE
     transaction.rules.filterDeSoBalance = rootState.filterDeSoBalance || 0
     transaction.rules.returnAmount = rootState.returnAmount || 0
     transaction.rules.lastActiveDays = rootState.lastActiveDays || 0
+
+    transaction.isPoll = rootState.isPoll
+    transaction.pollOptions = rootState.pollOptions || []
 
     if (transaction.distributeTo === Enums.values.CUSTOM) {
       transaction.customList = rootState.customListModal.userList

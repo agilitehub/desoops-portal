@@ -263,6 +263,7 @@ const GeneralTab = ({
               <Select.Option value={Enums.values.NFT}>NFT Owners</Select.Option>
               <Select.Option value={Enums.values.FOLLOWERS}>Followers</Select.Option>
               <Select.Option value={Enums.values.FOLLOWING}>Following</Select.Option>
+              <Select.Option value={Enums.values.POLL}>Poll Voters</Select.Option>
               <Select.Option value={Enums.values.CUSTOM}>Custom List</Select.Option>
             </Select>
             {rootState.distributeTo === Enums.values.CUSTOM ? (
@@ -287,6 +288,20 @@ const GeneralTab = ({
                 }
               >
                 Select NFT
+              </Button>
+            ) : null}
+            {rootState.distributeTo === Enums.values.POLL ? (
+              <Button
+                type='link'
+                onClick={handleSelectNFT}
+                style={styleProps.linkButton}
+                icon={
+                  rootState.nftMetaData.id ? (
+                    <Image src={rootState.nftMetaData.imageUrl} style={styleProps.nftIcon} preview={false} />
+                  ) : null
+                }
+              >
+                Select Poll
               </Button>
             ) : null}
           </Space>

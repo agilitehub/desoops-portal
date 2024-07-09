@@ -12,6 +12,7 @@ const Enums = {
     DAO: 'dao',
     CREATOR: 'creator',
     NFT: 'nft',
+    POLL: 'poll',
     CUSTOM: 'custom',
     POST: 'post',
     HEX_PREFIX: '0x',

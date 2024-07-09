@@ -30,6 +30,7 @@ import {
   getInitialDeSoData,
   processCustomList,
   processNFTEntries,
+  processPollEntries,
   processTokenHodlers,
   sendCreatorCoins,
   sendDAOTokens,
@@ -51,6 +52,7 @@ import {
   GET_FOLLOWERS,
   GET_FOLLOWING,
   GET_NFT_ENTRIES,
+  GET_POLL_POST,
   GQL_GET_INITIAL_DESO_DATA,
   GQL_GET_TOKEN_HOLDERS
 } from 'custom/lib/graphql-models'
@@ -256,9 +258,12 @@ const _BatchTransactionsForm = () => {
       resetState()
       if (!distributeTo) return
 
-      // Then, if user selects NFT or CUSTOM, no extra work is needed
+      // Then, if user selects NFT, POLL or CUSTOM, no extra work is needed
       if (distributeTo === Enums.values.NFT) {
         setState({ distributeTo, nftUrl: '', nftMetaData: {}, nftHodlers: [], openNftSearch: true })
+        return
+      } else if (distributeTo === Enums.values.POLL) {
+        setState({ distributeTo, nftUrl: '', nftMetaData: {}, nftHodlers: [], openNftSearch: true, isPoll: true })
         return
       } else if (distributeTo === Enums.values.CUSTOM) {
         setState({ distributeTo, customListModal: customListModal(true) })
@@ -358,22 +363,36 @@ const _BatchTransactionsForm = () => {
     setState(tmpState)
   }
 
-  const handleConfirmNFT = async (nftMetaData, nftUrl) => {
+  const handleConfirmNFT = async (nftMetaData, nftUrl, pollOptions) => {
     try {
       let nftEntries = null
       let nftHodlers = null
 
       setState({ loading: true, isExecuting: true, openNftSearch: false })
 
-      const gqlProps = {
-        condition: {
-          nftPostHash: nftMetaData.id
+      if (state.isPoll) {
+        const gqlProps = {
+          condition: {
+            associationType: 'POLL_RESPONSE',
+            postHash: nftMetaData.id
+          },
+          postHash: nftMetaData.id
         }
-      }
 
-      nftEntries = await client.query({ query: GET_NFT_ENTRIES, variables: gqlProps, fetchPolicy: 'no-cache' })
-      nftEntries = nftEntries.data.nfts.nodes
-      nftHodlers = await processNFTEntries(desoData.profile.publicKey, nftEntries)
+        nftEntries = await client.query({ query: GET_POLL_POST, variables: gqlProps, fetchPolicy: 'no-cache' })
+        nftEntries = nftEntries.data.postAssociations.nodes
+        nftHodlers = await processPollEntries(nftEntries, pollOptions)
+      } else {
+        const gqlProps = {
+          condition: {
+            nftPostHash: nftMetaData.id
+          }
+        }
+
+        nftEntries = await client.query({ query: GET_NFT_ENTRIES, variables: gqlProps, fetchPolicy: 'no-cache' })
+        nftEntries = nftEntries.data.nfts.nodes
+        nftHodlers = await processNFTEntries(desoData.profile.publicKey, nftEntries)
+      }
 
       const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(nftHodlers, state, desoData)
 
@@ -388,7 +407,8 @@ const _BatchTransactionsForm = () => {
         nftUrl,
         openNftSearch: false,
         loading: false,
-        isExecuting: false
+        isExecuting: false,
+        pollOptions
       })
     } catch (e) {
       console.error(e)
@@ -510,15 +530,31 @@ const _BatchTransactionsForm = () => {
 
           break
         case Enums.values.NFT:
-          gqlProps = {
-            condition: {
-              nftPostHash: template.nftId
+        case Enums.values.POLL:
+          if (template.isPoll) {
+            gqlProps = {
+              condition: {
+                associationType: 'POLL_RESPONSE',
+                postHash: template.nftId
+              },
+              postHash: template.nftId
             }
+
+            nftEntries = await client.query({ query: GET_POLL_POST, variables: gqlProps, fetchPolicy: 'no-cache' })
+            nftEntries = nftEntries.data.postAssociations.nodes
+            nftHodlers = await processPollEntries(nftEntries, template.pollOptions)
+          } else {
+            gqlProps = {
+              condition: {
+                nftPostHash: template.nftId
+              }
+            }
+
+            nftEntries = await client.query({ query: GET_NFT_ENTRIES, variables: gqlProps, fetchPolicy: 'no-cache' })
+            nftEntries = nftEntries.data.nfts.nodes
+            nftHodlers = await processNFTEntries(desoData.profile.publicKey, nftEntries)
           }
 
-          nftEntries = await client.query({ query: GET_NFT_ENTRIES, variables: gqlProps, fetchPolicy: 'no-cache' })
-          nftEntries = nftEntries.data.nfts.nodes
-          nftHodlers = await processNFTEntries(desoData.profile.publicKey, nftEntries)
           hodlerData = await setupHodlers(nftHodlers, state, desoData)
 
           tmpState.nftId = template.nftId
@@ -526,11 +562,14 @@ const _BatchTransactionsForm = () => {
           tmpState.nftMetaData = {
             id: template.nftId,
             imageUrl: template.nftImageUrl,
-            description: template.nftDescription
+            description: template.nftDescription,
+            extraData: template.nftExtraData
           }
 
           tmpState.nftHodlers = hodlerData.finalHodlers
           tmpState.nftUrl = template.nftUrl
+          tmpState.isPoll = template.isPoll
+          tmpState.pollOptions = template.pollOptions
 
           break
         default:
@@ -740,15 +779,31 @@ const _BatchTransactionsForm = () => {
 
           break
         case Enums.values.NFT:
-          gqlProps = {
-            condition: {
-              nftPostHash: tmpState.nftMetaData.id
+        case Enums.values.POLL:
+          if (tmpState.isPoll) {
+            gqlProps = {
+              condition: {
+                associationType: 'POLL_RESPONSE',
+                postHash: tmpState.nftMetaData.id
+              },
+              postHash: tmpState.nftMetaData.id
             }
+
+            nftEntries = await client.query({ query: GET_POLL_POST, variables: gqlProps, fetchPolicy: 'no-cache' })
+            nftEntries = nftEntries.data.postAssociations.nodes
+            nftHodlers = await processPollEntries(nftEntries, tmpState.pollOptions)
+          } else {
+            gqlProps = {
+              condition: {
+                nftPostHash: tmpState.nftMetaData.id
+              }
+            }
+
+            nftEntries = await client.query({ query: GET_NFT_ENTRIES, variables: gqlProps, fetchPolicy: 'no-cache' })
+            nftEntries = nftEntries.data.nfts.nodes
+            nftHodlers = await processNFTEntries(publicKey, nftEntries)
           }
 
-          nftEntries = await client.query({ query: GET_NFT_ENTRIES, variables: gqlProps, fetchPolicy: 'no-cache' })
-          nftEntries = nftEntries.data.nfts.nodes
-          nftHodlers = await processNFTEntries(publicKey, nftEntries)
           hodlerData = await setupHodlers(nftHodlers, tmpState, desoData)
 
           break

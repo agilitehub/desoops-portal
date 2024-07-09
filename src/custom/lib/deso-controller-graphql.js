@@ -568,8 +568,9 @@ export const processNFTPost = (nftPost, postHash) => {
       try {
         nftMetaData = {
           id: postHash,
-          imageUrl: nftPost.imageUrls.length > 0 ? nftPost.imageUrls[0] : nftLogo,
-          description: cleanString(nftPost.body, 100)
+          imageUrl: nftPost.imageUrls?.length > 0 ? nftPost.imageUrls[0] : nftLogo,
+          description: cleanString(nftPost.body ? nftPost.body : '', 100),
+          extraData: nftPost.extraData
         }
 
         resolve(nftMetaData)
@@ -648,6 +649,54 @@ export const processNFTEntries = (publicKey, nftEntries) => {
         })
 
         resolve(nftHodlers)
+      } catch (e) {
+        console.error(e)
+        reject(e)
+      }
+    })()
+  })
+}
+
+export const processPollEntries = (pollEntries, pollOptions) => {
+  return new Promise((resolve, reject) => {
+    ;(async () => {
+      const pollHodlers = []
+
+      try {
+        for (const entry of pollEntries) {
+          if (pollOptions.includes(entry.associationValue)) {
+            const newEntry = desoUserModel()
+            let lastActiveDays = null
+
+            newEntry.publicKey = entry.transactor.publicKey
+            newEntry.username = entry.transactor.username
+
+            if (!newEntry.username) {
+              newEntry.hasUsername = false
+              newEntry.username = `${newEntry.publicKey.substring(0, 5)}...${newEntry.publicKey.substring(
+                newEntry.publicKey.length - 5,
+                newEntry.publicKey.length
+              )}`
+            }
+
+            if (
+              entry.transactor.transactionStats &&
+              entry.transactor.transactionStats.latestTransactionTimestamp !== null
+            ) {
+              lastActiveDays = calculateDaysSinceLastActive(
+                entry.transactor.transactionStats.latestTransactionTimestamp
+              )
+            }
+
+            newEntry.profilePicUrl = await generateProfilePicUrl(newEntry.publicKey)
+            newEntry.lastActiveDays = lastActiveDays
+
+            newEntry.tokenBalance = 1
+            pollHodlers.push(newEntry)
+          }
+        }
+
+        resolve(pollHodlers)
       } catch (e) {
         console.error(e)
         reject(e)

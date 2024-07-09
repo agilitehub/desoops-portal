@@ -114,6 +114,29 @@ export const GET_NFT_POST = gql`
   }
 `
 
+export const GET_POLL_POST = gql`
+  query PostAssociations($condition: PostAssociationCondition, $postHash: String!) {
+    postAssociations(condition: $condition) {
+      totalCount
+      nodes {
+        transactor {
+          username
+          publicKey
+          transactionStats {
+            latestTransactionTimestamp
+          }
+        }
+        associationValue
+      }
+    }
+    post(postHash: $postHash) {
+      body
+      imageUrls
+      extraData
+    }
+  }
+`
+
 export const GET_NFT_ENTRIES = gql`
   query Profiles($condition: NftCondition) {
     nfts(condition: $condition) {
