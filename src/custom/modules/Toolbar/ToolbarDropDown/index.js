@@ -39,12 +39,11 @@ const ToolbarDropDown = () => {
           items: handleGetItems()
         }}
       >
-        <Button icon={<Image src={profile.profilePicUrl} className='toolbar-dropdown-btn-icon' preview={false} />}>
-          <Space>
-            {profile.username}
-            <DownOutlined />
-          </Space>
-        </Button>
+        <Space style={{ cursor: 'pointer', marginTop: 10 }}>
+          <Image src={profile.profilePicUrl} className='toolbar-dropdown-btn-icon' preview={false} />
+          {profile.username}
+          <DownOutlined />
+        </Space>
       </Dropdown>
     </div>
   )
