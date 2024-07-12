@@ -16,6 +16,7 @@ import Enums from './enums'
 import { desoUserModel } from './data-models'
 import { calculateDaysSinceLastActive, cleanString, hexToInt, sortByKey } from './utils'
 import nftLogo from '../assets/nft-default-logo.png'
+import pollLogo from '../assets/poll-default-logo.png'
 import { setupHodlers } from 'custom/modules/DistributionDashboard/controller'
 
 const desoConfigure = {
@@ -560,7 +561,7 @@ export const processFollowersOrFollowing = (followType, data) => {
   })
 }
 
-export const processNFTPost = (nftPost, postHash) => {
+export const processNFTPost = (nftPost, postHash, isPoll) => {
   return new Promise((resolve, reject) => {
     ;(async () => {
       let nftMetaData = null
@@ -568,7 +569,7 @@ export const processNFTPost = (nftPost, postHash) => {
       try {
         nftMetaData = {
           id: postHash,
-          imageUrl: nftPost.imageUrls?.length > 0 ? nftPost.imageUrls[0] : nftLogo,
+          imageUrl: nftPost.imageUrls?.length > 0 ? nftPost.imageUrls[0] : isPoll ? pollLogo : nftLogo,
           description: cleanString(nftPost.body ? nftPost.body : '', 100),
           extraData: nftPost.extraData
         }

@@ -110,7 +110,7 @@ const DeSoNFTSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfir
       }
 
       nftPost = nftPost.data.post
-      const nftMetaData = await processNFTPost(nftPost, postHash)
+      const nftMetaData = await processNFTPost(nftPost, postHash, rootState.isPoll)
 
       setState({ nftMetaData, isExecuting: false })
 
@@ -197,9 +197,9 @@ const DeSoNFTSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfir
                   <Checkbox.Group onChange={(value) => setState({ pollOptions: value })} value={state.pollOptions}>
                     {JSON.parse(state.nftMetaData.extraData.PollOptions).map((option, index) => {
                       return (
-                        <>
+                        <div style={{ width: '100%', marginBottom: 10 }}>
                           <Checkbox key={index} value={option} /> <span style={{ fontSize: 13 }}>{option}</span>
-                        </>
+                        </div>
                       )
                     })}
                   </Checkbox.Group>

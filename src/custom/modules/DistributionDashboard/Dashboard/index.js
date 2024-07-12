@@ -260,7 +260,7 @@ const _BatchTransactionsForm = () => {
 
       // Then, if user selects NFT, POLL or CUSTOM, no extra work is needed
       if (distributeTo === Enums.values.NFT) {
-        setState({ distributeTo, nftUrl: '', nftMetaData: {}, nftHodlers: [], openNftSearch: true })
+        setState({ distributeTo, nftUrl: '', nftMetaData: {}, nftHodlers: [], openNftSearch: true, isPoll: false })
         return
       } else if (distributeTo === Enums.values.POLL) {
         setState({ distributeTo, nftUrl: '', nftMetaData: {}, nftHodlers: [], openNftSearch: true, isPoll: true })
