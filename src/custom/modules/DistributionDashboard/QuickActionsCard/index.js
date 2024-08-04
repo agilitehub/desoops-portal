@@ -28,8 +28,8 @@ const QuickActionsCard = ({ desoData, configData, onResetDashboard, onRefreshDas
   const [state, setState] = useReducer(reducer, initialState)
 
   const styleProps = {
-    title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
-    headStyle: { background: '#DDE6ED', minHeight: deviceType.isSmartphone ? 30 : 40 },
+    title: { fontSize: deviceType.isSmartphone ? 14 : 16 },
+    headStyle: { background: '#fafafa', minHeight: deviceType.isSmartphone ? 30 : 40 },
     bodyStyle: { height: deviceType.isTablet ? 70 : 75 },
     actionWrapper: { marginTop: deviceType.isSmartphone ? -5 : -3 },
     iconReset: { color: '#17A2B8', borderColor: '#17A2B8', backgroundColor: 'white' },

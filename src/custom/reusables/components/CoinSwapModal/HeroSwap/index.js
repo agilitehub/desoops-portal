@@ -57,7 +57,13 @@ const HeroSwap = () => {
           )}
           <iframe
             title={Enums.coinSwap.heroSwap.title}
-            style={{ width: '100%', height: '100%', display: isLoading ? 'none' : 'block' }}
+            style={{
+              width: '100%',
+              height: '100%',
+              display: isLoading ? 'none' : 'block',
+              border: 'none',
+              boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)'
+            }}
             src={`${Enums.coinSwap.heroSwap.url}?depositTicker=${Enums.coinSwap.heroSwap.depositTicker}&destinationTicker=${Enums.coinSwap.heroSwap.destinationTicker}&affiliateAddress=${Enums.values.DESO_OPS_PUBLIC_KEY}`}
             onLoad={handleLoad}
           />

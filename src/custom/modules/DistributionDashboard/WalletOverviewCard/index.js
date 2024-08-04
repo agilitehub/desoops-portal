@@ -8,18 +8,18 @@ const WalletOverviewCard = ({ desoProfile, deviceType }) => {
   const formattedDaoBalance = daoBalance.toLocaleString('en-US', { useGrouping: true })
 
   const styleProps = {
-    title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
-    headStyle: { background: '#DDE6ED', minHeight: deviceType.isSmartphone ? 30 : 40 },
+    title: { fontSize: deviceType.isSmartphone ? 14 : 16 },
+    headStyle: { background: '#fafafa', minHeight: deviceType.isSmartphone ? 30 : 40 },
     bodyStyle: { height: deviceType.isSmartphone ? 58 : deviceType.isTablet ? 70 : 75 },
     rowWrapper: { textAlign: 'center', marginTop: deviceType.isSmartphone ? 0 : deviceType.isTablet ? 4 : 4 },
     divWrapper: {
-      backgroundColor: '#FFA07A',
+      backgroundColor: '#188EFF',
       paddingTop: 2,
       paddingBottom: 2,
       borderRadius: '5px',
       fontSize: deviceType.isSmartphone ? 11 : deviceType.isTablet ? 13 : 14
     },
-    backgroundColor: '#FFA07A',
+    backgroundColor: '#188EFF',
     textColor: '#F3F3F3'
   }
 

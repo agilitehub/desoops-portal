@@ -1,12 +1,30 @@
 import React, { useReducer } from 'react'
 import { identity, configure } from 'deso-protocol'
-import { Col, Row, message, Card, Button } from 'antd'
+import { Col, Row, message, Card } from 'antd'
 import { faCheckCircle, faBitcoinSign } from '@fortawesome/free-solid-svg-icons'
 import { LoginOutlined } from '@ant-design/icons'
+import {
+  Paper,
+  Avatar,
+  Center,
+  Space,
+  Group,
+  Button,
+  Text,
+  Image,
+  Container,
+  SimpleGrid,
+  ThemeIcon,
+  Stack
+} from '@mantine/core'
+import { MdPayments } from 'react-icons/md'
+import { PiHandCoinsDuotone } from 'react-icons/pi'
+import { BsCoin } from 'react-icons/bs'
 
 // Utils
 import styles from './style.module.sass'
 import logo from '../../assets/deso-ops-logo-full.png'
+import feature from '../../assets/feature-animation.gif'
 import VideoModal from '../../reusables/components/VideoModal'
 import Enums from '../../lib/enums'
 import { useSelector } from 'react-redux'
@@ -67,106 +85,136 @@ const Login = () => {
 
   return (
     <>
-      <Row className={styles.wrapper}>
-        <Col span={24}>
-          <Row justify='center'>
-            <Col span={24}>
-              <Card type='inner' size='small' className={styles.card}>
-                <Row justify='center' style={{ marginTop: styleProps.rowMarginTop }}>
-                  <Col
-                    className={styles.cardContent}
-                    style={{
-                      borderRadius: styleProps.contentBorderRadius
-                    }}
-                    xs={24}
-                    sm={22}
-                    md={16}
-                    lg={14}
-                    xl={12}
-                    xxl={10}
-                  >
-                    <center>
-                      <img src={logo} alt='DeSoOps Portal' style={{ width: styleProps.logoWidth }} />
-                      <h1 style={{ marginTop: -20 }}> PORTAL SIGN-IN</h1>
-                    </center>
-                    <Row justify='center' style={{ marginBottom: 10 }}>
-                      <Col>
-                        <Button
-                          type='link'
-                          style={{ cursor: 'pointer', color: '#188EFF', fontSize: 17 }}
-                          onClick={handleWatchIntroductionDeSoOps}
-                        >
-                          Watch Introduction To DeSoOps
-                        </Button>
-                      </Col>
-                    </Row>
-                    <Row justify='center' style={{ marginBottom: 20 }}>
-                      <Col>
-                        <Button
-                          type='link'
-                          style={{ cursor: 'pointer', color: '#188EFF', fontSize: 17 }}
-                          onClick={handleWatchIntroductionDeSo}
-                        >
-                          Watch Introduction To DeSo
-                        </Button>
-                      </Col>
-                    </Row>
-                    <Row justify='space-around' gutter={[12, 12]}>
-                      <Col
-                        span={24}
-                        className={styles.btnWrapper}
-                        style={{ display: 'flex', justifyContent: 'center' }}
-                      >
-                        <button className={styles.signInButton} onClick={handleLogin}>
-                          <div className={styles.icon}>
-                            <LoginOutlined style={{ fontSize: 20 }} />
-                          </div>
-                          <span className={styles.text}>SIGN IN WITH DESO</span>
-                        </button>
-                        <button className={styles.coinSwapButton} onClick={handleLaunchCoinSwap}>
-                          <div className={styles.icon}>
-                            <FontAwesomeIcon style={{ fontSize: 20 }} icon={faBitcoinSign} />
-                          </div>
-                          <span className={styles.text}>COIN SWAP</span>
-                        </button>
-                      </Col>
-                      <Col span={24}>
-                        <div style={{ display: 'flex', justifyContent: 'center', paddingLeft: 5, paddingRight: 5 }}>
-                          <div>
-                            <p style={{ marginTop: 0 }}>
-                              <FontAwesomeIcon className={styles.checkColor} icon={faCheckCircle} />{' '}
-                              <span style={{ fontSize: styleProps.bulletPointFontSize }}>Payment Distributions</span>
-                            </p>
-                            <p style={{ marginTop: -10 }}>
-                              <FontAwesomeIcon className={styles.checkColor} icon={faCheckCircle} />{' '}
-                              <span style={{ fontSize: styleProps.bulletPointFontSize }}>
-                                Distribute to DAO Token, Creator Coin, and NFT Holders
-                              </span>
-                            </p>
-                            <p style={{ marginTop: -10 }}>
-                              <FontAwesomeIcon className={styles.checkColor} icon={faCheckCircle} />{' '}
-                              <span style={{ fontSize: styleProps.bulletPointFontSize }}>
-                                Distribute $DESO, DAO Tokens, and Creator Coins
-                              </span>
-                            </p>
-                          </div>
-                        </div>
-                      </Col>
-                    </Row>
-                  </Col>
-                </Row>
-              </Card>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
+      <Space h={55} />
+      <Container size='lg'>
+        <Paper withBorder p='md' radius='lg' shadow='xl'>
+          <SimpleGrid cols={{ base: 1, sm: 2, lg: 2 }} spacing='sm' verticalSpacing='sm'>
+            <Image
+              src={feature}
+              h={700}
+              radius='md'
+              title='Data illustrations by Storyset'
+              alt='Data illustration from Storyset'
+              visibleFrom='sm'
+            />
+
+            <Image
+              src={feature}
+              fit='contain'
+              radius='md'
+              title='Data illustrations by Storyset'
+              alt='Data illustration from Storyset'
+              hiddenFrom='sm'
+            />
+
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                paddingRight: '40px',
+                paddingLeft: '40px',
+                paddingTop: '40px'
+              }}
+            >
+              <div style={{ flex: 1 }}>
+                <Center>
+                  <Avatar src={logo} size={125} radius={111} />
+                </Center>
+
+                <Space h='md' />
+
+                <Text size='xl' fw={500} ta='center'>
+                  Welcome to DeSoOps
+                </Text>
+
+                <Text size='sm' c='dimmed' ta='center'>
+                  Simplify your DeSo journey: Manage projects, reward supporters, and distribute tokens with ease
+                </Text>
+
+                <Space h={70} />
+
+                <SimpleGrid
+                  cols={3}
+                  spacing={30}
+                  breakpoints={[
+                    { maxWidth: 'md', cols: 2, spacing: 'md' },
+                    { maxWidth: 'sm', cols: 1, spacing: 'sm' }
+                  ]}
+                  justify='center'
+                >
+                  <Stack align='center' spacing='xs'>
+                    <ThemeIcon variant='light' radius='xl' size='xl'>
+                      <MdPayments style={{ width: '75%', height: '75%' }} />
+                    </ThemeIcon>
+                    <Text size='sm' c='dimmed' ta='center' maw={100}>
+                      Manage payment distributions.
+                    </Text>
+                  </Stack>
+
+                  <Stack align='center' spacing='xs'>
+                    <ThemeIcon variant='light' radius='xl' size='xl'>
+                      <PiHandCoinsDuotone style={{ width: '75%', height: '75%' }} />
+                    </ThemeIcon>
+                    <Text size='sm' c='dimmed' ta='center' maw={100}>
+                      Distribute to DAO Token, Creator Coin, and NFT Holders.
+                    </Text>
+                  </Stack>
+
+                  <Stack align='center' spacing='xs'>
+                    <ThemeIcon variant='light' radius='xl' size='xl'>
+                      <BsCoin style={{ width: '75%', height: '75%' }} />
+                    </ThemeIcon>
+                    <Text size='sm' c='dimmed' ta='center' maw={100}>
+                      Distribute $DESO, DAO Tokens, and Creator Coins.
+                    </Text>
+                  </Stack>
+                </SimpleGrid>
+
+                <Space h='xl' />
+
+                <Group justify='center'>
+                  <Button onClick={handleWatchIntroductionDeSo} variant='default' size='xs'>
+                    <Text size='xs'>Watch Introduction To DeSo</Text>
+                  </Button>
+
+                  <Button onClick={handleWatchIntroductionDeSoOps} variant='default' size='xs'>
+                    <Text size='xs'>Watch Introduction To DeSoOps</Text>
+                  </Button>
+                </Group>
+              </div>
+
+              <Space h='md' />
+
+              <Group justify='center' grow mb='xs'>
+                <Button onClick={handleLogin} variant='filled' radius='xl'>
+                  Sign In with DeSo
+                </Button>
+              </Group>
+
+              <Group justify='center' grow mb='xs'>
+                <Button onClick={handleLaunchCoinSwap} variant='filled' radius='xl' color='green'>
+                  Coin Swap
+                </Button>
+              </Group>
+            </div>
+          </SimpleGrid>
+        </Paper>
+      </Container>
+      <Space h={55} />
+
       <VideoModal
         isOpen={state.openVideoModal}
         title={state.videoModalTitle}
         url={state.videoUrl}
         onCloseModal={() => setState({ openVideoModal: false })}
+        closeOnOutsideClick={true}
       />
-      <CoinSwapModal isOpen={state.openCoinSwapModal} onCloseModal={() => setState({ openCoinSwapModal: false })} />
+      <CoinSwapModal
+        isOpen={state.openCoinSwapModal}
+        onCloseModal={() => setState({ openCoinSwapModal: false })}
+        closeOnOutsideClick={true}
+      />
     </>
   )
 }
