@@ -8,7 +8,7 @@ import { Card } from 'antd'
 const ContainerCard = ({ title, deviceType, children }) => {
   const styleProps = {
     card: { width: '100%', overflow: 'hidden', marginTop: 10 },
-    title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
+    title: { fontSize: deviceType.isSmartphone ? 14 : 16 },
     headStyle: { backgroundColor: '#FFA07A', minHeight: deviceType.isSmartphone ? 30 : 40 },
     bodyStyle: { padding: 4, background: '#EDEDED' }
   }

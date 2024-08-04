@@ -1,13 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Button, Dropdown, Image, Space } from 'antd'
+import { Text, Group } from '@mantine/core'
 import { useSelector } from 'react-redux'
 import { DownOutlined } from '@ant-design/icons'
+import { MdOutlineKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md'
 
 import { desoLogout } from 'custom/lib/deso-controller-graphql'
 
 import './style.sass'
 
 const ToolbarDropDown = () => {
+  const [menuOpen, setMenuOpen] = useState(false)
   const profile = useSelector((state) => state.custom.desoData.profile)
 
   const handleGetItems = () => {
@@ -30,6 +33,10 @@ const ToolbarDropDown = () => {
     return [dropDownItems.signOut, dropDownItems.version]
   }
 
+  const handleMenuClick = () => {
+    setMenuOpen(!menuOpen)
+  }
+
   return (
     <div>
       <Dropdown
@@ -38,12 +45,16 @@ const ToolbarDropDown = () => {
         menu={{
           items: handleGetItems()
         }}
+        onOpenChange={(open) => setMenuOpen(open)}
       >
-        <Button icon={<Image src={profile.profilePicUrl} className='toolbar-dropdown-btn-icon' preview={false} />}>
-          <Space>
-            {profile.username}
-            <DownOutlined />
-          </Space>
+        <Button
+          icon={<Image src={profile.profilePicUrl} className='toolbar-dropdown-btn-icon' preview={false} />}
+          onClick={handleMenuClick}
+        >
+          <Group gap='sm'>
+            <Text size='md'>{profile.username}</Text>
+            {menuOpen ? <MdKeyboardArrowUp size='1.5rem' /> : <MdOutlineKeyboardArrowDown size='1.5rem' />}
+          </Group>
         </Button>
       </Dropdown>
     </div>

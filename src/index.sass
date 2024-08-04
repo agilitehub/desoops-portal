@@ -1,11 +1,31 @@
 @import 'styles/helpers.sass'
 @import 'styles/ant-design-overrides.sass'
+@import 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap'
+
+html, body
+    height: 100%
+    margin: 0
 
 body
     margin: 0
-    font-family: 'Roboto', sans-serif
+    font-family: 'Poppins', sans-serif
     font-size: 16px
+    display: flex
+    flex-direction: column
+    min-height: 100%
+    position: relative
+    overflow-x: hidden
+
+    &::before
+        content: ''
+        position: fixed
+        top: 0
+        left: 0
+        right: 0
+        bottom: 0
+        background: linear-gradient(135deg, #FFFFFF, #FF725E)
+        z-index: -1
 
 th, span
-    font-family: 'Roboto', sans-serif
+    font-family: 'Poppins', sans-serif
     font-size: 16px

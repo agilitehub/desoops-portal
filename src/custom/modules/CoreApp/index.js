@@ -39,6 +39,7 @@ import { getDeSoPricing, getInitialDeSoData } from 'custom/lib/deso-controller-g
 import { GQL_GET_INITIAL_DESO_DATA } from 'custom/lib/graphql-models'
 
 import './style.sass'
+import { Paper, Space, Container, Text } from '@mantine/core'
 
 const initialState = {
   initializing: false,
@@ -150,14 +151,20 @@ const CoreApp = () => {
     case Enums.appRenderState.SIGNING_IN:
       return (
         <>
-          <Toolbar />
-          <div className='cs-spin-wrapper'>
-            <Spin size='large' />
-            <span>{state.spinTip}</span>
-          </div>
-          <center>
-            <img src={logo} alt={process.env.REACT_APP_NAME} style={{ width: 300 }} />
-          </center>
+          <Space h={55} />
+          <Container size='sm'>
+            <Paper withBorder p='md' radius='lg' shadow='xl'>
+              <center>
+                <img src={logo} alt={process.env.REACT_APP_NAME} style={{ width: 300 }} />
+              </center>
+              <div className='cs-spin-wrapper'>
+                <Spin size='large' />
+                <Text size='sm' mt={10}>
+                  {state.spinTip}
+                </Text>
+              </div>
+            </Paper>
+          </Container>
         </>
       )
     case Enums.appRenderState.LAUNCH:
@@ -170,7 +177,6 @@ const CoreApp = () => {
     case Enums.appRenderState.LOGIN:
       return (
         <>
-          <Toolbar />
           <Login />
         </>
       )

@@ -2,7 +2,8 @@ import React, { memo, useEffect, useReducer } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DeepDiff } from 'deep-diff'
 // UI Components
-import { Row, Col, message, Divider } from 'antd'
+import { Row, Col, message } from 'antd'
+import { Paper, Text, SimpleGrid, Container, Space, Divider } from '@mantine/core'
 
 // Custom Components
 import ContainerCard from '../../../reusables/components/ContainerCard'
@@ -1028,71 +1029,63 @@ const _BatchTransactionsForm = () => {
 
   return (
     <>
-      <Row justify='center' gutter={[12, 12]}>
-        <Col xs={22} xl={20} xxl={16}>
-          <ContainerCard title={'Distribution Dashboard'} deviceType={deviceType}>
-            <Row gutter={[12, styleProps.verticalGutter]}>
-              <Col span={24}>
-                <Row gutter={[12, styleProps.verticalGutter]}>
-                  <Col xs={24} md={12}>
-                    <WalletOverviewCard desoProfile={desoData.profile} deviceType={deviceType} />
-                  </Col>
-                  <Col xs={24} md={12}>
-                    <QuickActionsCard
-                      desoData={desoData}
-                      configData={configData}
-                      onResetDashboard={resetState}
-                      onRefreshDashboard={handleRefreshDashboard}
-                      rootState={state}
-                      deviceType={deviceType}
-                      setRootState={setState}
-                    />
-                  </Col>
-                </Row>
-                <Divider style={styleProps.divider} />
-                <Row gutter={[12, styleProps.verticalGutter]}>
-                  <Col xs={24} lg={12}>
-                    <SetupCard
-                      desoData={desoData}
-                      rootState={state}
-                      templateNameModal={state.templateNameModal}
-                      onDistributeTo={handleDistributeTo}
-                      onDistributeMyHodlers={handleDistributeMyHodlers}
-                      onDistributeDeSoUser={handleDistributeDeSoUser}
-                      onDistributionType={handleDistributionType}
-                      onTokenToUse={handleTokenToUse}
-                      setRootState={setState}
-                      onConfirmNFT={handleConfirmNFT}
-                      onConfirmCustomList={handleConfirmCustomList}
-                      onSelectTemplate={handleSelectTemplate}
-                      onDeleteTemplate={handleDeleteTemplate}
-                      onSetTemplateName={handleSetTemplateName}
-                      onConfirmDiamondOptions={handleConfirmDiamondOptions}
-                      deviceType={deviceType}
-                      isLoading={state.loading}
-                      distributionTemplates={distributionTemplates}
-                    />
-                  </Col>
-                  <Col xs={24} lg={12}>
-                    <SummaryCard
-                      desoData={desoData}
-                      configData={configData}
-                      rootState={state}
-                      setRootState={setState}
-                      onRefreshDashboard={handlePostDistributionRefresh}
-                      deviceType={deviceType}
-                    />
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-            <Divider style={styleProps.divider} />
-            <Row>
-              <TableData desoData={desoData} rootState={state} setRootState={setState} deviceType={deviceType} />
-            </Row>
-          </ContainerCard>
-        </Col>
-      </Row>
+      <Space h={55} />
+      <Container size='lg'>
+        <Paper withBorder p='md' radius='lg' shadow='xl'>
+          <Text fz={22} ta='center' fw={500} mt={-5}>
+            Distribution Dashboard
+          </Text>
+          <Divider />
+          <Space h='md' />
+          <SimpleGrid cols={{ base: 1, sm: 2, lg: 2 }} spacing='sm' verticalSpacing='sm'>
+            <WalletOverviewCard desoProfile={desoData.profile} deviceType={deviceType} />
+
+            <QuickActionsCard
+              desoData={desoData}
+              configData={configData}
+              onResetDashboard={resetState}
+              onRefreshDashboard={handleRefreshDashboard}
+              rootState={state}
+              deviceType={deviceType}
+              setRootState={setState}
+            />
+            <SetupCard
+              desoData={desoData}
+              rootState={state}
+              templateNameModal={state.templateNameModal}
+              onDistributeTo={handleDistributeTo}
+              onDistributeMyHodlers={handleDistributeMyHodlers}
+              onDistributeDeSoUser={handleDistributeDeSoUser}
+              onDistributionType={handleDistributionType}
+              onTokenToUse={handleTokenToUse}
+              setRootState={setState}
+              onConfirmNFT={handleConfirmNFT}
+              onConfirmCustomList={handleConfirmCustomList}
+              onSelectTemplate={handleSelectTemplate}
+              onDeleteTemplate={handleDeleteTemplate}
+              onSetTemplateName={handleSetTemplateName}
+              onConfirmDiamondOptions={handleConfirmDiamondOptions}
+              deviceType={deviceType}
+              isLoading={state.loading}
+              distributionTemplates={distributionTemplates}
+            />
+
+            <SummaryCard
+              desoData={desoData}
+              configData={configData}
+              rootState={state}
+              setRootState={setState}
+              onRefreshDashboard={handlePostDistributionRefresh}
+              deviceType={deviceType}
+            />
+          </SimpleGrid>
+
+          <Space h='sm' />
+
+          <TableData desoData={desoData} rootState={state} setRootState={setState} deviceType={deviceType} />
+        </Paper>
+      </Container>
+      <Space h={55} />
       <PaymentModal props={state.paymentModal} onPaymentDone={handlePaymentDone} onRetryExecute={handleRetryExecute} />
     </>
   )
