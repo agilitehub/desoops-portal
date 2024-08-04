@@ -17,6 +17,12 @@ import Enums from 'custom/lib/enums'
 // Import default Stylesheet for application
 import 'index.sass'
 
+// Mantine UI Styles - https://mantine.dev/
+import '@mantine/core/styles.css'
+
+// Mantine UI Wrapper
+import { MantineProvider } from '@mantine/core'
+
 // Nullify console outputs for production
 if (process.env.NODE_ENV === Enums.values.ENV_PRODUCTION) {
   console.error = function () {}
@@ -73,7 +79,9 @@ root.render(
   <Provider store={Store}>
     <ApolloProvider client={client}>
       <DeSoIdentityProvider>
-        <RouterProvider router={router} />
+        <MantineProvider>
+          <RouterProvider router={router} />
+        </MantineProvider>
       </DeSoIdentityProvider>
     </ApolloProvider>
   </Provider>
