@@ -1,27 +1,44 @@
-// This component loads an Ant Design Modal component.
-// Using react-player and a passed url, the video will be displayed in the Modal.
-// additional props can be passed to this component to control the video player.
 import React from 'react'
 import ReactPlayer from 'react-player/youtube'
+import { Modal } from 'antd'
 
-import { Row, Modal, Col } from 'antd'
-
-const VideoModal = ({ isOpen, title, url, onCloseModal }) => {
+const VideoModal = ({ isOpen, url, onCloseModal, closeOnOutsideClick = false, title }) => {
   return (
     <Modal
       title={title}
       open={isOpen}
-      onOk={onCloseModal}
+      onCancel={onCloseModal}
       closeIcon={false}
-      okText='Done'
-      cancelButtonProps={{ style: { display: 'none' } }}
+      footer={null} // Remove the footer entirely
       destroyOnClose
+      width='80%'
+      styles={{
+        header: { display: 'none' },
+        body: { padding: 0 },
+        content: { padding: 0 }
+      }}
+      centered
+      maskClosable={closeOnOutsideClick}
     >
-      <Row style={{ height: 400 }}>
-        <Col span={24}>
-          <ReactPlayer url={url} width='100%' height='100%' controls playing />
-        </Col>
-      </Row>
+      <div
+        style={{
+          position: 'relative',
+          paddingTop: '56.25%' // 16:9 aspect ratio
+        }}
+      >
+        <ReactPlayer
+          url={url}
+          width='100%'
+          height='100%'
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0
+          }}
+          controls
+          playing
+        />
+      </div>
     </Modal>
   )
 }

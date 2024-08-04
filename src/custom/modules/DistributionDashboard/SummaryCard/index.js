@@ -49,7 +49,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
   const client = useApolloClient()
 
   const styleProps = {
-    title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
+    title: { fontSize: deviceType.isSmartphone ? 14 : 16 },
     divider: { margin: '7px 0' },
     btnExecuteActive: {
       color: 'green',
@@ -677,7 +677,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
     <Card
       title={<span style={styleProps.title}>Step 2: Distribution Summary</span>}
       size='small'
-      headStyle={{ background: '#DDE6ED' }}
+      headStyle={{ background: '#fafafa' }}
     >
       <Row>
         <Col
