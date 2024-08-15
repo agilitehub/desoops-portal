@@ -261,7 +261,7 @@ export const getDeSoPricing = async (currDeSoPrice) => {
 
   try {
     desoPrice = await getExchangeRates()
-    desoPrice = desoPrice.USDCentsPerDeSoCoinbase / 100
+    desoPrice = desoPrice.USDCentsPerDeSoExchangeRate / 100
     return desoPrice
   } catch (e) {
     return currDeSoPrice
