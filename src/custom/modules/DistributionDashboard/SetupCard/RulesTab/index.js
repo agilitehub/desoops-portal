@@ -6,7 +6,7 @@ import React from 'react'
 import { Row, Col, Select, Divider, InputNumber, Radio, Switch, message } from 'antd'
 import { calculateEstimatedPayment, setupHodlers } from '../../controller'
 import { cloneDeep } from 'lodash'
-import Enums from 'custom/lib/enums'
+import Enums from '../../../../lib/enums'
 
 const styleParams = {
   col1XS: 24,
@@ -119,7 +119,9 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
             onChange={handleSpreadAmountBasedOn}
             disabled={rootState.isExecuting || rootState.distributionType === Enums.paymentTypes.DIAMONDS}
           >
-            <Radio.Button value={'Ownership'}>% Ownership</Radio.Button>
+            <Radio.Button value={'Ownership'}>
+              % {rootState.distributeTo === Enums.values.DESO_OPS ? 'Usage' : 'Ownership'}
+            </Radio.Button>
             <Radio.Button value={'Equal Spread'}>Equal Spread</Radio.Button>
           </Radio.Group>
         </Col>

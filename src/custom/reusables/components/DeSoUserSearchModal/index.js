@@ -11,9 +11,9 @@ import { Row, Modal, Col, Spin, Select, Divider, Button } from 'antd'
 import { cloneDeep, debounce } from 'lodash'
 import Enums from '../../../lib/enums'
 import { SortAscendingOutlined } from '@ant-design/icons'
-import { SEARCH_PROFILES } from 'custom/lib/graphql-models'
+import { SEARCH_PROFILES } from '../../../lib/graphql-models'
 import { useApolloClient } from '@apollo/client'
-import { sortByKey } from 'custom/lib/utils'
+import { sortByKey } from '../../../lib/utils'
 
 const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfirm, onCancel }) => {
   const [search, setSearch] = useState([])

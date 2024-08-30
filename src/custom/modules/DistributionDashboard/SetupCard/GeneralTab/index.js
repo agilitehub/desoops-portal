@@ -6,7 +6,7 @@ import Enums from '../../../../lib/enums'
 // App Components
 import { debounce } from 'lodash'
 import { Link } from 'react-scroll'
-import { SEARCH_PROFILES } from 'custom/lib/graphql-models'
+import { SEARCH_PROFILES } from '../../../../lib/graphql-models'
 import { UsergroupAddOutlined } from '@ant-design/icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGem } from '@fortawesome/free-regular-svg-icons'
@@ -238,6 +238,24 @@ const GeneralTab = ({
     setRootState({ diamondOptionsModal: { ...rootState.diamondOptionsModal, isOpen: true } })
   }
 
+  const generateDistroList = () => {
+    const distroList = [
+      { key: Enums.values.CREATOR, value: Enums.values.CREATOR, label: 'Creator Coin Holders' },
+      { key: Enums.values.DAO, value: Enums.values.DAO, label: 'DAO Token Holders' },
+      { key: Enums.values.NFT, value: Enums.values.NFT, label: 'NFT Owners' },
+      { key: Enums.values.FOLLOWERS, value: Enums.values.FOLLOWERS, label: 'Followers' },
+      { key: Enums.values.FOLLOWING, value: Enums.values.FOLLOWING, label: 'Following' },
+      { key: Enums.values.POLL, value: Enums.values.POLL, label: 'Poll Voters' },
+      { key: Enums.values.DESO_OPS, value: Enums.values.DESO_OPS, label: 'DeSoOps Users' }
+    ]
+
+    distroList.sort((a, b) => a.label.localeCompare(b.label))
+
+    distroList.push({ key: Enums.values.CUSTOM, value: Enums.values.CUSTOM, label: 'Custom List' })
+
+    return distroList
+  }
+
   return (
     <>
       <Row>
@@ -258,13 +276,13 @@ const GeneralTab = ({
               style={styleProps.select}
             >
               <Select.Option value={Enums.values.EMPTY_STRING}>- Select -</Select.Option>
-              <Select.Option value={Enums.values.CREATOR}>Creator Coin Holders</Select.Option>
-              <Select.Option value={Enums.values.DAO}>DAO Token Holders</Select.Option>
-              <Select.Option value={Enums.values.NFT}>NFT Owners</Select.Option>
-              <Select.Option value={Enums.values.FOLLOWERS}>Followers</Select.Option>
-              <Select.Option value={Enums.values.FOLLOWING}>Following</Select.Option>
-              <Select.Option value={Enums.values.POLL}>Poll Voters</Select.Option>
-              <Select.Option value={Enums.values.CUSTOM}>Custom List</Select.Option>
+              {generateDistroList().map((entry) => {
+                return (
+                  <Select.Option key={entry.key} value={entry.value}>
+                    {entry.label}
+                  </Select.Option>
+                )
+              })}
             </Select>
             {rootState.distributeTo === Enums.values.CUSTOM ? (
               <Button

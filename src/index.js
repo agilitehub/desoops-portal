@@ -8,14 +8,14 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 // Utilities
-import { initAgilite } from 'custom/lib/agilite-controller'
-import Store from 'store'
-import App from 'custom/modules/CoreApp'
-import OptOut, { loader as optOutLoader } from 'custom/modules/OptOut'
-import Enums from 'custom/lib/enums'
+import { initAgilite } from './custom/lib/agilite-controller'
+import Store from './store'
+import App from './custom/modules/CoreApp'
+import OptOut, { loader as optOutLoader } from './custom/modules/OptOut'
+import Enums from './custom/lib/enums'
 
 // Import default Stylesheet for application
-import 'index.sass'
+import './index.sass'
 
 // Nullify console outputs for production
 if (process.env.NODE_ENV === Enums.values.ENV_PRODUCTION) {

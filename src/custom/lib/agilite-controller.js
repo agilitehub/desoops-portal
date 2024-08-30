@@ -48,6 +48,25 @@ export const updateDistributionTransaction = async (id, data) => {
   return response.data
 }
 
+// Create a function that fetches all trasactions from Agilit-e
+export const getDistributionTransactions = async () => {
+  const response = await agilite.Connectors.execute('distribution_transactions', 'aggregate', {
+    pipeline: JSON.stringify([
+      {
+        $group: {
+          _id: '$publicKey',
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { count: -1 }
+      }
+    ])
+  })
+
+  return response.data
+}
+
 // Fetch Distribution Templates for user
 export const getDistributionTemplates = async (publicKey) => {
   const response = await agilite.Connectors.execute('distribution_templates', 'find', {

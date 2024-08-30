@@ -8,7 +8,7 @@ import DeSoNFTSearchModal from '../../../reusables/components/DeSoNFTSearchModal
 import DeSoUserSearchModal from '../../../reusables/components/DeSoUserSearchModal'
 import SelectTemplateModal from '../SelectTemplateModal'
 import TemplateNameModal from '../TemplateNameModal'
-import DiamondOptionsModal from 'custom/reusables/components/DiamondOptionsModal'
+import DiamondOptionsModal from '../../../reusables/components/DiamondOptionsModal'
 
 const SetupCard = ({
   desoData,

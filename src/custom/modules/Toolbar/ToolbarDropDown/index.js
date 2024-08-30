@@ -1,9 +1,9 @@
 import React from 'react'
-import { Button, Dropdown, Image, Space } from 'antd'
+import { Dropdown, Image, Space } from 'antd'
 import { useSelector } from 'react-redux'
 import { DownOutlined } from '@ant-design/icons'
 
-import { desoLogout } from 'custom/lib/deso-controller-graphql'
+import { desoLogout } from '../../../lib/deso-controller-graphql'
 
 import './style.sass'
 

@@ -12,13 +12,13 @@ import { useApolloClient } from '@apollo/client'
 import { Spin } from 'antd'
 
 // App Components
-import DistributionDashboard from 'custom/modules/DistributionDashboard'
-import Login from 'custom/modules/Login'
-import Toolbar from 'custom/modules/Toolbar'
+import DistributionDashboard from '../DistributionDashboard'
+import Login from '../Login'
+import Toolbar from '../Toolbar'
 
 // Utils
-import Enums from 'custom/lib/enums'
-import logo from 'custom/assets/deso-ops-logo-full.png'
+import Enums from '../../lib/enums'
+import logo from '../../assets/deso-ops-logo-full.png'
 import {
   setDeSoData,
   setConfigData,
@@ -26,17 +26,17 @@ import {
   setDeviceType,
   setDeSoPrice,
   setDistributionTemplates
-} from 'custom/reducer'
+} from '../../reducer'
 import {
   getConfigData,
   getDistributionTemplates,
   getOptOutProfile,
   getOptOutTemplate
-} from 'custom/lib/agilite-controller'
+} from '../../lib/agilite-controller'
 
 import { renderApp } from './controller'
-import { getDeSoPricing, getInitialDeSoData } from 'custom/lib/deso-controller-graphql'
-import { GQL_GET_INITIAL_DESO_DATA } from 'custom/lib/graphql-models'
+import { getDeSoPricing, getInitialDeSoData } from '../../lib/deso-controller-graphql'
+import { GQL_GET_INITIAL_DESO_DATA } from '../../lib/graphql-models'
 
 import './style.sass'
 

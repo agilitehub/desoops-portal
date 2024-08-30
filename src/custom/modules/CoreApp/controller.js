@@ -1,4 +1,4 @@
-import Enums from 'custom/lib/enums'
+import Enums from '../../lib/enums'
 
 export const renderApp = async (currentUser, isLoading, state) => {
   let newState = {}

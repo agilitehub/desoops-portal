@@ -3,10 +3,10 @@ import { thunk } from 'redux-thunk'
 import { composeWithDevTools } from 'redux-devtools-extension'
 
 // Utilities
-import Enums from 'custom/lib/enums'
+import Enums from './custom/lib/enums'
 
 // Reducers
-import customReducer from 'custom/reducer'
+import customReducer from './custom/reducer'
 
 const devTools =
   process.env.NODE_ENV === Enums.values.ENV_PRODUCTION

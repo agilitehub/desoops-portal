@@ -17,7 +17,7 @@ import { desoUserModel } from './data-models'
 import { calculateDaysSinceLastActive, cleanString, hexToInt, sortByKey } from './utils'
 import nftLogo from '../assets/nft-default-logo.png'
 import pollLogo from '../assets/poll-default-logo.png'
-import { setupHodlers } from 'custom/modules/DistributionDashboard/controller'
+import { setupHodlers } from '../modules/DistributionDashboard/controller'
 
 const desoConfigure = {
   appName: process.env.REACT_APP_NAME,
@@ -145,7 +145,7 @@ export const processTokenHodlers = async (distributeTo, gqlData, rootState, deso
   }
 }
 
-export const processCustomList = async (gqlData, rootState, desoData, configData) => {
+export const processCustomList = async (gqlData, rootState, desoData, configData, sortByUsername = true) => {
   const originalHodlers = []
   let newEntry = null
 
@@ -162,7 +162,10 @@ export const processCustomList = async (gqlData, rootState, desoData, configData
       originalHodlers.push(newEntry)
     }
 
-    sortByKey(originalHodlers, 'username')
+    if (sortByUsername) {
+      sortByKey(originalHodlers, 'username')
+    }
+
     const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(originalHodlers, rootState, desoData)
 
     return { originalHodlers, finalHodlers, selectedTableKeys, tokenTotal }
@@ -437,6 +440,7 @@ export const createCustomUserEntry = (entry, optOutProfile) => {
           }
         }
 
+        newEntry.deSoOpsTransactionCount = entry.transactionCount
         newEntry.publicKey = entry.publicKey
         newEntry.username = entry.username
         newEntry.lastActiveDays = lastActiveDays

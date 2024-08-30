@@ -89,6 +89,7 @@ export const distributionTemplateModel = () => {
     myHodlers: true,
     distributeDeSoUser: '',
     distributionType: '',
+    paymentType: '',
     tokenToUse: '',
     distributionAmount: 0,
     nftId: '',

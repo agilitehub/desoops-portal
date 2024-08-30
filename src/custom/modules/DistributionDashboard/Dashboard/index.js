@@ -41,6 +41,7 @@ import {
   createDistributionTemplate,
   deleteDistributionTemplate,
   getConfigData,
+  getDistributionTransactions,
   getOptOutProfile,
   getOptOutTemplate,
   updateDistributionTemplate,
@@ -55,8 +56,8 @@ import {
   GET_POLL_POST,
   GQL_GET_INITIAL_DESO_DATA,
   GQL_GET_TOKEN_HOLDERS
-} from 'custom/lib/graphql-models'
-import { buildGQLProps, randomize } from 'custom/lib/utils'
+} from '../../../lib/graphql-models'
+import { buildGQLProps, randomize } from '../../../lib/utils'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
@@ -487,6 +488,7 @@ const _BatchTransactionsForm = () => {
       tmpState.distributeDeSoUser = template.distributeDeSoUser
       tmpState.tokenToUse = template.tokenToUse
       tmpState.distributionAmount = template.distributionAmount
+      tmpState.paymentType = template.paymentType
       tmpState.rulesEnabled = template.rules.enabled
       tmpState.spreadAmountBasedOn = template.rules.spreadAmountBasedOn
       tmpState.filterUsers = template.rules.filterUsers
@@ -716,6 +718,7 @@ const _BatchTransactionsForm = () => {
     let hodlerData = null
     let gqlProps = null
     let gqlData = null
+    let mongoData = null
     let publicKeys = null
     let nftEntries = null
     let nftHodlers = null
@@ -756,6 +759,38 @@ const _BatchTransactionsForm = () => {
           hodlerData = await processTokenHodlers(distributeTo, gqlData.data, tmpState, desoData, configData)
 
           break
+        case Enums.values.DESO_OPS:
+          mongoData = await getDistributionTransactions()
+          publicKeys = mongoData.map((item) => item._id)
+
+          gqlProps = {
+            filter: {
+              publicKey: {
+                in: publicKeys
+              }
+            }
+          }
+
+          gqlData = await client.query({
+            query: FETCH_MULTIPLE_PROFILES,
+            variables: gqlProps,
+            fetchPolicy: 'no-cache'
+          })
+
+          if (gqlData.data.profiles.nodes && gqlData.data.profiles.nodes.length > 0) {
+            gqlData.data.profiles.nodes.map((profile) => {
+              const tmpIndex = mongoData.findIndex((item) => item._id === profile.publicKey)
+              profile.transactionCount = mongoData[tmpIndex].count
+              return profile
+            })
+
+            // Sort the data by transaction count
+            gqlData.data.profiles.nodes.sort((a, b) => (a.transactionCount < b.transactionCount ? 1 : -1))
+          }
+
+          hodlerData = await processCustomList(gqlData.data, tmpState, desoData, configData, false)
+
+          break
         case Enums.values.CUSTOM:
           // Build the list of public keys
           publicKeys = tmpState.customListModal.userList.map((item) => item.publicKey)
@@ -775,7 +810,7 @@ const _BatchTransactionsForm = () => {
             fetchPolicy: 'no-cache'
           })
 
-          hodlerData = await processCustomList(gqlData.data, tmpState, desoData, configData)
+          hodlerData = await processCustomList(gqlData.data, tmpState, desoData, configData, true)
 
           break
         case Enums.values.NFT:

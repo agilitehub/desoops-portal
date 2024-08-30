@@ -13,6 +13,7 @@ const Enums = {
     CREATOR: 'creator',
     NFT: 'nft',
     POLL: 'poll',
+    DESO_OPS: 'deso_ops',
     CUSTOM: 'custom',
     POST: 'post',
     HEX_PREFIX: '0x',
@@ -31,7 +32,8 @@ const Enums = {
     DESO: '$DESO',
     DAO: 'DAO',
     CREATOR: 'CC',
-    DIAMONDS: 'Diamonds'
+    DIAMONDS: 'Diamonds',
+    USD: 'USD'
   },
   defaults: {
     USER_SEARCH_NUM_TO_FETCH: 50,

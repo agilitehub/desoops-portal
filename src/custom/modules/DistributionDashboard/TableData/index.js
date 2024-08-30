@@ -10,6 +10,7 @@ import { cloneDeep } from 'lodash'
 
 const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
   const [tableData, setTableData] = useState([])
+  const { desoPrice } = desoData
   const { message } = App.useApp()
 
   const handleSelectionChange = async (updatedKeys) => {
@@ -33,6 +34,16 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
 
       await calculateEstimatedPayment(
         newState.distributionAmount,
+        newState.distributionType,
+        newState.spreadAmountBasedOn,
+        finalHodlers,
+        desoData
+      )
+    } else if (rootState.distributionType === Enums.paymentTypes.DESO) {
+      await calculateEstimatedPayment(
+        rootState.paymentType === Enums.paymentTypes.USD
+          ? newState.distributionAmount / desoPrice
+          : newState.distributionAmount,
         newState.distributionType,
         newState.spreadAmountBasedOn,
         finalHodlers,
@@ -112,7 +123,7 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
   } else {
     tableColumns = [
       {
-        title: 'User (Token Balance)',
+        title: rootState.distributeTo === Enums.values.DESO_OPS ? 'User (Transaction Count)' : 'User (Token Balance)',
         dataIndex: 'username',
         key: 'username',
         width: '35%',
@@ -128,14 +139,19 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
                 preview={false}
               />
               <span style={{ color: theme.twitterBootstrap.primary, marginLeft: 5 }}>{`${value} (${
-                entry.tokenBalanceLabel
-              }${entry.isCustom ? '' : ' token(s)'})`}</span>
+                rootState.distributeTo === Enums.values.DESO_OPS
+                  ? entry.deSoOpsTransactionCount
+                  : entry.tokenBalanceLabel
+              }${
+                entry.isCustom ? '' : rootState.distributeTo === Enums.values.DESO_OPS ? ' transaction(s)' : ' token(s)'
+              })`}</span>
             </div>
           )
         }
       },
       {
-        title: '% Ownership -> Est Payment',
+        title:
+          rootState.distributeTo === Enums.values.DESO_OPS ? '% Usage -> Est Payment' : '% Ownership -> Est Payment',
         dataIndex: 'percentOwnershipLabel',
         key: 'percentOwnershipLabel',
         width: '30%',

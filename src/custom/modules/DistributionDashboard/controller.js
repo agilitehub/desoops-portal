@@ -1,4 +1,4 @@
-import Axios from 'agilite-utils/axios'
+import Axios from 'axios'
 
 // Utils
 import Enums from '../../lib/enums'
@@ -75,16 +75,32 @@ export const calculatePercentages = (hodlers, sortOrder = 'desc') => {
 
     try {
       const tokenTotal = hodlers.reduce((total, entry) => {
+        let value = 0
+
         // We only want to calculate the percentage for active entries
+        if (entry.deSoOpsTransactionCount) {
+          value = entry.deSoOpsTransactionCount
+        } else {
+          value = entry.tokenBalance
+        }
+
         if (!entry.isActive) return total
-        return total + entry.tokenBalance
+        return total + value
       }, 0)
 
       hodlers.map((entry) => {
-        if (entry.isActive && entry.tokenBalance > 0) {
-          percentOwnership = (entry.tokenBalance / tokenTotal) * 100
+        let value = 0
+
+        if (entry.deSoOpsTransactionCount) {
+          value = entry.deSoOpsTransactionCount
+        } else {
+          value = entry.tokenBalance
+        }
+
+        if (entry.isActive && value > 0) {
+          percentOwnership = (value / tokenTotal) * 100
           percentOwnershipLabel = Math.floor(percentOwnership * 1000) / 1000
-          tokenBalanceLabel = entry.tokenBalance.toString()
+          tokenBalanceLabel = value.toString()
         } else {
           percentOwnership = 0
           percentOwnershipLabel = '0'
@@ -465,6 +481,7 @@ export const prepDistributionTemplate = async (desoData, rootState, name, rulesE
     transaction.distributionType = rootState.distributionType
     transaction.distributionAmount = rootState.distributionAmount
     transaction.tokenToUse = rootState.tokenToUse
+    transaction.paymentType = rootState.paymentType
 
     transaction.nftId = rootState.nftMetaData.id || ''
     transaction.nftUrl = rootState.nftUrl || ''

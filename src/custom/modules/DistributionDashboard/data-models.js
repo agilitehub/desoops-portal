@@ -1,5 +1,7 @@
 // Data Models that get used for Redux States and React Components
 
+import Enums from '../../lib/enums'
+
 // Component States
 export const distributionDashboardState = (feePerTransactionUSD) => {
   return {
@@ -36,7 +38,8 @@ export const distributionDashboardState = (feePerTransactionUSD) => {
     paymentModal: paymentModal(),
     selectTemplateModal: selectTemplateModal(),
     templateNameModal: templateNameModal(),
-    diamondOptionsModal: diamondOptionsModal()
+    diamondOptionsModal: diamondOptionsModal(),
+    paymentType: Enums.paymentTypes.DESO
   }
 }
 

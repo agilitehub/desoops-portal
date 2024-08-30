@@ -2,25 +2,25 @@ import React, { useEffect, useReducer } from 'react'
 import { identity, configure } from 'deso-protocol'
 import { useLoaderData } from 'react-router-dom'
 import { useApolloClient } from '@apollo/client'
-import { Col, Row, message, Card } from 'antd'
+import { Col, Row, message, Card, Modal } from 'antd'
 import { LoginOutlined } from '@ant-design/icons'
 
 // Utils
 import Enums from '../../lib/enums'
 import { useDispatch, useSelector } from 'react-redux'
 import { generateProfilePicUrl, getDeSoConfig } from '../../lib/deso-controller-graphql'
-import Toolbar from 'custom/modules/Toolbar'
+import Toolbar from '../../modules/Toolbar'
 
-import Spinner from 'custom/reusables/components/Spinner'
-import { FETCH_SINGLE_PROFILE } from 'custom/lib/graphql-models'
-import { createOptOutProfile, getOptOutProfile, updateOptOutProfile } from 'custom/lib/agilite-controller'
-import { optOutModel } from 'custom/lib/data-models'
+import Spinner from '../../reusables/components/Spinner'
+import { FETCH_SINGLE_PROFILE } from '../../lib/graphql-models'
+import { createOptOutProfile, getOptOutProfile, updateOptOutProfile } from '../../lib/agilite-controller'
+import { optOutModel } from '../../lib/data-models'
 import Completion from './Completion'
 
-import logo from 'custom/assets/deso-ops-logo-full.png'
+import logo from '../../assets/deso-ops-logo-full.png'
 import styles from './style.module.sass'
 import { cloneDeep } from 'lodash'
-import { setDeSoData } from 'custom/reducer'
+import { setDeSoData } from '../../reducer'
 
 configure(getDeSoConfig())
 
@@ -41,7 +41,8 @@ const OptOut = () => {
     renderState: Enums.appRenderState.PREP,
     optOutStatus: null,
     username: null,
-    publicKey: null
+    publicKey: null,
+    optOutProfileState: null
   })
 
   useEffect(() => {
@@ -120,6 +121,8 @@ const OptOut = () => {
 
           dispatch(setDeSoData(newDeSoData))
           setState({ renderState: Enums.appRenderState.INIT })
+        } else if (state.identityState.event === 'LOGOUT_END' && !state.identityState.currentUser) {
+          setState({ renderState: Enums.appRenderState.LOGIN })
         }
       } catch (e) {
         console.error(e)
@@ -140,6 +143,7 @@ const OptOut = () => {
       let optOutProfile = null
       let optOutEntry = null
       let response = null
+      let tmpUsername = null
       let qry = null
 
       try {
@@ -173,6 +177,8 @@ const OptOut = () => {
 
               return
             } else {
+              tmpUsername = gqlData.username
+
               setState({
                 username: gqlData.username,
                 publicKey: gqlData.publicKey
@@ -184,6 +190,8 @@ const OptOut = () => {
             response = await getOptOutProfile(qry)
 
             if (response) {
+              setState({ optOutProfileState: response })
+
               // Check publicKey in response.recipients array to see if the user has already been opted out
               optOutEntry = response.recipients.find((recipient) => recipient.publicKey === desoData.profile.publicKey)
 
@@ -194,18 +202,26 @@ const OptOut = () => {
                   optOutStatus: 'CONFLICT'
                 })
               } else {
-                // User has not been opted out. Add them to the recipients array
-                response.recipients.push({
-                  publicKey: desoData.profile.publicKey,
-                  timestamp: new Date()
-                })
+                Modal.confirm({
+                  title: 'Opt Out Confirmation',
+                  content: `Are you sure you want to Opt Out of DeSoOps tagging via user - @${tmpUsername}?`,
+                  onOk: async () => {
+                    // User has not been opted out. Add them to the recipients array
+                    response.recipients.push({
+                      publicKey: desoData.profile.publicKey,
+                      timestamp: new Date()
+                    })
 
-                // Update the OptOut Profile in Agilit-e
-                response = await updateOptOutProfile(response._id, response)
+                    // Update the OptOut Profile in Agilit-e
+                    response = await updateOptOutProfile(response._id, response)
 
-                setState({
-                  renderState: Enums.appRenderState.COMPLETION,
-                  optOutStatus: 'SUCCESS'
+                    setState({
+                      renderState: Enums.appRenderState.COMPLETION,
+                      optOutStatus: 'SUCCESS'
+                    })
+                  },
+                  okText: 'Yes',
+                  cancelText: 'No'
                 })
               }
             } else {
@@ -231,6 +247,56 @@ const OptOut = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.renderState])
 
+  const handleOptIn = async () => {
+    let tmpOptOutProfileState = cloneDeep(state.optOutProfileState)
+    let tmpIndex = -1
+
+    try {
+      setState({ renderState: Enums.appRenderState.LOADING })
+
+      tmpIndex = tmpOptOutProfileState.recipients.findIndex(
+        (recipient) => recipient.publicKey === desoData.profile.publicKey
+      )
+
+      if (tmpIndex > -1) {
+        tmpOptOutProfileState.recipients.splice(tmpIndex, 1)
+
+        tmpOptOutProfileState = await updateOptOutProfile(tmpOptOutProfileState._id, tmpOptOutProfileState)
+
+        setState({
+          optOutProfileState: tmpOptOutProfileState,
+          renderState: Enums.appRenderState.COMPLETION,
+          optOutStatus: 'SUCCESS_OPT_IN'
+        })
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const handleOptOut = async () => {
+    let tmpOptOutProfileState = cloneDeep(state.optOutProfileState)
+
+    try {
+      setState({ renderState: Enums.appRenderState.LOADING })
+
+      tmpOptOutProfileState.recipients.push({
+        publicKey: desoData.profile.publicKey,
+        timestamp: new Date()
+      })
+
+      tmpOptOutProfileState = await updateOptOutProfile(tmpOptOutProfileState._id, tmpOptOutProfileState)
+
+      setState({
+        optOutProfileState: tmpOptOutProfileState,
+        renderState: Enums.appRenderState.COMPLETION,
+        optOutStatus: 'SUCCESS'
+      })
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   const handleLogin = async () => {
     try {
       await identity.login()
@@ -249,7 +315,7 @@ const OptOut = () => {
               <Col span={24}>
                 <center>
                   <img src={logo} alt='DeSoOps Portal' className={styles.logo} />
-                  <span className={styles.header}>OPT OUT OF DESO OPS TAGGING</span>
+                  <span className={styles.header}>OPT IN/OUT OF DESO OPS TAGGING</span>
                 </center>
                 {state.renderState === Enums.appRenderState.PREP ? <Spinner tip={Enums.spinnerMessages.PREP} /> : null}
 
@@ -261,7 +327,9 @@ const OptOut = () => {
                   <Spinner tip={Enums.spinnerMessages.INIT_REQUEST} />
                 ) : null}
 
-                {state.renderState === Enums.appRenderState.COMPLETION ? <Completion rootState={state} /> : null}
+                {state.renderState === Enums.appRenderState.COMPLETION ? (
+                  <Completion handleOptIn={handleOptIn} handleOptOut={handleOptOut} rootState={state} />
+                ) : null}
 
                 {state.renderState === Enums.appRenderState.LOGIN ? (
                   <Row>

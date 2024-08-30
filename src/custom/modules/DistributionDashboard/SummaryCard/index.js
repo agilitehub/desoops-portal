@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer } from 'react'
-import { Card, Row, Col, Divider, InputNumber, Button, Alert, App } from 'antd'
+import { Card, Row, Col, Divider, InputNumber, Button, Alert, App, Select } from 'antd'
 import { cloneDeep } from 'lodash'
 import { RightCircleOutlined } from '@ant-design/icons'
 
@@ -24,9 +24,9 @@ import { createDistributionTransaction, updateDistributionTransaction } from '..
 
 import './style.sass'
 import { identity } from 'deso-protocol'
-import { GET_POSTS } from 'custom/lib/graphql-models'
+import { GET_POSTS } from '../../../lib/graphql-models'
 import { useApolloClient } from '@apollo/client'
-import { diamondPostModel } from 'custom/lib/data-models'
+import { diamondPostModel } from '../../../lib/data-models'
 
 const styleParams = {
   labelColXS: 11,
@@ -162,9 +162,16 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
         tokenToDistribute = `${CoreEnums.paymentTypes.DESO} (~${desoData.profile.desoBalance})`
         isInFinalStage = true
 
-        if (totalFeeDESO + distributionAmount > desoData.profile.desoBalance) {
-          amountExceeded = true
-          warningMsg = 'The Amount exceeds your DESO Balance.'
+        if (rootState.paymentType === CoreEnums.paymentTypes.USD) {
+          if (totalFeeDESO + distributionAmount / desoPrice > desoData.profile.desoBalance) {
+            amountExceeded = true
+            warningMsg = 'The Amount exceeds your DESO Balance.'
+          }
+        } else {
+          if (totalFeeDESO + distributionAmount > desoData.profile.desoBalance) {
+            amountExceeded = true
+            warningMsg = 'The Amount exceeds your DESO Balance.'
+          }
         }
       } else if (rootState.distributionType === CoreEnums.paymentTypes.DIAMONDS) {
         tokenToDistribute = `${CoreEnums.paymentTypes.DIAMONDS}`
@@ -254,7 +261,8 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
     configData.desoGasFeesSendDESONanos,
     configData.desoGasFeesSendCCNanos,
     configData.desoGasFeesSendDAONanos,
-    desoData.profile.publicKey
+    desoData.profile.publicKey,
+    rootState.paymentType
   ])
 
   useEffect(() => {
@@ -293,7 +301,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
     let finalHodlers = cloneDeep(rootState.finalHodlers)
 
     await calculateEstimatedPayment(
-      distributionAmount,
+      rootState.paymentType === CoreEnums.paymentTypes.USD ? distributionAmount / desoPrice : distributionAmount,
       rootState.distributionType,
       rootState.spreadAmountBasedOn,
       finalHodlers,
@@ -304,10 +312,14 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
 
   const handleConfirmExecute = () => {
     const tokenName = rootState.tokenToUseLabel ? `$${rootState.tokenToUseLabel} token(s)` : rootState.distributionType
+
     const amount =
       rootState.distributionType === CoreEnums.paymentTypes.DIAMONDS
         ? tokenName
+        : rootState.paymentType === CoreEnums.paymentTypes.USD
+        ? `${(rootState.distributionAmount / desoPrice).toFixed(3)} ${tokenName}`
         : `${rootState.distributionAmount} ${tokenName}`
+
     const users = rootState.distributionType === CoreEnums.paymentTypes.DIAMONDS ? 'posts' : 'users'
     let title = `Please confirm you are ready to distribute ${amount}`
     title += ` to ${state.noOfPaymentTransactions} ${users}.`
@@ -673,6 +685,26 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
     }
   }
 
+  const handleGetAmountAddon = () => {
+    if (rootState.distributionType === CoreEnums.paymentTypes.DESO) {
+      return (
+        <Select
+          value={rootState.paymentType}
+          style={{ width: 100 }}
+          options={[
+            { label: 'DESO', value: CoreEnums.paymentTypes.DESO },
+            { label: 'USD', value: CoreEnums.paymentTypes.USD }
+          ]}
+          onChange={(value) => {
+            setRootState({ paymentType: value })
+          }}
+        />
+      )
+    } else {
+      return null
+    }
+  }
+
   return (
     <Card
       title={<span style={styleProps.title}>Step 2: Distribution Summary</span>}
@@ -816,9 +848,31 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
                 readOnly={state.amountReadOnly}
                 disabled={rootState.isExecuting || state.isExecuting}
                 value={rootState.distributionAmount}
-                style={{ width: deviceType.isSmartphone ? '100%' : 250 }}
+                style={{ width: deviceType.isSmartphone ? '100%' : 300 }}
                 onChange={handleDistributionAmount}
+                addonAfter={handleGetAmountAddon()}
               />
+            </Col>
+            {/* PLACEHOLDER COL */}
+            <Col
+              xs={24}
+              sm={styleParams.labelColSM}
+              md={styleParams.labelColMD}
+              lg={styleParams.labelColLG}
+              style={styleParams.labelColStyle}
+            ></Col>
+            <Col
+              xs={24}
+              sm={styleParams.labelColSM}
+              md={styleParams.labelColMD}
+              lg={styleParams.labelColLG}
+              style={styleParams.labelColStyle}
+            >
+              {rootState.paymentType === CoreEnums.paymentTypes.DESO ? (
+                <span>≈ ${(rootState.distributionAmount * desoPrice).toFixed(2)} USD</span>
+              ) : (
+                <span>≈ {(rootState.distributionAmount / desoPrice).toFixed(3)} DESO</span>
+              )}
             </Col>
           </Row>
         </>
