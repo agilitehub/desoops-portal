@@ -1,9 +1,17 @@
 import React, { useEffect, useReducer } from 'react'
-import { Col, Row, Card, Button, Modal } from 'antd'
-import { AppstoreOutlined } from '@ant-design/icons'
+import { Col, Row, Card, Button, Modal, Space } from 'antd'
+import {
+  AppstoreOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  DownCircleOutlined,
+  UndoOutlined,
+  UpCircleOutlined
+} from '@ant-design/icons'
 
 import styles from './style.module.sass'
 import { Link } from 'react-router-dom'
+import { getUsernameForPublicKey } from 'deso-protocol'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
@@ -11,8 +19,23 @@ const Completion = ({ rootState, handleOptIn, handleOptOut }) => {
   const [state, setState] = useReducer(reducer, {
     headerMessage: '',
     headerClass: '',
-    extraContent: null
+    extraContent: null,
+    loggedInUsername: null
   })
+
+  useEffect(() => {
+    const getLoggedInUser = async () => {
+      try {
+        const username = await getUsernameForPublicKey(rootState.identityState.currentUser.publicKey)
+        setState({ loggedInUsername: username })
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
+    getLoggedInUser()
+    // eslint-disable-next-line
+  }, [])
 
   useEffect(() => {
     const init = async () => {
@@ -24,24 +47,38 @@ const Completion = ({ rootState, handleOptIn, handleOptOut }) => {
         switch (rootState.optOutStatus) {
           case 'SUCCESS':
             headerClass = 'headerSuccess'
-            headerMessage = `You have successfully Opted Out of DeSoOps tagging via user - @${rootState.username}`
+            headerMessage = `As @${state.loggedInUsername}, you have successfully Opted Out of DeSoOps tagging for user @${rootState.username}`
             extraContent = (
               <div style={{ fontSize: 16 }}>
-                Alternatively:{' '}
-                <Button onClick={() => handleConfirm(true)} style={{ margin: 0, padding: 0 }} type='link'>
-                  Opt In
+                <Button
+                  type='primary'
+                  size='large'
+                  onClick={() => handleConfirm(true)}
+                  style={{ backgroundColor: '#42C470', fontSize: 18 }}
+                >
+                  <Space>
+                    <CheckOutlined style={{ fontSize: 18 }} />
+                    Opt Back In
+                  </Space>
                 </Button>
               </div>
             )
             break
           case 'CONFLICT':
             headerClass = 'headerConflict'
-            headerMessage = `You have already Opted Out of DeSoOps tagging via user - @${rootState.username}`
+            headerMessage = `As @${state.loggedInUsername}, you have already Opted Out of DeSoOps tagging for user @${rootState.username}`
             extraContent = (
               <div style={{ fontSize: 16 }}>
-                Alternatively:{' '}
-                <Button onClick={() => handleConfirm(true)} style={{ margin: 0, padding: 0 }} type='link'>
-                  Opt In
+                <Button
+                  type='primary'
+                  size='large'
+                  onClick={() => handleConfirm(true)}
+                  style={{ backgroundColor: '#42C470', fontSize: 18 }}
+                >
+                  <Space>
+                    <CheckOutlined style={{ fontSize: 18 }} />
+                    Opt Back In
+                  </Space>
                 </Button>
               </div>
             )
@@ -57,12 +94,19 @@ const Completion = ({ rootState, handleOptIn, handleOptOut }) => {
             break
           case 'SUCCESS_OPT_IN':
             headerClass = 'headerSuccess'
-            headerMessage = `You have successfully Opted In of DeSoOps tagging via user - @${rootState.username}`
+            headerMessage = `As @${state.loggedInUsername}, you have successfully Opted In of DeSoOps tagging for user @${rootState.username}`
             extraContent = (
               <div style={{ fontSize: 16 }}>
-                Alternatively:{' '}
-                <Button onClick={() => handleConfirm(false)} style={{ margin: 0, padding: 0 }} type='link'>
-                  Opt Out
+                <Button
+                  type='primary'
+                  size='large'
+                  onClick={() => handleConfirm(false)}
+                  style={{ backgroundColor: '#FF2E2E', fontSize: 18 }}
+                >
+                  <Space>
+                    <CloseOutlined style={{ fontSize: 18 }} />
+                    Opt Out
+                  </Space>
                 </Button>
               </div>
             )
@@ -75,16 +119,18 @@ const Completion = ({ rootState, handleOptIn, handleOptOut }) => {
       }
     }
 
-    init()
+    if (state.loggedInUsername) {
+      init()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rootState.optOutStatus])
+  }, [rootState.optOutStatus, state.loggedInUsername])
 
   const handleConfirm = async (optIn) => {
     Modal.confirm({
       title: optIn ? 'Opt In Confirmation' : 'Opt Out Confirmation',
-      content: `Are you sure you want to ${optIn ? 'Opt In' : 'Opt Out'} of DeSoOps tagging via user - @${
-        rootState.username
-      }?`,
+      content: `As @${state.loggedInUsername}, are you sure you want to ${
+        optIn ? 'Opt In' : 'Opt Out'
+      } for DeSoOps tagging for user @${rootState.username}?`,
       onOk: async () => {
         if (optIn) {
           await handleOptIn()
@@ -106,7 +152,7 @@ const Completion = ({ rootState, handleOptIn, handleOptOut }) => {
           </center>
         </Col>
       </Row>
-      <Row justify='center'>
+      <Row justify='center' style={{ marginTop: 10 }}>
         <Col>{state.extraContent}</Col>
       </Row>
       <Row style={{ marginTop: 20 }}>
