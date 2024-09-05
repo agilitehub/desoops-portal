@@ -135,16 +135,18 @@ const GeneralTab = ({
     switch (rootState.distributionType) {
       case Enums.paymentTypes.DAO:
         for (const entry of desoProfile.daoHodlings) {
-          tmpTokenOwnerList.push({
-            index: index.toString(),
-            key: entry.publicKey,
-            value: entry.publicKey,
-            username: entry.username,
-            imageUrl: entry.profilePicUrl,
-            balance: entry.tokenBalance
-          })
+          if (!configData.otherCryptoKeys.includes(entry.publicKey)) {
+            tmpTokenOwnerList.push({
+              index: index.toString(),
+              key: entry.publicKey,
+              value: entry.publicKey,
+              username: entry.username,
+              imageUrl: entry.profilePicUrl,
+              balance: entry.tokenBalance
+            })
 
-          index++
+            index++
+          }
         }
 
         break
@@ -184,9 +186,7 @@ const GeneralTab = ({
         tmpTokenOwnerList = []
     }
 
-    console.log('tmpTokenOwnerList', tmpTokenOwnerList)
     tmpTokenOwnerList = _.sortBy(tmpTokenOwnerList, ['username'])
-    console.log('tmpTokenOwnerList', tmpTokenOwnerList)
 
     setTokenOwnerList(tmpTokenOwnerList)
   }, [rootState.distributionType]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -453,7 +453,11 @@ const GeneralTab = ({
               md={styleParams.labelColMD}
               style={styleProps.labelColStyle}
             >
-              <span style={styleProps.fieldLabel}>{`${rootState.distributionType} Token to use:`}</span>
+              <span style={styleProps.fieldLabel}>{`${
+                rootState.distributionType === Enums.paymentTypes.OTHER_CRYPTO
+                  ? 'Select Crypto'
+                  : rootState.distributionType + ' Token'
+              } to use:`}</span>
             </Col>
             <Col xs={styleParams.valueColXS} sm={styleParams.valueColSM} md={styleParams.valueColMD}>
               <Select

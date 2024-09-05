@@ -142,6 +142,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
           desoGasFeesNanos = configData.desoGasFeesSendCCNanos * noOfPaymentTransactions
           break
         case CoreEnums.paymentTypes.DAO:
+        case CoreEnums.paymentTypes.OTHER_CRYPTO:
           desoGasFeesNanos = configData.desoGasFeesSendDAONanos * noOfPaymentTransactions
           break
         case CoreEnums.paymentTypes.DIAMONDS:
@@ -189,6 +190,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
               selectedToken = desoData.profile.ccHodlings.find((hodling) => hodling.publicKey === rootState.tokenToUse)
               break
             case CoreEnums.paymentTypes.DAO:
+            case CoreEnums.paymentTypes.OTHER_CRYPTO:
               selectedToken = desoData.profile.daoHodlings.find((hodling) => hodling.publicKey === rootState.tokenToUse)
               break
           }
@@ -520,6 +522,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
               await sendDESO(desoData.profile.publicKey, hodler.publicKey, hodler.estimatedPaymentToken)
               break
             case CoreEnums.paymentTypes.DAO:
+            case CoreEnums.paymentTypes.OTHER_CRYPTO:
               await sendDAOTokens(
                 desoData.profile.publicKey,
                 hodler.publicKey,
@@ -868,11 +871,15 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
               lg={styleParams.labelColLG}
               style={styleParams.labelColStyle}
             >
-              {rootState.paymentType === CoreEnums.paymentTypes.DESO ? (
-                <span>≈ ${(rootState.distributionAmount * desoPrice).toFixed(2)} USD</span>
-              ) : (
-                <span>≈ {(rootState.distributionAmount / desoPrice).toFixed(3)} DESO</span>
-              )}
+              {rootState.distributionType === CoreEnums.paymentTypes.DESO ? (
+                <>
+                  {rootState.paymentType === CoreEnums.paymentTypes.DESO ? (
+                    <span>≈ ${(rootState.distributionAmount * desoPrice).toFixed(2)} USD</span>
+                  ) : (
+                    <span>≈ {(rootState.distributionAmount / desoPrice).toFixed(3)} DESO</span>
+                  )}
+                </>
+              ) : undefined}
             </Col>
           </Row>
         </>
