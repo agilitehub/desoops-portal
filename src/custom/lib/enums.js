@@ -24,7 +24,7 @@ const Enums = {
     FOLLOWERS: 'Followers',
     FOLLOWING: 'Following',
     SELECTED_USERS: 'Selected Users in Table',
-    DESO_VIDEO_URL: 'https://www.youtube.com/watch?v=5jHXBYUb7X4',
+    DESO_VIDEO_URL: 'https://www.youtube.com/watch?v=Qf2DMRo_Fyc',
     DESOOPS_VIDEO_URL: 'https://www.youtube.com/watch?v=PAQELCazfs8',
     GQL_API_URL: 'https://graphql-prod.deso.com/graphql'
   },

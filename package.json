@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@ant-design/icons": "5.4.0",
-    "@apollo/client": "3.11.5",
+    "@apollo/client": "3.11.7",
     "@craco/craco": "7.1.0",
     "@fortawesome/fontawesome-svg-core": "6.6.0",
     "@fortawesome/free-regular-svg-icons": "6.6.0",
@@ -38,12 +38,12 @@
     "@reduxjs/toolkit": "2.2.7",
     "@types/agilite": "7.3.0",
     "agilite": "7.7.0-rc-5",
-    "antd": "5.20.3",
-    "axios": "1.7.5",
+    "antd": "5.20.5",
+    "axios": "1.7.7",
     "bignumber.js": "9.1.2",
     "dayjs": "1.11.13",
     "deep-diff": "1.0.2",
-    "deso-protocol": "3.3.0",
+    "deso-protocol": "3.3.2",
     "firebase": "10.13.1",
     "graphql": "16.9.0",
     "immutability-helper": "3.1.1",
@@ -64,6 +64,6 @@
     "redux": "5.0.1",
     "redux-devtools-extension": "2.13.9",
     "redux-thunk": "3.1.0",
-    "sass": "1.77.8"
+    "sass": "1.78.0"
   }
 }
