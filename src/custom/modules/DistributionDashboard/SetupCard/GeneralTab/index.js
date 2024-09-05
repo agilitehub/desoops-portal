@@ -4,12 +4,13 @@ import { useApolloClient } from '@apollo/client'
 import Enums from '../../../../lib/enums'
 
 // App Components
-import { debounce } from 'lodash'
+import _, { debounce } from 'lodash'
 import { Link } from 'react-scroll'
 import { SEARCH_PROFILES } from '../../../../lib/graphql-models'
 import { UsergroupAddOutlined } from '@ant-design/icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGem } from '@fortawesome/free-regular-svg-icons'
+import { useSelector } from 'react-redux'
 
 const styleParams = {
   labelColXS: 24,
@@ -33,6 +34,7 @@ const GeneralTab = ({
   setRootState
 }) => {
   const client = useApolloClient()
+  const configData = useSelector((state) => state.custom.configData)
 
   const [tokenOwnerList, setTokenOwnerList] = useState([])
   const [showMyHodlers, setShowMyHodlers] = useState(false)
@@ -105,7 +107,9 @@ const GeneralTab = ({
 
       if (
         tmpShowDistributionType &&
-        [Enums.paymentTypes.CREATOR, Enums.paymentTypes.DAO].includes(rootState.distributionType)
+        [Enums.paymentTypes.CREATOR, Enums.paymentTypes.DAO, Enums.paymentTypes.OTHER_CRYPTO].includes(
+          rootState.distributionType
+        )
       ) {
         tmpShowTokenToUse = true
       }
@@ -144,6 +148,23 @@ const GeneralTab = ({
         }
 
         break
+      case Enums.paymentTypes.OTHER_CRYPTO:
+        for (const entry of desoProfile.daoHodlings) {
+          if (configData.otherCryptoKeys.includes(entry.publicKey)) {
+            tmpTokenOwnerList.push({
+              index: index.toString(),
+              key: entry.publicKey,
+              value: entry.publicKey,
+              username: entry.username,
+              imageUrl: entry.profilePicUrl,
+              balance: entry.tokenBalance
+            })
+
+            index++
+          }
+        }
+
+        break
       case Enums.paymentTypes.CREATOR:
         for (const entry of desoProfile.ccHodlings) {
           tmpTokenOwnerList.push({
@@ -162,6 +183,10 @@ const GeneralTab = ({
       default:
         tmpTokenOwnerList = []
     }
+
+    console.log('tmpTokenOwnerList', tmpTokenOwnerList)
+    tmpTokenOwnerList = _.sortBy(tmpTokenOwnerList, ['username'])
+    console.log('tmpTokenOwnerList', tmpTokenOwnerList)
 
     setTokenOwnerList(tmpTokenOwnerList)
   }, [rootState.distributionType]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -402,6 +427,7 @@ const GeneralTab = ({
                 <Select.Option value={Enums.paymentTypes.CREATOR}>Creator Coin</Select.Option>
                 <Select.Option value={Enums.paymentTypes.DAO}>DAO Token</Select.Option>
                 <Select.Option value={Enums.paymentTypes.DIAMONDS}>Diamonds</Select.Option>
+                <Select.Option value={Enums.paymentTypes.OTHER_CRYPTO}>Other Crypto</Select.Option>
               </Select>
               {rootState.distributionType === Enums.paymentTypes.DIAMONDS ? (
                 <Button

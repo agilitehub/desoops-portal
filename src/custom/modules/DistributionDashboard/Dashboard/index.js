@@ -82,7 +82,11 @@ const _BatchTransactionsForm = () => {
     let distributionAmountEnabled = false
 
     if (state.distributeTo && state.distributionType) {
-      if ([Enums.paymentTypes.DAO, Enums.paymentTypes.CREATOR].includes(state.distributionType)) {
+      if (
+        [Enums.paymentTypes.DAO, Enums.paymentTypes.CREATOR, Enums.paymentTypes.OTHER_CRYPTO].includes(
+          state.distributionType
+        )
+      ) {
         if (state.tokenToUse) {
           rulesEnabled = true
           distributionAmountEnabled = true
@@ -944,6 +948,7 @@ const _BatchTransactionsForm = () => {
               await sendDESO(desoData.profile.publicKey, hodler.publicKey, hodler.estimatedPaymentToken)
               break
             case Enums.paymentTypes.DAO:
+            case Enums.paymentTypes.OTHER_CRYPTO:
               await sendDAOTokens(
                 desoData.profile.publicKey,
                 hodler.publicKey,

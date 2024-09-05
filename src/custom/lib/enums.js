@@ -33,7 +33,8 @@ const Enums = {
     DAO: 'DAO',
     CREATOR: 'CC',
     DIAMONDS: 'Diamonds',
-    USD: 'USD'
+    USD: 'USD',
+    OTHER_CRYPTO: 'Other Crypto'
   },
   defaults: {
     USER_SEARCH_NUM_TO_FETCH: 50,
