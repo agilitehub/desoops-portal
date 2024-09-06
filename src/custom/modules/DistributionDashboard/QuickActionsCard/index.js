@@ -7,7 +7,7 @@ import { generateOptOutLink, prepUsersForClipboard } from '../controller'
 import CoinSwapModal from '../../../reusables/components/CoinSwapModal'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBitcoinSign } from '@fortawesome/free-solid-svg-icons'
-import { compileTemplate } from 'agilite-utils'
+import AgiliteUtils from 'agilite-utils'
 
 const initialState = {
   ctcLoading: false,
@@ -110,7 +110,7 @@ const QuickActionsCard = ({ desoData, configData, onResetDashboard, onRefreshDas
         selectedUsers: userList.data
       }
 
-      template = compileTemplate(configData.optOutTemplate, params)
+      template = AgiliteUtils.compileTemplate(configData.optOutTemplate, params)
 
       if (userList.length > 0) {
         await copyTextToClipboard(template)

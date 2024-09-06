@@ -1,13 +1,6 @@
 import React, { useEffect, useReducer } from 'react'
 import { Col, Row, Card, Button, Modal, Space } from 'antd'
-import {
-  AppstoreOutlined,
-  CheckOutlined,
-  CloseOutlined,
-  DownCircleOutlined,
-  UndoOutlined,
-  UpCircleOutlined
-} from '@ant-design/icons'
+import { AppstoreOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons'
 
 import styles from './style.module.sass'
 import { Link } from 'react-router-dom'
