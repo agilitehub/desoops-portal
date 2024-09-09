@@ -1,14 +1,15 @@
 import React, { useEffect, useReducer } from 'react'
-import { Col, Row, Card, Button, Modal, Space } from 'antd'
-import { AppstoreOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons'
+import { Col, Row, Card, Button, Space } from 'antd'
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons'
 
 import styles from './style.module.sass'
-import { Link } from 'react-router-dom'
 import { getUsernameForPublicKey } from 'deso-protocol'
+import { desoLogout } from '../../../../custom/lib/deso-controller-graphql'
+import Enums from '../../../../custom/lib/enums'
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
-const Completion = ({ rootState, handleOptIn, handleOptOut }) => {
+const Completion = ({ rootState, setRootState, handleOptIn, handleOptOut }) => {
   const [state, setState] = useReducer(reducer, {
     headerMessage: '',
     headerClass: '',
@@ -43,17 +44,22 @@ const Completion = ({ rootState, handleOptIn, handleOptOut }) => {
             headerMessage = `As @${state.loggedInUsername}, you have successfully Opted Out of DeSoOps tagging for user @${rootState.username}`
             extraContent = (
               <div style={{ fontSize: 16 }}>
-                <Button
-                  type='primary'
-                  size='large'
-                  onClick={() => handleConfirm(true)}
-                  style={{ backgroundColor: '#42C470', fontSize: 18 }}
-                >
-                  <Space>
-                    <CheckOutlined style={{ fontSize: 18 }} />
-                    Opt Back In
-                  </Space>
-                </Button>
+                <Row justify='center'>
+                  <Col>
+                    <Button
+                      type='primary'
+                      size='large'
+                      onClick={() => handleConfirm(true)}
+                      style={{ backgroundColor: '#FF9100', fontSize: 18 }}
+                    >
+                      <Space>
+                        <CheckOutlined style={{ fontSize: 18 }} />
+                        Opt Back In
+                      </Space>
+                    </Button>
+                  </Col>
+                </Row>
+                {renderSwitchAccount(false)}
               </div>
             )
             break
@@ -62,17 +68,22 @@ const Completion = ({ rootState, handleOptIn, handleOptOut }) => {
             headerMessage = `As @${state.loggedInUsername}, you have already Opted Out of DeSoOps tagging for user @${rootState.username}`
             extraContent = (
               <div style={{ fontSize: 16 }}>
-                <Button
-                  type='primary'
-                  size='large'
-                  onClick={() => handleConfirm(true)}
-                  style={{ backgroundColor: '#42C470', fontSize: 18 }}
-                >
-                  <Space>
-                    <CheckOutlined style={{ fontSize: 18 }} />
-                    Opt Back In
-                  </Space>
-                </Button>
+                <Row justify='center'>
+                  <Col>
+                    <Button
+                      type='primary'
+                      size='large'
+                      onClick={() => handleConfirm(true)}
+                      style={{ backgroundColor: '#FF9100', fontSize: 18 }}
+                    >
+                      <Space>
+                        <CheckOutlined style={{ fontSize: 18 }} />
+                        Opt Back In
+                      </Space>
+                    </Button>
+                  </Col>
+                </Row>
+                {renderSwitchAccount(false)}
               </div>
             )
             break
@@ -90,17 +101,75 @@ const Completion = ({ rootState, handleOptIn, handleOptOut }) => {
             headerMessage = `As @${state.loggedInUsername}, you have successfully Opted In of DeSoOps tagging for user @${rootState.username}`
             extraContent = (
               <div style={{ fontSize: 16 }}>
-                <Button
-                  type='primary'
-                  size='large'
-                  onClick={() => handleConfirm(false)}
-                  style={{ backgroundColor: '#FF2E2E', fontSize: 18 }}
-                >
-                  <Space>
-                    <CloseOutlined style={{ fontSize: 18 }} />
-                    Opt Out
-                  </Space>
-                </Button>
+                <Row justify='center'>
+                  <Col>
+                    <Button
+                      type='primary'
+                      size='large'
+                      onClick={() => handleConfirm(false)}
+                      style={{ backgroundColor: '#FF9100', fontSize: 18 }}
+                    >
+                      <Space>
+                        <CloseOutlined style={{ fontSize: 18 }} />
+                        Opt Out
+                      </Space>
+                    </Button>
+                  </Col>
+                </Row>
+                {renderSwitchAccount(false)}
+              </div>
+            )
+            break
+          case 'NO_ACTION':
+            headerClass = 'headerSuccess'
+            headerMessage = `As @${state.loggedInUsername}, you are Opted In of DeSoOps tagging for user @${rootState.username}`
+            extraContent = (
+              <div style={{ fontSize: 16 }}>
+                <Row justify='center'>
+                  <Col>
+                    <Button
+                      type='primary'
+                      size='large'
+                      onClick={() => handleConfirm(false)}
+                      style={{ backgroundColor: '#FF9100', fontSize: 18 }}
+                    >
+                      <Space>
+                        <CloseOutlined style={{ fontSize: 18 }} />
+                        Opt Out
+                      </Space>
+                    </Button>
+                  </Col>
+                </Row>
+                {renderSwitchAccount(false)}
+              </div>
+            )
+            break
+          case 'CONFIRMATION':
+            headerClass = 'headerSuccess'
+            headerMessage = `As @${state.loggedInUsername}, are you sure you want to ${
+              rootState.isOptIn ? 'Opt In' : 'Opt Out'
+            } for DeSoOps tagging for user @${rootState.username}?`
+            extraContent = (
+              <div style={{ fontSize: 16 }}>
+                <Row justify='center'>
+                  <Col>
+                    <Button
+                      type='primary'
+                      size='large'
+                      onClick={() => {
+                        if (rootState.isOptIn) {
+                          handleOptIn()
+                        } else {
+                          handleOptOut()
+                        }
+                      }}
+                      style={{ backgroundColor: '#FF9100', fontSize: 18 }}
+                    >
+                      <Space>Yes - {rootState.isOptIn ? 'Opt In' : 'Opt Out'}</Space>
+                    </Button>
+                  </Col>
+                </Row>
+                {renderSwitchAccount(true)}
               </div>
             )
             break
@@ -118,22 +187,32 @@ const Completion = ({ rootState, handleOptIn, handleOptOut }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rootState.optOutStatus, state.loggedInUsername])
 
+  const renderSwitchAccount = (renderNo) => {
+    return (
+      <Row justify='center' style={{ marginTop: 10 }}>
+        <Col>
+          <Button size='large' type='primary' onClick={() => desoLogout()} style={{ fontSize: 18 }}>
+            {renderNo ? 'No - ' : ''}Switch Account
+          </Button>
+        </Col>
+      </Row>
+    )
+  }
+
   const handleConfirm = async (optIn) => {
-    Modal.confirm({
-      title: optIn ? 'Opt In Confirmation' : 'Opt Out Confirmation',
-      content: `As @${state.loggedInUsername}, are you sure you want to ${
-        optIn ? 'Opt In' : 'Opt Out'
-      } for DeSoOps tagging for user @${rootState.username}?`,
-      onOk: async () => {
-        if (optIn) {
-          await handleOptIn()
-        } else {
-          await handleOptOut()
-        }
-      },
-      okText: 'Yes',
-      cancelText: 'No'
-    })
+    if (optIn) {
+      setRootState({
+        renderState: Enums.appRenderState.COMPLETION,
+        optOutStatus: 'CONFIRMATION',
+        isOptIn: true
+      })
+    } else {
+      setRootState({
+        renderState: Enums.appRenderState.COMPLETION,
+        optOutStatus: 'CONFIRMATION',
+        isOptIn: false
+      })
+    }
   }
 
   return (
@@ -147,26 +226,6 @@ const Completion = ({ rootState, handleOptIn, handleOptOut }) => {
       </Row>
       <Row justify='center' style={{ marginTop: 10 }}>
         <Col>{state.extraContent}</Col>
-      </Row>
-      <Row style={{ marginTop: 20 }}>
-        <Col span={24}>
-          <center>
-            <p className={styles.paragraph}>
-              You can choose to close this page, or alternatively, you can access the DeSoOps Dashboard by clicking the
-              button below.
-            </p>
-          </center>
-        </Col>
-      </Row>
-      <Row>
-        <Col span={24} className={styles.btnWrapper}>
-          <Link className={styles.btnDashboard} to='/'>
-            <div className={styles.icon}>
-              <AppstoreOutlined style={{ fontSize: 20 }} />
-            </div>
-            <span className={styles.text}>DeSoOps Dashboard</span>
-          </Link>
-        </Col>
       </Row>
     </Card>
   )

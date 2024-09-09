@@ -1,8 +1,8 @@
 import React, { useEffect, useReducer } from 'react'
-import { identity, configure } from 'deso-protocol'
+import { identity, configure, getUsernameForPublicKey } from 'deso-protocol'
 import { useLoaderData } from 'react-router-dom'
 import { useApolloClient } from '@apollo/client'
-import { Col, Row, message, Card, Modal } from 'antd'
+import { Col, Row, message, Card } from 'antd'
 import { LoginOutlined } from '@ant-design/icons'
 
 // Utils
@@ -42,7 +42,9 @@ const OptOut = () => {
     optOutStatus: null,
     username: null,
     publicKey: null,
-    optOutProfileState: null
+    optOutProfileState: null,
+    loggedInUsername: null,
+    isOptIn: false
   })
 
   useEffect(() => {
@@ -50,6 +52,22 @@ const OptOut = () => {
       setState({ identityState: state })
     })
   }, [])
+
+  useEffect(() => {
+    const getLoggedInUser = async () => {
+      try {
+        const username = await getUsernameForPublicKey(state.identityState.currentUser.publicKey)
+        setState({ loggedInUsername: username })
+      } catch (e) {
+        console.error(e)
+      }
+    }
+
+    if (state.identityState) {
+      getLoggedInUser()
+    }
+    // eslint-disable-next-line
+  }, [state.identityState])
 
   useEffect(() => {
     const init = async () => {
@@ -143,7 +161,6 @@ const OptOut = () => {
       let optOutProfile = null
       let optOutEntry = null
       let response = null
-      let tmpUsername = null
       let qry = null
 
       try {
@@ -177,8 +194,6 @@ const OptOut = () => {
 
               return
             } else {
-              tmpUsername = gqlData.username
-
               setState({
                 username: gqlData.username,
                 publicKey: gqlData.publicKey
@@ -202,26 +217,10 @@ const OptOut = () => {
                   optOutStatus: 'CONFLICT'
                 })
               } else {
-                Modal.confirm({
-                  title: 'Opt Out Confirmation',
-                  content: `Are you sure you want to Opt Out of DeSoOps tagging via user - @${tmpUsername}?`,
-                  onOk: async () => {
-                    // User has not been opted out. Add them to the recipients array
-                    response.recipients.push({
-                      publicKey: desoData.profile.publicKey,
-                      timestamp: new Date()
-                    })
-
-                    // Update the OptOut Profile in Agilit-e
-                    response = await updateOptOutProfile(response._id, response)
-
-                    setState({
-                      renderState: Enums.appRenderState.COMPLETION,
-                      optOutStatus: 'SUCCESS'
-                    })
-                  },
-                  okText: 'Yes',
-                  cancelText: 'No'
+                setState({
+                  renderState: Enums.appRenderState.COMPLETION,
+                  optOutStatus: 'CONFIRMATION',
+                  isOptIn: false
                 })
               }
             } else {
@@ -328,7 +327,12 @@ const OptOut = () => {
                 ) : null}
 
                 {state.renderState === Enums.appRenderState.COMPLETION ? (
-                  <Completion handleOptIn={handleOptIn} handleOptOut={handleOptOut} rootState={state} />
+                  <Completion
+                    handleOptIn={handleOptIn}
+                    handleOptOut={handleOptOut}
+                    rootState={state}
+                    setRootState={setState}
+                  />
                 ) : null}
 
                 {state.renderState === Enums.appRenderState.LOGIN ? (
