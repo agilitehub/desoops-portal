@@ -12,7 +12,7 @@ const theme = {
     secondary: '#7F878E',
     success: '#29A745',
     danger: '#DC3645',
-    warning: '#FFC20E',
+    warning: '#FF7F50',
     info: '#17A2B8'
   },
   custom: {}

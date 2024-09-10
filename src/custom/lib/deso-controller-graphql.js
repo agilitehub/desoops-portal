@@ -1,3 +1,5 @@
+import Store from '../../store'
+
 // This library provide a set of functions that can be used to interact with the DeSo blockchain.
 import { cloneDeep } from 'lodash'
 import {
@@ -18,6 +20,7 @@ import { calculateDaysSinceLastActive, cleanString, hexToInt, sortByKey } from '
 import nftLogo from '../assets/nft-default-logo.png'
 import pollLogo from '../assets/poll-default-logo.png'
 import { setupHodlers } from '../modules/DistributionDashboard/controller'
+import { resetState } from '../../custom/reducer'
 
 const desoConfigure = {
   appName: process.env.REACT_APP_NAME,
@@ -71,6 +74,7 @@ export const desoLogin = async () => {
 export const desoLogout = async () => {
   try {
     await identity.logout()
+    Store.dispatch(resetState())
     return
   } catch (e) {
     // Most likely the user cancelled the logout. We can leave it be
