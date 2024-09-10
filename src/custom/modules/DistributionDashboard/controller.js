@@ -270,10 +270,7 @@ export const processHodlerConditions = async (hodlers, rootState) => {
           conditions.lastActiveDays !== 0
         ) {
           hodler.isVisible =
-            hodler.isVisible &&
-            hodler.lastActiveDays !== null &&
-            hodler.lastActiveDays !== 0 &&
-            hodler.lastActiveDays <= conditions.lastActiveDays
+            hodler.isVisible && hodler.lastActiveDays !== null && hodler.lastActiveDays <= conditions.lastActiveDays
           hodler.isActive = hodler.isVisible
         }
 

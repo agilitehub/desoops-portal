@@ -874,7 +874,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
               {rootState.distributionType === CoreEnums.paymentTypes.DESO ? (
                 <>
                   {rootState.paymentType === CoreEnums.paymentTypes.DESO ? (
-                    <span>≈ ${(rootState.distributionAmount * desoPrice).toFixed(2)} USD</span>
+                    <span>≈ ${(Math.floor(rootState.distributionAmount * desoPrice * 100) / 100).toFixed(2)} USD</span>
                   ) : (
                     <span>≈ {(rootState.distributionAmount / desoPrice).toFixed(3)} DESO</span>
                   )}
