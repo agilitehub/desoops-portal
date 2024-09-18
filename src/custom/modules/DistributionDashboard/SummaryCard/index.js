@@ -692,7 +692,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
     if (rootState.distributionType === CoreEnums.paymentTypes.DESO) {
       return (
         <Select
-          value={rootState.paymentType}
+          value={rootState.paymentType ? rootState.paymentType : CoreEnums.paymentTypes.DESO}
           style={{ width: 100 }}
           options={[
             { label: 'DESO', value: CoreEnums.paymentTypes.DESO },
