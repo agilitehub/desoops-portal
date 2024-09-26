@@ -15,6 +15,7 @@ import { Spin } from 'antd'
 import DistributionDashboard from '../DistributionDashboard'
 import Login from '../Login'
 import Toolbar from '../Toolbar'
+import EditProfile from '../EditProfile'
 
 // Utils
 import Enums from '../../lib/enums'
@@ -25,7 +26,8 @@ import {
   resetState,
   setDeviceType,
   setDeSoPrice,
-  setDistributionTemplates
+  setDistributionTemplates,
+  setEditProfileVisible
 } from '../../reducer'
 import {
   getConfigData,
@@ -55,6 +57,7 @@ const CoreApp = () => {
   const { currentUser, isLoading } = useContext(DeSoIdentityContext)
   const client = useApolloClient()
   const [state, setState] = useReducer(reducer, initialState)
+  const coreState = useSelector((state) => state)
 
   // Determine Device Type
   useEffect(() => {
@@ -72,8 +75,6 @@ const CoreApp = () => {
       let tmpOptOutProfile = null
       let tmpTemplates = null
       let newState = null
-      let gqlProps = null
-      let gqlData = null
 
       try {
         newState = await renderApp(currentUser, isLoading, state)
@@ -103,18 +104,8 @@ const CoreApp = () => {
             dispatch(setDistributionTemplates(tmpTemplates))
 
             // Next, we need to fetch the rest of the user's DeSo data
-            gqlProps = {
-              publicKey: currentUser.PublicKeyBase58Check
-            }
+            await getUsersDeSoData()
 
-            gqlData = await client.query({
-              query: GQL_GET_INITIAL_DESO_DATA,
-              variables: gqlProps,
-              fetchPolicy: 'no-cache'
-            })
-
-            const tmpDeSoData = await getInitialDeSoData(desoData, gqlData.data, tmpConfigData)
-            dispatch(setDeSoData(tmpDeSoData))
             setState({ initializing: false })
 
             break
@@ -128,6 +119,47 @@ const CoreApp = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser, isLoading, state.userReturned, state.initializing, state.renderState])
+
+  const getUsersDeSoData = async () => {
+    const tmpConfigData = coreState.custom.configData
+    let gqlProps = null
+    let gqlData = null
+
+    try {
+      gqlProps = {
+        publicKey: currentUser.PublicKeyBase58Check
+      }
+
+      gqlData = await client.query({
+        query: GQL_GET_INITIAL_DESO_DATA,
+        variables: gqlProps,
+        fetchPolicy: 'no-cache'
+      })
+
+      const tmpDeSoData = await getInitialDeSoData(desoData, gqlData.data, tmpConfigData)
+
+      // Fail Safe
+      if (!tmpDeSoData.profile.publicKey) {
+        tmpDeSoData.profile.publicKey = currentUser.PublicKeyBase58Check
+      }
+
+      dispatch(setDeSoData(tmpDeSoData))
+
+      if (gqlData.data.accountByPublicKey) {
+        if (
+          !gqlData.data.accountByPublicKey.username &&
+          (!gqlData.data.accountByPublicKey.extraData?.desoOpsUserProfilePrompt ||
+            gqlData.data.accountByPublicKey.extraData?.desoOpsUserProfilePrompt === 'true')
+        ) {
+          dispatch(setEditProfileVisible(true))
+        }
+      } else {
+        dispatch(setEditProfileVisible(true))
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   // Update DeSo Price every x seconds
   useEffect(() => {
@@ -145,36 +177,48 @@ const CoreApp = () => {
     } catch (e) {}
   }
 
-  switch (state.renderState) {
-    case Enums.appRenderState.INIT:
-    case Enums.appRenderState.SIGNING_IN:
-      return (
-        <>
-          <Toolbar />
-          <div className='cs-spin-wrapper'>
-            <Spin size='large' />
-            <span>{state.spinTip}</span>
-          </div>
-          <center>
-            <img src={logo} alt={process.env.REACT_APP_NAME} style={{ width: 300 }} />
-          </center>
-        </>
-      )
-    case Enums.appRenderState.LAUNCH:
-      return (
-        <>
-          <Toolbar />
-          <DistributionDashboard />
-        </>
-      )
-    case Enums.appRenderState.LOGIN:
-      return (
-        <>
-          <Toolbar />
-          <Login />
-        </>
-      )
+  const handleGetState = () => {
+    switch (state.renderState) {
+      case Enums.appRenderState.INIT:
+      case Enums.appRenderState.SIGNING_IN:
+        return (
+          <>
+            <div className='cs-spin-wrapper'>
+              <Spin size='large' />
+              <span>{state.spinTip}</span>
+            </div>
+            <center>
+              <img src={logo} alt={process.env.REACT_APP_NAME} style={{ width: 300 }} />
+            </center>
+          </>
+        )
+      case Enums.appRenderState.LAUNCH:
+        return (
+          <>
+            <DistributionDashboard />
+          </>
+        )
+      case Enums.appRenderState.LOGIN:
+        return (
+          <>
+            <Login />
+          </>
+        )
+    }
   }
+
+  return (
+    <>
+      <Toolbar />
+      {handleGetState()}
+      <EditProfile
+        isVisible={coreState.custom.editProfileVisible}
+        setDeSoData={setDeSoData}
+        desoData={desoData}
+        getUsersDeSoData={getUsersDeSoData}
+      />
+    </>
+  )
 }
 
 export default CoreApp

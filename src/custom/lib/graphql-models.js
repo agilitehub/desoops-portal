@@ -5,6 +5,7 @@ export const GQL_GET_INITIAL_DESO_DATA = gql`
     accountByPublicKey(publicKey: $publicKey) {
       publicKey
       username
+      description
       desoBalance {
         balanceNanos
       }
@@ -24,6 +25,7 @@ export const GQL_GET_INITIAL_DESO_DATA = gql`
           }
         }
       }
+      extraData
     }
   }
 `

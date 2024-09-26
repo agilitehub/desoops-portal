@@ -41,6 +41,9 @@ const slice = createSlice({
     },
     setLeftMenu: (state, data) => {
       state.leftMenu = data.payload
+    },
+    setEditProfileVisible: (state, data) => {
+      state.editProfileVisible = data.payload
     }
   }
 })
@@ -55,6 +58,7 @@ export const {
   setDeviceType,
   setLeftMenu,
   setDeSoPrice,
-  setDiamondLevels
+  setDiamondLevels,
+  setEditProfileVisible
 } = slice.actions
 export default slice.reducer

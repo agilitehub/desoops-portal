@@ -195,13 +195,15 @@ export const getInitialDeSoData = async (desoData, gqlData, configData) => {
 
   try {
     newDeSoData = cloneDeep(desoData)
-    newDeSoData.profile.publicKey = gqlData.accountByPublicKey.publicKey
-    newDeSoData.profile.username = gqlData.accountByPublicKey.username
+    newDeSoData.profile.publicKey = gqlData.accountByPublicKey?.publicKey
+    newDeSoData.profile.username = gqlData.accountByPublicKey?.username
+    newDeSoData.profile.extraData = gqlData.accountByPublicKey?.extraData
+    newDeSoData.profile.description = gqlData.accountByPublicKey?.description
     newDeSoData.profile.profilePicUrl = await generateProfilePicUrl(newDeSoData.profile.publicKey)
 
     // Fetch the current price of DeSo
-    if (gqlData.accountByPublicKey.desoBalance !== null) {
-      desoBalance = gqlData.accountByPublicKey.desoBalance.balanceNanos / Enums.values.NANO_VALUE
+    if (gqlData.accountByPublicKey?.desoBalance !== null) {
+      desoBalance = gqlData.accountByPublicKey?.desoBalance.balanceNanos / Enums.values.NANO_VALUE
     }
 
     newDeSoData.desoPrice = await getDeSoPricing(newDeSoData.desoPrice)
@@ -209,29 +211,31 @@ export const getInitialDeSoData = async (desoData, gqlData, configData) => {
 
     // Next, we need to loop through the tokenBalancesAsHodler array to find the DAO and CC Balances
     // and then create hodlings arrays, but we also need to separate our own balances
-    tmpGQLData = gqlData.accountByPublicKey.tokenBalances
+    tmpGQLData = gqlData.accountByPublicKey?.tokenBalances
 
-    for (const entry of tmpGQLData.nodes) {
-      if (!entry.creator) entry.creator = {}
-      entry.creator.publicKey = entry.creatorPkid
-      newEntry = await createUserEntry(entry, entry.creator, configData.optOutProfile)
+    if (tmpGQLData && tmpGQLData.nodes) {
+      for (const entry of tmpGQLData.nodes) {
+        if (!entry.creator) entry.creator = {}
+        entry.creator.publicKey = entry.creatorPkid
+        newEntry = await createUserEntry(entry, entry.creator, configData.optOutProfile)
 
-      // Skip if newEntry is null, because it means the user is invalid
-      if (newEntry === null) continue
+        // Skip if newEntry is null, because it means the user is invalid
+        if (newEntry === null) continue
 
-      if (entry.isDaoCoin) {
-        if (newEntry.publicKey === newDeSoData.profile.publicKey) {
-          daoBalance = newEntry.tokenBalance
-          ownEntryDAO = newEntry
+        if (entry.isDaoCoin) {
+          if (newEntry.publicKey === newDeSoData.profile.publicKey) {
+            daoBalance = newEntry.tokenBalance
+            ownEntryDAO = newEntry
+          } else {
+            daoHodlings.push(newEntry)
+          }
         } else {
-          daoHodlings.push(newEntry)
-        }
-      } else {
-        if (newEntry.publicKey === newDeSoData.profile.publicKey) {
-          ccBalance = newEntry.tokenBalance
-          ownEntryCC = newEntry
-        } else {
-          ccHodlings.push(newEntry)
+          if (newEntry.publicKey === newDeSoData.profile.publicKey) {
+            ccBalance = newEntry.tokenBalance
+            ownEntryCC = newEntry
+          } else {
+            ccHodlings.push(newEntry)
+          }
         }
       }
     }

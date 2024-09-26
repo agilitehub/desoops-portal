@@ -1,17 +1,27 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Dropdown, Image, Space } from 'antd'
-import { useSelector } from 'react-redux'
-import { DownOutlined } from '@ant-design/icons'
+import { useDispatch, useSelector } from 'react-redux'
+import { DownOutlined, UserOutlined } from '@ant-design/icons'
 
 import { desoLogout } from '../../../lib/deso-controller-graphql'
 
 import './style.sass'
+import { setEditProfileVisible } from '../../../reducer'
 
 const ToolbarDropDown = () => {
+  const dispatch = useDispatch()
+  const [profilePic, setProfilePic] = useState(false)
   const profile = useSelector((state) => state.custom.desoData.profile)
 
   const handleGetItems = () => {
     const dropDownItems = {
+      editProfile: {
+        danger: false,
+        key: 'Edit Profile',
+        label: 'Edit Profile',
+        className: 'dropdown-item',
+        onClick: () => dispatch(setEditProfileVisible(true))
+      },
       signOut: {
         danger: true,
         key: 'Sign Out',
@@ -27,8 +37,26 @@ const ToolbarDropDown = () => {
       }
     }
 
-    return [dropDownItems.signOut, dropDownItems.version]
+    return [dropDownItems.editProfile, dropDownItems.signOut, dropDownItems.version]
   }
+
+  useEffect(() => {
+    const handleValidateProfilePic = async () => {
+      try {
+        const response = await fetch(profile.profilePicUrl)
+        if (response.status === 200) {
+          setProfilePic(true)
+        } else {
+          setProfilePic(false)
+        }
+      } catch (e) {}
+    }
+
+    if (profile.profilePicUrl) {
+      handleValidateProfilePic()
+    }
+    // eslint-disable-next-line
+  }, [profile.profilePicUrl])
 
   return (
     <div>
@@ -40,7 +68,11 @@ const ToolbarDropDown = () => {
         }}
       >
         <Space style={{ cursor: 'pointer', marginTop: 10 }}>
-          <Image src={profile.profilePicUrl} className='toolbar-dropdown-btn-icon' preview={false} />
+          {profilePic ? (
+            <Image src={profile.profilePicUrl} className='toolbar-dropdown-btn-icon' preview={false} />
+          ) : (
+            <UserOutlined style={{ fontSize: 20 }} />
+          )}
           {profile.username}
           <DownOutlined />
         </Space>

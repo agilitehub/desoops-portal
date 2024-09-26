@@ -49,6 +49,7 @@ export const customState = () => {
     configData,
     distributionTemplates: [],
     userAgent,
-    leftMenu
+    leftMenu,
+    editProfileVisible: false
   }
 }

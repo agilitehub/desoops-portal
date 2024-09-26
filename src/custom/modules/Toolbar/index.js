@@ -16,7 +16,7 @@ const Toolbar = () => {
       <Header className='toolbar-header'>
         <Logo />
 
-        {profile.publicKey ? <ToolbarDropDown /> : null}
+        {profile?.publicKey ? <ToolbarDropDown /> : null}
       </Header>
     </Layout>
   )

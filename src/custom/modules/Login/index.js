@@ -1,8 +1,8 @@
 import React, { useReducer } from 'react'
 import { identity, configure } from 'deso-protocol'
-import { Col, Row, message, Card, Button } from 'antd'
+import { Col, Row, message, Card, Button, Space } from 'antd'
 import { faCheckCircle, faBitcoinSign } from '@fortawesome/free-solid-svg-icons'
-import { LoginOutlined } from '@ant-design/icons'
+import { LoginOutlined, UserAddOutlined } from '@ant-design/icons'
 
 // Utils
 import styles from './style.module.sass'
@@ -111,24 +111,38 @@ const Login = () => {
                         </Button>
                       </Col>
                     </Row>
-                    <Row justify='space-around' gutter={[12, 12]}>
-                      <Col
-                        span={24}
-                        className={styles.btnWrapper}
-                        style={{ display: 'flex', justifyContent: 'center' }}
-                      >
-                        <button className={styles.signInButton} onClick={handleLogin}>
-                          <div className={styles.icon}>
-                            <LoginOutlined style={{ fontSize: 20 }} />
-                          </div>
-                          <span className={styles.text}>SIGN IN WITH DESO</span>
-                        </button>
-                        <button className={styles.coinSwapButton} onClick={handleLaunchCoinSwap}>
-                          <div className={styles.icon}>
-                            <FontAwesomeIcon style={{ fontSize: 20 }} icon={faBitcoinSign} />
-                          </div>
-                          <span className={styles.text}>COIN SWAP</span>
-                        </button>
+                    <Row justify='center'>
+                      <Col>
+                        <Row justify='center' style={{ marginBottom: 10 }}>
+                          <Col>
+                            <Button type='primary' size='large' onClick={handleLogin}>
+                              <Space>
+                                <LoginOutlined style={{ fontSize: 20 }} />
+                                SIGN IN WITH DESO
+                              </Space>
+                            </Button>
+                          </Col>
+                        </Row>
+                        <Row justify='center' style={{ marginBottom: 10 }}>
+                          <Col>
+                            <Button className={styles.signUpButton} type='primary' size='large' onClick={handleLogin}>
+                              <Space>
+                                <UserAddOutlined style={{ fontSize: 20 }} />
+                                SIGN UP WITH DESO
+                              </Space>
+                            </Button>
+                          </Col>
+                        </Row>
+                        <Row justify='center' style={{ marginBottom: 10 }}>
+                          <Col>
+                            <Button className={styles.coinSwapButton} size='large' onClick={handleLaunchCoinSwap}>
+                              <Space>
+                                <FontAwesomeIcon style={{ fontSize: 20 }} icon={faBitcoinSign} />
+                                COIN SWAP
+                              </Space>
+                            </Button>
+                          </Col>
+                        </Row>
                       </Col>
                       <Col span={24}>
                         <div style={{ display: 'flex', justifyContent: 'center', paddingLeft: 5, paddingRight: 5 }}>
