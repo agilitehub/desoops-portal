@@ -4,11 +4,12 @@ import { getSingleProfile, updateProfile } from 'deso-protocol'
 
 import styles from './style.module.sass'
 import { CopyTwoTone, LoadingOutlined, PlusOutlined } from '@ant-design/icons'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setEditProfileVisible } from '../../reducer'
 
 const EditProfile = ({ isVisible, desoData, setDeSoData }) => {
   const dispatch = useDispatch()
+  const profile = useSelector((state) => state.custom.desoData.profile)
   const [loading, setLoading] = useState(false)
   const [imageUrl, setImageUrl] = useState(undefined)
   const [imageChanged, setImageChanged] = useState(false)
@@ -69,11 +70,12 @@ const EditProfile = ({ isVisible, desoData, setDeSoData }) => {
   }
 
   const handleOkExtended = async () => {
+    const formValues = form.getFieldsValue()
     const updateObject = {
       UpdaterPublicKeyBase58Check: desoData.profile.publicKey,
       ProfilePublicKeyBase58Check: desoData.profile.publicKey,
-      NewUsername: form.getFieldValue('username'),
-      NewDescription: form.getFieldValue('bio'),
+      NewUsername: formValues.username,
+      NewDescription: formValues.bio,
       MinFeeRateNanosPerKB: 1000,
       NewCreatorBasisPoints: 10000,
       NewStakeMultipleBasisPoints: 12500,
@@ -94,15 +96,19 @@ const EditProfile = ({ isVisible, desoData, setDeSoData }) => {
           ...desoData,
           profile: {
             ...desoData.profile,
-            username: form.getFieldValue('username'),
-            description: form.getFieldValue('bio'),
+            username: formValues.username,
+            description: formValues.bio,
             profilePic: imageUrl
           }
         })
       )
+
       dispatch(setEditProfileVisible(false))
       setImageUrl(undefined)
-      form.resetFields()
+      form.setFieldsValue({
+        username: formValues.username,
+        bio: formValues.bio
+      })
     } catch (e2) {
       if (e2.message) {
         message.error(e2.message)
@@ -223,8 +229,8 @@ const EditProfile = ({ isVisible, desoData, setDeSoData }) => {
             layout='vertical'
             form={form}
             initialValues={{
-              username: desoData.profile?.username || '',
-              bio: desoData.profile?.description || ''
+              username: profile.username || '',
+              bio: profile.description || ''
             }}
           >
             {desoData.profile?.publicKey ? (

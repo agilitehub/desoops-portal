@@ -43,7 +43,10 @@ const ToolbarDropDown = () => {
   useEffect(() => {
     const handleValidateProfilePic = async () => {
       try {
+        setProfilePic(false)
+
         const response = await fetch(profile.profilePicUrl)
+
         if (response.status === 200) {
           setProfilePic(true)
         } else {
@@ -54,9 +57,12 @@ const ToolbarDropDown = () => {
 
     if (profile.profilePicUrl) {
       handleValidateProfilePic()
+    } else {
+      setProfilePic(false)
     }
+
     // eslint-disable-next-line
-  }, [profile.profilePicUrl])
+  }, [profile])
 
   return (
     <div>
