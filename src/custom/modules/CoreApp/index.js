@@ -16,6 +16,7 @@ import DistributionDashboard from '../DistributionDashboard'
 import Login from '../Login'
 import Toolbar from '../Toolbar'
 import EditProfile from '../EditProfile'
+import Notifications from '../Notifications'
 
 // Utils
 import Enums from '../../lib/enums'
@@ -109,6 +110,8 @@ const CoreApp = () => {
             setState({ initializing: false })
 
             break
+          default:
+            setState(newState)
         }
       } catch (e) {
         console.error(e)
@@ -118,7 +121,7 @@ const CoreApp = () => {
     init()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser, isLoading, state.userReturned, state.initializing, state.renderState])
+  }, [currentUser, isLoading, state.userReturned, state.initializing])
 
   const getUsersDeSoData = async () => {
     const tmpConfigData = coreState.custom.configData
@@ -193,6 +196,7 @@ const CoreApp = () => {
           </>
         )
       case Enums.appRenderState.LAUNCH:
+      case Enums.appRenderState.DISTRO:
         return (
           <>
             <DistributionDashboard />
@@ -204,12 +208,14 @@ const CoreApp = () => {
             <Login />
           </>
         )
+      case Enums.appRenderState.NOTIFICATIONS:
+        return <Notifications />
     }
   }
 
   return (
     <>
-      <Toolbar />
+      <Toolbar state={state} setState={setState} />
       {handleGetState()}
       <EditProfile
         isVisible={coreState.custom.editProfileVisible}

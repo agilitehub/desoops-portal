@@ -3,9 +3,13 @@ import { Provider } from 'react-redux'
 import { createRoot } from 'react-dom/client'
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
+import { getMessaging, getToken, onMessage } from 'firebase/messaging'
 import { DeSoIdentityProvider } from 'react-deso-protocol'
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+
+// PWA
+import * as serviceWorkerRegistration from './serviceWorkerRegistration'
 
 // Utilities
 import { initAgilite } from './custom/lib/agilite-controller'
@@ -36,6 +40,7 @@ initAgilite()
 
 // Initialize Firebase
 let tmpAnalytics = null
+let messaging = null
 
 if (process.env.REACT_APP_FIREBASE_ENABLED === Enums.values.YES) {
   const firebaseConfig = {
@@ -49,6 +54,10 @@ if (process.env.REACT_APP_FIREBASE_ENABLED === Enums.values.YES) {
   }
 
   const app = initializeApp(firebaseConfig)
+
+  // Initialize Firebase Cloud Messaging
+  messaging = getMessaging(app)
+
   tmpAnalytics = getAnalytics(app)
 }
 
@@ -79,4 +88,8 @@ root.render(
   </Provider>
 )
 
+// Register the service worker for PWA functionality
+serviceWorkerRegistration.register()
+
 export const analytics = tmpAnalytics
+export { messaging, getToken, onMessage }
