@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { Col, Layout, message, Row } from 'antd'
+import { Button, Col, Layout, notification, Row } from 'antd'
 import { Footer, Header } from 'antd/es/layout/layout'
 
 import ToolbarDropDown from './ToolbarDropDown'
@@ -8,47 +8,64 @@ import Logo from './Logo'
 import Enums from '../../lib/enums'
 
 import './style.sass'
-import { getToken, messaging, onMessage } from '../../../index'
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHome, faMoneyBillTransfer, faMessage, faBell } from '@fortawesome/free-solid-svg-icons'
+import { getToken, onMessage } from 'firebase/messaging'
+import { messaging } from '../../lib/firebase-controller'
 
 const Toolbar = ({ state, setState }) => {
   const profile = useSelector((state) => state.custom.desoData.profile)
+  const [api, contextHolder] = notification.useNotification()
+  const [token, setToken] = React.useState('')
 
-  const requestPermission = async () => {
-    try {
-      const currentToken = await getToken(messaging, { vapidKey: 'YOUR_VAPID_KEY' })
-      if (currentToken) {
-        console.log('FCM Token:', currentToken)
-        // Send the token to your server to store for later use
-      } else {
-        console.log('No registration token available. Request permission to generate one.')
-      }
-    } catch (error) {
-      console.error('An error occurred while retrieving token. ', error)
+  const requestForPushNotifications = async () => {
+    const permission = await Notification.requestPermission()
+
+    if (permission === 'granted') {
+      const token = await getToken(messaging, {
+        vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY
+      })
+
+      //We can send token to server
+      console.log('Token generated : ', token)
+      setToken(token)
+    } else if (permission === 'denied') {
+      //notifications are blocked
+      alert('You denied for the notification')
     }
   }
 
   useEffect(() => {
-    requestPermission()
-  }, [])
+    console.log('Toolbar: useEffect', profile)
+    if (profile?.publicKey) {
+      const btn = (
+        <Button type='primary' size='small' onClick={requestForPushNotifications}>
+          Confirm
+        </Button>
+      )
 
-  useEffect(() => {
-    const unsubscribe = onMessage(messaging, (payload) => {
-      message.info('Message received')
-      console.log('Message received. ', payload)
-      // Customize how you display the notification or update your UI here
-    })
-
-    return () => unsubscribe()
-  }, [])
+      api.open({
+        message: 'Token',
+        description: token,
+        duration: 0,
+        btn,
+        key: 'key'
+      })
+    }
+  }, [profile, api, token])
 
   const handleNavigate = (renderState) => {
     setState({ renderState })
   }
 
+  onMessage(messaging, (payload) => {
+    console.log('incoming msg', payload)
+  })
+
   return (
     <Layout className='toolbar-layout'>
+      {contextHolder}
       <Header className='toolbar-header'>
         <Logo />
 
