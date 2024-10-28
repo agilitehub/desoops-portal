@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
-import { getMessaging, onMessage } from 'firebase/messaging'
+import { getMessaging, getToken, onMessage } from 'firebase/messaging'
 import Enums from './enums'
 
 // Initialize Firebase
@@ -24,7 +24,28 @@ export const initFirebase = () => {
 
     // Initialize Firebase Cloud Messaging
     messaging = getMessaging(app)
+
+    onMessage(messaging, (payload) => {
+      console.log('incoming msg', payload)
+    })
   }
 }
 
-export { messaging, analytics }
+const requestForPushNotifications = async (setToken) => {
+  const permission = await Notification.requestPermission()
+
+  if (permission === 'granted') {
+    const token = await getToken(messaging, {
+      vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY
+    })
+
+    //We can send token to server
+    console.log('Token generated : ', token)
+    setToken(token)
+  } else if (permission === 'denied') {
+    //notifications are blocked
+    alert('You denied for the notification')
+  }
+}
+
+export { messaging, analytics, requestForPushNotifications }
