@@ -5,7 +5,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Card } from 'antd'
 
-const ContainerCard = ({ title, deviceType, children }) => {
+const ContainerCard = ({ title, deviceType, children, extra }) => {
   const styleProps = {
     card: { width: '100%', overflow: 'hidden', marginTop: 10 },
     title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
@@ -25,6 +25,7 @@ const ContainerCard = ({ title, deviceType, children }) => {
       bodyStyle={styleProps.bodyStyle}
       type='inner'
       size='small'
+      extra={extra}
     >
       {children}
     </Card>

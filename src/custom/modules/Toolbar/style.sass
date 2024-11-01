@@ -6,13 +6,54 @@
     border-bottom: 1px solid $border-color
 
 .toolbar-header
-    display: flex,
+    display: flex
     flex-direction: row
     justify-content: space-between
+    align-items: center
     background-color: $blue1-dark
     height: 60px
+    padding: 0 24px
     +xs
         height: 45px
+
+.toolbar-header-left
+    width: 200px
+    padding-left: 16px
+    display: flex
+    align-items: center
+    +xs
+        width: auto
+
+.toolbar-header-center
+    flex: 1
+    display: flex
+    justify-content: center
+    align-items: center
+    // Hide on mobile
+    +xs
+        display: none
+
+.toolbar-header-right
+    width: 200px
+    display: flex
+    padding-right: 16px
+    margin-bottom: 16px
+    justify-content: flex-end
+    align-items: center
+    height: 100%
+    +xs
+        width: auto
+
+.toolbar-header-icon
+    font-size: 24px
+    color: $white
+    transition: transform 0.2s ease
+
+.toolbar-header-icon-active
+    font-size: 24px
+    color: $orange2
+    cursor: pointer
+    border-radius: 20%
 
 .toolbar-footer
     position: fixed
@@ -22,23 +63,54 @@
     text-align: center
     z-index: 100
     background-color: $blue1-dark
-    height: 60px
+    height: 70px
+    display: none
+    align-items: center
+    +xs
+        display: flex
+
+.toolbar-footer-item
+    text-align: center
+    display: flex
+    flex-direction: column
+    align-items: center
+    cursor: pointer
+
+    &.active
+        .toolbar-footer-icon, .toolbar-footer-text
+            color: $orange2
 
 .toolbar-footer-icon
     font-size: 28px
-    margin: 0 20px
     color: $white
-    cursor: pointer
+    margin-bottom: 4px
     +xs
         font-size: 26px
-        margin: 0 12px
 
-.toolbar-footer-icon-active
-    font-size: 28px
-    margin: 0 20px
-    color: $orange2
+.toolbar-footer-text
+    font-size: 12px
+    color: $white
+    margin-top: 2px
+
+.toolbar-header-item
+    display: flex
+    align-items: center
+    gap: 8px
     cursor: pointer
-    border-radius: 20%
+    transition: transform 0.2s ease
+
+    &:hover
+        transform: scale(1.1)
+
+    &.active
+        .toolbar-header-icon, .toolbar-header-text
+            color: $orange2
+
+.toolbar-header-text
+    color: $white
+    font-size: 14px
+    transition: transform 0.2s ease
+
+    // Hide on mobile
     +xs
-        font-size: 26px
-        margin: 0 12px
+        display: none
