@@ -1,44 +1,42 @@
-// Utility function to check if the device is iOS
-const isIOS = () => {
-  const userAgent = window.navigator.userAgent.toLowerCase()
-  return /iphone|ipad|ipod/.test(userAgent)
+export const promptIOSInstall = () => {
+  // Check if the device is iOS and not in standalone mode
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+  
+  return isIOS && !isStandalone
 }
 
-// Utility function to get the iOS version
-const getIOSVersion = () => {
-  const userAgent = window.navigator.userAgent.toLowerCase()
-  const match = userAgent.match(/os (\d+_\d+)/)
-  if (match) {
-    const version = match[1].replace('_', '.')
-    return parseFloat(version)
-  }
-  return null
-}
-
-// Utility function to check if the app is installed as a PWA
-const isPWAInstalled = () => {
-  return window.navigator.standalone === true // True when PWA is added to home screen on iOS
-}
-
-// Main function to handle iOS version and PWA installation check
-const handlePWAForiOS = () => {
-  if (isIOS()) {
-    const iOSVersion = getIOSVersion()
-
-    if (iOSVersion >= 16.4) {
-      if (!isPWAInstalled()) {
-        // Prompt the user to add the PWA to their home screen
-        alert(
-          'To receive notifications, please add this app to your home screen. Tap the share icon and select "Add to Home Screen".'
-        )
-      } else {
-        console.log('PWA is already installed on iOS 16.4+.')
-      }
-    } else {
-      // iOS version is earlier than 16.4, so no push notifications are possible
-      alert('Your device is running iOS version earlier than 16.4. Push notifications are not supported.')
+export const requestNotificationPermission = async () => {
+  try {
+    if (!('Notification' in window)) {
+      console.log('This browser does not support notifications')
+      return false
     }
+
+    const permission = await Notification.requestPermission()
+    return permission === 'granted'
+  } catch (error) {
+    console.error('Error requesting notification permission:', error)
+    return false
   }
 }
 
-export { handlePWAForiOS }
+export const checkServiceWorkerStatus = async () => {
+  if (!('serviceWorker' in navigator)) {
+    return 'unsupported'
+  }
+
+  try {
+    const registration = await navigator.serviceWorker.ready
+    return registration.active ? 'active' : 'inactive'
+  } catch (error) {
+    console.error('Error checking service worker status:', error)
+    return 'error'
+  }
+}
+
+export const isPWAInstalled = () => {
+  return window.matchMedia('(display-mode: standalone)').matches || 
+         window.navigator.standalone || 
+         document.referrer.includes('android-app://')
+}

@@ -11,11 +11,11 @@
     ],
     "headers": [
       {
-        "source": "/firebase-messaging-sw.js",
+        "source": "**/*.js",
         "headers": [
           {
-            "key": "Cache-Control",
-            "value": "no-cache"
+            "key": "Content-Type",
+            "value": "application/javascript"
           }
         ]
       }

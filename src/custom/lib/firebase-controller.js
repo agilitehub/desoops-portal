@@ -21,31 +21,26 @@ export const initFirebase = () => {
 
     const app = initializeApp(firebaseConfig)
     analytics = getAnalytics(app)
-
-    // Initialize Firebase Cloud Messaging
     messaging = getMessaging(app)
 
     onMessage(messaging, (payload) => {
-      console.log('incoming msg', payload)
+        console.log('Message received. ', payload)
+      })
+    
+    getToken(messaging, { vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY }).then((currentToken) => {
+        if (currentToken) {
+            console.log('Firebase token:', currentToken)
+            // Send the token to your server and update the UI if necessary
+            // ...
+          } else {
+            // Show permission request UI
+            console.log('No registration token available. Request permission to generate one.')
+            // ...
+        }
+    }).catch((err) => {
+        console.log('Error requesting Firebase token', err)
     })
   }
 }
 
-const requestForPushNotifications = async (setToken) => {
-  const permission = await Notification.requestPermission()
-
-  if (permission === 'granted') {
-    const token = await getToken(messaging, {
-      vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY
-    })
-
-    //We can send token to server
-    console.log('Token generated : ', token)
-    setToken(token)
-  } else if (permission === 'denied') {
-    //notifications are blocked
-    alert('You denied for the notification')
-  }
-}
-
-export { messaging, analytics, requestForPushNotifications }
+export { analytics, messaging }

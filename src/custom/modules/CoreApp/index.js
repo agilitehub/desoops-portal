@@ -9,14 +9,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { DeSoIdentityContext } from 'react-deso-protocol'
 import { isMobile, isTablet } from 'react-device-detect'
 import { useApolloClient } from '@apollo/client'
-import { Button, Spin, notification } from 'antd'
+import { Spin } from 'antd'
 
 // App Components
 import DistributionDashboard from '../DistributionDashboard'
 import Login from '../Login'
 import Toolbar from '../Toolbar'
 import EditProfile from '../EditProfile'
-import Notifications from '../Notifications'
+import PWAStatus from '../PWAStatus'
 
 // Utils
 import Enums from '../../lib/enums'
@@ -42,8 +42,6 @@ import { getDeSoPricing, getInitialDeSoData } from '../../lib/deso-controller-gr
 import { GQL_GET_INITIAL_DESO_DATA } from '../../lib/graphql-models'
 
 import './style.sass'
-import { handlePWAForiOS } from '../../lib/pwa-controller'
-import { requestForPushNotifications } from '../../lib/firebase-controller'
 
 const initialState = {
   initializing: false,
@@ -61,14 +59,11 @@ const CoreApp = () => {
   const client = useApolloClient()
   const [state, setState] = useReducer(reducer, initialState)
   const coreState = useSelector((state) => state)
-  const [api, contextHolder] = notification.useNotification()
-  const [token, setToken] = React.useState('')
 
   // Determine Device Type and init PWA Check
   useEffect(() => {
     const isSmartphone = isMobile && !isTablet
     dispatch(setDeviceType({ isMobile, isTablet, isSmartphone }))
-    handlePWAForiOS()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Determine the State of the page and what loads
@@ -91,21 +86,6 @@ const CoreApp = () => {
             break
           case Enums.appRenderState.LAUNCH:
             setState(newState)
-
-            const btn = (
-              <Button type='primary' size='small' onClick={() => requestForPushNotifications(setToken)}>
-                Confirm
-              </Button>
-            )
-
-            api.open({
-              message: 'Token',
-              description: token,
-              duration: 0,
-              btn,
-              key: 'key'
-            })
-
             break
           case Enums.appRenderState.LOGIN:
             // User logged out or was never logged in. Reset the Redux store and state
@@ -143,7 +123,7 @@ const CoreApp = () => {
     init()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser, isLoading, state.userReturned, state.initializing, api, token])
+  }, [currentUser, isLoading, state.userReturned, state.initializing])
 
   const getUsersDeSoData = async () => {
     const tmpConfigData = coreState.custom.configData
@@ -230,14 +210,11 @@ const CoreApp = () => {
             <Login />
           </>
         )
-      case Enums.appRenderState.NOTIFICATIONS:
-        return <Notifications />
     }
   }
 
   return (
     <>
-      {contextHolder}
       <Toolbar state={state} setState={setState} />
       {handleGetState()}
       <EditProfile
@@ -246,6 +223,7 @@ const CoreApp = () => {
         desoData={desoData}
         getUsersDeSoData={getUsersDeSoData}
       />
+      <PWAStatus />
     </>
   )
 }
