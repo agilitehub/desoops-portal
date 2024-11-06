@@ -4,7 +4,7 @@
 // If no, we display the Login page.
 // We also display a loading spinner while we are fetching the user's DeSo data.
 
-import React, { useContext, useEffect, useReducer } from 'react'
+import React, { useContext, useEffect, useReducer, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DeSoIdentityContext } from 'react-deso-protocol'
 import { isMobile, isTablet } from 'react-device-detect'
@@ -13,10 +13,10 @@ import { Spin } from 'antd'
 
 // App Components
 import DistributionDashboard from '../DistributionDashboard'
+import PWAManager from '../PWAManager'
 import Login from '../Login'
 import Toolbar from '../Toolbar'
 import EditProfile from '../EditProfile'
-import PWAStatus from '../PWAStatus'
 
 // Utils
 import Enums from '../../lib/enums'
@@ -60,6 +60,7 @@ const CoreApp = () => {
   const { currentUser, isLoading } = useContext(DeSoIdentityContext)
   const client = useApolloClient()
   const [state, setState] = useReducer(reducer, initialState)
+  const [canShowPWAManager, setCanShowPWAManager] = useState(false)
   const coreState = useSelector((state) => state)
 
   // Determine Device Type and init PWA Check
@@ -87,6 +88,7 @@ const CoreApp = () => {
             setState(newState)
             break
           case Enums.appRenderState.LAUNCH:
+            setCanShowPWAManager(shouldShowPWAManager('')) //TODO: Complete logic for user status
             setState(newState)
             break
           case Enums.appRenderState.LOGIN:
