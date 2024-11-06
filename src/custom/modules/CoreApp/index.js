@@ -40,8 +40,10 @@ import {
 import { renderApp } from './controller'
 import { getDeSoPricing, getInitialDeSoData } from '../../lib/deso-controller-graphql'
 import { GQL_GET_INITIAL_DESO_DATA } from '../../lib/graphql-models'
+import { shouldShowPWAManager } from '../PWAManager/controller'
 
 import './style.sass'
+import Notifications from '../Notifications'
 
 const initialState = {
   initializing: false,
@@ -202,6 +204,14 @@ const CoreApp = () => {
         return (
           <>
             <DistributionDashboard />
+            {canShowPWAManager && <PWAManager />}
+          </>
+        )
+      case Enums.appRenderState.NOTIFICATIONS:
+        return (
+          <>
+            <Notifications />
+            {canShowPWAManager && <PWAManager />}
           </>
         )
       case Enums.appRenderState.LOGIN:
@@ -223,7 +233,6 @@ const CoreApp = () => {
         desoData={desoData}
         getUsersDeSoData={getUsersDeSoData}
       />
-      <PWAStatus />
     </>
   )
 }

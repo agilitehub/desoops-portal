@@ -170,7 +170,7 @@ const SetupCard = ({
       <Card
         size='small'
         title={<span style={styleProps.title}>👇 Step 1: Setup & Config (Start Here)</span>}
-        headStyle={styleProps.headStyle}
+        styles={{ header: styleProps.headStyle }}
       >
         <Tabs
           disabled={true}

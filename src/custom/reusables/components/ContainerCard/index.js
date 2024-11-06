@@ -9,7 +9,7 @@ const ContainerCard = ({ title, deviceType, children, extra }) => {
   const styleProps = {
     card: { width: '100%', overflow: 'hidden', marginTop: 10 },
     title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
-    headStyle: { backgroundColor: '#FFA07A', minHeight: deviceType.isSmartphone ? 30 : 40 },
+    header: { backgroundColor: '#FFA07A', minHeight: deviceType.isSmartphone ? 30 : 40 },
     bodyStyle: { padding: 4, background: '#EDEDED' }
   }
 
@@ -21,8 +21,10 @@ const ContainerCard = ({ title, deviceType, children, extra }) => {
         </center>
       }
       style={styleProps.card}
-      headStyle={styleProps.headStyle}
-      bodyStyle={styleProps.bodyStyle}
+      styles={{
+        header: styleProps.header,
+        body: styleProps.bodyStyle
+      }}
       type='inner'
       size='small'
       extra={extra}

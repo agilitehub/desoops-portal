@@ -712,7 +712,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
     <Card
       title={<span style={styleProps.title}>Step 2: Distribution Summary</span>}
       size='small'
-      headStyle={{ background: '#DDE6ED' }}
+      styles={{ header: { background: '#DDE6ED' } }}
     >
       <Row>
         <Col

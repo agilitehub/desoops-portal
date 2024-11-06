@@ -159,8 +159,10 @@ const QuickActionsCard = ({ desoData, configData, onResetDashboard, onRefreshDas
     <Card
       title={<span style={styleProps.title}>Quick Actions</span>}
       size='small'
-      bodyStyle={styleProps.bodyStyle}
-      headStyle={styleProps.headStyle}
+      styles={{
+        body: styleProps.bodyStyle,
+        header: styleProps.headStyle
+      }}
     >
       <Row style={{ textAlign: 'center' }}>
         <Col span={5}>

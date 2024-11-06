@@ -27,8 +27,10 @@ const WalletOverviewCard = ({ desoProfile, deviceType }) => {
     <Card
       title={<span style={styleProps.title}>Wallet Overview</span>}
       size='small'
-      bodyStyle={styleProps.bodyStyle}
-      headStyle={styleProps.headStyle}
+      styles={{
+        body: styleProps.bodyStyle,
+        header: styleProps.headStyle
+      }}
     >
       <Row gutter={[5, 5]} style={styleProps.rowWrapper}>
         <Col span={8}>
