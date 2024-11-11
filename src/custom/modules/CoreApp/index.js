@@ -4,7 +4,7 @@
 // If no, we display the Login page.
 // We also display a loading spinner while we are fetching the user's DeSo data.
 
-import React, { useContext, useEffect, useReducer, useState } from 'react'
+import React, { useContext, useEffect, useReducer } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DeSoIdentityContext } from 'react-deso-protocol'
 import { isMobile, isTablet } from 'react-device-detect'
@@ -30,20 +30,17 @@ import {
   setDistributionTemplates,
   setEditProfileVisible
 } from '../../reducer'
-import {
-  getConfigData,
-  getDistributionTemplates,
-  getOptOutProfile,
-  getOptOutTemplate
-} from '../../lib/agilite-controller'
+import { initUserSession, getDistributionTemplates } from '../../lib/agilite-controller'
 
 import { renderApp } from './controller'
 import { getDeSoPricing, getInitialDeSoData } from '../../lib/deso-controller-graphql'
 import { GQL_GET_INITIAL_DESO_DATA } from '../../lib/graphql-models'
-import { shouldShowPWAManager } from '../PWAManager/controller'
 
 import './style.sass'
 import Notifications from '../Notifications'
+import { initializeMessaging, messaging, requestFirebaseToken } from '../../lib/firebase-controller'
+import { checkSupport, detectBrowser, detectDevice } from '../PWAManager/controller'
+import UpdateChecker from '../PWAUpdateChecker'
 
 const initialState = {
   initializing: false,
@@ -57,13 +54,13 @@ const reducer = (state, newState) => ({ ...state, ...newState })
 const CoreApp = () => {
   const dispatch = useDispatch()
   const desoData = useSelector((state) => state.custom.desoData)
+  const configData = useSelector((state) => state.custom.configData)
   const { currentUser, isLoading } = useContext(DeSoIdentityContext)
   const client = useApolloClient()
   const [state, setState] = useReducer(reducer, initialState)
-  const [canShowPWAManager, setCanShowPWAManager] = useState(false)
   const coreState = useSelector((state) => state)
 
-  // Determine Device Type and init PWA Check
+  // Determine Device Type
   useEffect(() => {
     const isSmartphone = isMobile && !isTablet
     dispatch(setDeviceType({ isMobile, isTablet, isSmartphone }))
@@ -75,10 +72,9 @@ const CoreApp = () => {
     // and sets it in the Redux store.
     const init = async () => {
       let tmpConfigData = null
-      let tmpOptOutTemplate = null
-      let tmpOptOutProfile = null
       let tmpTemplates = null
       let newState = null
+      let firebaseToken = null
 
       try {
         newState = await renderApp(currentUser, isLoading, state)
@@ -88,7 +84,58 @@ const CoreApp = () => {
             setState(newState)
             break
           case Enums.appRenderState.LAUNCH:
-            setCanShowPWAManager(shouldShowPWAManager('')) //TODO: Complete logic for user status
+            // Check if notifications are already permitted
+            const support = checkSupport()
+            console.log('Support:', support)
+            if (!support.needsInstall) {
+              if (Notification.permission === 'granted') {
+                await initializeMessaging()
+              }
+            }
+            // Only try to get token if messaging is initialized
+
+            if (messaging) {
+              firebaseToken = await requestFirebaseToken()
+              console.log('Firebase token:', firebaseToken)
+
+              if (firebaseToken) {
+                const fcmTokens = configData?.userProfile?.fcm?.tokens || []
+                console.log('Stored FCM tokens:', fcmTokens)
+
+                // Check if this token already exists
+                const existingToken = fcmTokens.find((t) => t.token === firebaseToken)
+
+                if (!existingToken) {
+                  // Token doesn't exist, add it
+                  const newTokenData = {
+                    token: firebaseToken,
+                    device: detectDevice(),
+                    browser: detectBrowser(),
+                    lastActive: new Date().toISOString(),
+                    createdAt: new Date().toISOString()
+                  }
+
+                  // TODO: API call to add the new token
+                  console.log('Adding new FCM token:', newTokenData)
+                } else {
+                  // Token exists, update lastActive
+                  if (existingToken.lastActive) {
+                    const lastActive = new Date(existingToken.lastActive)
+                    const oneDay = 24 * 60 * 60 * 1000 // milliseconds in a day
+
+                    if (Date.now() - lastActive.getTime() > oneDay) {
+                      // Update lastActive if more than a day old
+                      existingToken.lastActive = new Date().toISOString()
+                      // TODO: API call to update the token's lastActive date
+                      console.log('Updating FCM token lastActive:', existingToken)
+                    }
+                  }
+                }
+              } else {
+                console.log('Firebase Messaging not supported on this device/browser')
+              }
+            }
+
             setState(newState)
             break
           case Enums.appRenderState.LOGIN:
@@ -99,11 +146,7 @@ const CoreApp = () => {
           case Enums.appRenderState.INIT:
             setState(newState)
             // Retrieve configurations from Agilit-e
-            tmpConfigData = await getConfigData()
-            tmpOptOutTemplate = await getOptOutTemplate()
-            tmpConfigData.optOutTemplate = tmpOptOutTemplate
-            tmpOptOutProfile = await getOptOutProfile({ publicKey: currentUser.PublicKeyBase58Check })
-            tmpConfigData.optOutProfile = tmpOptOutProfile
+            tmpConfigData = await initUserSession(currentUser.PublicKeyBase58Check)
             dispatch(setConfigData(tmpConfigData))
 
             // Retrieve Distribution Templates from Agilit-e
@@ -186,6 +229,12 @@ const CoreApp = () => {
     } catch (e) {}
   }
 
+  const handleNotificationsEnabled = async () => {
+    console.log('Notifications enabled!')
+    const token = await requestFirebaseToken()
+    console.log('Firebase token:', token)
+  }
+
   const handleGetState = () => {
     switch (state.renderState) {
       case Enums.appRenderState.INIT:
@@ -206,20 +255,24 @@ const CoreApp = () => {
         return (
           <>
             <DistributionDashboard />
-            {canShowPWAManager && <PWAManager />}
+            <PWAManager onNotificationsEnabled={handleNotificationsEnabled} />
+            <UpdateChecker />
           </>
         )
       case Enums.appRenderState.NOTIFICATIONS:
         return (
           <>
             <Notifications />
-            {canShowPWAManager && <PWAManager />}
+            <PWAManager onNotificationsEnabled={handleNotificationsEnabled} />
+            <UpdateChecker />
           </>
         )
       case Enums.appRenderState.LOGIN:
         return (
           <>
             <Login />
+            <PWAManager onNotificationsEnabled={handleNotificationsEnabled} />
+            <UpdateChecker />
           </>
         )
     }

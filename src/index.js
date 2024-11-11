@@ -6,7 +6,6 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 // Utilities
-import { initAgilite } from './custom/lib/agilite-controller'
 import { initFirebase } from './custom/lib/firebase-controller'
 import App from './custom/modules/CoreApp'
 import OptOut, { loader as optOutLoader } from './custom/modules/OptOut'
@@ -15,6 +14,7 @@ import Store from './store'
 
 // Import default Stylesheet for application
 import './index.sass'
+import { initAgilite } from './custom/lib/agilite-controller'
 
 // TODO: Nullify console outputs for production
 // if (process.env.NODE_ENV === Enums.values.ENV_PRODUCTION) {
@@ -30,33 +30,40 @@ const client = new ApolloClient({
   cache: new InMemoryCache()
 })
 
-// Initiate Controllers
-initAgilite()
-initFirebase()
+const init = async () => {
+  try {
+    initAgilite()
+    initFirebase()
 
-// Initialize Router
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <App />
-    // errorElement: <ErrorPage />
-  },
-  {
-    path: 'optout/:publicKey?',
-    element: <OptOut />,
-    loader: optOutLoader
+    // Initialize Router after Firebase is ready
+    const router = createBrowserRouter([
+      {
+        path: '/',
+        element: <App />
+      },
+      {
+        path: 'optout/:publicKey?',
+        element: <OptOut />,
+        loader: optOutLoader
+      }
+    ])
+
+    // Render the app
+    const root = createRoot(document.getElementById('root'))
+    root.render(
+      <React.StrictMode>
+        <Provider store={Store}>
+          <DeSoIdentityProvider>
+            <ApolloProvider client={client}>
+              <RouterProvider router={router} />
+            </ApolloProvider>
+          </DeSoIdentityProvider>
+        </Provider>
+      </React.StrictMode>
+    )
+  } catch (error) {
+    console.error('Initialization failed:', error)
   }
-])
+}
 
-// Initialize App
-const root = createRoot(document.getElementById(Enums.values.DIV_ROOT))
-
-root.render(
-  <Provider store={Store}>
-    <ApolloProvider client={client}>
-      <DeSoIdentityProvider>
-        <RouterProvider router={router} />
-      </DeSoIdentityProvider>
-    </ApolloProvider>
-  </Provider>
-)
+init()

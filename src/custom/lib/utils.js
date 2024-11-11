@@ -1,11 +1,5 @@
 import Enums from './enums'
 
-/**
- * Copies the provided text to the clipboard.
- *
- * @param {string} text - The text to be copied to the clipboard.
- * @returns {Promise} A promise that resolves when the text has been successfully copied, or rejects when an error occurs or the Clipboard API is not supported.
- */
 export const copyTextToClipboard = async (text) => {
   let error = null
 
@@ -38,24 +32,10 @@ export const copyTextToClipboard = async (text) => {
   }
 }
 
-/**
- * Converts a hex string to an integer.
- *
- * @param {string} hex - The hex string to be converted to an integer.
- * @returns {integer} The resulting integer.
- */
 export const hexToInt = (hex) => {
   return parseInt(hex, 16)
 }
 
-/**
- * Cleans the provided string by limiting the characters and removing unwanted values.
- *
- * @param {string} inputString - The string to be cleaned.
- * @param {integer} maxCharacters - The maximum number of characters allowed in the string.
- * @param {boolean} removeHashTaggs - Whether or not to remove hash tags from the string.
- * @returns {string} The cleaned string.
- */
 export const cleanString = (inputString = '', maxCharacters = 0, removeHashTags = true) => {
   let cleanedString = inputString
 
