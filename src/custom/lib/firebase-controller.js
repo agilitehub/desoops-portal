@@ -9,21 +9,16 @@ let messaging = null
 let firebaseApp = null
 
 const isMessagingSupported = () => {
-  console.log('Checking Firebase messaging support...')
-
   // First check if the required APIs are available
   if (!('Notification' in window)) {
-    console.log('❌ Notifications API not supported')
     return false
   }
 
   if (!('serviceWorker' in navigator)) {
-    console.log('❌ Service Workers not supported')
     return false
   }
 
   if (!('PushManager' in window)) {
-    console.log('❌ Push API not supported')
     return false
   }
 
@@ -33,10 +28,8 @@ const isMessagingSupported = () => {
     // 1. iOS 16.4+ Safari
     // 2. App installed to home screen
     const isPWA = PWA_CONFIG.env.isInstalled
-    console.log('Is PWA installed:', isPWA)
 
     if (!isPWA) {
-      console.log('❌ iOS requires app to be installed to home screen')
       return false
     }
 
@@ -46,16 +39,13 @@ const isMessagingSupported = () => {
     const isVersionSupported = iosVersion >= PWA_CONFIG.minIOSVersion
 
     if (!isIOSSafari) {
-      console.log('❌ iOS requires Safari browser')
       return false
     }
 
     if (!isVersionSupported) {
-      console.log(`❌ iOS version ${iosVersion} not supported (minimum: ${PWA_CONFIG.minIOSVersion})`)
       return false
     }
 
-    console.log('✅ iOS Safari PWA supported')
     return true
   }
 
@@ -63,13 +53,11 @@ const isMessagingSupported = () => {
   if (/android/i.test(navigator.userAgent)) {
     const isSupportedBrowser = /(chrome|firefox)/i.test(navigator.userAgent)
     if (!isSupportedBrowser) {
-      console.log('❌ Unsupported browser on Android')
       return false
     }
   }
 
   // For desktop, most modern browsers are supported
-  console.log('✅ Push notifications supported on this platform')
   return true
 }
 
@@ -84,7 +72,6 @@ const registerServiceWorker = async () => {
     })
 
     await navigator.serviceWorker.ready
-    console.log('Service Worker registered successfully:', registration)
     return registration
   } catch (error) {
     console.error('Service Worker registration failed:', error)
@@ -144,21 +131,19 @@ export const initializeMessaging = async () => {
       console.log('Using existing FCM token:', existingToken)
     }
 
-    // Handle foreground messages
+    // Handle foreground messages, but exclude iOS. Note this logic is needed for iOS for the Safari Push Notification handler to work
     onMessage(messaging, (payload) => {
-      console.log('Foreground message received:', payload)
+      if (!PWA_CONFIG.env.isIOS) {
+        // TODO: Handle the notification data here
+        console.log('Foreground message received:', payload)
+      }
     })
 
     // For iOS PWA, also set up Safari Push Notification handler
     if (PWA_CONFIG.env.isIOS && PWA_CONFIG.env.isInstalled) {
       navigator.serviceWorker.addEventListener('message', (event) => {
+        // TODO: Handle the notification data here
         console.log('Safari Push message received:', event.data)
-        // Handle the notification data here
-        if (event.data.firebase && event.data.firebase.messaging) {
-          const payload = event.data.firebase.messaging
-          // Now you can handle the notification payload
-          console.log('Firebase notification payload:', payload)
-        }
       })
     }
 
@@ -171,7 +156,6 @@ export const initializeMessaging = async () => {
 
 export const requestFirebaseToken = async () => {
   if (!messaging || !isMessagingSupported()) {
-    console.log('Firebase Messaging not supported or not initialized')
     return null
   }
 
@@ -190,7 +174,6 @@ export const requestFirebaseToken = async () => {
       return currentToken
     }
 
-    console.log('No registration token available. Request permission to generate one.')
     return null
   } catch (error) {
     console.error('Error requesting Firebase token:', error)

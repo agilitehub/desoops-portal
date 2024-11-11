@@ -1,5 +1,4 @@
 // These are generic enums used throughout the app.
-
 const Enums = {
   values: {
     DESO_OPS_PUBLIC_KEY: 'BC1YLfmmgppbA2CiVvdRjX9jL7kSvGQeqJdxibXRyhpMcP9WTm7qz6R',
@@ -77,6 +76,11 @@ const Enums = {
     LOADING: 'Loading...',
     INIT_REQUEST: 'Initializing Request...',
     SIGNING_IN: 'Signing In...'
+  },
+  reqTypes: {
+    INIT_USER_SESSION: 'init_user_session',
+    UPDATE_FCM_TOKENS: 'update_fcm_tokens',
+    OPT_OUT_PROFILE: 'opt_out_profile'
   },
   messages: {
     UNKNOWN_ERROR: 'Unknown Error Occured. Please check console',

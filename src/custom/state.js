@@ -29,7 +29,8 @@ const configData = {
   desoGasFeesSendCCNanos: 0,
   tips: [],
   optOutTemplate: '',
-  optOutProfile: null
+  optOutProfile: null,
+  userProfile: null
 }
 
 const userAgent = {

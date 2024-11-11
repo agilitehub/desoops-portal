@@ -1,8 +1,11 @@
 // Logic in this file will interact with the Agilit-e API.
 // As a start, we will be executing the Templates Agilite API...
 // which will bring down the App configurations in JSON format.
+// import Agilite from 'agilite'
+import Axios from 'axios'
+import { detectBrowser, detectDevice } from '../modules/PWAManager/controller'
+import Enums from './enums'
 import Agilite from 'agilite'
-
 let agilite = null
 
 // Create a function that initiates the Agilit-e API
@@ -13,20 +16,44 @@ export const initAgilite = () => {
   })
 }
 
-// Create a function that retrieves the App configurations from Agilit-e
-export const getConfigData = async () => {
-  const response = await agilite.Templates.execute('deso_ops_portal_config')
+// Create a function that initiates a User Session and returns necessary config data
+export const initUserSession = async (publicKey) => {
+  const device = detectDevice()
+  const browser = detectBrowser()
+
+  const axiosConfig = {
+    baseURL: process.env.REACT_APP_NODE_RED_URL,
+    method: 'POST',
+    headers: {
+      'api-key': process.env.REACT_APP_AGILITE_API_KEY,
+      'req-type': Enums.reqTypes.INIT_USER_SESSION,
+      'public-key': publicKey,
+      device: device,
+      browser: browser
+    }
+  }
+
+  const response = await Axios.request(axiosConfig)
   return response.data
 }
 
-export const getOptOutTemplate = async () => {
-  const response = await agilite.Templates.getData(['opt_out_template'])
-
-  if (response.data && response.data.length > 0) {
-    return response.data[0].data.data
-  } else {
-    return ''
+export const updateFCMToken = async (publicKey, updateType, data) => {
+  const axiosConfig = {
+    baseURL: process.env.REACT_APP_NODE_RED_URL,
+    method: 'POST',
+    headers: {
+      'api-key': process.env.REACT_APP_AGILITE_API_KEY,
+      'req-type': updateType,
+      'public-key': publicKey
+    },
+    data
   }
+
+  console.log('Updating FCM token:', axiosConfig)
+
+  const response = await Axios.request(axiosConfig)
+  console.log('Response from updateFCMToken:', response.data)
+  return response.data
 }
 
 // Create a function that creates a new Distribution Transaction in Agilit-e
@@ -111,11 +138,18 @@ export const deleteDistributionTemplate = async (id) => {
   return response.data
 }
 
-export const getOptOutProfile = async (qry) => {
-  const response = await agilite.Connectors.execute('opt_out_profiles', 'find_one', {
-    qry: JSON.stringify(qry)
-  })
+export const getOptOutProfile = async (publicKey) => {
+  const axiosConfig = {
+    baseURL: process.env.REACT_APP_NODE_RED_URL,
+    method: 'POST',
+    headers: {
+      'api-key': process.env.REACT_APP_AGILITE_API_KEY,
+      'req-type': Enums.reqTypes.INIT_USER_SESSION,
+      'public-key': publicKey
+    }
+  }
 
+  const response = await Axios.request(axiosConfig)
   return response.data
 }
 

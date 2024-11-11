@@ -30,7 +30,7 @@ import {
   setDistributionTemplates,
   setEditProfileVisible
 } from '../../reducer'
-import { initUserSession, getDistributionTemplates } from '../../lib/agilite-controller'
+import { initUserSession, getDistributionTemplates, updateFCMToken } from '../../lib/agilite-controller'
 
 import { renderApp } from './controller'
 import { getDeSoPricing, getInitialDeSoData } from '../../lib/deso-controller-graphql'
@@ -74,7 +74,6 @@ const CoreApp = () => {
       let tmpConfigData = null
       let tmpTemplates = null
       let newState = null
-      let firebaseToken = null
 
       try {
         newState = await renderApp(currentUser, isLoading, state)
@@ -86,54 +85,15 @@ const CoreApp = () => {
           case Enums.appRenderState.LAUNCH:
             // Check if notifications are already permitted
             const support = checkSupport()
-            console.log('Support:', support)
+
             if (!support.needsInstall) {
               if (Notification.permission === 'granted') {
                 await initializeMessaging()
               }
             }
-            // Only try to get token if messaging is initialized
-
+            // Only try to get and manage token if messaging is initialized
             if (messaging) {
-              firebaseToken = await requestFirebaseToken()
-              console.log('Firebase token:', firebaseToken)
-
-              if (firebaseToken) {
-                const fcmTokens = configData?.userProfile?.fcm?.tokens || []
-                console.log('Stored FCM tokens:', fcmTokens)
-
-                // Check if this token already exists
-                const existingToken = fcmTokens.find((t) => t.token === firebaseToken)
-
-                if (!existingToken) {
-                  // Token doesn't exist, add it
-                  const newTokenData = {
-                    token: firebaseToken,
-                    device: detectDevice(),
-                    browser: detectBrowser(),
-                    lastActive: new Date().toISOString(),
-                    createdAt: new Date().toISOString()
-                  }
-
-                  // TODO: API call to add the new token
-                  console.log('Adding new FCM token:', newTokenData)
-                } else {
-                  // Token exists, update lastActive
-                  if (existingToken.lastActive) {
-                    const lastActive = new Date(existingToken.lastActive)
-                    const oneDay = 24 * 60 * 60 * 1000 // milliseconds in a day
-
-                    if (Date.now() - lastActive.getTime() > oneDay) {
-                      // Update lastActive if more than a day old
-                      existingToken.lastActive = new Date().toISOString()
-                      // TODO: API call to update the token's lastActive date
-                      console.log('Updating FCM token lastActive:', existingToken)
-                    }
-                  }
-                }
-              } else {
-                console.log('Firebase Messaging not supported on this device/browser')
-              }
+              await handleNotificationsEnabled()
             }
 
             setState(newState)
@@ -230,9 +190,51 @@ const CoreApp = () => {
   }
 
   const handleNotificationsEnabled = async () => {
-    console.log('Notifications enabled!')
-    const token = await requestFirebaseToken()
-    console.log('Firebase token:', token)
+    const firebaseToken = await requestFirebaseToken()
+
+    if (firebaseToken) {
+      const device = detectDevice()
+      const browser = detectBrowser()
+      const existingFcmTokens = configData?.userProfile?.fcm?.tokens || []
+
+      let fcmTokens = [...existingFcmTokens]
+
+      let existingTokenConfig = null
+      let createTokenConfig = true
+      let updateTokenConfig = false
+
+      console.log('Stored FCM tokens:', fcmTokens)
+
+      existingTokenConfig = fcmTokens.find((t) => t.device === device && t.browser === browser)
+
+      if (existingTokenConfig) {
+        createTokenConfig = false
+
+        if (existingTokenConfig.token !== firebaseToken) {
+          updateTokenConfig = true
+          existingTokenConfig.token = firebaseToken
+          existingTokenConfig.lastActive = new Date().toISOString()
+        }
+      }
+
+      if (createTokenConfig) {
+        const newTokenConfig = {
+          token: firebaseToken,
+          device,
+          browser,
+          lastActive: new Date().toISOString(),
+          createdAt: new Date().toISOString()
+        }
+
+        console.log('Adding new FCM token:', newTokenConfig, fcmTokens)
+        fcmTokens = [...fcmTokens, newTokenConfig]
+        await updateFCMToken(currentUser.PublicKeyBase58Check, Enums.reqTypes.UPDATE_FCM_TOKENS, fcmTokens)
+      } else if (updateTokenConfig) {
+        await updateFCMToken(currentUser.PublicKeyBase58Check, Enums.reqTypes.UPDATE_FCM_TOKENS, fcmTokens)
+      } else {
+        console.log('Token config already exists, no action needed')
+      }
+    }
   }
 
   const handleGetState = () => {
