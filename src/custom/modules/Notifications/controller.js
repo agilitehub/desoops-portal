@@ -1,4 +1,6 @@
 import Enums from '../../../custom/lib/enums'
+import { FETCH_SINGLE_PROFILE } from '../../../custom/lib/graphql-models'
+import { generateProfilePicUrl } from '../../../custom/lib/deso-controller-graphql'
 
 // Helper function to get notification type and description
 const formatAmount = (amount, divideTwice = true) => {
@@ -77,34 +79,48 @@ const getNotificationDetails = (notification) => {
 }
 
 // Main function to format notifications
-export const formatNotifications = (notifications) => {
-  return notifications.map((notification) => {
-    // Get notification type and description
-    const { type, description } = getNotificationDetails(notification)
+export const formatNotifications = async (notifications, client) => {
+  const formattedNotifications = await Promise.all(
+    notifications.map(async (notification) => {
+      // Get notification type and description
+      const { type, description } = getNotificationDetails(notification)
 
-    // If type is null, we don't care about this notification and need to skip it
-    if (!type) {
-      return null
-    }
-
-    const { Metadata, Index } = notification.data
-    const { BlockHashHex, TransactorPublicKeyBase58Check } = Metadata
-
-    // TODO: Get the profile of who triggered the notification
-    // TODO: Get the profile picture
-
-    return {
-      id: Index,
-      timestamp: notification.data.Timestamp,
-      type,
-      description,
-      blockHash: BlockHashHex,
-      isRead: notification.isRead,
-      actor: {
-        publicKey: TransactorPublicKeyBase58Check,
-        username: TransactorPublicKeyBase58Check,
-        profilePic: null
+      // If type is null, we don't care about this notification and need to skip it
+      if (!type) {
+        return null
       }
-    }
-  })
+
+      const { Metadata, Index } = notification.data
+      const { BlockHashHex, TransactorPublicKeyBase58Check } = Metadata
+
+      // Get the profile of who triggered the notification
+      let actorProfile = null
+      try {
+        const response = await client.query({
+          query: FETCH_SINGLE_PROFILE,
+          variables: { publicKey: TransactorPublicKeyBase58Check },
+          fetchPolicy: 'no-cache'
+        })
+        actorProfile = response.data.accountByPublicKey
+      } catch (error) {
+        console.error('Error fetching actor profile:', error)
+      }
+
+      return {
+        id: Index,
+        timestamp: notification.data.Timestamp,
+        type,
+        description,
+        blockHash: BlockHashHex,
+        isRead: notification.isRead,
+        actor: {
+          publicKey: TransactorPublicKeyBase58Check,
+          username: actorProfile?.username || TransactorPublicKeyBase58Check,
+          profilePic: actorProfile ? await generateProfilePicUrl(actorProfile.publicKey) : null
+        }
+      }
+    })
+  )
+
+  return formattedNotifications.filter(Boolean)
 }

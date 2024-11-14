@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Dropdown, Image, Space } from 'antd'
 import { useDispatch, useSelector } from 'react-redux'
-import { DownOutlined, UserOutlined } from '@ant-design/icons'
+import { BellOutlined, DownOutlined, UserOutlined } from '@ant-design/icons'
 
 import { desoLogout } from '../../../lib/deso-controller-graphql'
 
 import './style.sass'
-import { setEditProfileVisible } from '../../../reducer'
+import { setEditProfileVisible, setEditNotificationsVisible } from '../../../reducer'
 
 const ToolbarDropDown = () => {
   const dispatch = useDispatch()
@@ -16,11 +16,20 @@ const ToolbarDropDown = () => {
   const handleGetItems = () => {
     const dropDownItems = {
       editProfile: {
+        icon: <UserOutlined style={{ fontSize: 16 }} />,
         danger: false,
         key: 'Edit Profile',
-        label: 'Edit Profile',
+        label: 'Profile',
         className: 'dropdown-item',
         onClick: () => dispatch(setEditProfileVisible(true))
+      },
+      editNotifications: {
+        icon: <BellOutlined style={{ fontSize: 16 }} />,
+        danger: false,
+        key: 'Edit Notifications',
+        label: 'Notifications',
+        className: 'dropdown-item',
+        onClick: () => dispatch(setEditNotificationsVisible(true))
       },
       signOut: {
         danger: true,
@@ -37,7 +46,7 @@ const ToolbarDropDown = () => {
       }
     }
 
-    return [dropDownItems.editProfile, dropDownItems.signOut, dropDownItems.version]
+    return [dropDownItems.editProfile, dropDownItems.editNotifications, dropDownItems.signOut, dropDownItems.version]
   }
 
   useEffect(() => {

@@ -7,6 +7,7 @@ import { Col, Empty, message, Row, Spin, Avatar } from 'antd'
 import { formatNotifications } from './controller'
 import { getNotifications } from '../../lib/agilite-controller'
 import dayjs from 'dayjs'
+import { useApolloClient } from '@apollo/client'
 
 const formatDate = (date) => {
   const now = new Date()
@@ -36,6 +37,7 @@ const formatDate = (date) => {
 }
 
 const Notifications = () => {
+  const client = useApolloClient()
   const {
     custom: {
       userAgent: { isTablet, isSmartphone, isMobile },
@@ -59,7 +61,7 @@ const Notifications = () => {
     setLoading(true)
     try {
       const response = await getNotifications(profile.publicKey, 1, 50)
-      const formattedNotifications = formatNotifications(response)
+      const formattedNotifications = await formatNotifications(response, client)
       setNotifications(formattedNotifications)
     } catch (error) {
       message.error('Failed to load notifications')

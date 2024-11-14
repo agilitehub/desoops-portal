@@ -41,6 +41,7 @@ import Notifications from '../Notifications'
 import { initializeMessaging, messaging, requestFirebaseToken } from '../../lib/firebase-controller'
 import { checkSupport, detectBrowser, detectDevice } from '../PWAManager/controller'
 import UpdateChecker from '../PWAUpdateChecker'
+import EditNotifications from '../EditNotifications'
 
 const initialState = {
   initializing: false,
@@ -289,6 +290,11 @@ const CoreApp = () => {
         setDeSoData={setDeSoData}
         desoData={desoData}
         getUsersDeSoData={getUsersDeSoData}
+      />
+      <EditNotifications
+        isVisible={coreState.custom.editNotificationsVisible}
+        setDeSoData={setDeSoData}
+        desoData={desoData}
       />
     </>
   )
