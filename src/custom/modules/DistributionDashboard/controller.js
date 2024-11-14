@@ -14,7 +14,9 @@ export const setupHodlers = async (hodlers, rootState, desoData) => {
 
     percentResult = await calculatePercentages(filterResult.hodlers)
     percentResult.hodlers = await calculateEstimatedPayment(
-      rootState.distributionAmount,
+      rootState.paymentType === Enums.paymentTypes.USD
+        ? rootState.distributionAmount / desoData.desoPrice
+        : rootState.distributionAmount,
       rootState.distributionType,
       rootState.spreadAmountBasedOn,
       percentResult.hodlers,
@@ -50,7 +52,9 @@ export const updateTableSelection = async (hodlers, rootState, desoData, selecte
 
     percentResult = await calculatePercentages(tmpHodlers)
     percentResult.hodlers = await calculateEstimatedPayment(
-      rootState.distributionAmount,
+      rootState.paymentType === Enums.paymentTypes.USD
+        ? rootState.distributionAmount / desoData.desoPrice
+        : rootState.distributionAmount,
       rootState.distributionType,
       rootState.spreadAmountBasedOn,
       percentResult.hodlers,
