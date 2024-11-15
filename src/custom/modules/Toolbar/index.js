@@ -1,6 +1,6 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
-import { Col, Layout, Row } from 'antd'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { Badge, Col, Layout, Row } from 'antd'
 import { Footer, Header } from 'antd/es/layout/layout'
 
 import ToolbarDropDown from './ToolbarDropDown'
@@ -11,12 +11,26 @@ import './style.sass'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMoneyBillTransfer, faMessage, faBell, faWallet } from '@fortawesome/free-solid-svg-icons'
+import { setComingSoonVisible } from '../../../custom/reducer'
 
-const Toolbar = ({ state, setState }) => {
+const Toolbar = ({ state, setState, onNotificationsClick }) => {
+  const dispatch = useDispatch()
   const profile = useSelector((state) => state.custom.desoData.profile)
 
   const handleNavigate = (renderState) => {
     setState({ renderState })
+  }
+
+  useEffect(() => {
+    if (state.renderState === Enums.appRenderState.LAUNCH) {
+      setState({ renderState: Enums.appRenderState.DISTRO })
+    }
+
+    // eslint-disable-next-line
+  }, [state.renderState])
+
+  const showComingSoon = () => {
+    dispatch(setComingSoonVisible(true))
   }
 
   return (
@@ -37,9 +51,9 @@ const Toolbar = ({ state, setState }) => {
                 gap: '32px'
               }}
             >
-              <div className='toolbar-header-item'>
-                <FontAwesomeIcon icon={faWallet} className='toolbar-header-icon' />
-                <span className='toolbar-header-text'>Wallet</span>
+              <div className='toolbar-header-item' onClick={() => showComingSoon()}>
+                <FontAwesomeIcon icon={faWallet} className='toolbar-header-icon-disabled' />
+                <span className='toolbar-header-text-disabled'>Wallet</span>
               </div>
               <div
                 className={`toolbar-header-item ${state.renderState === Enums.appRenderState.DISTRO ? 'active' : ''}`}
@@ -48,18 +62,15 @@ const Toolbar = ({ state, setState }) => {
                 <FontAwesomeIcon className='toolbar-header-icon' icon={faMoneyBillTransfer} />
                 <span className='toolbar-header-text'>Distribute</span>
               </div>
-              <div className='toolbar-header-item'>
-                <FontAwesomeIcon className='toolbar-header-icon' icon={faMessage} />
-                <span className='toolbar-header-text'>Messages</span>
+              <div className='toolbar-header-item' onClick={() => showComingSoon()}>
+                <FontAwesomeIcon className='toolbar-header-icon-disabled' icon={faMessage} />
+                <span className='toolbar-header-text-disabled'>Messages</span>
               </div>
-              <div
-                className={`toolbar-header-item ${
-                  state.renderState === Enums.appRenderState.NOTIFICATIONS ? 'active' : ''
-                }`}
-                onClick={() => handleNavigate(Enums.appRenderState.NOTIFICATIONS)}
-              >
+              <div className='toolbar-header-item' onClick={onNotificationsClick}>
                 <FontAwesomeIcon className='toolbar-header-icon' icon={faBell} />
-                <span className='toolbar-header-text'>Notifications</span>
+                <Badge className='toolbar-header-text' count={'99+'} offset={[20, -5]}>
+                  Notifications
+                </Badge>
               </div>
             </Row>
           ) : undefined}
@@ -80,9 +91,9 @@ const Toolbar = ({ state, setState }) => {
               padding: '8px 20px'
             }}
           >
-            <Col className='toolbar-footer-item'>
-              <FontAwesomeIcon icon={faWallet} className='toolbar-footer-icon' />
-              <div className='toolbar-footer-text'>Wallet</div>
+            <Col className='toolbar-footer-item' onClick={() => showComingSoon()}>
+              <FontAwesomeIcon icon={faWallet} className='toolbar-footer-icon-disabled' />
+              <div className='toolbar-footer-text-disabled'>Wallet</div>
             </Col>
             <Col
               className={`toolbar-footer-item ${state.renderState === Enums.appRenderState.DISTRO ? 'active' : ''}`}
@@ -91,18 +102,15 @@ const Toolbar = ({ state, setState }) => {
               <FontAwesomeIcon className='toolbar-footer-icon' icon={faMoneyBillTransfer} />
               <div className='toolbar-footer-text'>Distribute</div>
             </Col>
-            <Col className='toolbar-footer-item'>
-              <FontAwesomeIcon className='toolbar-footer-icon' icon={faMessage} />
-              <div className='toolbar-footer-text'>Messages</div>
+            <Col className='toolbar-footer-item' onClick={() => showComingSoon()}>
+              <FontAwesomeIcon className='toolbar-footer-icon-disabled' icon={faMessage} />
+              <div className='toolbar-footer-text-disabled'>Messages</div>
             </Col>
-            <Col
-              className={`toolbar-footer-item ${
-                state.renderState === Enums.appRenderState.NOTIFICATIONS ? 'active' : ''
-              }`}
-              onClick={() => handleNavigate(Enums.appRenderState.NOTIFICATIONS)}
-            >
+            <Col className={'toolbar-footer-item'} onClick={onNotificationsClick}>
               <FontAwesomeIcon className='toolbar-footer-icon' icon={faBell} />
-              <div className='toolbar-footer-text'>Notifications</div>
+              <Badge className='toolbar-footer-text' count={'99+'} offset={[0, -30]}>
+                Notifications
+              </Badge>
             </Col>
           </Row>
         </Footer>

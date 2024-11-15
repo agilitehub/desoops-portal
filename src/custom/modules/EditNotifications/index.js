@@ -1,8 +1,10 @@
 import React from 'react'
-import { Modal, Form, Switch, Select, Card, Row, Col, Divider } from 'antd'
+import { Modal, Form, Switch, Select, Card, Row, Col, Divider, Space } from 'antd'
 import { useDispatch } from 'react-redux'
 import styles from './style.module.sass'
 import { setEditNotificationsVisible } from '../../../custom/reducer'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBell, faBellSlash } from '@fortawesome/free-regular-svg-icons'
 
 const EditNotifications = ({ isVisible }) => {
   const dispatch = useDispatch()
@@ -65,10 +67,19 @@ const EditNotifications = ({ isVisible }) => {
 
           {formState.enableNotifications && (
             <div style={{ marginTop: 10 }}>
+              <Row>
+                <Col span={12}>
+                  <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 15, textAlign: 'center' }}>In App</p>
+                </Col>
+                <Col span={12}>
+                  <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 15, textAlign: 'center' }}>Push</p>
+                </Col>
+              </Row>
               <Divider style={{ margin: '8px 0' }} />
+              <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 14 }}>Diamonds</p>
               <Row gutter={[16, 16]}>
                 <Col span={12}>
-                  <Form.Item label='Diamonds' name='diamondsThreshold'>
+                  <Form.Item name='diamondsThreshold'>
                     <Select>
                       <Select.Option value='none'>None</Select.Option>
                       <Select.Option value='1'>1+ Diamonds</Select.Option>
@@ -81,62 +92,120 @@ const EditNotifications = ({ isVisible }) => {
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  {formState.diamondsThreshold !== 'none' && (
-                    <Form.Item label='Enable Push' name='diamondsPush'>
-                      <Switch checkedChildren='Yes' unCheckedChildren='No' />
-                    </Form.Item>
-                  )}
+                  <center>
+                    {formState.diamondsThreshold !== 'none' && (
+                      <Form.Item name='diamondsPush'>
+                        <Switch
+                          checkedChildren={
+                            <Space>
+                              <FontAwesomeIcon icon={faBell} /> Yes
+                            </Space>
+                          }
+                          unCheckedChildren={
+                            <Space>
+                              <FontAwesomeIcon icon={faBellSlash} /> No
+                            </Space>
+                          }
+                        />
+                      </Form.Item>
+                    )}
+                  </center>
                 </Col>
               </Row>
-
               <Divider style={{ margin: '8px 0' }} />
-
+              <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 14 }}>$DESO</p>
               <Row gutter={[16, 16]}>
                 <Col span={12}>
-                  <Form.Item label='$DESO' name='desoNotifications'>
-                    <Switch checkedChildren='Yes' unCheckedChildren='No' />
+                  <Form.Item name='desoNotifications'>
+                    <Select>
+                      <Select.Option value={true}>Enabled</Select.Option>
+                      <Select.Option value={false}>Disabled</Select.Option>
+                    </Select>
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  {formState.desoNotifications && (
-                    <Form.Item label='Enable Push' name='desoPush'>
-                      <Switch checkedChildren='Yes' unCheckedChildren='No' />
-                    </Form.Item>
-                  )}
+                  <center>
+                    {formState.desoNotifications && (
+                      <Form.Item name='desoPush'>
+                        <Switch
+                          checkedChildren={
+                            <Space>
+                              <FontAwesomeIcon icon={faBell} /> Yes
+                            </Space>
+                          }
+                          unCheckedChildren={
+                            <Space>
+                              <FontAwesomeIcon icon={faBellSlash} /> No
+                            </Space>
+                          }
+                        />
+                      </Form.Item>
+                    )}
+                  </center>
                 </Col>
               </Row>
-
               <Divider style={{ margin: '8px 0' }} />
-
+              <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 14 }}>Social/DAO</p>
               <Row gutter={[16, 16]}>
                 <Col span={12}>
-                  <Form.Item label='Social/DAO' name='socialNotifications'>
-                    <Switch checkedChildren='Yes' unCheckedChildren='No' />
+                  <Form.Item name='socialNotifications'>
+                    <Select>
+                      <Select.Option value={true}>Enabled</Select.Option>
+                      <Select.Option value={false}>Disabled</Select.Option>
+                    </Select>
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  {formState.socialNotifications && (
-                    <Form.Item label='Enable Push' name='socialPush'>
-                      <Switch checkedChildren='Yes' unCheckedChildren='No' />
-                    </Form.Item>
-                  )}
+                  <center>
+                    {formState.socialNotifications && (
+                      <Form.Item name='socialPush'>
+                        <Switch
+                          checkedChildren={
+                            <Space>
+                              <FontAwesomeIcon icon={faBell} /> Yes
+                            </Space>
+                          }
+                          unCheckedChildren={
+                            <Space>
+                              <FontAwesomeIcon icon={faBellSlash} /> No
+                            </Space>
+                          }
+                        />
+                      </Form.Item>
+                    )}
+                  </center>
                 </Col>
               </Row>
-
               <Divider style={{ margin: '8px 0' }} />
-
+              <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 14 }}>Other Crypto</p>
               <Row gutter={[16, 16]}>
                 <Col span={12}>
-                  <Form.Item label='Other Crypto' name='cryptoNotifications'>
-                    <Switch checkedChildren='Yes' unCheckedChildren='No' />
+                  <Form.Item name='cryptoNotifications'>
+                    <Select>
+                      <Select.Option value={true}>Enabled</Select.Option>
+                      <Select.Option value={false}>Disabled</Select.Option>
+                    </Select>
                   </Form.Item>
                 </Col>
                 <Col span={12}>
-                  {formState.cryptoNotifications && (
-                    <Form.Item label='Enable Push' name='cryptoPush'>
-                      <Switch checkedChildren='Yes' unCheckedChildren='No' />
-                    </Form.Item>
-                  )}
+                  <center>
+                    {formState.cryptoNotifications && (
+                      <Form.Item name='cryptoPush'>
+                        <Switch
+                          checkedChildren={
+                            <Space>
+                              <FontAwesomeIcon icon={faBell} /> Yes
+                            </Space>
+                          }
+                          unCheckedChildren={
+                            <Space>
+                              <FontAwesomeIcon icon={faBellSlash} /> No
+                            </Space>
+                          }
+                        />
+                      </Form.Item>
+                    )}
+                  </center>
                 </Col>
               </Row>
             </div>

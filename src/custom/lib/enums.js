@@ -53,8 +53,7 @@ const Enums = {
     LOGIN: 'login',
     LOADING: 'loading',
     COMPLETION: 'completion',
-    DISTRO: 'distro',
-    NOTIFICATIONS: 'notifications'
+    DISTRO: 'distro'
   },
   coinSwap: {
     heroSwap: {

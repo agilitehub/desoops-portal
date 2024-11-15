@@ -4,7 +4,7 @@
 // If no, we display the Login page.
 // We also display a loading spinner while we are fetching the user's DeSo data.
 
-import React, { useContext, useEffect, useReducer } from 'react'
+import React, { useContext, useEffect, useReducer, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DeSoIdentityContext } from 'react-deso-protocol'
 import { isMobile, isTablet } from 'react-device-detect'
@@ -42,6 +42,7 @@ import { initializeMessaging, messaging, requestFirebaseToken } from '../../lib/
 import { checkSupport, detectBrowser, detectDevice } from '../PWAManager/controller'
 import UpdateChecker from '../PWAUpdateChecker'
 import EditNotifications from '../EditNotifications'
+import ComingSoon from '../ComingSoon'
 
 const initialState = {
   initializing: false,
@@ -60,6 +61,7 @@ const CoreApp = () => {
   const client = useApolloClient()
   const [state, setState] = useReducer(reducer, initialState)
   const coreState = useSelector((state) => state)
+  const [notificationsVisible, setNotificationsVisible] = useState(false)
 
   // Determine Device Type
   useEffect(() => {
@@ -258,14 +260,7 @@ const CoreApp = () => {
         return (
           <>
             <DistributionDashboard />
-            <PWAManager onNotificationsEnabled={handleNotificationsEnabled} />
-            <UpdateChecker />
-          </>
-        )
-      case Enums.appRenderState.NOTIFICATIONS:
-        return (
-          <>
-            <Notifications />
+            <Notifications visible={notificationsVisible} onClose={() => setNotificationsVisible(false)} />
             <PWAManager onNotificationsEnabled={handleNotificationsEnabled} />
             <UpdateChecker />
           </>
@@ -283,7 +278,7 @@ const CoreApp = () => {
 
   return (
     <>
-      <Toolbar state={state} setState={setState} />
+      <Toolbar state={state} setState={setState} onNotificationsClick={() => setNotificationsVisible(true)} />
       {handleGetState()}
       <EditProfile
         isVisible={coreState.custom.editProfileVisible}
@@ -296,6 +291,7 @@ const CoreApp = () => {
         setDeSoData={setDeSoData}
         desoData={desoData}
       />
+      <ComingSoon isVisible={coreState.custom.comingSoonVisible} />
     </>
   )
 }

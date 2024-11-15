@@ -52,6 +52,7 @@ export const customState = () => {
     userAgent,
     leftMenu,
     editProfileVisible: false,
+    comingSoonVisible: false,
     editNotificationsVisible: false
   }
 }

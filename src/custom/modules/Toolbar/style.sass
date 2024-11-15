@@ -10,7 +10,7 @@
     flex-direction: row
     justify-content: space-between
     align-items: center
-    background-color: $blue1-dark
+    background-color: $blue2-dark
     height: 60px
     padding: 0 24px
     +xs
@@ -49,6 +49,11 @@
     color: $white
     transition: transform 0.2s ease
 
+.toolbar-header-icon-disabled
+    font-size: 24px
+    color: $white
+    opacity: 0.5
+
 .toolbar-header-icon-active
     font-size: 24px
     color: $orange2
@@ -62,7 +67,7 @@
     padding: 0
     text-align: center
     z-index: 100
-    background-color: $blue1-dark
+    background-color: $blue2-dark
     height: 70px
     display: none
     align-items: center
@@ -97,9 +102,23 @@
     +xs
         font-size: 26px
 
+.toolbar-footer-icon-disabled
+    font-size: 28px
+    color: $white
+    opacity: 0.5
+    margin-bottom: 4px
+    +xs
+        font-size: 26px
+
 .toolbar-footer-text
     font-size: 12px
     color: $white
+    margin-top: 2px
+
+.toolbar-footer-text-disabled
+    font-size: 12px
+    color: $white
+    opacity: 0.5
     margin-top: 2px
 
 .toolbar-header-item
@@ -134,3 +153,7 @@
     // Hide on mobile
     +xs
         display: none
+
+.toolbar-header-text-disabled
+    color: $white
+    opacity: 0.5

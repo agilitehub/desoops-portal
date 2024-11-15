@@ -1,9 +1,8 @@
-import { UserOutlined } from '@ant-design/icons'
-import ContainerCard from '../../reusables/components/ContainerCard'
+import { CloseOutlined, UserOutlined } from '@ant-design/icons'
 import React, { useState, useEffect, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import styles from './style.module.sass'
-import { Col, Empty, message, Row, Spin, Avatar } from 'antd'
+import { Empty, message, Spin, Avatar, Card, Drawer } from 'antd'
 import { formatNotifications } from './controller'
 import { getNotifications } from '../../lib/agilite-controller'
 import dayjs from 'dayjs'
@@ -36,7 +35,7 @@ const formatDate = (date) => {
   return dayjs(date).format('YYYY/MM/DD HH:mm')
 }
 
-const Notifications = () => {
+const Notifications = ({ visible, onClose }) => {
   const client = useApolloClient()
   const {
     custom: {
@@ -77,46 +76,52 @@ const Notifications = () => {
   }, [])
 
   return (
-    <Row justify='center'>
-      <Col xs={22} xl={20} xxl={16}>
-        <ContainerCard title='Notifications' deviceType={deviceType}>
-          <button className={styles.refreshButton} onClick={loadNotifications} disabled={loading}>
-            Refresh
-          </button>
-          {loading ? (
-            <div className={styles.loadingContainer}>
-              <Spin size='large' />
-              <div className={styles.loadingText}>Loading...</div>
-            </div>
-          ) : notifications.length === 0 ? (
-            <Empty description='No notifications to show' />
-          ) : (
-            <>
-              {notifications.filter(Boolean).map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`${styles.notificationItem} ${notification.isRead ? '' : styles.unread}`}
-                >
-                  <Avatar
-                    src={notification.actor.profilePic}
-                    icon={!notification.actor.profilePic && <UserOutlined />}
-                    className={styles.avatar}
-                  />
-                  <div className={styles.contentWrapper}>
-                    <div className={styles.header}>
-                      <span className={styles.username}>{notification.actor.username}</span>
-                      <span className={styles.timestamp}>{formatDate(new Date(notification.timestamp))}</span>
-                    </div>
-                    <span className={styles.description}>{notification.description}</span>
-                    {notification.post && <div className={styles.postPreview}>{notification.post.body}</div>}
+    <Drawer
+      title='Notifications'
+      placement='right'
+      onClose={onClose}
+      open={visible}
+      width={deviceType.isSmartphone ? '100%' : 500}
+      classNames={{
+        header: styles.drawerHeader
+      }}
+      closeIcon={<CloseOutlined className={styles.closeIcon} />}
+    >
+      {loading ? (
+        <div className={styles.loadingContainer}>
+          <Spin size='large' />
+          <div className={styles.loadingText}>Loading...</div>
+        </div>
+      ) : notifications.length === 0 ? (
+        <Empty description='No notifications to show' />
+      ) : (
+        <>
+          {notifications.filter(Boolean).map((notification, index) => (
+            <Card
+              key={notification.id}
+              className={`${styles.notificationCard} ${notification.isRead || index === 1 ? '' : styles.unread}`}
+              bordered={false}
+            >
+              <div className={styles.notificationContent}>
+                <Avatar
+                  src={notification.actor.profilePic}
+                  icon={!notification.actor.profilePic && <UserOutlined />}
+                  className={styles.avatar}
+                />
+                <div className={styles.contentWrapper}>
+                  <div className={styles.header}>
+                    <span className={styles.username}>{notification.actor.username}</span>
+                    <span className={styles.timestamp}>{formatDate(new Date(notification.timestamp))}</span>
                   </div>
+                  <span className={styles.description}>{notification.description}</span>
+                  {notification.post && <div className={styles.postPreview}>{notification.post.body}</div>}
                 </div>
-              ))}
-            </>
-          )}
-        </ContainerCard>
-      </Col>
-    </Row>
+              </div>
+            </Card>
+          ))}
+        </>
+      )}
+    </Drawer>
   )
 }
 

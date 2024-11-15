@@ -45,8 +45,11 @@ const slice = createSlice({
     setEditProfileVisible: (state, data) => {
       state.editProfileVisible = data.payload
     },
-    setEditNotificationsVisible: (state, data) => {
-      state.editNotificationsVisible = data.payload
+    setComingSoonVisible: (state, data) => {
+      state.comingSoonVisible = data.payload
+    },
+    setUnreadNotifications: (state, data) => {
+      state.unreadNotifications = data.payload
     }
   }
 })
@@ -63,6 +66,7 @@ export const {
   setDeSoPrice,
   setDiamondLevels,
   setEditProfileVisible,
+  setComingSoonVisible,
   setEditNotificationsVisible
 } = slice.actions
 export default slice.reducer
