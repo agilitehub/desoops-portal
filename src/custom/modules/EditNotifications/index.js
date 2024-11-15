@@ -1,5 +1,5 @@
 import React from 'react'
-import { Modal, Form, Switch, Select, Card } from 'antd'
+import { Modal, Form, Switch, Select, Card, Row, Col, Divider } from 'antd'
 import { useDispatch } from 'react-redux'
 import styles from './style.module.sass'
 import { setEditNotificationsVisible } from '../../../custom/reducer'
@@ -7,10 +7,17 @@ import { setEditNotificationsVisible } from '../../../custom/reducer'
 const EditNotifications = ({ isVisible }) => {
   const dispatch = useDispatch()
   const [form] = Form.useForm()
-  const [notificationsEnabled, setNotificationsEnabled] = React.useState(false)
-  const [desoEnabled, setDesoEnabled] = React.useState(false)
-  const [socialEnabled, setSocialEnabled] = React.useState(false)
-  const [cryptoEnabled, setCryptoEnabled] = React.useState(false)
+  const [formState, setFormState] = React.useState({
+    enableNotifications: true,
+    diamondsThreshold: '2',
+    diamondsPush: true,
+    desoNotifications: true,
+    desoPush: true,
+    socialNotifications: true,
+    socialPush: true,
+    cryptoNotifications: true,
+    cryptoPush: true
+  })
 
   const handleOk = () => {
     dispatch(setEditNotificationsVisible(false))
@@ -28,8 +35,12 @@ const EditNotifications = ({ isVisible }) => {
     })
   }
 
-  const handleNotificationsChange = (enabled) => {
-    setNotificationsEnabled(enabled)
+  const handleFieldsChange = (_, allFields) => {
+    const newState = allFields.reduce((acc, field) => {
+      acc[field.name[0]] = field.value
+      return acc
+    }, {})
+    setFormState((prev) => ({ ...prev, ...newState }))
   }
 
   return (
@@ -46,94 +57,91 @@ const EditNotifications = ({ isVisible }) => {
       className='full-screen-modal'
       destroyOnClose
     >
-      <Form
-        form={form}
-        layout='vertical'
-        initialValues={{
-          enableNotifications: true,
-          diamondsThreshold: '2',
-          diamondsPush: true,
-          desoNotifications: true,
-          desoPush: true,
-          socialNotifications: true,
-          socialPush: true,
-          cryptoNotifications: true,
-          cryptoPush: true
-        }}
-      >
-        <Card styles={{ body: { padding: '12px' } }}>
+      <Form form={form} layout='vertical' initialValues={formState} onFieldsChange={handleFieldsChange}>
+        <Card size='small' type='inner'>
           <Form.Item label='Enable Notifications' name='enableNotifications' style={{ marginBottom: 0 }}>
-            <Switch checkedChildren='Yes' unCheckedChildren='No' onChange={handleNotificationsChange} />
+            <Switch checkedChildren='Yes' unCheckedChildren='No' />
           </Form.Item>
+
+          {formState.enableNotifications && (
+            <div style={{ marginTop: 10 }}>
+              <Divider style={{ margin: '8px 0' }} />
+              <Row gutter={[16, 16]}>
+                <Col span={12}>
+                  <Form.Item label='Diamonds' name='diamondsThreshold'>
+                    <Select>
+                      <Select.Option value='none'>None</Select.Option>
+                      <Select.Option value='1'>1+ Diamonds</Select.Option>
+                      <Select.Option value='2'>2+ Diamonds</Select.Option>
+                      <Select.Option value='3'>3+ Diamonds</Select.Option>
+                      <Select.Option value='4'>4+ Diamonds</Select.Option>
+                      <Select.Option value='5'>5+ Diamonds</Select.Option>
+                      <Select.Option value='6'>6+ Diamonds</Select.Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  {formState.diamondsThreshold !== 'none' && (
+                    <Form.Item label='Enable Push' name='diamondsPush'>
+                      <Switch checkedChildren='Yes' unCheckedChildren='No' />
+                    </Form.Item>
+                  )}
+                </Col>
+              </Row>
+
+              <Divider style={{ margin: '8px 0' }} />
+
+              <Row gutter={[16, 16]}>
+                <Col span={12}>
+                  <Form.Item label='$DESO' name='desoNotifications'>
+                    <Switch checkedChildren='Yes' unCheckedChildren='No' />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  {formState.desoNotifications && (
+                    <Form.Item label='Enable Push' name='desoPush'>
+                      <Switch checkedChildren='Yes' unCheckedChildren='No' />
+                    </Form.Item>
+                  )}
+                </Col>
+              </Row>
+
+              <Divider style={{ margin: '8px 0' }} />
+
+              <Row gutter={[16, 16]}>
+                <Col span={12}>
+                  <Form.Item label='Social/DAO' name='socialNotifications'>
+                    <Switch checkedChildren='Yes' unCheckedChildren='No' />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  {formState.socialNotifications && (
+                    <Form.Item label='Enable Push' name='socialPush'>
+                      <Switch checkedChildren='Yes' unCheckedChildren='No' />
+                    </Form.Item>
+                  )}
+                </Col>
+              </Row>
+
+              <Divider style={{ margin: '8px 0' }} />
+
+              <Row gutter={[16, 16]}>
+                <Col span={12}>
+                  <Form.Item label='Other Crypto' name='cryptoNotifications'>
+                    <Switch checkedChildren='Yes' unCheckedChildren='No' />
+                  </Form.Item>
+                </Col>
+                <Col span={12}>
+                  {formState.cryptoNotifications && (
+                    <Form.Item label='Enable Push' name='cryptoPush'>
+                      <Switch checkedChildren='Yes' unCheckedChildren='No' />
+                    </Form.Item>
+                  )}
+                </Col>
+              </Row>
+            </div>
+          )}
         </Card>
-
-        {notificationsEnabled && (
-          <div style={{ marginTop: 2 }}>
-            {/* Diamonds Section */}
-            <Card title='Diamonds' size='small' type='inner'>
-              <Form.Item label='Notify me when I receive' name='diamondsThreshold'>
-                <Select>
-                  <Select.Option value='none'>None</Select.Option>
-                  <Select.Option value='1'>1+ Diamonds</Select.Option>
-                  <Select.Option value='2'>2+ Diamonds</Select.Option>
-                  <Select.Option value='3'>3+ Diamonds</Select.Option>
-                  <Select.Option value='4'>4+ Diamonds</Select.Option>
-                  <Select.Option value='5'>5+ Diamonds</Select.Option>
-                  <Select.Option value='6'>6+ Diamonds</Select.Option>
-                </Select>
-              </Form.Item>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                {form.getFieldValue('diamondsThreshold') !== 'none' && (
-                  <Form.Item label='Enable Push' name='diamondsPush' style={{ marginBottom: 0, flex: 1 }}>
-                    <Switch checkedChildren='Yes' unCheckedChildren='No' />
-                  </Form.Item>
-                )}
-              </div>
-            </Card>
-
-            {/* DESO Section */}
-            <Card title='$DESO' size='small' type='inner' style={{ marginTop: 2 }}>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-                <Form.Item label='Notifications' name='desoNotifications' style={{ flex: 1, marginBottom: 0 }}>
-                  <Switch checkedChildren='Yes' unCheckedChildren='No' onChange={setDesoEnabled} />
-                </Form.Item>
-                {desoEnabled && (
-                  <Form.Item label='Enable Push' name='desoPush' style={{ flex: 1, marginBottom: 0 }}>
-                    <Switch checkedChildren='Yes' unCheckedChildren='No' />
-                  </Form.Item>
-                )}
-              </div>
-            </Card>
-
-            {/* Social/DAO Section */}
-            <Card title='Social/DAO' size='small' type='inner' style={{ marginTop: 2 }}>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-                <Form.Item label='Notifications' name='socialNotifications' style={{ flex: 1, marginBottom: 0 }}>
-                  <Switch checkedChildren='Yes' unCheckedChildren='No' onChange={setSocialEnabled} />
-                </Form.Item>
-                {socialEnabled && (
-                  <Form.Item label='Enable Push' name='socialPush' style={{ flex: 1, marginBottom: 0 }}>
-                    <Switch checkedChildren='Yes' unCheckedChildren='No' />
-                  </Form.Item>
-                )}
-              </div>
-            </Card>
-
-            {/* Other Crypto Section */}
-            <Card title='Other Crypto' size='small' type='inner' style={{ marginTop: 2 }}>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-                <Form.Item label='Notifications' name='cryptoNotifications' style={{ flex: 1, marginBottom: 0 }}>
-                  <Switch checkedChildren='Yes' unCheckedChildren='No' onChange={setCryptoEnabled} />
-                </Form.Item>
-                {cryptoEnabled && (
-                  <Form.Item label='Enable Push' name='cryptoPush' style={{ flex: 1, marginBottom: 0 }}>
-                    <Switch checkedChildren='Yes' unCheckedChildren='No' />
-                  </Form.Item>
-                )}
-              </div>
-            </Card>
-          </div>
-        )}
       </Form>
     </Modal>
   )
