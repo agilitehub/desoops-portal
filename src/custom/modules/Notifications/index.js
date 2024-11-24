@@ -1,5 +1,5 @@
-import { CloseOutlined, UserOutlined } from '@ant-design/icons'
-import React, { useState, useEffect, useMemo } from 'react'
+import { UserOutlined } from '@ant-design/icons'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useSelector } from 'react-redux'
 import styles from './style.module.sass'
 import { Empty, message, Spin, Avatar, Card, Drawer } from 'antd'
@@ -37,26 +37,11 @@ const formatDate = (date) => {
 
 const Notifications = ({ visible, onClose }) => {
   const client = useApolloClient()
-  const {
-    custom: {
-      userAgent: { isTablet, isSmartphone, isMobile },
-      desoData: { profile }
-    }
-  } = useSelector((state) => state)
-
+  const { profile } = useSelector((state) => state.custom.desoData)
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const deviceType = useMemo(
-    () => ({
-      isSmartphone,
-      isTablet,
-      isMobile
-    }),
-    [isSmartphone, isTablet, isMobile]
-  )
-
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     setLoading(true)
     try {
       const response = await getNotifications(profile.publicKey, 1, 50)
@@ -68,12 +53,11 @@ const Notifications = ({ visible, onClose }) => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [profile.publicKey, client])
 
   useEffect(() => {
     loadNotifications()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [loadNotifications])
 
   return (
     <Drawer
@@ -81,11 +65,7 @@ const Notifications = ({ visible, onClose }) => {
       placement='right'
       onClose={onClose}
       open={visible}
-      width={deviceType.isSmartphone ? '100%' : 500}
-      classNames={{
-        header: styles.drawerHeader
-      }}
-      closeIcon={<CloseOutlined className={styles.closeIcon} />}
+      width={500}
     >
       {loading ? (
         <div className={styles.loadingContainer}>
@@ -95,31 +75,18 @@ const Notifications = ({ visible, onClose }) => {
       ) : notifications.length === 0 ? (
         <Empty description='No notifications to show' />
       ) : (
-        <>
-          {notifications.filter(Boolean).map((notification, index) => (
-            <Card
-              key={notification.id}
-              className={`${styles.notificationCard} ${notification.isRead || index === 1 ? '' : styles.unread}`}
-              bordered={false}
-            >
-              <div className={styles.notificationContent}>
-                <Avatar
-                  src={notification.actor.profilePic}
-                  icon={!notification.actor.profilePic && <UserOutlined />}
-                  className={styles.avatar}
-                />
-                <div className={styles.contentWrapper}>
-                  <div className={styles.header}>
-                    <span className={styles.username}>{notification.actor.username}</span>
-                    <span className={styles.timestamp}>{formatDate(new Date(notification.timestamp))}</span>
-                  </div>
-                  <span className={styles.description}>{notification.description}</span>
-                  {notification.post && <div className={styles.postPreview}>{notification.post.body}</div>}
-                </div>
+        notifications.map((notification) => (
+          <Card key={notification.id} bordered={false}>
+            <div>
+              <Avatar src={notification.actor.profilePic} icon={!notification.actor.profilePic && <UserOutlined />} />
+              <div>
+                <span>{notification.actor.username}</span>
+                <span>{formatDate(new Date(notification.timestamp))}</span>
+                <span>{notification.description}</span>
               </div>
-            </Card>
-          ))}
-        </>
+            </div>
+          </Card>
+        ))
       )}
     </Drawer>
   )

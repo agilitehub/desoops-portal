@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app'
 import { getAnalytics } from 'firebase/analytics'
 import { getMessaging, getToken, onMessage } from 'firebase/messaging'
+import { checkPwaFeatures } from '../modules/PWAManager/PWADetector/utils'
 import { PWA_CONFIG } from '../modules/PWAManager/config'
 import Enums from './enums'
 
@@ -8,7 +9,8 @@ let analytics = null
 let messaging = null
 let firebaseApp = null
 
-const isMessagingSupported = () => {
+const isMessagingSupported = async () => {
+  const features = await checkPwaFeatures()
   // First check if the required APIs are available
   if (!('Notification' in window)) {
     return false
@@ -23,18 +25,18 @@ const isMessagingSupported = () => {
   }
 
   // Check if it's iOS
-  if (PWA_CONFIG.env.isIOS) {
+  if (features.deviceType === 'ios') {
     // For iOS, we need both:
     // 1. iOS 16.4+ Safari
     // 2. App installed to home screen
-    const isPWA = PWA_CONFIG.env.isInstalled
+    const isPWA = features.isPWAInstalled
 
     if (!isPWA) {
       return false
     }
 
     // Check if it's Safari and correct version
-    const isIOSSafari = PWA_CONFIG.env.isIOSSafari
+    const isIOSSafari = features.browserType === 'safari'
     const iosVersion = parseFloat((navigator.userAgent.match(/OS (\d+)_(\d+)_?(\d+)?/) || [])[1])
     const isVersionSupported = iosVersion >= PWA_CONFIG.minIOSVersion
 
@@ -126,10 +128,6 @@ export const initializeMessaging = async () => {
       vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY,
       serviceWorkerRegistration: registration
     })
-
-    if (existingToken) {
-      console.log('Using existing FCM token:', existingToken)
-    }
 
     // Handle foreground messages, but exclude iOS. Note this logic is needed for iOS for the Safari Push Notification handler to work
     onMessage(messaging, (payload) => {

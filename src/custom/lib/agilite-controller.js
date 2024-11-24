@@ -3,7 +3,6 @@
 // which will bring down the App configurations in JSON format.
 // import Agilite from 'agilite'
 import Axios from 'axios'
-import { detectBrowser, detectDevice } from '../modules/PWAManager/controller'
 import Enums from './enums'
 import Agilite from 'agilite'
 let agilite = null
@@ -17,10 +16,7 @@ export const initAgilite = () => {
 }
 
 // Create a function that initiates a User Session and returns necessary config data
-export const initUserSession = async (publicKey) => {
-  const device = detectDevice()
-  const browser = detectBrowser()
-
+export const initUserSession = async (publicKey, device, browser) => {
   const axiosConfig = {
     baseURL: process.env.REACT_APP_NODE_RED_URL,
     method: 'POST',
@@ -28,8 +24,8 @@ export const initUserSession = async (publicKey) => {
       'api-key': process.env.REACT_APP_AGILITE_API_KEY,
       'req-type': Enums.reqTypes.INIT_USER_SESSION,
       'public-key': publicKey,
-      device: device,
-      browser: browser
+      device,
+      browser
     }
   }
 
@@ -49,10 +45,23 @@ export const updateFCMToken = async (publicKey, updateType, data) => {
     data
   }
 
-  console.log('Updating FCM token:', axiosConfig)
+  const response = await Axios.request(axiosConfig)
+  return response.data
+}
+
+export const updatePWAManagerEnabled = async (publicKey, updateType, enabled) => {
+  const axiosConfig = {
+    baseURL: process.env.REACT_APP_NODE_RED_URL,
+    method: 'POST',
+    headers: {
+      'api-key': process.env.REACT_APP_AGILITE_API_KEY,
+      'req-type': updateType,
+      'public-key': publicKey,
+      enabled: enabled ? 'true' : 'false'
+    }
+  }
 
   const response = await Axios.request(axiosConfig)
-  console.log('Response from updateFCMToken:', response.data)
   return response.data
 }
 

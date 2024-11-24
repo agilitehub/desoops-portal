@@ -56,7 +56,7 @@ import {
   GQL_GET_TOKEN_HOLDERS
 } from '../../../lib/graphql-models'
 import { buildGQLProps, randomize } from '../../../lib/utils'
-
+import { usePwaFeatures } from '../../PWAManager/PWADetector/hooks'
 const reducer = (state, newState) => ({ ...state, ...newState })
 
 const _BatchTransactionsForm = () => {
@@ -67,13 +67,13 @@ const _BatchTransactionsForm = () => {
   const client = useApolloClient()
   const [state, setState] = useReducer(reducer, distributionDashboardState(configData.feePerTransactionUSD))
   const { isTablet, isSmartphone, isMobile } = useSelector((state) => state.custom.userAgent)
-
+  const { deviceType, browserType } = usePwaFeatures()
   const styleProps = {
     divider: { margin: '4px 0', borderBlockStart: 0 },
     verticalGutter: isSmartphone ? 6 : 12
   }
 
-  const deviceType = { isSmartphone, isTablet, isMobile }
+  const mobileType = { isSmartphone, isTablet, isMobile }
 
   useEffect(() => {
     let rulesEnabled = false
@@ -158,7 +158,7 @@ const _BatchTransactionsForm = () => {
       setState({ isExecuting: true })
 
       // First we retrieve configurations from Agilit-e
-      const tmpConfigData = await initUserSession(desoData.profile.publicKey)
+      const tmpConfigData = await initUserSession(desoData.profile.publicKey, deviceType, browserType)
       dispatch(setConfigData(tmpConfigData))
 
       // Now we need to determine which public key to use based on myHodlers
@@ -211,7 +211,7 @@ const _BatchTransactionsForm = () => {
       setState({ isExecuting: true })
 
       // First we retrieve configurations from Agilit-e
-      const tmpConfigData = await initUserSession(desoData.profile.publicKey)
+      const tmpConfigData = await initUserSession(desoData.profile.publicKey, deviceType, browserType)
       dispatch(setConfigData(tmpConfigData))
 
       // Get the rest of the DeSo Data for the current User
@@ -1115,12 +1115,12 @@ const _BatchTransactionsForm = () => {
     <>
       <Row justify='center' gutter={[12, 12]}>
         <Col xs={22} xl={20} xxl={16}>
-          <ContainerCard title={'Distribution Dashboard'} deviceType={deviceType}>
+          <ContainerCard title={'Distribution Dashboard'} deviceType={mobileType}>
             <Row gutter={[12, styleProps.verticalGutter]}>
               <Col span={24}>
                 <Row gutter={[12, styleProps.verticalGutter]}>
                   <Col xs={24} md={12}>
-                    <WalletOverviewCard desoProfile={desoData.profile} deviceType={deviceType} />
+                    <WalletOverviewCard desoProfile={desoData.profile} deviceType={mobileType} />
                   </Col>
                   <Col xs={24} md={12}>
                     <QuickActionsCard
@@ -1129,7 +1129,7 @@ const _BatchTransactionsForm = () => {
                       onResetDashboard={resetState}
                       onRefreshDashboard={handleRefreshDashboard}
                       rootState={state}
-                      deviceType={deviceType}
+                      deviceType={mobileType}
                       setRootState={setState}
                     />
                   </Col>
@@ -1153,7 +1153,7 @@ const _BatchTransactionsForm = () => {
                       onDeleteTemplate={handleDeleteTemplate}
                       onSetTemplateName={handleSetTemplateName}
                       onConfirmDiamondOptions={handleConfirmDiamondOptions}
-                      deviceType={deviceType}
+                      deviceType={mobileType}
                       isLoading={state.loading}
                       distributionTemplates={distributionTemplates}
                     />
@@ -1165,7 +1165,7 @@ const _BatchTransactionsForm = () => {
                       rootState={state}
                       setRootState={setState}
                       onRefreshDashboard={handlePostDistributionRefresh}
-                      deviceType={deviceType}
+                      deviceType={mobileType}
                     />
                   </Col>
                 </Row>
@@ -1173,7 +1173,7 @@ const _BatchTransactionsForm = () => {
             </Row>
             <Divider style={styleProps.divider} />
             <Row>
-              <TableData desoData={desoData} rootState={state} setRootState={setState} deviceType={deviceType} />
+              <TableData desoData={desoData} rootState={state} setRootState={setState} deviceType={mobileType} />
             </Row>
           </ContainerCard>
         </Col>

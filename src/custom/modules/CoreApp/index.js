@@ -10,6 +10,7 @@ import { DeSoIdentityContext } from 'react-deso-protocol'
 import { isMobile, isTablet } from 'react-device-detect'
 import { useApolloClient } from '@apollo/client'
 import { Spin } from 'antd'
+import { usePwaFeatures } from '../PWAManager/PWADetector/hooks'
 
 // App Components
 import DistributionDashboard from '../DistributionDashboard'
@@ -17,6 +18,7 @@ import PWAManager from '../PWAManager'
 import Login from '../Login'
 import Toolbar from '../Toolbar'
 import EditProfile from '../EditProfile'
+import Notifications from '../Notifications'
 
 // Utils
 import Enums from '../../lib/enums'
@@ -30,17 +32,14 @@ import {
   setDistributionTemplates,
   setEditProfileVisible
 } from '../../reducer'
-import { initUserSession, getDistributionTemplates, updateFCMToken } from '../../lib/agilite-controller'
+import { initUserSession, getDistributionTemplates, updateFCMToken, updatePWAManagerEnabled } from '../../lib/agilite-controller'
 
 import { renderApp } from './controller'
 import { getDeSoPricing, getInitialDeSoData } from '../../lib/deso-controller-graphql'
 import { GQL_GET_INITIAL_DESO_DATA } from '../../lib/graphql-models'
 
 import './style.sass'
-import Notifications from '../Notifications'
-import { initializeMessaging, messaging, requestFirebaseToken } from '../../lib/firebase-controller'
-import { checkSupport, detectBrowser, detectDevice } from '../PWAManager/controller'
-import UpdateChecker from '../PWAUpdateChecker'
+import { initializeMessaging, requestFirebaseToken } from '../../lib/firebase-controller'
 import EditNotifications from '../EditNotifications'
 import ComingSoon from '../ComingSoon'
 
@@ -57,11 +56,14 @@ const CoreApp = () => {
   const dispatch = useDispatch()
   const desoData = useSelector((state) => state.custom.desoData)
   const configData = useSelector((state) => state.custom.configData)
+  const editProfileVisible = useSelector((state) => state.custom.editProfileVisible)
+  const editNotificationsVisible = useSelector((state) => state.custom.editNotificationsVisible)
+  const comingSoonVisible = useSelector((state) => state.custom.comingSoonVisible)
   const { currentUser, isLoading } = useContext(DeSoIdentityContext)
   const client = useApolloClient()
   const [state, setState] = useReducer(reducer, initialState)
-  const coreState = useSelector((state) => state)
   const [notificationsVisible, setNotificationsVisible] = useState(false)
+  const { notificationPermission, browserType, deviceType } = usePwaFeatures()
 
   // Determine Device Type
   useEffect(() => {
@@ -71,8 +73,6 @@ const CoreApp = () => {
 
   // Determine the State of the page and what loads
   useEffect(() => {
-    // This function gets a user's profile, balance, and other DeSo data
-    // and sets it in the Redux store.
     const init = async () => {
       let tmpConfigData = null
       let tmpTemplates = null
@@ -86,16 +86,9 @@ const CoreApp = () => {
             setState(newState)
             break
           case Enums.appRenderState.LAUNCH:
-            // Check if notifications are already permitted
-            const support = checkSupport()
-
-            if (!support.needsInstall) {
-              if (Notification.permission === 'granted') {
-                await initializeMessaging()
-              }
-            }
-            // Only try to get and manage token if messaging is initialized
-            if (messaging) {
+            // Check if we need to initialize messaging and request tokens
+            if (notificationPermission === 'granted') {
+              await initializeMessaging()
               await handleNotificationsEnabled()
             }
 
@@ -109,7 +102,7 @@ const CoreApp = () => {
           case Enums.appRenderState.INIT:
             setState(newState)
             // Retrieve configurations from Agilit-e
-            tmpConfigData = await initUserSession(currentUser.PublicKeyBase58Check)
+            tmpConfigData = await initUserSession(currentUser.PublicKeyBase58Check, browserType, deviceType)
             dispatch(setConfigData(tmpConfigData))
 
             // Retrieve Distribution Templates from Agilit-e
@@ -136,7 +129,7 @@ const CoreApp = () => {
   }, [currentUser, isLoading, state.userReturned, state.initializing])
 
   const getUsersDeSoData = async () => {
-    const tmpConfigData = coreState.custom.configData
+    const tmpConfigData = configData
     let gqlProps = null
     let gqlData = null
 
@@ -189,16 +182,14 @@ const CoreApp = () => {
     try {
       const desoPrice = await getDeSoPricing(currDeSoPrice)
       dispatch(setDeSoPrice(desoPrice))
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const handleNotificationsEnabled = async () => {
     const firebaseToken = await requestFirebaseToken()
 
     if (firebaseToken) {
-      const device = detectDevice()
-      const browser = detectBrowser()
-      const existingFcmTokens = configData?.userProfile?.fcm?.tokens || []
+      const existingFcmTokens = configData?.userProfile?.notifications?.tokens || []
 
       let fcmTokens = [...existingFcmTokens]
 
@@ -206,9 +197,7 @@ const CoreApp = () => {
       let createTokenConfig = true
       let updateTokenConfig = false
 
-      console.log('Stored FCM tokens:', fcmTokens)
-
-      existingTokenConfig = fcmTokens.find((t) => t.device === device && t.browser === browser)
+      existingTokenConfig = fcmTokens.find((t) => t.device === deviceType && t.browser === browserType)
 
       if (existingTokenConfig) {
         createTokenConfig = false
@@ -223,21 +212,22 @@ const CoreApp = () => {
       if (createTokenConfig) {
         const newTokenConfig = {
           token: firebaseToken,
-          device,
-          browser,
+          device: deviceType,
+          browser: browserType,
           lastActive: new Date().toISOString(),
           createdAt: new Date().toISOString()
         }
 
-        console.log('Adding new FCM token:', newTokenConfig, fcmTokens)
         fcmTokens = [...fcmTokens, newTokenConfig]
         await updateFCMToken(currentUser.PublicKeyBase58Check, Enums.reqTypes.UPDATE_FCM_TOKENS, fcmTokens)
       } else if (updateTokenConfig) {
         await updateFCMToken(currentUser.PublicKeyBase58Check, Enums.reqTypes.UPDATE_FCM_TOKENS, fcmTokens)
-      } else {
-        console.log('Token config already exists, no action needed')
       }
     }
+  }
+
+  const handleDontShowAgain = async () => {
+    await updatePWAManagerEnabled(currentUser.PublicKeyBase58Check, Enums.reqTypes.UPDATE_PWAMANAGER_ENABLED, false)
   }
 
   const handleGetState = () => {
@@ -261,16 +251,13 @@ const CoreApp = () => {
           <>
             <DistributionDashboard />
             <Notifications visible={notificationsVisible} onClose={() => setNotificationsVisible(false)} />
-            <PWAManager onNotificationsEnabled={handleNotificationsEnabled} />
-            <UpdateChecker />
+            <PWAManager onNotificationsEnabled={handleNotificationsEnabled} onDontShowAgain={handleDontShowAgain} disabled={!configData?.userProfile?.notifications?.pwaManagerEnabled} />
           </>
         )
       case Enums.appRenderState.LOGIN:
         return (
           <>
             <Login />
-            <PWAManager onNotificationsEnabled={handleNotificationsEnabled} />
-            <UpdateChecker />
           </>
         )
     }
@@ -281,17 +268,17 @@ const CoreApp = () => {
       <Toolbar state={state} setState={setState} onNotificationsClick={() => setNotificationsVisible(true)} />
       {handleGetState()}
       <EditProfile
-        isVisible={coreState.custom.editProfileVisible}
+        isVisible={editProfileVisible}
         setDeSoData={setDeSoData}
         desoData={desoData}
         getUsersDeSoData={getUsersDeSoData}
       />
       <EditNotifications
-        isVisible={coreState.custom.editNotificationsVisible}
+        isVisible={editNotificationsVisible}
         setDeSoData={setDeSoData}
         desoData={desoData}
       />
-      <ComingSoon isVisible={coreState.custom.comingSoonVisible} />
+      <ComingSoon isVisible={comingSoonVisible} />
     </>
   )
 }

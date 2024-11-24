@@ -11,7 +11,7 @@ const EditNotifications = ({ isVisible }) => {
   const [form] = Form.useForm()
   const [formState, setFormState] = React.useState({
     enableNotifications: true,
-    diamondsThreshold: '2',
+    diamondsThreshold: 2,
     diamondsPush: true,
     desoNotifications: true,
     desoPush: true,

@@ -79,7 +79,8 @@ const Enums = {
   reqTypes: {
     INIT_USER_SESSION: 'init_user_session',
     UPDATE_FCM_TOKENS: 'update_fcm_tokens',
-    OPT_OUT_PROFILE: 'opt_out_profile'
+    OPT_OUT_PROFILE: 'opt_out_profile',
+    UPDATE_PWAMANAGER_ENABLED: 'update_pwa_manager_enabled'
   },
   messages: {
     UNKNOWN_ERROR: 'Unknown Error Occured. Please check console',
