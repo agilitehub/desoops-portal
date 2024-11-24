@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
 import { BellOutlined } from '@ant-design/icons'
-import { Modal, Collapse } from 'antd'
+import { Modal, Collapse, Button } from 'antd'
 import { usePWAManager } from './controller'
 import styles from './style.module.sass'
 import { initializeMessaging } from '../../lib/firebase-controller'
 import UpdateChecker from './PWAUpdateChecker'
+import { faBell, faBellSlash } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const IOSInstructions = () => (
   <div>
@@ -31,7 +33,7 @@ const NotificationInstructions = () => (
   </div>
 )
 
-const PWAManager = ({ onNotificationsEnabled, onDontShowAgain, disabled }) => {
+const PWAManager = ({ onNotificationsEnabled, onDontShowAgain, disabled = false, forceShow = false }) => {
   const [showModal, setShowModal] = useState(false)
   const {
     isVisible,
@@ -39,31 +41,16 @@ const PWAManager = ({ onNotificationsEnabled, onDontShowAgain, disabled }) => {
     dismiss,
     triggerInstallPrompt,
     ...pwaFeatures
-  } = usePWAManager()
+  } = usePWAManager(forceShow)
 
   const handleEnable = async () => {
     try {
-      if (support.type === 'ios') {
-        // Handle iOS case
-        setShowModal(false)
+      // Handle notification permission
+      const permission = await Notification.requestPermission()
+      if (permission === 'granted') {
+        await initializeMessaging()
+        onNotificationsEnabled?.()
         dismiss()
-        return
-      }
-
-      if (pwaFeatures.installPromptAvailable) {
-        // Handle PWA installation
-        const outcome = await triggerInstallPrompt()
-        if (outcome === 'accepted') {
-          dismiss()
-        }
-      } else {
-        // Handle notification permission
-        const permission = await Notification.requestPermission()
-        if (permission === 'granted') {
-          await initializeMessaging()
-          onNotificationsEnabled?.()
-          dismiss()
-        }
       }
 
       setShowModal(false)
@@ -81,25 +68,36 @@ const PWAManager = ({ onNotificationsEnabled, onDontShowAgain, disabled }) => {
 
   return (
     <>
-      {!disabled && isVisible && (
+      {(forceShow || (!disabled && isVisible)) && (
         <>
           <div className={styles.bellContainer} onClick={() => setShowModal(true)}>
             <BellOutlined className={styles.bellIcon} />
           </div>
 
           <Modal
-            title={support.type === 'ios' ? 'Install App' : 'Enable Notifications'}
+            title={support.type === 'ios' && support.needsInstall ? 'Install App' : 'Enable Notifications'}
             open={showModal}
             onCancel={() => setShowModal(false)}
             footer={null}
           >
-            {support.type === 'ios' ? <IOSInstructions /> : <NotificationInstructions />}
+            {support.type === 'ios' && support.needsInstall ? <IOSInstructions /> : <NotificationInstructions />}
 
             <div className={styles.buttonContainer}>
-              <button className={styles.primaryButton} onClick={handleEnable}>
-                {support.type === 'ios' ? 'Got it!' : 'Enable'}
-              </button>
-              <button onClick={() => handleDontShowAgain()}>Don't Show Again</button>
+              <Button
+                type="primary"
+                size="large"
+                icon={<FontAwesomeIcon icon={faBell} />}
+                onClick={handleEnable}
+              >
+                {support.type === 'ios' && support.needsInstall ? 'Got it!' : 'Enable'}
+              </Button>
+              <Button
+                size="large"
+                icon={<FontAwesomeIcon icon={faBellSlash} />}
+                onClick={() => handleDontShowAgain()}
+              >
+                Don't Show Again
+              </Button>
             </div>
 
             <Collapse
