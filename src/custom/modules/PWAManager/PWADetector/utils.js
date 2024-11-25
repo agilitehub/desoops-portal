@@ -80,6 +80,17 @@ const isSecureContext = () => {
 }
 
 /**
+ * Checks if Bluetooth API is supported
+ * @returns {boolean} Whether Bluetooth is supported
+ */
+const isBluetoothSupported = () => {
+  return Boolean(
+    navigator.bluetooth ||
+    'bluetooth' in navigator
+  )
+}
+
+/**
  * Checks all PWA features and returns their status
  * @returns {Promise<Object>} Object containing all PWA feature statuses
  */
@@ -166,6 +177,9 @@ export const checkPwaFeatures = async () => {
 
   const isPWAInstalled = isStandalone
 
+  // Add Bluetooth support check
+  const bluetoothSupported = isBluetoothSupported()
+
   // Support object for PWAManager
   const support = {
     isSupported: deviceType === 'desktop'
@@ -192,6 +206,7 @@ export const checkPwaFeatures = async () => {
     backgroundSyncSupported,
     notificationPermission,
     persistentStorageAllowed,
+    bluetoothSupported,
     support
   }
 }

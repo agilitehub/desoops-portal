@@ -66,6 +66,7 @@ export const usePwaFeatures = (options = {}) => {
     pushNotificationsSupported: false, // Are push notifications supported
     backgroundSyncSupported: false,    // Is background sync supported
     installPromptAvailable: false,     // Can we prompt to install (non-iOS)
+    bluetoothSupported: false,      // Is Bluetooth supported
 
     // Permissions
     notificationPermission: null,      // Current notification permission status
