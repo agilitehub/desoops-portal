@@ -180,7 +180,7 @@ export const updateOptOutProfile = async (id, data) => {
 }
 
 export const getNotifications = async (publicKey, page, pageLimit) => {
-  const response = await agilite.Connectors.execute('notifications', 'read', {
+  const response = await agilite.Connectors.execute('notifications', 'find', {
     filter: JSON.stringify({ publicKey }),
     page,
     pageLimit

@@ -39,7 +39,7 @@ import { getDeSoPricing, getInitialDeSoData } from '../../lib/deso-controller-gr
 import { GQL_GET_INITIAL_DESO_DATA } from '../../lib/graphql-models'
 
 import './style.sass'
-import { initializeMessaging, requestFirebaseToken } from '../../lib/firebase-controller'
+import { initializeMessaging } from '../../lib/firebase-controller'
 import EditNotifications from '../EditNotifications'
 import ComingSoon from '../ComingSoon'
 
@@ -83,15 +83,7 @@ const CoreApp = () => {
 
         switch (newState.renderState) {
           case Enums.appRenderState.SIGNING_IN:
-            setState(newState)
-            break
           case Enums.appRenderState.LAUNCH:
-            // Check if we need to initialize messaging and request tokens
-            if (notificationPermission === 'granted') {
-              await initializeMessaging()
-              await handleNotificationsEnabled()
-            }
-
             setState(newState)
             break
           case Enums.appRenderState.LOGIN:
@@ -127,6 +119,16 @@ const CoreApp = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser, isLoading, state.userReturned, state.initializing])
+
+  // On App Launch, we need to check if the notificationPermission changed
+  useEffect(() => {
+    console.log('useEffect - notificationPermission', notificationPermission)
+    if (state.renderState === Enums.appRenderState.LAUNCH) {
+      if (notificationPermission === 'granted') {
+        handleNotificationsEnabled()
+      }
+    }
+  }, [notificationPermission, state.renderState])
 
   const getUsersDeSoData = async () => {
     const tmpConfigData = configData
@@ -186,8 +188,8 @@ const CoreApp = () => {
   }
 
   const handleNotificationsEnabled = async () => {
-    const firebaseToken = await requestFirebaseToken()
-
+    const firebaseToken = await initializeMessaging()
+    console.log('handleNotificationsEnabled - firebaseToken', firebaseToken)
     if (firebaseToken) {
       const existingFcmTokens = configData?.userProfile?.notifications?.tokens || []
 
@@ -251,7 +253,7 @@ const CoreApp = () => {
           <>
             <DistributionDashboard />
             <Notifications visible={notificationsVisible} onClose={() => setNotificationsVisible(false)} />
-            <PWAManager onNotificationsEnabled={handleNotificationsEnabled} onDontShowAgain={handleDontShowAgain} disabled={!configData?.userProfile?.notifications?.pwaManagerEnabled} />
+            <PWAManager onDontShowAgain={handleDontShowAgain} disabled={!configData?.userProfile?.notifications?.pwaManagerEnabled} />
           </>
         )
       case Enums.appRenderState.LOGIN:

@@ -3,7 +3,6 @@ import { BellOutlined } from '@ant-design/icons'
 import { Modal, Collapse, Button } from 'antd'
 import { usePWAManager } from './controller'
 import styles from './style.module.sass'
-import { initializeMessaging } from '../../lib/firebase-controller'
 import UpdateChecker from './PWAUpdateChecker'
 import { faBell, faBellSlash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -33,7 +32,7 @@ const NotificationInstructions = () => (
   </div>
 )
 
-const PWAManager = ({ onNotificationsEnabled, onDontShowAgain, disabled = false, forceShow = false }) => {
+const PWAManager = ({ onDontShowAgain, disabled = false, forceShow = false }) => {
   const [showModal, setShowModal] = useState(false)
   const {
     isVisible,
@@ -45,14 +44,9 @@ const PWAManager = ({ onNotificationsEnabled, onDontShowAgain, disabled = false,
 
   const handleEnable = async () => {
     try {
-      // Handle notification permission
-      const permission = await Notification.requestPermission()
-      if (permission === 'granted') {
-        await initializeMessaging()
-        onNotificationsEnabled?.()
-        dismiss()
-      }
-
+      // TODO: We need to manage the Modal UI during this process
+      await Notification.requestPermission()
+      dismiss()
       setShowModal(false)
     } catch (error) {
       console.error('Error enabling notifications or installing PWA:', error)
