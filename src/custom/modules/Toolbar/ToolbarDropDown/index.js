@@ -27,7 +27,7 @@ const ToolbarDropDown = () => {
         icon: <BellOutlined style={{ fontSize: 16 }} />,
         danger: false,
         key: 'Edit Notifications',
-        label: 'Notifications',
+        label: 'Edit Notifications',
         className: 'dropdown-item',
         onClick: () => dispatch(setEditNotificationsVisible(true))
       },

@@ -179,11 +179,37 @@ export const updateOptOutProfile = async (id, data) => {
   return response.data
 }
 
-export const getNotifications = async (publicKey, page, pageLimit) => {
+export const getNotifications = async (publicKey, limit = 30, lastTimestamp = null) => {
+  const filter = {
+    publicKey,
+    ...(lastTimestamp && { transactionDate: { $lt: new Date(lastTimestamp) } })
+  }
+
   const response = await agilite.Connectors.execute('notifications', 'find', {
-    filter: JSON.stringify({ publicKey }),
-    page,
-    pageLimit
+    filter: JSON.stringify(filter),
+    pageLimit: limit,
+    options: JSON.stringify({
+      sort: { transactionDate: -1 },
+      limit
+    })
   })
+  return response.data
+}
+
+export const markNotificationsAsRead = async (ids) => {
+  const response = await agilite.Connectors.execute('notifications', 'update_many', {
+    filter: JSON.stringify({ _id: { $in: ids } }),
+    data: JSON.stringify({ unread: false })
+  })
+
+  return response.data
+}
+
+export const updateUserRecord = async (publicKey, data) => {
+  const response = await agilite.Connectors.execute('users', 'update', {
+    filter: JSON.stringify({ publicKey }),
+    data: JSON.stringify(data)
+  })
+
   return response.data
 }

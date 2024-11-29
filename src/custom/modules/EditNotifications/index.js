@@ -1,28 +1,60 @@
-import React from 'react'
-import { Modal, Form, Switch, Select, Card, Row, Col, Divider, Space } from 'antd'
-import { useDispatch } from 'react-redux'
+import React, { useEffect } from 'react'
+import { Modal, Form, Switch, Select, Card, Row, Col, Divider, Space, message } from 'antd'
+import { useDispatch, useSelector } from 'react-redux'
 import styles from './style.module.sass'
 import { setEditNotificationsVisible } from '../../../custom/reducer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faBellSlash } from '@fortawesome/free-regular-svg-icons'
+import { updateUserRecord } from '../../../custom/lib/agilite-controller'
 
 const EditNotifications = ({ isVisible }) => {
+  // Hooks
   const dispatch = useDispatch()
+  const profile = useSelector((state) => state.custom)
+  const userProfileState = useSelector((state) => state.custom.configData.userProfile)
   const [form] = Form.useForm()
-  const [formState, setFormState] = React.useState({
-    enableNotifications: true,
-    diamondsThreshold: 2,
-    diamondsPush: true,
-    desoNotifications: true,
-    desoPush: true,
-    socialNotifications: true,
-    socialPush: true,
-    cryptoNotifications: true,
-    cryptoPush: true
-  })
 
-  const handleOk = () => {
-    dispatch(setEditNotificationsVisible(false))
+  // State
+  const [formState, setFormState] = React.useState({
+    enabled: true,
+    rules: {
+      diamonds: {
+        enabled: 2,
+        pushEnabled: true
+      },
+      deso: {
+        enabled: true,
+        pushEnabled: true
+      },
+      socialTokens: {
+        enabled: true,
+        pushEnabled: true
+      },
+      otherCrypto: {
+        enabled: true,
+        pushEnabled: true
+      }
+    }
+  })
+  const [loading, setLoading] = React.useState(false)
+
+  useEffect(() => {
+    if (userProfileState) {
+      setFormState(JSON.parse(JSON.stringify(userProfileState.notifications)))
+    }
+  }, [userProfileState])
+
+  const handleOk = async () => {
+    setLoading(true)
+    try {
+      await updateUserRecord(profile.publicKey, { notifications: formState })
+    } catch (error) {
+      message.error('Failed to save notifications')
+    } finally {
+      setLoading(false)
+      dispatch(setEditNotificationsVisible(false))
+      message.success('Notification settings saved')
+    }
   }
 
   const handleCancel = () => {
@@ -38,11 +70,18 @@ const EditNotifications = ({ isVisible }) => {
   }
 
   const handleFieldsChange = (_, allFields) => {
-    const newState = allFields.reduce((acc, field) => {
-      acc[field.name[0]] = field.value
-      return acc
-    }, {})
-    setFormState((prev) => ({ ...prev, ...newState }))
+    const newState = { ...formState }
+
+    allFields.forEach((field) => {
+      const [category, subcategory, property] = field.name
+      if (category === 'enabled') {
+        newState.enabled = field.value
+      } else if (category === 'rules') {
+        newState.rules[subcategory][property] = field.value
+      }
+    })
+
+    setFormState(newState)
   }
 
   return (
@@ -50,7 +89,8 @@ const EditNotifications = ({ isVisible }) => {
       title={<center>Edit Notifications</center>}
       open={isVisible}
       okText='Save'
-      okButtonProps={{ className: styles.finishButton }}
+      cancelButtonProps={{ disabled: loading }}
+      okButtonProps={{ className: styles.finishButton, loading }}
       maskProps={{ style: { backgroundColor: 'rgba(0, 0, 0, 0.8)' } }}
       closable={false}
       maskClosable={false}
@@ -61,11 +101,11 @@ const EditNotifications = ({ isVisible }) => {
     >
       <Form form={form} layout='vertical' initialValues={formState} onFieldsChange={handleFieldsChange}>
         <Card size='small' type='inner'>
-          <Form.Item label='Enable Notifications' name='enableNotifications' style={{ marginBottom: 0 }}>
+          <Form.Item label='Enable Notifications' name={['enabled']} style={{ marginBottom: 0 }}>
             <Switch checkedChildren='Yes' unCheckedChildren='No' />
           </Form.Item>
 
-          {formState.enableNotifications && (
+          {formState.enabled && (
             <div style={{ marginTop: 10 }}>
               <Row>
                 <Col span={12}>
@@ -79,22 +119,22 @@ const EditNotifications = ({ isVisible }) => {
               <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 14 }}>Diamonds</p>
               <Row gutter={[16, 16]}>
                 <Col span={12}>
-                  <Form.Item name='diamondsThreshold'>
+                  <Form.Item name={['rules', 'diamonds', 'enabled']}>
                     <Select>
                       <Select.Option value='none'>None</Select.Option>
-                      <Select.Option value='1'>1+ Diamonds</Select.Option>
-                      <Select.Option value='2'>2+ Diamonds</Select.Option>
-                      <Select.Option value='3'>3+ Diamonds</Select.Option>
-                      <Select.Option value='4'>4+ Diamonds</Select.Option>
-                      <Select.Option value='5'>5+ Diamonds</Select.Option>
-                      <Select.Option value='6'>6+ Diamonds</Select.Option>
+                      <Select.Option value={1}>1+ Diamonds</Select.Option>
+                      <Select.Option value={2}>2+ Diamonds</Select.Option>
+                      <Select.Option value={3}>3+ Diamonds</Select.Option>
+                      <Select.Option value={4}>4+ Diamonds</Select.Option>
+                      <Select.Option value={5}>5+ Diamonds</Select.Option>
+                      <Select.Option value={6}>6+ Diamonds</Select.Option>
                     </Select>
                   </Form.Item>
                 </Col>
                 <Col span={12}>
                   <center>
-                    {formState.diamondsThreshold !== 'none' && (
-                      <Form.Item name='diamondsPush'>
+                    {formState.rules.diamonds.enabled !== 'none' && (
+                      <Form.Item name={['rules', 'diamonds', 'pushEnabled']}>
                         <Switch
                           checkedChildren={
                             <Space>
@@ -116,7 +156,7 @@ const EditNotifications = ({ isVisible }) => {
               <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 14 }}>$DESO</p>
               <Row gutter={[16, 16]}>
                 <Col span={12}>
-                  <Form.Item name='desoNotifications'>
+                  <Form.Item name={['rules', 'deso', 'enabled']}>
                     <Select>
                       <Select.Option value={true}>Enabled</Select.Option>
                       <Select.Option value={false}>Disabled</Select.Option>
@@ -125,8 +165,8 @@ const EditNotifications = ({ isVisible }) => {
                 </Col>
                 <Col span={12}>
                   <center>
-                    {formState.desoNotifications && (
-                      <Form.Item name='desoPush'>
+                    {formState.rules.deso.enabled && (
+                      <Form.Item name={['rules', 'deso', 'pushEnabled']}>
                         <Switch
                           checkedChildren={
                             <Space>
@@ -148,7 +188,7 @@ const EditNotifications = ({ isVisible }) => {
               <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 14 }}>Social/DAO</p>
               <Row gutter={[16, 16]}>
                 <Col span={12}>
-                  <Form.Item name='socialNotifications'>
+                  <Form.Item name={['rules', 'socialTokens', 'enabled']}>
                     <Select>
                       <Select.Option value={true}>Enabled</Select.Option>
                       <Select.Option value={false}>Disabled</Select.Option>
@@ -157,8 +197,8 @@ const EditNotifications = ({ isVisible }) => {
                 </Col>
                 <Col span={12}>
                   <center>
-                    {formState.socialNotifications && (
-                      <Form.Item name='socialPush'>
+                    {formState.rules.socialTokens.enabled && (
+                      <Form.Item name={['rules', 'socialTokens', 'pushEnabled']}>
                         <Switch
                           checkedChildren={
                             <Space>
@@ -180,7 +220,7 @@ const EditNotifications = ({ isVisible }) => {
               <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 14 }}>Other Crypto</p>
               <Row gutter={[16, 16]}>
                 <Col span={12}>
-                  <Form.Item name='cryptoNotifications'>
+                  <Form.Item name={['rules', 'otherCrypto', 'enabled']}>
                     <Select>
                       <Select.Option value={true}>Enabled</Select.Option>
                       <Select.Option value={false}>Disabled</Select.Option>
@@ -189,8 +229,8 @@ const EditNotifications = ({ isVisible }) => {
                 </Col>
                 <Col span={12}>
                   <center>
-                    {formState.cryptoNotifications && (
-                      <Form.Item name='cryptoPush'>
+                    {formState.rules.otherCrypto.enabled && (
+                      <Form.Item name={['rules', 'otherCrypto', 'pushEnabled']}>
                         <Switch
                           checkedChildren={
                             <Space>

@@ -10,72 +10,40 @@ const formatAmount = (amount, divideTwice = true) => {
 }
 
 const getNotificationDetails = (notification) => {
-  const { Metadata } = notification.data
-  const {
-    TxnType,
-    BasicTransferTxindexMetadata,
-    BitcoinExchangeTxindexMetadata,
-    CreatorCoinTxindexMetadata,
-    CreatorCoinTransferTxindexMetadata,
-    DAOCoinTransferTxindexMetadata
-  } = Metadata
+  const { tokenType, amountNanos, diamondLevel } = notification
 
-  let type = ''
   let description = ''
 
-  switch (TxnType) {
-    case 'CREATOR_COIN':
-      type = 'CREATOR_COIN'
-      if (CreatorCoinTxindexMetadata) {
-        const operation = CreatorCoinTxindexMetadata.OperationType.toLowerCase()
-        const amount = formatAmount(
-          CreatorCoinTxindexMetadata.DeSoToSellNanos || CreatorCoinTxindexMetadata.CreatorCoinToSellNanos
-        )
-        description = `${operation} ${amount} of your creator coins`
-      }
+  switch (tokenType) {
+    case 'diamonds':
+      description = `gave you ${diamondLevel} diamond${diamondLevel > 1 ? 's' : ''}`
       break
 
-    case 'CREATOR_COIN_TRANSFER':
-      type = 'CREATOR_COIN'
-      if (CreatorCoinTransferTxindexMetadata) {
-        const amount = formatAmount(CreatorCoinTransferTxindexMetadata.CreatorCoinToTransferNanos)
-        description = `transferred you ${amount} creator coins of ${CreatorCoinTransferTxindexMetadata.CreatorUsername}`
-      }
+    case 'deso':
+      const desoAmount = formatAmount(amountNanos, false)
+      description = `sent you ${desoAmount} DESO`
       break
 
-    case 'BITCOIN_EXCHANGE':
-      type = 'BITCOIN_EXCHANGE'
-      if (BitcoinExchangeTxindexMetadata) {
-        const amount = formatAmount(BitcoinExchangeTxindexMetadata.NanosCreated)
-        description = `exchanged Bitcoin for ${amount} DESO`
-      }
+    case 'creatorCoins':
+      const ccAmount = formatAmount(amountNanos)
+      description = `transferred you ${ccAmount} creator coins`
       break
 
-    case 'DAO_COIN_TRANSFER':
-      type = 'DAO_COIN'
-      if (DAOCoinTransferTxindexMetadata) {
-        const amount = formatAmount(parseInt(DAOCoinTransferTxindexMetadata.DAOCoinToTransferNanos, 16))
-        description = `transferred you ${amount} DAO coins of ${DAOCoinTransferTxindexMetadata.CreatorUsername}`
-      }
+    case 'socialTokens':
+      const stAmount = formatAmount(amountNanos)
+      description = `transferred you ${stAmount} social tokens`
       break
 
-    case 'BASIC_TRANSFER':
-      type = 'TRANSFER'
-      if (BasicTransferTxindexMetadata) {
-        if (BasicTransferTxindexMetadata.DiamondLevel) {
-          const level = BasicTransferTxindexMetadata.DiamondLevel
-          description = `gave you ${level} diamond${level > 1 ? 's' : ''}`
-        } else {
-          const amount = formatAmount(BasicTransferTxindexMetadata.TotalOutputNanos, false)
-          description = `sent you ${amount} DESO`
-        }
-      }
+    case 'otherCrypto':
+      const cryptoAmount = formatAmount(amountNanos)
+      description = `exchanged crypto for ${cryptoAmount} DESO`
       break
+
     default:
-      type = null
+      return null
   }
 
-  return { type, description }
+  return { description }
 }
 
 // Main function to format notifications
@@ -83,22 +51,19 @@ export const formatNotifications = async (notifications, client) => {
   const formattedNotifications = await Promise.all(
     notifications.map(async (notification) => {
       // Get notification type and description
-      const { type, description } = getNotificationDetails(notification)
+      const { description } = getNotificationDetails(notification)
 
       // If type is null, we don't care about this notification and need to skip it
-      if (!type) {
+      if (!description) {
         return null
       }
-
-      const { Metadata, Index } = notification.data
-      const { BlockHashHex, TransactorPublicKeyBase58Check } = Metadata
 
       // Get the profile of who triggered the notification
       let actorProfile = null
       try {
         const response = await client.query({
           query: FETCH_SINGLE_PROFILE,
-          variables: { publicKey: TransactorPublicKeyBase58Check },
+          variables: { publicKey: notification.senderPublicKey },
           fetchPolicy: 'no-cache'
         })
         actorProfile = response.data.accountByPublicKey
@@ -107,15 +72,15 @@ export const formatNotifications = async (notifications, client) => {
       }
 
       return {
-        id: Index,
-        timestamp: notification.data.Timestamp,
-        type,
+        _id: notification._id,
+        id: notification.id,
+        timestamp: notification.transactionDate,
+        createdAt: notification.createdAt,
         description,
-        blockHash: BlockHashHex,
-        isRead: notification.isRead,
+        unread: notification.unread,
         actor: {
-          publicKey: TransactorPublicKeyBase58Check,
-          username: actorProfile?.username || TransactorPublicKeyBase58Check,
+          publicKey: notification.senderPublicKey,
+          username: actorProfile?.username || notification.senderPublicKey,
           profilePic: actorProfile ? await generateProfilePicUrl(actorProfile.publicKey) : null
         }
       }

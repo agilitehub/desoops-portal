@@ -16,6 +16,7 @@ import { setComingSoonVisible } from '../../../custom/reducer'
 const Toolbar = ({ state, setState, onNotificationsClick }) => {
   const dispatch = useDispatch()
   const profile = useSelector((state) => state.custom.desoData.profile)
+  const unreadCount = useSelector((state) => state.custom.unreadNotifications)
 
   const handleNavigate = (renderState) => {
     setState({ renderState })
@@ -68,7 +69,7 @@ const Toolbar = ({ state, setState, onNotificationsClick }) => {
               </div>
               <div className='toolbar-header-item' onClick={onNotificationsClick}>
                 <FontAwesomeIcon className='toolbar-header-icon' icon={faBell} />
-                <Badge className='toolbar-header-text' count={'99+'} offset={[20, -5]}>
+                <Badge className='toolbar-header-text' count={unreadCount} offset={[20, -5]}>
                   Notifications
                 </Badge>
               </div>
@@ -108,7 +109,7 @@ const Toolbar = ({ state, setState, onNotificationsClick }) => {
             </Col>
             <Col className={'toolbar-footer-item'} onClick={onNotificationsClick}>
               <FontAwesomeIcon className='toolbar-footer-icon' icon={faBell} />
-              <Badge className='toolbar-footer-text' count={'99+'} offset={[0, -30]}>
+              <Badge className='toolbar-footer-text' count={unreadCount} offset={[0, -30]}>
                 Notifications
               </Badge>
             </Col>

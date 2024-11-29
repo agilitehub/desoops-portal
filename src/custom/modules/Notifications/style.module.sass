@@ -14,17 +14,18 @@
 .notificationContent
   display: flex
   align-items: flex-start
-  padding: 12px
+  padding: 0 4px
 
 .avatar
   margin-right: 12px
   width: 40px
   height: 40px
 
-.contentWrapper
+.notificationDetails
   flex: 1
+  min-width: 0
 
-.header
+.notificationHeader
   display: flex
   justify-content: space-between
   align-items: center
@@ -32,17 +33,16 @@
 
 .username
   font-weight: 600
-  color: #1a1a1a
-  font-size: 14px
+  margin-right: 8px
 
 .timestamp
-  color: #8c8c8c
+  color: rgba(0, 0, 0, 0.45)
   font-size: 12px
+  white-space: nowrap
 
 .description
-  color: #262626
-  font-size: 14px
-  line-height: 1.5
+  color: rgba(0, 0, 0, 0.85)
+  word-break: break-word
 
 .postPreview
   margin-top: 8px
@@ -84,23 +84,8 @@
   &:hover:not(:disabled)
     background: darken(#188EFF, 10%)
 
-.refreshButton
-  padding: 4px 12px
-  border: none
-  border-radius: 4px
-  background: $orange1
-  color: white
-  cursor: pointer
-  &:hover
-    color: #40a9ff
-  &:disabled
-    cursor: not-allowed
-    color: rgba(0, 0, 0, 0.25)
-    background: #f5f5f5
-    border-color: #d9d9d9
-
 .drawerHeader
-  background-color: $blue2-dark
+  background-color: #fff
   height: 60px
   display: flex
   align-items: center
@@ -111,18 +96,79 @@
     justify-content: center
     
     :global(.ant-drawer-close)
-      color: white
-      font-size: 18px
       order: 2
       margin-right: -8px
       
     :global(.ant-drawer-title)
-      color: white
       font-size: 18px
       text-align: center
-      flex: 1
-      padding-right: 48px
 
   +xs
     height: 45px
+
+.card
+  margin-bottom: 12px
+  @media (max-width: 768px)
+    margin-left: 5px
+    margin-right: 5px
+  &:last-child
+    margin-bottom: 0
+
+.drawer
+  :global(.ant-drawer-body)
+    padding: 0
+    height: calc(100% - 60px)
+    overflow: hidden
+    
+  :global(.ant-drawer-header)
+    position: sticky
+    top: 0
+    z-index: 1
+    border-bottom: 1px solid #f0f0f0
+
+.drawerContent
+  height: 100%
+  overflow-y: auto
+  padding: 16px
+  
+  scroll-behavior: smooth
+  
+  &::-webkit-scrollbar
+    width: 6px
+  
+  &::-webkit-scrollbar-track
+    background: #f1f1f1
+  
+  &::-webkit-scrollbar-thumb
+    background: #888
+    border-radius: 3px
+
+.refreshButton
+  margin-right: -8px
+  color: $blue2-dark
+  border: 1px solid $blue2-dark
+
+.loadMoreContainer
+  display: flex
+  justify-content: center
+  padding: 16px 0
+
+  button
+    min-width: 120px
+
+.newNotificationsBar
+  position: sticky
+  top: 0
+  z-index: 1
+  background: #fff
+  padding: 8px
+  text-align: center
+  border-bottom: 1px solid #f0f0f0
+  margin-bottom: 8px
+  
+  button
+    width: 100%
+    background: $blue2-dark
+    &:hover
+      background: darken($blue2-dark, 10%)
 

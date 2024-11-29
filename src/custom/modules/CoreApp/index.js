@@ -32,7 +32,12 @@ import {
   setDistributionTemplates,
   setEditProfileVisible
 } from '../../reducer'
-import { initUserSession, getDistributionTemplates, updateFCMToken, updatePWAManagerEnabled } from '../../lib/agilite-controller'
+import {
+  initUserSession,
+  getDistributionTemplates,
+  updateFCMToken,
+  updatePWAManagerEnabled
+} from '../../lib/agilite-controller'
 
 import { renderApp } from './controller'
 import { getDeSoPricing, getInitialDeSoData } from '../../lib/deso-controller-graphql'
@@ -128,6 +133,7 @@ const CoreApp = () => {
         handleNotificationsEnabled()
       }
     }
+    // eslint-disable-next-line
   }, [notificationPermission, state.renderState])
 
   const getUsersDeSoData = async () => {
@@ -184,7 +190,7 @@ const CoreApp = () => {
     try {
       const desoPrice = await getDeSoPricing(currDeSoPrice)
       dispatch(setDeSoPrice(desoPrice))
-    } catch (e) { }
+    } catch (e) {}
   }
 
   const handleNotificationsEnabled = async () => {
@@ -253,7 +259,10 @@ const CoreApp = () => {
           <>
             <DistributionDashboard />
             <Notifications visible={notificationsVisible} onClose={() => setNotificationsVisible(false)} />
-            <PWAManager onDontShowAgain={handleDontShowAgain} disabled={!configData?.userProfile?.notifications?.pwaManagerEnabled} />
+            <PWAManager
+              onDontShowAgain={handleDontShowAgain}
+              disabled={!configData?.userProfile?.notifications?.pwaManagerEnabled}
+            />
           </>
         )
       case Enums.appRenderState.LOGIN:
@@ -275,11 +284,7 @@ const CoreApp = () => {
         desoData={desoData}
         getUsersDeSoData={getUsersDeSoData}
       />
-      <EditNotifications
-        isVisible={editNotificationsVisible}
-        setDeSoData={setDeSoData}
-        desoData={desoData}
-      />
+      <EditNotifications isVisible={editNotificationsVisible} setDeSoData={setDeSoData} desoData={desoData} />
       <ComingSoon isVisible={comingSoonVisible} />
     </>
   )
