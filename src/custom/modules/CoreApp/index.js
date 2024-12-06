@@ -70,6 +70,10 @@ const CoreApp = () => {
   const client = useApolloClient()
   const [state, setState] = useReducer(reducer, initialState)
   const { notificationPermission, browserType, deviceType } = usePwaFeatures()
+  const [stepStatuses, setStepStatus] = useState({
+    tokenObtained: '',
+    initComplete: ''
+  })
 
   // Determine Device Type
   useEffect(() => {
@@ -192,10 +196,12 @@ const CoreApp = () => {
   }
 
   const handleNotificationsEnabled = async () => {
+    setStepStatus('tokenObtained', 'pending')
     const firebaseToken = await initializeMessaging()
     const timestamp = new Date().toISOString()
 
     if (firebaseToken) {
+      setStepStatus({ tokenObtained: 'success', initComplete: 'pending' })
       const existingFcmTokens = configData?.userProfile?.notifications?.tokens || []
 
       let fcmTokens = cloneDeep(existingFcmTokens)
@@ -230,6 +236,10 @@ const CoreApp = () => {
       } else if (updateTokenConfig) {
         await updateFCMToken(currentUser.PublicKeyBase58Check, Enums.reqTypes.UPDATE_FCM_TOKENS, fcmTokens)
       }
+
+      setStepStatus({ initComplete: 'success' })
+    } else {
+      setStepStatus({ tokenObtained: 'error' })
     }
   }
 
@@ -269,7 +279,7 @@ const CoreApp = () => {
     <>
       <Toolbar state={state} setState={setState} onNotificationsClick={() => dispatch(setNotificationsVisible(true))} />
       {handleGetState()}
-      <PWAManager disabled={!state.appReady} />
+      <PWAManager disabled={!state.appReady} stepStatuses={stepStatuses} />
       <EditProfile
         isVisible={editProfileVisible}
         setDeSoData={setDeSoData}

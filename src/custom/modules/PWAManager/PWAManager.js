@@ -32,21 +32,26 @@ const NotificationInstructions = () => (
   </div>
 )
 
-const PWAManager = ({ disabled = false, forceShow = false }) => {
+const PWAManager = ({ disabled = false, stepStatuses, forceShow = false }) => {
   const [showModal, setShowModal] = useState(false)
   const [stepsVisible, setStepsVisible] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
-  const [steps, setSteps] = useState([
-    {
-      label: 'Requesting Notification Permissions'
+  const { tokenObtained, initComplete } = stepStatuses
+
+  const [steps, setSteps] = useState({
+    '1': {
+      label: 'Requesting Notification Permissions',
+      status: ''
     },
-    {
-      label: 'Obtaining Token'
+    '2': {
+      label: 'Obtaining Token',
+      status: ''
     },
-    {
-      label: 'Initializing Notifications'
+    '3': {
+      label: 'Initializing Notifications',
+      status: ''
     }
-  ])
+  })
 
   const { isVisible, support, dismiss, triggerInstallPrompt, notificationPermission } = usePWAManager(forceShow)
 
@@ -59,21 +64,29 @@ const PWAManager = ({ disabled = false, forceShow = false }) => {
       }
 
       setStepsVisible(true)
+      let permission = null
 
       if (notificationPermission === 'default') {
-        setCurrentStep(0)
-        await Notification.requestPermission()
+        setSteps((prev) => ({ ...prev, '1': { ...prev['1'], status: 'pending' } }))
+        permission = await Notification.requestPermission()
+        if (permission === 'granted') {
+          setSteps((prev) => ({ ...prev, '1': { ...prev['1'], status: 'success' } }))
+        } else {
+          setSteps((prev) => ({ ...prev, '1': { ...prev['1'], status: 'error' } }))
+
+          // TODO: Handle error. Prompt user to manually enable notifications in settings
+        }
       }
 
-      if (support.type === 'standard' && triggerInstallPrompt) {
-        await triggerInstallPrompt()
-      }
+      // TODO: We need to better manage this instance of the install prompt
+      // if (support.type === 'standard' && triggerInstallPrompt) {
+      //   await triggerInstallPrompt()
+      // }
 
       dismiss()
       setShowModal(false)
     } catch (error) {
       console.error('Error enabling deposit notifications or installing PWA:', error)
-      setShowModal(false)
     }
   }
 
@@ -84,12 +97,23 @@ const PWAManager = ({ disabled = false, forceShow = false }) => {
   }
 
   useEffect(() => {
-    if (notificationPermission === 'granted') {
-      setCurrentStep(currentStep + 1)
+    setSteps((prev) => ({
+      ...prev,
+      '2': { ...prev['2'], status: tokenObtained },
+      '3': { ...prev['3'], status: initComplete }
+    }))
+
+    // Based on the step statuses, determine if we need to handle any errors, or close the modal
+    if (tokenObtained === 'error' || initComplete === 'error') {
+      // TODO: Handle error in dialog by providing user feedback and disabling stepsVisible
+    } else {
+      // TODO: Handle success in the modal, providing feedback and allowing user to edit deposit settings.
+      // They can either close or edit deposit settings. If edit deposit settings, close modal and launch settings modal.
+      // setShowModal(false)
     }
 
     // eslint-disable-next-line
-  }, [notificationPermission])
+  }, [tokenObtained, initComplete])
 
   return (
     <>
@@ -108,41 +132,44 @@ const PWAManager = ({ disabled = false, forceShow = false }) => {
             closable={!stepsVisible}
           >
             {stepsVisible ? (
-              <ul>
-                {steps.map((step, index) => (
+              <ol>
+                {Object.values(steps).map((step, index) => (
                   <li key={index}>
-                    {index < currentStep ? (
+                    {step.status === 'success' ? (
                       <Space style={{ color: 'green' }}>
-                        {step.label} <FontAwesomeIcon icon={faCheck} />
+                        <FontAwesomeIcon icon={faCheck} /> {step.label}
                       </Space>
-                    ) : index === currentStep ? (
+                    ) : step.status === 'pending' ? (
                       <Space style={{ color: 'blue' }}>
-                        {step.label} <FontAwesomeIcon icon={faSpinner} className={styles.spinningIcon} />
+                        <FontAwesomeIcon icon={faSpinner} className={styles.spinningIcon} /> {step.label}
+                      </Space>
+                    ) : step.status === 'error' ? (
+                      <Space style={{ color: 'red' }}>
+                        <FontAwesomeIcon icon={faTimes} /> {step.label}
                       </Space>
                     ) : (
-                      <div style={{ color: '#aaa' }}>{step.label}</div>
+                      <Space>{step.label}</Space>
                     )}
                   </li>
                 ))}
-              </ul>
+              </ol>
             ) : (
               <>{support.type === 'ios' && support.needsInstall ? <IOSInstructions /> : <NotificationInstructions />}</>
             )}
 
-            {!stepsVisible ? (
-              <div className={styles.buttonContainer}>
-                <Button type='primary' size='large' icon={<FontAwesomeIcon icon={faBell} />} onClick={handleEnable}>
-                  {support.type === 'ios' && support.needsInstall ? 'Got it!' : 'Enable'}
-                </Button>
-                <Button
-                  size='large'
-                  icon={<FontAwesomeIcon icon={faBellSlash} />}
-                  onClick={() => handleDontShowAgain()}
-                >
-                  Don't Show Again
-                </Button>
-              </div>
-            ) : undefined}
+            <div className={styles.buttonContainer}>
+              <Button type='primary' size='large' icon={<FontAwesomeIcon icon={faBell} />} onClick={handleEnable} disabled={stepsVisible}>
+                {support.type === 'ios' && support.needsInstall ? 'Got it!' : 'Enable'}
+              </Button>
+              <Button
+                size='large'
+                icon={<FontAwesomeIcon icon={faBellSlash} />}
+                onClick={() => handleDontShowAgain()}
+                disabled={stepsVisible}
+              >
+                Don't Show Again
+              </Button>
+            </div>
 
             {/* <Collapse
               className={styles.debugSection}
