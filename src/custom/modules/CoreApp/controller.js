@@ -20,7 +20,7 @@ export const renderApp = async (currentUser, isLoading, state) => {
       }
     } else if (currentUser && state.userReturned && !state.initializing) {
       // We have the user and data, We can launch the app
-      newState = { renderState: Enums.appRenderState.LAUNCH }
+      newState = { renderState: Enums.appRenderState.LAUNCH, appReady: true }
     }
 
     return newState

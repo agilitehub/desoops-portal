@@ -53,7 +53,8 @@ const initialState = {
   initializing: false,
   renderState: Enums.appRenderState.LOGIN,
   userReturned: false,
-  spinTip: Enums.spinnerMessages.INIT
+  spinTip: Enums.spinnerMessages.INIT,
+  appReady: false
 }
 
 const reducer = (state, newState) => ({ ...state, ...newState })
@@ -127,14 +128,11 @@ const CoreApp = () => {
 
   // On App Launch, we need to check if the notificationPermission changed
   useEffect(() => {
-    console.log('useEffect - notificationPermission', notificationPermission)
-    if (state.renderState === Enums.appRenderState.LAUNCH) {
-      if (notificationPermission === 'granted') {
-        handleNotificationsEnabled()
-      }
+    if (state.appReady && notificationPermission === 'granted') {
+      handleNotificationsEnabled()
     }
     // eslint-disable-next-line
-  }, [notificationPermission, state.renderState])
+  }, [notificationPermission, state.appReady])
 
   const getUsersDeSoData = async () => {
     const tmpConfigData = configData
@@ -196,6 +194,7 @@ const CoreApp = () => {
   const handleNotificationsEnabled = async () => {
     const firebaseToken = await initializeMessaging()
     const timestamp = new Date().toISOString()
+
     if (firebaseToken) {
       const existingFcmTokens = configData?.userProfile?.notifications?.tokens || []
 
@@ -255,7 +254,6 @@ const CoreApp = () => {
           <>
             <DistributionDashboard />
             <Notifications />
-            <PWAManager />
           </>
         )
       case Enums.appRenderState.LOGIN:
@@ -271,6 +269,7 @@ const CoreApp = () => {
     <>
       <Toolbar state={state} setState={setState} onNotificationsClick={() => dispatch(setNotificationsVisible(true))} />
       {handleGetState()}
+      <PWAManager disabled={!state.appReady} />
       <EditProfile
         isVisible={editProfileVisible}
         setDeSoData={setDeSoData}

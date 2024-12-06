@@ -49,12 +49,12 @@ export const initializeMessaging = async () => {
       onMessage(messaging, (payload) => {
         console.log('Foreground message received:', payload)
         // For iOS standalone mode (installed to home screen), manually show notification
-        if (navigator.standalone) {
-          new Notification(payload.data.title || 'New Message', {
-            body: payload.data.body || 'You have a new notification'
-          })
-          return
-        }
+        // if (navigator.standalone) {
+        //   new Notification(payload.data.title || 'New Message', {
+        //     body: payload.data.body || 'You have a new notification'
+        //   })
+        //   return
+        // }
 
         // TODO: Handle non-iOS standalone notifications here
 
