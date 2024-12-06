@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import { Modal, Form, Switch, Select, Card, Row, Col, Divider, Space, message, Button } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { Modal, Form, Switch, Select, Card, Row, Col, Divider, Space, message, Button, Alert } from 'antd'
 import { useDispatch, useSelector } from 'react-redux'
 import styles from './style.module.sass'
 import { setEditNotificationsVisible } from '../../../custom/reducer'
@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faBellSlash } from '@fortawesome/free-regular-svg-icons'
 import { updateUserRecord } from '../../../custom/lib/agilite-controller'
 import { isMobile } from 'react-device-detect'
+import { usePwaFeatures } from '../PWADetector/hooks'
 
 const EditNotifications = ({ isVisible }) => {
   // Hooks
@@ -14,6 +15,7 @@ const EditNotifications = ({ isVisible }) => {
   const profile = useSelector((state) => state.custom.desoData.profile)
   const userProfileState = useSelector((state) => state.custom.configData.userProfile)
   const [form] = Form.useForm()
+  const { notificationPermission, support } = usePwaFeatures()
 
   // State
   const [formState, setFormState] = React.useState({
@@ -41,12 +43,28 @@ const EditNotifications = ({ isVisible }) => {
     }
   })
   const [loading, setLoading] = React.useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
     if (userProfileState) {
       setFormState(JSON.parse(JSON.stringify(userProfileState.notifications)))
     }
   }, [userProfileState])
+
+  useEffect(() => {
+    if (notificationPermission === 'denied') {
+      let errorMessage =
+        'Permission to receive push notifications was denied. To enable this, you will need to manually enable notifications in your browser settings and reload DeSoOps.'
+
+      if (support && support.type === 'ios') {
+        errorMessage =
+          'Permission to receive push notifications was denied. To enable this, you will need to manually enable notifications in your iOS notification settings for the DeSoOps app.'
+      }
+
+      setErrorMessage(errorMessage)
+    }
+    // eslint-disable-next-line
+  }, [notificationPermission, support])
 
   const handleOk = async () => {
     setLoading(true)
@@ -129,12 +147,15 @@ const EditNotifications = ({ isVisible }) => {
     >
       <Form form={form} layout='vertical' initialValues={formState} onFieldsChange={handleFieldsChange}>
         <Card size='small' type='inner'>
+          {errorMessage && (
+            <Alert message='Warning' description={errorMessage} type='warning' showIcon style={{ marginTop: 10 }} />
+          )}
           <div style={{ marginTop: 8 }}>
             <Row>
               <Col span={12}>
                 <p style={{ marginBottom: 2, fontWeight: 600, fontSize: 15, textAlign: 'center' }}>In-app</p>
               </Col>
-              <Col span={12}>
+              <Col span={12} style={{ display: notificationPermission === 'denied' ? 'none' : 'block' }}>
                 <p style={{ marginBottom: 2, fontWeight: 600, fontSize: 15, textAlign: 'center' }}>Push</p>
               </Col>
             </Row>
@@ -159,6 +180,7 @@ const EditNotifications = ({ isVisible }) => {
                   {formState.rules.diamonds.enabled !== 0 && (
                     <Form.Item name={['rules', 'diamonds', 'pushEnabled']}>
                       <Switch
+                        style={{ display: notificationPermission === 'denied' ? 'none' : 'block' }}
                         checkedChildren={
                           <Space>
                             <FontAwesomeIcon icon={faBell} /> Yes
@@ -191,6 +213,7 @@ const EditNotifications = ({ isVisible }) => {
                   {formState.rules.deso.enabled && (
                     <Form.Item name={['rules', 'deso', 'pushEnabled']}>
                       <Switch
+                        style={{ display: notificationPermission === 'denied' ? 'none' : 'block' }}
                         checkedChildren={
                           <Space>
                             <FontAwesomeIcon icon={faBell} /> Yes
@@ -223,6 +246,7 @@ const EditNotifications = ({ isVisible }) => {
                   {formState.rules.creatorCoins.enabled && (
                     <Form.Item name={['rules', 'creatorCoins', 'pushEnabled']}>
                       <Switch
+                        style={{ display: notificationPermission === 'denied' ? 'none' : 'block' }}
                         checkedChildren={
                           <Space>
                             <FontAwesomeIcon icon={faBell} /> Yes
@@ -255,6 +279,7 @@ const EditNotifications = ({ isVisible }) => {
                   {formState.rules.socialTokens.enabled && (
                     <Form.Item name={['rules', 'socialTokens', 'pushEnabled']}>
                       <Switch
+                        style={{ display: notificationPermission === 'denied' ? 'none' : 'block' }}
                         checkedChildren={
                           <Space>
                             <FontAwesomeIcon icon={faBell} /> Yes
@@ -287,6 +312,7 @@ const EditNotifications = ({ isVisible }) => {
                   {formState.rules.otherCrypto.enabled && (
                     <Form.Item name={['rules', 'otherCrypto', 'pushEnabled']}>
                       <Switch
+                        style={{ display: notificationPermission === 'denied' ? 'none' : 'block' }}
                         checkedChildren={
                           <Space>
                             <FontAwesomeIcon icon={faBell} /> Yes
