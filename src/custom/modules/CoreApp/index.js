@@ -65,7 +65,7 @@ const CoreApp = () => {
   const { currentUser, isLoading } = useContext(DeSoIdentityContext)
   const client = useApolloClient()
   const [state, setState] = useReducer(reducer, initialState)
-  const { notificationPermission, browserType, deviceType } = usePwaFeatures()
+  const { notificationPermission, browserType, deviceType, standaloneRequired } = usePwaFeatures()
   const [stepStatuses, setStepStatus] = useState({
     tokenObtained: '',
     initComplete: ''
@@ -188,7 +188,7 @@ const CoreApp = () => {
     try {
       const desoPrice = await getDeSoPricing(currDeSoPrice)
       dispatch(setDeSoPrice(desoPrice))
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const handleNotificationsEnabled = async () => {
@@ -275,7 +275,10 @@ const CoreApp = () => {
     <>
       <Toolbar state={state} setState={setState} onNotificationsClick={() => dispatch(setNotificationsVisible(true))} />
       {handleGetState()}
-      <PWAManager disabled={!state.appReady} stepStatuses={stepStatuses} />
+      <PWAManager
+        disabled={!state.appReady && !(state.renderState === Enums.appRenderState.LOGIN && standaloneRequired)}
+        stepStatuses={stepStatuses}
+      />
       <EditProfile
         isVisible={editProfileVisible}
         setDeSoData={setDeSoData}
