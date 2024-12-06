@@ -83,7 +83,6 @@ const PWAManager = ({ disabled = false, stepStatuses, forceShow = false }) => {
 
       permission = await Notification.requestPermission()
 
-      console.log('permission', permission)
       switch (permission) {
         case 'granted':
           setSteps((prev) => ({ ...prev, 1: { ...prev['1'], status: 'success' }, 2: { ...prev['2'], status: 'pending' } }))
@@ -117,13 +116,8 @@ const PWAManager = ({ disabled = false, stepStatuses, forceShow = false }) => {
   }
 
   useEffect(() => {
-    console.log('stepStatuses', stepStatuses)
-  }, [stepStatuses])
-
-  useEffect(() => {
     if (!showModal) return
-    console.log('tokenObtained', tokenObtained)
-    console.log('initComplete', initComplete)
+
     setSteps((prev) => ({
       ...prev,
       2: { ...prev['2'], status: tokenObtained },

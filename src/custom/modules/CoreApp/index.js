@@ -171,7 +171,7 @@ const CoreApp = () => {
         dispatch(setEditProfileVisible(true))
       }
     } catch (e) {
-      console.log(e)
+      console.error(e)
     }
   }
 
@@ -192,12 +192,12 @@ const CoreApp = () => {
   }
 
   const handleNotificationsEnabled = async () => {
-    setStepStatus('tokenObtained', 'pending')
+    setStepStatus((prev) => ({ ...prev, tokenObtained: 'pending' }))
     const firebaseToken = await initializeMessaging()
     const timestamp = new Date().toISOString()
 
     if (firebaseToken) {
-      setStepStatus({ tokenObtained: 'success', initComplete: 'pending' })
+      setStepStatus((prev) => ({ ...prev, tokenObtained: 'success', initComplete: 'pending' }))
       const existingFcmTokens = configData?.userProfile?.notifications?.tokens || []
 
       let fcmTokens = cloneDeep(existingFcmTokens)
@@ -233,9 +233,9 @@ const CoreApp = () => {
         await updateFCMToken(currentUser.PublicKeyBase58Check, Enums.reqTypes.UPDATE_FCM_TOKENS, fcmTokens)
       }
 
-      setStepStatus({ initComplete: 'success' })
+      setStepStatus((prev) => ({ ...prev, initComplete: 'success' }))
     } else {
-      setStepStatus({ tokenObtained: 'error' })
+      setStepStatus((prev) => ({ ...prev, tokenObtained: 'error' }))
     }
   }
 

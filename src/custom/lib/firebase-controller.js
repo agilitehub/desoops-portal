@@ -75,8 +75,6 @@ export const initializeMessaging = async () => {
       serviceWorkerRegistration: registration
     })
 
-    console.log('initializeMessaging - token', token)
-
     return token
   } catch (error) {
     console.error('Messaging initialization failed:', error)
