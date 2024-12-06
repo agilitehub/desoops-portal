@@ -4,7 +4,7 @@
 // If no, we display the Login page.
 // We also display a loading spinner while we are fetching the user's DeSo data.
 
-import React, { useContext, useEffect, useReducer } from 'react'
+import React, { useContext, useEffect, useReducer, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DeSoIdentityContext } from 'react-deso-protocol'
 import { isMobile, isTablet } from 'react-device-detect'
@@ -33,11 +33,7 @@ import {
   setDistributionTemplates,
   setEditProfileVisible
 } from '../../reducer'
-import {
-  initUserSession,
-  getDistributionTemplates,
-  updateFCMToken
-} from '../../lib/agilite-controller'
+import { initUserSession, getDistributionTemplates, updateFCMToken } from '../../lib/agilite-controller'
 
 import { renderApp } from './controller'
 import { getDeSoPricing, getInitialDeSoData } from '../../lib/deso-controller-graphql'
@@ -192,7 +188,7 @@ const CoreApp = () => {
     try {
       const desoPrice = await getDeSoPricing(currDeSoPrice)
       dispatch(setDeSoPrice(desoPrice))
-    } catch (e) { }
+    } catch (e) {}
   }
 
   const handleNotificationsEnabled = async () => {
@@ -287,7 +283,11 @@ const CoreApp = () => {
         getUsersDeSoData={getUsersDeSoData}
       />
       <EditNotifications isVisible={editNotificationsVisible} setDeSoData={setDeSoData} desoData={desoData} />
-      <ComingSoon isVisible={comingSoonObject.isVisible} title={comingSoonObject.title} description={comingSoonObject.description} />
+      <ComingSoon
+        isVisible={comingSoonObject.isVisible}
+        title={comingSoonObject.title}
+        description={comingSoonObject.description}
+      />
     </>
   )
 }
