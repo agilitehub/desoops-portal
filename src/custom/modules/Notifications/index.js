@@ -4,7 +4,7 @@ import { Empty, Avatar, Drawer, Space, Button, List } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell } from '@fortawesome/free-solid-svg-icons'
-import { formatNotifications, categorizeNotifications } from './controller'
+import { formatNotifications, categorizeNotifications, formatDate } from './controller'
 import { fetchUserNotifications, markNotificationsAsRead } from '../../lib/agilite-controller'
 import { setUnreadCount as setUnreadCountRedux, setNotificationsVisible } from '../../../custom/reducer'
 
@@ -32,6 +32,15 @@ const Notifications = () => {
   const drawerContentRef = useRef(null)
   const isFirstMount = useRef(true)
 
+  const refreshShortDates = useCallback(() => {
+    setNotifications((prevNotifications) =>
+      prevNotifications.map((notification) => ({
+        ...notification,
+        shortDate: formatDate(new Date(notification.transactionDate))
+      }))
+    )
+  }, [])
+
   // Manages processing of new notifications
   useEffect(() => {
     const init = async () => {
@@ -39,7 +48,7 @@ const Notifications = () => {
         let combinedNotifications = []
 
         // Remove duplicates from tmpNotifications and check if there are any left to process
-        const uniqueNotifications = tmpNewNotifications.filter(n => !notifications.some(n2 => n2.id === n.id))
+        const uniqueNotifications = tmpNewNotifications.filter((n) => !notifications.some((n2) => n2.id === n.id))
 
         setTmpNewNotifications([]) // Clear tmpNewNotifications as they've been processed
         if (uniqueNotifications.length === 0) return
@@ -48,7 +57,9 @@ const Notifications = () => {
 
         // Update notifications
         if (notificationsVisible) {
-          const uniqueNewNotifications = formattedNotifications.filter(n => !newNotifications.some(n2 => n2.id === n.id))
+          const uniqueNewNotifications = formattedNotifications.filter(
+            (n) => !newNotifications.some((n2) => n2.id === n.id)
+          )
           combinedNotifications = [...uniqueNewNotifications, ...newNotifications, ...notifications] // This is used to determine the unread count
           setNewNotifications([...uniqueNewNotifications, ...newNotifications])
         } else {
@@ -56,7 +67,7 @@ const Notifications = () => {
           setNotifications(combinedNotifications)
         }
 
-        const newUnreadCount = combinedNotifications.filter(n => n.unread).length
+        const newUnreadCount = combinedNotifications.filter((n) => n.unread).length
         dispatch(setUnreadCountRedux(newUnreadCount))
       }
     }
@@ -84,7 +95,6 @@ const Notifications = () => {
 
   const checkNewNotifications = useCallback(async () => {
     try {
-
       const response = await fetchUserNotifications(profile.publicKey)
       if (response.length === 0) return
       // Set notification key based on a concatenation of the response
@@ -103,7 +113,7 @@ const Notifications = () => {
       if (isFirstMount.current) {
         isFirstMount.current = false
         const formattedNotifications = await formatNotifications(initialNotifications, desoPrice)
-        const tmpUnreadCount = formattedNotifications.filter(notification => notification.unread).length
+        const tmpUnreadCount = formattedNotifications.filter((notification) => notification.unread).length
 
         setNotifications(formattedNotifications)
         setHasMore(formattedNotifications.length >= notificationLimit)
@@ -123,10 +133,7 @@ const Notifications = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const categorizedNotifications = useMemo(() =>
-    categorizeNotifications(notifications || []),
-    [notifications]
-  )
+  const categorizedNotifications = useMemo(() => categorizeNotifications(notifications || []), [notifications])
 
   const handleLoadMore = async () => {
     setLoadingMore(true)
@@ -136,9 +143,9 @@ const Notifications = () => {
 
     if (response.length === 0) return
 
-    // Set notification key based on a concatenation of the response
     setMoreNotificationKey(response.map((n) => n.id).join('-'))
     setTmpMoreNotifications(response)
+    refreshShortDates()
   }
 
   const handleOnClose = async () => {
@@ -160,11 +167,26 @@ const Notifications = () => {
   const handleShowNewNotifications = () => {
     setNotifications([...newNotifications, ...notifications])
     setNewNotifications([])
+    refreshShortDates()
 
-    // Scroll to top smoothly
     if (drawerContentRef.current) {
       drawerContentRef.current.scrollTo({ top: 0, behavior: 'smooth' })
     }
+  }
+
+  // Add an effect to refresh dates when drawer opens
+  useEffect(() => {
+    if (notificationsVisible) {
+      refreshShortDates()
+    }
+  }, [notificationsVisible, refreshShortDates])
+
+  const toTitleCase = (str) => {
+    // Convert camelCase to separate words and capitalize each word
+    return str
+      .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+      .replace(/^./, (str) => str.toUpperCase()) // Capitalize first letter
+      .trim() // Remove any leading/trailing spaces
   }
 
   return (
@@ -195,52 +217,49 @@ const Notifications = () => {
             <Empty description='No new deposit notifications to show' />
           ) : (
             <>
-              {Object.entries(categorizedNotifications).map(([category, items]) => (
-                items.length > 0 && (
-                  <div key={category}>
-                    <h3>{category.charAt(0).toUpperCase() + category.slice(1)}</h3>
-                    <List
-                      itemLayout="horizontal"
-                      dataSource={items}
-                      renderItem={notification => (
-                        <List.Item className={`${notification.unread ? styles.unread : styles.read} ${styles.card}`}>
-                          <List.Item.Meta
-                            avatar={
-                              <Avatar
-                                size={30}
-                                src={notification.senderPic}
-                                icon={!notification.senderPic && <UserOutlined />}
-                                className={styles.avatar}
-                              />
-                            }
-                            title={
-                              <div className={styles.notificationHeader}>
-                                <span className={styles.username}>{notification.sender}</span>
-                                <span className={styles.timestamp}>
-                                  {notification.shortDate}
-                                </span>
-                              </div>
-                            }
-                            description={
-                              <>
-                                <div className={styles.description}>{notification.description}</div>
-                                <div className={styles.fullTimestamp}>
-                                  {notification.fullDate}
+              {Object.entries(categorizedNotifications).map(
+                ([category, items]) =>
+                  items.length > 0 && (
+                    <div key={category}>
+                      <h3>{toTitleCase(category)}</h3>
+                      <List
+                        itemLayout='horizontal'
+                        dataSource={items}
+                        renderItem={(notification) => (
+                          <List.Item className={`${notification.unread ? styles.unread : styles.read} ${styles.card}`}>
+                            <List.Item.Meta
+                              avatar={
+                                <Avatar
+                                  size={30}
+                                  src={notification.senderPic}
+                                  icon={!notification.senderPic && <UserOutlined />}
+                                  className={styles.avatar}
+                                />
+                              }
+                              title={
+                                <div className={styles.notificationHeader}>
+                                  <span className={styles.username}>{notification.sender}</span>
+                                  <span className={styles.timestamp}>{notification.shortDate}</span>
                                 </div>
-                              </>
-                            }
-                          />
-                          {notification.icon && (
-                            <div className={styles.iconContainer}>
-                              <FontAwesomeIcon icon={notification.icon} className={styles.typeIcon} />
-                            </div>
-                          )}
-                        </List.Item>
-                      )}
-                    />
-                  </div>
-                )
-              ))}
+                              }
+                              description={
+                                <>
+                                  <div className={styles.description}>{notification.description}</div>
+                                  <div className={styles.fullTimestamp}>{notification.fullDate}</div>
+                                </>
+                              }
+                            />
+                            {notification.icon && (
+                              <div className={styles.iconContainer}>
+                                <FontAwesomeIcon icon={notification.icon} className={styles.typeIcon} />
+                              </div>
+                            )}
+                          </List.Item>
+                        )}
+                      />
+                    </div>
+                  )
+              )}
 
               {hasMore && (
                 <div className={styles.loadMoreContainer}>

@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react'
-import { Modal, Form, Switch, Select, Card, Row, Col, Divider, Space, message } from 'antd'
+import { Modal, Form, Switch, Select, Card, Row, Col, Divider, Space, message, Button } from 'antd'
 import { useDispatch, useSelector } from 'react-redux'
 import styles from './style.module.sass'
 import { setEditNotificationsVisible } from '../../../custom/reducer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faBellSlash } from '@fortawesome/free-regular-svg-icons'
 import { updateUserRecord } from '../../../custom/lib/agilite-controller'
+import { isMobile } from 'react-device-detect'
 
 const EditNotifications = ({ isVisible }) => {
   // Hooks
@@ -87,35 +88,59 @@ const EditNotifications = ({ isVisible }) => {
     setFormState(newState)
   }
 
+  const modalButtons = (
+    <Row justify='center' align='middle' gutter={[16, 16]}>
+      <Col>
+        <Button disabled={loading} onClick={handleCancel}>
+          Cancel
+        </Button>
+      </Col>
+      <Col>
+        <Button className={styles.finishButton} loading={loading} onClick={handleOk}>
+          Save
+        </Button>
+      </Col>
+    </Row>
+  )
+
+  const modalTitle = (
+    <>
+      <Row justify='center' align='middle'>
+        <Col>Deposit Notification Settings</Col>
+      </Row>
+      {isMobile && (
+        <Row justify='center' align='middle' style={{ marginTop: 8 }}>
+          <Col>{modalButtons}</Col>
+        </Row>
+      )}
+    </>
+  )
+
   return (
     <Modal
-      title={<center>Deposit Notification Settings</center>}
+      title={modalTitle}
       open={isVisible}
-      okText='Save'
-      cancelButtonProps={{ disabled: loading }}
-      okButtonProps={{ className: styles.finishButton, loading }}
+      footer={modalButtons}
       maskProps={{ style: { backgroundColor: 'rgba(0, 0, 0, 0.8)' } }}
       closable={false}
       maskClosable={false}
-      onOk={handleOk}
-      onCancel={handleCancel}
       className='full-screen-modal'
       destroyOnClose
     >
       <Form form={form} layout='vertical' initialValues={formState} onFieldsChange={handleFieldsChange}>
         <Card size='small' type='inner'>
-          <div style={{ marginTop: 10 }}>
+          <div style={{ marginTop: 8 }}>
             <Row>
               <Col span={12}>
-                <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 15, textAlign: 'center' }}>In-app</p>
+                <p style={{ marginBottom: 2, fontWeight: 600, fontSize: 15, textAlign: 'center' }}>In-app</p>
               </Col>
               <Col span={12}>
-                <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 15, textAlign: 'center' }}>Push</p>
+                <p style={{ marginBottom: 2, fontWeight: 600, fontSize: 15, textAlign: 'center' }}>Push</p>
               </Col>
             </Row>
-            <Divider style={{ margin: '8px 0' }} />
-            <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 14 }}>Diamonds</p>
-            <Row gutter={[16, 16]}>
+            <Divider style={{ margin: '1px 0' }} />
+            <p style={{ marginBottom: 2, fontWeight: 600, fontSize: 14 }}>Diamonds</p>
+            <Row gutter={[16, 8]}>
               <Col span={12}>
                 <Form.Item name={['rules', 'diamonds', 'enabled']}>
                   <Select>
@@ -150,9 +175,9 @@ const EditNotifications = ({ isVisible }) => {
                 </center>
               </Col>
             </Row>
-            <Divider style={{ margin: '8px 0' }} />
-            <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 14 }}>$DESO</p>
-            <Row gutter={[16, 16]}>
+            <Divider style={{ margin: '1px 0' }} />
+            <p style={{ marginBottom: 2, fontWeight: 600, fontSize: 14 }}>$DESO</p>
+            <Row gutter={[16, 8]}>
               <Col span={12}>
                 <Form.Item name={['rules', 'deso', 'enabled']}>
                   <Select>
@@ -182,9 +207,9 @@ const EditNotifications = ({ isVisible }) => {
                 </center>
               </Col>
             </Row>
-            <Divider style={{ margin: '8px 0' }} />
-            <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 14 }}>Creator Coins</p>
-            <Row gutter={[16, 16]}>
+            <Divider style={{ margin: '1px 0' }} />
+            <p style={{ marginBottom: 2, fontWeight: 600, fontSize: 14 }}>Creator Coins</p>
+            <Row gutter={[16, 8]}>
               <Col span={12}>
                 <Form.Item name={['rules', 'creatorCoins', 'enabled']}>
                   <Select>
@@ -214,9 +239,9 @@ const EditNotifications = ({ isVisible }) => {
                 </center>
               </Col>
             </Row>
-            <Divider style={{ margin: '8px 0' }} />
-            <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 14 }}>Social/DAO</p>
-            <Row gutter={[16, 16]}>
+            <Divider style={{ margin: '1px 0' }} />
+            <p style={{ marginBottom: 2, fontWeight: 600, fontSize: 14 }}>Social/DAO</p>
+            <Row gutter={[16, 8]}>
               <Col span={12}>
                 <Form.Item name={['rules', 'socialTokens', 'enabled']}>
                   <Select>
@@ -246,9 +271,9 @@ const EditNotifications = ({ isVisible }) => {
                 </center>
               </Col>
             </Row>
-            <Divider style={{ margin: '8px 0' }} />
-            <p style={{ marginBottom: 3, fontWeight: 600, fontSize: 14 }}>Other Crypto</p>
-            <Row gutter={[16, 16]}>
+            <Divider style={{ margin: '1px 0' }} />
+            <p style={{ marginBottom: 2, fontWeight: 600, fontSize: 14 }}>Other Crypto</p>
+            <Row gutter={[16, 8]}>
               <Col span={12}>
                 <Form.Item name={['rules', 'otherCrypto', 'enabled']}>
                   <Select>
