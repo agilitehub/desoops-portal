@@ -1,91 +1,128 @@
+import { faGem, faUsers, faDollarSign, faCoins, faBitcoinSign } from '@fortawesome/free-solid-svg-icons'
+import dayjs from 'dayjs'
 import Enums from '../../../custom/lib/enums'
-import { FETCH_SINGLE_PROFILE } from '../../../custom/lib/graphql-models'
 import { generateProfilePicUrl } from '../../../custom/lib/deso-controller-graphql'
 
-// Helper function to get notification type and description
-const formatAmount = (amount, divideTwice = true) => {
-  return (
-    divideTwice ? amount / Enums.values.NANO_VALUE / Enums.values.NANO_VALUE : amount / Enums.values.NANO_VALUE
-  ).toFixed(2)
-}
+export const formatDate = (date) => {
+  const now = new Date()
+  const diff = now - date
 
-const getNotificationDetails = (notification) => {
-  const { tokenType, amountNanos, diamondLevel } = notification
-
-  let description = ''
-
-  switch (tokenType) {
-    case 'diamonds':
-      description = `gave you ${diamondLevel} diamond${diamondLevel > 1 ? 's' : ''}`
-      break
-
-    case 'deso':
-      const desoAmount = formatAmount(amountNanos, false)
-      description = `sent you ${desoAmount} DESO`
-      break
-
-    case 'creatorCoins':
-      const ccAmount = formatAmount(amountNanos)
-      description = `transferred you ${ccAmount} creator coins`
-      break
-
-    case 'socialTokens':
-      const stAmount = formatAmount(amountNanos)
-      description = `transferred you ${stAmount} social tokens`
-      break
-
-    case 'otherCrypto':
-      const cryptoAmount = formatAmount(amountNanos)
-      description = `exchanged crypto for ${cryptoAmount} DESO`
-      break
-
-    default:
-      return null
+  // Less than 1 minute
+  if (diff < 60000) {
+    return 'Just now'
+  }
+  // Less than 1 hour
+  if (diff < 3600000) {
+    const minutes = Math.floor(diff / 60000)
+    return `${minutes}m ago`
+  }
+  // Less than 24 hours
+  if (diff < 86400000) {
+    const hours = Math.floor(diff / 3600000)
+    return `${hours}h ago`
+  }
+  // Less than 30 days
+  if (diff < 2592000000) {
+    const days = Math.floor(diff / 86400000)
+    return `${days}d ago`
   }
 
-  return { description }
+  // For older dates, just return ' > 30d ago'
+  return ' > 30d ago'
 }
 
-// Main function to format notifications
-export const formatNotifications = async (notifications, client) => {
-  const formattedNotifications = await Promise.all(
-    notifications.map(async (notification) => {
-      // Get notification type and description
-      const { description } = getNotificationDetails(notification)
+export const formatNotifications = async (notifications, desoPrice) => {
+  const result = []
 
-      // If type is null, we don't care about this notification and need to skip it
-      if (!description) {
-        return null
-      }
+  let entry = null
+  let amount = null
+  let usd = null
+  let tmpDescription = null
+  let description = null
+  let icon = null
+  let nanoValue = Enums.values.NANO_VALUE
 
-      // Get the profile of who triggered the notification
-      let actorProfile = null
-      try {
-        const response = await client.query({
-          query: FETCH_SINGLE_PROFILE,
-          variables: { publicKey: notification.senderPublicKey },
-          fetchPolicy: 'no-cache'
-        })
-        actorProfile = response.data.accountByPublicKey
-      } catch (error) {
-        console.error('Error fetching actor profile:', error)
-      }
+  for (const notification of notifications) {
+    switch (notification.tokenType) {
+      case 'diamonds':
+        amount = notification.diamondLevel
+        usd = Math.floor(((notification.amountNanos / nanoValue) * desoPrice) * 1000) / 1000
+        tmpDescription = `Diamond(s) (~$${usd})`
+        icon = faGem
 
-      return {
-        _id: notification._id,
-        id: notification.id,
-        timestamp: notification.transactionDate,
-        createdAt: notification.createdAt,
-        description,
-        unread: notification.unread,
-        actor: {
-          publicKey: notification.senderPublicKey,
-          username: actorProfile?.username || notification.senderPublicKey,
-          profilePic: actorProfile ? await generateProfilePicUrl(actorProfile.publicKey) : null
-        }
-      }
-    })
-  )
+        break
+      case 'deso':
+        amount = notification.amountNanos / nanoValue
+        usd = Math.floor(amount * desoPrice * 10000) / 10000
+        tmpDescription = `$DESO (~$${usd})`
+        icon = faDollarSign
+        break
+      case 'creatorCoins':
+        amount = notification.amountNanos / nanoValue
+        tmpDescription = `$${notification.tokenUser} Creator Coin(s)`
+        icon = faCoins
+        break
+      case 'socialTokens':
+        amount = notification.amountNanos / nanoValue / nanoValue
+        tmpDescription = `$${notification.tokenUser} Social Token(s)`
+        icon = faUsers
+        break
+      default:
+        amount = notification.amountNanos / nanoValue / nanoValue
+        tmpDescription = `$${notification.tokenUser} token(s)`
+        icon = faBitcoinSign
+    }
 
-  return formattedNotifications.filter(Boolean)
+    description = `sent you ${amount} ${tmpDescription}`
+
+    entry = {
+      id: notification.id,
+      unread: notification.unread,
+      transactionDate: notification.transactionDate,
+      shortDate: formatDate(new Date(notification.transactionDate)),
+      fullDate: dayjs(notification.transactionDate).format('YYYY-MM-DD HH:mm'),
+      user: notification.user,
+      userPic: await generateProfilePicUrl(notification.publicKey),
+      sender: notification.sender,
+      senderPic: await generateProfilePicUrl(notification.senderPublicKey),
+      tokenUser: notification.tokenUser,
+      tokenPic: notification.tokenKey ? await generateProfilePicUrl(notification.tokenKey) : null,
+      usd,
+      amount,
+      description,
+      usdExchangeRate: notification.usdExchangeRate,
+      icon
+    }
+
+    result.push(entry)
+  }
+
+  return result
+}
+
+export const categorizeNotifications = (notifications) => {
+  const today = []
+  const thisWeek = []
+  const older = []
+
+  const now = new Date()
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const startOfThisWeek = new Date(startOfToday)
+  const currentDay = startOfToday.getDay()
+  const daysToSubtract = currentDay === 0 ? 6 : currentDay - 1
+  startOfThisWeek.setDate(startOfToday.getDate() - daysToSubtract)
+
+  notifications.forEach((notification) => {
+    const notificationDate = new Date(notification.transactionDate)
+
+    if (notificationDate >= startOfToday) {
+      today.push(notification)
+    } else if (notificationDate >= startOfThisWeek) {
+      thisWeek.push(notification)
+    } else {
+      older.push(notification)
+    }
+  })
+
+  return { today, thisWeek, older }
 }

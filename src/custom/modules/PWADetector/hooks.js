@@ -14,15 +14,24 @@
  *     isStandalone,        // Is the app running as an installed PWA?
  *     canBeStandalone,     // Can the app be installed?
  *     standaloneRequired,  // Must the app be installed to function?
+ *     isOnline,           // Is the device connected to the internet
+ *     triggerInstallPrompt, // Function to trigger the install prompt
  *     // ... other features
  *   } = usePwaFeatures()
+ * 
+ *   // Listen for connectivity changes
+ *   useEffect(() => {
+ *     if (!isOnline) {
+ *       // Handle offline state
+ *     }
+ *   }, [isOnline])
  * 
  *   return (
  *     <div>
  *       <h2>PWA Support Status</h2>
  *       <p>Device: {deviceType}</p>
  *       <p>Browser: {browserType}</p>
- *       <p>Can Install: {canBeStandalone ? 'Yes' : 'No'}</p>
+ *       <p>Online: {isOnline ? 'Yes' : 'No'}</p>
  *     </div>
  *   )
  * }
@@ -62,7 +71,7 @@ export const usePwaFeatures = (options = {}) => {
     // Additional PWA Features
     isPWAInstalled: false,          // Is the app currently installed
     hasManifest: false,             // Does the app have a web manifest
-    isOnline: true,                 // Is the device connected to the internet
+    isOnline: navigator.onLine,     // Initialize with actual online status
     pushNotificationsSupported: false, // Are push notifications supported
     backgroundSyncSupported: false,    // Is background sync supported
     installPromptAvailable: false,     // Can we prompt to install (non-iOS)
@@ -97,14 +106,16 @@ export const usePwaFeatures = (options = {}) => {
       }))
     }
 
-    const handleOnlineStatus = () => {
-      setFeatures(prev => ({ ...prev, isOnline: navigator.onLine }))
+    const handleConnectivityChange = (e) => {
+      setFeatures(prev => ({
+        ...prev,
+        isOnline: e.detail.isOnline
+      }))
     }
 
     // Set up event listeners
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-    window.addEventListener('online', handleOnlineStatus)
-    window.addEventListener('offline', handleOnlineStatus)
+    window.addEventListener('pwa:connectivity-change', handleConnectivityChange)
 
     // Set up observers
     let manifestObserver
@@ -145,9 +156,8 @@ export const usePwaFeatures = (options = {}) => {
       if (manifestObserver) {
         manifestObserver.disconnect()
       }
+      window.removeEventListener('pwa:connectivity-change', handleConnectivityChange)
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-      window.removeEventListener('online', handleOnlineStatus)
-      window.removeEventListener('offline', handleOnlineStatus)
     }
   }, [checkOnPermissionChange, checkOnInstallChange, checkOnManifestChange, updateFeatures])
 

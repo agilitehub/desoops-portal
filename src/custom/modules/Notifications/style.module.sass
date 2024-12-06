@@ -13,8 +13,9 @@
 
 .notificationContent
   display: flex
-  align-items: flex-start
+  align-items: center
   padding: 0 4px
+  position: relative
 
 .avatar
   margin-right: 12px
@@ -24,12 +25,17 @@
 .notificationDetails
   flex: 1
   min-width: 0
+  margin-right: 40px
+  display: flex
+  flex-direction: column
 
 .notificationHeader
   display: flex
   justify-content: space-between
   align-items: center
-  margin-bottom: 4px
+  margin-left: -20px
+  margin-top: 3px
+
 
 .username
   font-weight: 600
@@ -39,10 +45,20 @@
   color: rgba(0, 0, 0, 0.45)
   font-size: 12px
   white-space: nowrap
+  margin-right: 5px
+
+.fullTimestamp
+  color: rgba(0, 0, 0, 0.35)
+  font-size: 12px
+  white-space: nowrap
+  margin-top: 8px
+  margin-right: 5px
+  text-align: right
 
 .description
   color: rgba(0, 0, 0, 0.85)
   word-break: break-word
+  margin-left: -20px
 
 .postPreview
   margin-top: 8px
@@ -67,22 +83,23 @@
   color: #8c8c8c
 
 .loadMoreButton
-  width: 100%
-  padding: 8px
-  margin-top: 8px
-  background: #188EFF
+  width: auto
+  min-width: 200px
+  padding: 6px 16px
+  background: rgba($blue2-dark, 0.9)
   color: white
   border: none
   border-radius: 4px
   cursor: pointer
   font-weight: 500
+  transition: background 0.2s ease
   
   &:disabled
-    background: #ccc
+    background: rgba($blue2-dark, 0.5)
     cursor: not-allowed
   
   &:hover:not(:disabled)
-    background: darken(#188EFF, 10%)
+    background: rgba($blue2-dark, 1)
 
 .drawerHeader
   background-color: #fff
@@ -107,7 +124,9 @@
     height: 45px
 
 .card
-  margin-bottom: 12px
+  padding: 3px !important
+  border-radius: 10px
+  margin-bottom: 2px
   @media (max-width: 768px)
     margin-left: 5px
     margin-right: 5px
@@ -158,17 +177,44 @@
 
 .newNotificationsBar
   position: sticky
-  top: 0
   z-index: 1
-  background: #fff
-  padding: 8px
-  text-align: center
+  background: rgba(255, 255, 255, 0.95)
+  padding: 12px 8px
   border-bottom: 1px solid #f0f0f0
   margin-bottom: 8px
+  backdrop-filter: blur(4px)
+  display: flex
+  align-items: center
+  justify-content: center
+  margin-top: -18px
   
   button
-    width: 100%
-    background: $blue2-dark
+    width: auto
+    min-width: 200px
+    padding: 6px 16px
+    background: rgba($blue2-dark, 0.9)
+    transition: background 0.2s ease
+    
     &:hover
-      background: darken($blue2-dark, 10%)
+      background: rgba($blue2-dark, 1)
+
+.drawerTitle
+  width: 100%
+  justify-content: space-between
+
+.bellIcon
+  margin-right: 8px
+  font-size: 14px
+
+.typeIcon
+  font-size: 18px
+  color: $blue2-dark
+  opacity: 0.8
+
+.iconContainer
+  position: absolute
+  right: 10px
+  height: 100%
+  display: flex
+  align-items: center
 

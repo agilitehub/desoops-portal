@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const IOSInstructions = () => (
   <div>
-    <p>To receive notifications, you need to install DeSoOps by adding it to your home screen.</p>
+    <p>To receive deposit notifications, you need to install DeSoOps by adding it to your home screen.</p>
     <ol>
       <li>Tap the share button (📤) in Safari's toolbar</li>
       <li>Scroll down and tap "Add to Home Screen"</li>
@@ -21,43 +21,55 @@ const IOSInstructions = () => (
 
 const NotificationInstructions = () => (
   <div>
-    <p>Receive notifications to your device when receiving:</p>
+    <p>Receive deposit notifications to your device when receiving:</p>
     <ul>
       <li>Diamonds</li>
       <li>$DESO</li>
       <li>Social/DAO Tokens</li>
       <li>Other Crypto (btc, eth, etc.)</li>
-      <li>Private Messages</li> {/* TODO: Add this in next version */}
+      {/* <li>Private Messages</li> TODO: Add this in next version */}
     </ul>
   </div>
 )
 
-const PWAManager = ({ onDontShowAgain, disabled = false, forceShow = false }) => {
+const PWAManager = ({ disabled = false, forceShow = false }) => {
   const [showModal, setShowModal] = useState(false)
   const {
     isVisible,
     support,
     dismiss,
     triggerInstallPrompt,
-    ...pwaFeatures
+    notificationPermission
   } = usePWAManager(forceShow)
 
   const handleEnable = async () => {
     try {
-      // TODO: We need to manage the Modal UI during this process
-      await Notification.requestPermission()
+      if (support.type === 'ios' && support.needsInstall) {
+        dismiss()
+        setShowModal(false)
+        return
+      }
+
+      if (notificationPermission === 'default') {
+        await Notification.requestPermission()
+      }
+
+      if (support.type === 'standard' && triggerInstallPrompt) {
+        await triggerInstallPrompt()
+      }
+
       dismiss()
       setShowModal(false)
     } catch (error) {
-      console.error('Error enabling notifications or installing PWA:', error)
+      console.error('Error enabling deposit notifications or installing PWA:', error)
       setShowModal(false)
     }
   }
 
   const handleDontShowAgain = () => {
+    localStorage.setItem('pwa-dismissed', 'true')
     dismiss()
     setShowModal(false)
-    onDontShowAgain()
   }
 
   return (
@@ -69,7 +81,7 @@ const PWAManager = ({ onDontShowAgain, disabled = false, forceShow = false }) =>
           </div>
 
           <Modal
-            title={support.type === 'ios' && support.needsInstall ? 'Install App' : 'Enable Notifications'}
+            title={support.type === 'ios' && support.needsInstall ? 'Install App' : 'Enable Deposit Notifications'}
             open={showModal}
             onCancel={() => setShowModal(false)}
             footer={null}
@@ -106,7 +118,7 @@ const PWAManager = ({ onDontShowAgain, disabled = false, forceShow = false }) =>
                         {
                           support,
                           isVisible,
-                          ...pwaFeatures
+                          notificationPermission
                         },
                         null,
                         2

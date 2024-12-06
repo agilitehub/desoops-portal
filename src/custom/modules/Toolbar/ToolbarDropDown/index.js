@@ -26,8 +26,8 @@ const ToolbarDropDown = () => {
       editNotifications: {
         icon: <BellOutlined style={{ fontSize: 16 }} />,
         danger: false,
-        key: 'Edit Notifications',
-        label: 'Edit Notifications',
+        key: 'Deposit Settings',
+        label: 'Deposit Settings',
         className: 'dropdown-item',
         onClick: () => dispatch(setEditNotificationsVisible(true))
       },
@@ -61,7 +61,7 @@ const ToolbarDropDown = () => {
         } else {
           setProfilePic(false)
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     if (profile.profilePicUrl) {

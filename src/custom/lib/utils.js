@@ -75,7 +75,7 @@ export const calculateDaysSinceLastActive = (lastTransactionTimestamp) => {
 
 export const randomize = (input, separator = ' ', x = 1, performance = false, duplicates = false) => {
   return new Promise((resolve, reject) => {
-    ;(async () => {
+    ; (async () => {
       let errMsg = null
 
       try {

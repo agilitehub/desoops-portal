@@ -47,10 +47,17 @@ export const initializeMessaging = async () => {
 
       // Handle foreground messages, but exclude iOS. Note this logic is needed for iOS for the Safari Push Notification handler to work
       onMessage(messaging, (payload) => {
-        // if (!PWA_CONFIG.env.isIOS) {
-        // TODO: Handle the notification data here
         console.log('Foreground message received:', payload)
-        // }
+        // For iOS standalone mode (installed to home screen), manually show notification
+        if (navigator.standalone) {
+          new Notification(payload.data.title || 'New Message', {
+            body: payload.data.body || 'You have a new notification'
+          })
+          return
+        }
+
+        // TODO: Handle non-iOS standalone notifications here
+
       })
 
       // For iOS PWA, also set up Safari Push Notification handler

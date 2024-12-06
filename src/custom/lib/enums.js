@@ -80,7 +80,7 @@ const Enums = {
     INIT_USER_SESSION: 'init_user_session',
     UPDATE_FCM_TOKENS: 'update_fcm_tokens',
     OPT_OUT_PROFILE: 'opt_out_profile',
-    UPDATE_PWAMANAGER_ENABLED: 'update_pwa_manager_enabled'
+    FETCH_USER_NOTIFICATIONS: 'fetch_user_notifications'
   },
   messages: {
     UNKNOWN_ERROR: 'Unknown Error Occured. Please check console',

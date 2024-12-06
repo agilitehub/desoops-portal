@@ -4,13 +4,14 @@
 // If no, we display the Login page.
 // We also display a loading spinner while we are fetching the user's DeSo data.
 
-import React, { useContext, useEffect, useReducer, useState } from 'react'
+import React, { useContext, useEffect, useReducer } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { DeSoIdentityContext } from 'react-deso-protocol'
 import { isMobile, isTablet } from 'react-device-detect'
 import { useApolloClient } from '@apollo/client'
 import { Spin } from 'antd'
-import { usePwaFeatures } from '../PWAManager/PWADetector/hooks'
+import { usePwaFeatures } from '../PWADetector/hooks'
+import { setNotificationsVisible } from '../../reducer'
 
 // App Components
 import DistributionDashboard from '../DistributionDashboard'
@@ -35,8 +36,7 @@ import {
 import {
   initUserSession,
   getDistributionTemplates,
-  updateFCMToken,
-  updatePWAManagerEnabled
+  updateFCMToken
 } from '../../lib/agilite-controller'
 
 import { renderApp } from './controller'
@@ -47,6 +47,7 @@ import './style.sass'
 import { initializeMessaging } from '../../lib/firebase-controller'
 import EditNotifications from '../EditNotifications'
 import ComingSoon from '../ComingSoon'
+import { cloneDeep } from 'lodash'
 
 const initialState = {
   initializing: false,
@@ -63,11 +64,10 @@ const CoreApp = () => {
   const configData = useSelector((state) => state.custom.configData)
   const editProfileVisible = useSelector((state) => state.custom.editProfileVisible)
   const editNotificationsVisible = useSelector((state) => state.custom.editNotificationsVisible)
-  const comingSoonVisible = useSelector((state) => state.custom.comingSoonVisible)
+  const comingSoonObject = useSelector((state) => state.custom.comingSoon)
   const { currentUser, isLoading } = useContext(DeSoIdentityContext)
   const client = useApolloClient()
   const [state, setState] = useReducer(reducer, initialState)
-  const [notificationsVisible, setNotificationsVisible] = useState(false)
   const { notificationPermission, browserType, deviceType } = usePwaFeatures()
 
   // Determine Device Type
@@ -190,16 +190,16 @@ const CoreApp = () => {
     try {
       const desoPrice = await getDeSoPricing(currDeSoPrice)
       dispatch(setDeSoPrice(desoPrice))
-    } catch (e) {}
+    } catch (e) { }
   }
 
   const handleNotificationsEnabled = async () => {
     const firebaseToken = await initializeMessaging()
-    console.log('handleNotificationsEnabled - firebaseToken', firebaseToken)
+    const timestamp = new Date().toISOString()
     if (firebaseToken) {
       const existingFcmTokens = configData?.userProfile?.notifications?.tokens || []
 
-      let fcmTokens = [...existingFcmTokens]
+      let fcmTokens = cloneDeep(existingFcmTokens)
 
       let existingTokenConfig = null
       let createTokenConfig = true
@@ -213,7 +213,7 @@ const CoreApp = () => {
         if (existingTokenConfig.token !== firebaseToken) {
           updateTokenConfig = true
           existingTokenConfig.token = firebaseToken
-          existingTokenConfig.lastActive = new Date().toISOString()
+          existingTokenConfig.lastActive = timestamp
         }
       }
 
@@ -222,8 +222,8 @@ const CoreApp = () => {
           token: firebaseToken,
           device: deviceType,
           browser: browserType,
-          lastActive: new Date().toISOString(),
-          createdAt: new Date().toISOString()
+          lastActive: timestamp,
+          createdAt: timestamp
         }
 
         fcmTokens = [...fcmTokens, newTokenConfig]
@@ -232,10 +232,6 @@ const CoreApp = () => {
         await updateFCMToken(currentUser.PublicKeyBase58Check, Enums.reqTypes.UPDATE_FCM_TOKENS, fcmTokens)
       }
     }
-  }
-
-  const handleDontShowAgain = async () => {
-    await updatePWAManagerEnabled(currentUser.PublicKeyBase58Check, Enums.reqTypes.UPDATE_PWAMANAGER_ENABLED, false)
   }
 
   const handleGetState = () => {
@@ -258,11 +254,8 @@ const CoreApp = () => {
         return (
           <>
             <DistributionDashboard />
-            <Notifications visible={notificationsVisible} onClose={() => setNotificationsVisible(false)} />
-            <PWAManager
-              onDontShowAgain={handleDontShowAgain}
-              disabled={!configData?.userProfile?.notifications?.pwaManagerEnabled}
-            />
+            <Notifications />
+            <PWAManager />
           </>
         )
       case Enums.appRenderState.LOGIN:
@@ -276,7 +269,7 @@ const CoreApp = () => {
 
   return (
     <>
-      <Toolbar state={state} setState={setState} onNotificationsClick={() => setNotificationsVisible(true)} />
+      <Toolbar state={state} setState={setState} onNotificationsClick={() => dispatch(setNotificationsVisible(true))} />
       {handleGetState()}
       <EditProfile
         isVisible={editProfileVisible}
@@ -285,7 +278,7 @@ const CoreApp = () => {
         getUsersDeSoData={getUsersDeSoData}
       />
       <EditNotifications isVisible={editNotificationsVisible} setDeSoData={setDeSoData} desoData={desoData} />
-      <ComingSoon isVisible={comingSoonVisible} />
+      <ComingSoon isVisible={comingSoonObject.isVisible} title={comingSoonObject.title} description={comingSoonObject.description} />
     </>
   )
 }

@@ -3,6 +3,29 @@
  */
 
 /**
+ * Device type constants
+ * @enum {string}
+ */
+export const DeviceType = {
+  IOS: 'ios',
+  ANDROID: 'android',
+  DESKTOP: 'desktop',
+  UNKNOWN: 'unknown'
+}
+
+/**
+ * Browser type constants
+ * @enum {string}
+ */
+export const BrowserType = {
+  CHROME: 'chrome',
+  FIREFOX: 'firefox',
+  SAFARI: 'safari',
+  EDGE: 'edge',
+  OTHER: 'other'
+}
+
+/**
  * Detects iOS version from user agent
  * @returns {number|null} iOS version number or null
  */
@@ -23,12 +46,12 @@ export const detectDevice = () => {
 
     if (!mobile) {
       if (platform.includes('mac') || platform.includes('win') || platform.includes('linux')) {
-        return 'desktop'
+        return DeviceType.DESKTOP
       }
     }
 
-    if (platform.includes('ios')) return 'ios'
-    if (platform.includes('android')) return 'android'
+    if (platform.includes('ios')) return DeviceType.IOS
+    if (platform.includes('android')) return DeviceType.ANDROID
   }
 
   // Fallback to user agent
@@ -36,18 +59,18 @@ export const detectDevice = () => {
 
   // Desktop detection
   if (ua.includes('macintosh') || ua.includes('windows') || ua.includes('linux')) {
-    return 'desktop'
+    return DeviceType.DESKTOP
   }
 
   // Mobile detection
   if ((ua.includes('iphone') || ua.includes('ipad') || ua.includes('ipod')) && !window.MSStream) {
-    return 'ios'
+    return DeviceType.IOS
   }
   if (ua.includes('android')) {
-    return 'android'
+    return DeviceType.ANDROID
   }
 
-  return 'desktop' // Default to desktop if no other match
+  return DeviceType.UNKNOWN
 }
 
 /**
@@ -58,19 +81,19 @@ export const detectBrowser = () => {
   // Try modern API first
   if (navigator.userAgentData) {
     const brands = navigator.userAgentData.brands
-    if (brands.some(b => b.brand.toLowerCase().includes('firefox'))) return 'firefox'
-    if (brands.some(b => b.brand.toLowerCase().includes('chrome'))) return 'chrome'
-    if (brands.some(b => b.brand.toLowerCase().includes('edge'))) return 'edge'
+    if (brands.some(b => b.brand.toLowerCase().includes('firefox'))) return BrowserType.FIREFOX
+    if (brands.some(b => b.brand.toLowerCase().includes('chrome'))) return BrowserType.CHROME
+    if (brands.some(b => b.brand.toLowerCase().includes('edge'))) return BrowserType.EDGE
   }
 
   // Fallback to user agent
   const ua = navigator.userAgent.toLowerCase()
-  if (ua.includes('firefox')) return 'firefox'
-  if (ua.includes('chrome') && !ua.includes('edg') && !ua.includes('opr')) return 'chrome'
-  if (ua.includes('safari') && !ua.includes('chrome')) return 'safari'
-  if (ua.includes('edg')) return 'edge'
+  if (ua.includes('firefox')) return BrowserType.FIREFOX
+  if (ua.includes('chrome') && !ua.includes('edg') && !ua.includes('opr')) return BrowserType.CHROME
+  if (ua.includes('safari') && !ua.includes('chrome')) return BrowserType.SAFARI
+  if (ua.includes('edg')) return BrowserType.EDGE
 
-  return 'other'
+  return BrowserType.OTHER
 }
 
 const isSecureContext = () => {
@@ -146,7 +169,22 @@ export const checkPwaFeatures = async () => {
   )
 
   // Online Status
-  const isOnline = navigator.onLine
+  let isOnline = navigator.onLine
+
+  // Add event listeners for connectivity changes
+  window.addEventListener('online', () => {
+    isOnline = true
+    window.dispatchEvent(new CustomEvent('pwa:connectivity-change', {
+      detail: { isOnline: true }
+    }))
+  })
+
+  window.addEventListener('offline', () => {
+    isOnline = false
+    window.dispatchEvent(new CustomEvent('pwa:connectivity-change', {
+      detail: { isOnline: false }
+    }))
+  })
 
   // Notification Permission
   const notificationPermission = window.Notification
@@ -165,7 +203,7 @@ export const checkPwaFeatures = async () => {
 
   // Standalone Requirements
   const standaloneRequired = Boolean(
-    deviceType === 'ios' &&
+    deviceType === DeviceType.IOS &&
     iosVersion >= 16.4 &&
     !isStandalone
   )
@@ -182,13 +220,13 @@ export const checkPwaFeatures = async () => {
 
   // Support object for PWAManager
   const support = {
-    isSupported: deviceType === 'desktop'
-      ? (browserType === 'chrome' || browserType === 'edge')
-      : deviceType === 'ios'
-        ? browserType === 'safari'
+    isSupported: deviceType === DeviceType.DESKTOP
+      ? (browserType === BrowserType.CHROME || browserType === BrowserType.EDGE)
+      : deviceType === DeviceType.IOS
+        ? browserType === BrowserType.SAFARI
         : notificationsAllowed || canBeStandalone,
     needsInstall: standaloneRequired,
-    type: deviceType === 'ios' ? 'ios' : 'standard'
+    type: deviceType === DeviceType.IOS ? DeviceType.IOS : 'standard'
   }
 
   return {

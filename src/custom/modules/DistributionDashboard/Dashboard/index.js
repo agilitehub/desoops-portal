@@ -56,7 +56,7 @@ import {
   GQL_GET_TOKEN_HOLDERS
 } from '../../../lib/graphql-models'
 import { buildGQLProps, randomize } from '../../../lib/utils'
-import { usePwaFeatures } from '../../PWAManager/PWADetector/hooks'
+import { usePwaFeatures } from '../../PWADetector/hooks'
 const reducer = (state, newState) => ({ ...state, ...newState })
 
 const _BatchTransactionsForm = () => {
@@ -1178,6 +1178,7 @@ const _BatchTransactionsForm = () => {
           </ContainerCard>
         </Col>
       </Row>
+      <div style={{ height: '100px' }}></div>
       <PaymentModal props={state.paymentModal} onPaymentDone={handlePaymentDone} onRetryExecute={handleRetryExecute} />
     </>
   )

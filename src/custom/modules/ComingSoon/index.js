@@ -1,16 +1,16 @@
 import { Modal } from 'antd'
-import { setComingSoonVisible } from '../../../custom/reducer'
+import { setComingSoon } from '../../../custom/reducer'
 import React from 'react'
 import { useDispatch } from 'react-redux'
 
-const ComingSoon = ({ isVisible }) => {
+const ComingSoon = ({ isVisible, title, description }) => {
   const dispatch = useDispatch()
   return (
     <Modal
       open={isVisible}
       cancelButtonProps={{ style: { display: 'none' } }}
       okButtonProps={{ style: { display: 'none' } }}
-      onCancel={() => dispatch(setComingSoonVisible(false))}
+      onCancel={() => dispatch(setComingSoon({ isVisible: false, title: '', description: '' }))}
       width={500}
       centered
     >
@@ -29,7 +29,7 @@ const ComingSoon = ({ isVisible }) => {
             WebkitTextFillColor: 'transparent'
           }}
         >
-          Coming Soon!
+          {title}
         </h1>
         <p
           style={{
@@ -38,7 +38,7 @@ const ComingSoon = ({ isVisible }) => {
             marginBottom: '1.5rem'
           }}
         >
-          We're working hard to bring you something amazing. Stay tuned for updates!
+          {description}
         </p>
         <div
           style={{

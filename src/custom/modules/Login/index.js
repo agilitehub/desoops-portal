@@ -149,19 +149,23 @@ const Login = () => {
                           <div>
                             <p style={{ marginTop: 0 }}>
                               <FontAwesomeIcon className={styles.checkColor} icon={faCheckCircle} />{' '}
-                              <span style={{ fontSize: styleProps.bulletPointFontSize }}>Payment Distributions</span>
+                              <span style={{ fontSize: styleProps.bulletPointFontSize }}>Bulk Token Distributions to DeSo Wallets</span>
                             </p>
                             <p style={{ marginTop: -10 }}>
                               <FontAwesomeIcon className={styles.checkColor} icon={faCheckCircle} />{' '}
                               <span style={{ fontSize: styleProps.bulletPointFontSize }}>
-                                Distribute to DAO Token, Creator Coin, and NFT Holders
+                                Distribute to Social/Creator/NFT Holders, & more
                               </span>
                             </p>
                             <p style={{ marginTop: -10 }}>
                               <FontAwesomeIcon className={styles.checkColor} icon={faCheckCircle} />{' '}
                               <span style={{ fontSize: styleProps.bulletPointFontSize }}>
-                                Distribute $DESO, DAO Tokens, and Creator Coins
+                                Distribute $DESO, Tokens, Creator Coins, & Crypto
                               </span>
+                            </p>
+                            <p style={{ marginTop: -10 }}>
+                              <FontAwesomeIcon className={styles.checkColor} icon={faCheckCircle} />{' '}
+                              <span style={{ fontSize: styleProps.bulletPointFontSize }}>Get Push Notifications when receiving Crypto</span>
                             </p>
                           </div>
                         </div>

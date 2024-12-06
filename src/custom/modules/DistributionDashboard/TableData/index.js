@@ -99,9 +99,8 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
                 fallback='https://openfund.com/images/ghost-profile-image.svg'
                 preview={false}
               />
-              <span style={{ color: theme.twitterBootstrap.primary, marginLeft: 5, fontSize: 14 }}>{`${
-                entry.username
-              } (${entry.tokenBalanceLabel}${entry.isCustom ? '' : ' token(s)'})`}</span>
+              <span style={{ color: theme.twitterBootstrap.primary, marginLeft: 5, fontSize: 14 }}>{`${entry.username
+                } (${entry.tokenBalanceLabel}${entry.isCustom ? '' : ' token(s)'})`}</span>
               <br />
               <span
                 style={{ color: theme.twitterBootstrap.primary, fontSize: 12 }}
@@ -138,13 +137,11 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
                 fallback='https://openfund.com/images/ghost-profile-image.svg'
                 preview={false}
               />
-              <span style={{ color: theme.twitterBootstrap.primary, marginLeft: 5 }}>{`${value} (${
-                rootState.distributeTo === Enums.values.DESO_OPS
-                  ? entry.deSoOpsTransactionCount
-                  : entry.tokenBalanceLabel
-              }${
-                entry.isCustom ? '' : rootState.distributeTo === Enums.values.DESO_OPS ? ' transaction(s)' : ' token(s)'
-              })`}</span>
+              <span style={{ color: theme.twitterBootstrap.primary, marginLeft: 5 }}>{`${value} (${rootState.distributeTo === Enums.values.DESO_OPS
+                ? entry.deSoOpsTransactionCount
+                : entry.tokenBalanceLabel
+                }${entry.isCustom ? '' : rootState.distributeTo === Enums.values.DESO_OPS ? ' transaction(s)' : ' token(s)'
+                })`}</span>
             </div>
           )
         }
@@ -209,24 +206,26 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
   }
 
   return (
-    <Table
-      rowKey={(hodler) => hodler.username}
-      rowSelection={{
-        selectedRowKeys: rootState.selectedTableKeys,
-        onChange: (selectedKeys) => handleSelectionChange(selectedKeys)
-      }}
-      dataSource={tableData}
-      loading={rootState.loading}
-      style={{ width: '100%' }}
-      columns={tableColumns}
-      pagination={{
-        position: ['topRight', 'bottomRight'],
-        defaultPageSize: 50,
-        size: 'small',
-        showLessItems: true,
-        showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-      }}
-    />
+    <>
+      <Table
+        rowKey={(hodler) => hodler.username}
+        rowSelection={{
+          selectedRowKeys: rootState.selectedTableKeys,
+          onChange: (selectedKeys) => handleSelectionChange(selectedKeys)
+        }}
+        dataSource={tableData}
+        loading={rootState.loading}
+        style={{ width: '100%' }}
+        columns={tableColumns}
+        pagination={{
+          position: ['topRight', 'bottomRight'],
+          defaultPageSize: 50,
+          size: 'small',
+          showLessItems: true,
+          showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+        }}
+      />
+    </>
   )
 }
 

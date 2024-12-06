@@ -49,15 +49,15 @@ export const updateFCMToken = async (publicKey, updateType, data) => {
   return response.data
 }
 
-export const updatePWAManagerEnabled = async (publicKey, updateType, enabled) => {
+export const fetchUserNotifications = async (publicKey, lastTimestamp) => {
   const axiosConfig = {
     baseURL: process.env.REACT_APP_NODE_RED_URL,
     method: 'POST',
     headers: {
       'api-key': process.env.REACT_APP_AGILITE_API_KEY,
-      'req-type': updateType,
+      'req-type': Enums.reqTypes.FETCH_USER_NOTIFICATIONS,
       'public-key': publicKey,
-      enabled: enabled ? 'true' : 'false'
+      'last-timestamp': lastTimestamp
     }
   }
 
@@ -193,12 +193,13 @@ export const getNotifications = async (publicKey, limit = 30, lastTimestamp = nu
       limit
     })
   })
+
   return response.data
 }
 
 export const markNotificationsAsRead = async (ids) => {
   const response = await agilite.Connectors.execute('notifications', 'update_many', {
-    filter: JSON.stringify({ _id: { $in: ids } }),
+    filter: JSON.stringify({ id: { $in: ids } }),
     data: JSON.stringify({ unread: false })
   })
 

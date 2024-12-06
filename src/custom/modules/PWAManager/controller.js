@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-import { usePwaFeatures } from './PWADetector/hooks'
-import { PWA_CONFIG } from './config'
+import { usePwaFeatures } from '../PWADetector/hooks'
 
-// Simplify memory storage to only track dismissal
+// Check localStorage for dismissal state
 const memoryStorage = {
-  dismissed: false
+  dismissed: localStorage.getItem('pwa-dismissed') === 'true'
 }
 
 export const usePWAManager = (forceShow = false) => {
@@ -14,55 +13,32 @@ export const usePWAManager = (forceShow = false) => {
     checkOnManifestChange: true
   })
 
-  // Combine all feature-related state into one useState
-  const [state, setState] = useState({
-    isVisible: false,
-    support: {
-      isSupported: false,
-      needsInstall: false,
-      type: 'standard'
-    },
-    ...features // Include initial features
-  })
+  const [isVisible, setIsVisible] = useState(false)
 
-  // Calculate new state only when features change
+  // Simplified state calculation using features.support
   useEffect(() => {
-    const supportObject = {
-      isSupported: features.deviceType === 'ios'
-        ? features.browserType === 'safari'
-        : features.notificationsAllowed,
-      needsInstall: features.standaloneRequired,
-      type: features.deviceType === 'ios' ? 'ios' : 'standard'
-    }
-
-    const notificationPermission = features.notificationsPermission || 'default'
-
     const shouldShow = forceShow ||
       (!memoryStorage.dismissed &&
-        supportObject.isSupported &&
-        (notificationPermission === 'default' || supportObject.needsInstall)
+        features?.support?.isSupported &&
+        (features.notificationPermission === 'default' || features?.support?.needsInstall)
       )
 
-    setState(prev => ({
-      ...prev,
-      ...features,
-      isVisible: shouldShow,
-      support: supportObject
-    }))
+    setIsVisible(shouldShow)
   }, [
     forceShow,
-    features.deviceType,
-    features.browserType,
-    features.iosVersion,
-    features.notificationsAllowed,
-    features.standaloneRequired,
-    features.notificationsPermission
+    features?.support?.isSupported,
+    features.notificationPermission,
+    features?.support?.needsInstall
   ])
 
   const dismiss = useCallback(() => {
     memoryStorage.dismissed = true
-    setState(prev => ({ ...prev, isVisible: false }))
+    setIsVisible(false)
   }, [])
 
-  return { ...state, dismiss }
+  return {
+    ...features,
+    isVisible,
+    dismiss
+  }
 }

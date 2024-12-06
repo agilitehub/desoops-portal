@@ -30,7 +30,9 @@ const configData = {
   tips: [],
   optOutTemplate: '',
   optOutProfile: null,
-  userProfile: null
+  userProfile: null,
+  notifications: [],
+  notificationLimit: 0
 }
 
 const userAgent = {
@@ -52,7 +54,13 @@ export const customState = () => {
     userAgent,
     leftMenu,
     editProfileVisible: false,
-    comingSoonVisible: false,
-    editNotificationsVisible: false
+    comingSoon: {
+      isVisible: false,
+      title: '',
+      description: ''
+    },
+    editNotificationsVisible: false,
+    notificationsVisible: false,
+    unreadCount: 0
   }
 }

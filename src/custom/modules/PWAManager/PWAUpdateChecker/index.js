@@ -4,6 +4,7 @@ import { Modal } from 'antd'
 const UpdateChecker = () => {
   const [updateAvailable, setUpdateAvailable] = useState(false)
   const [currentVersion, setCurrentVersion] = useState(null)
+  const [newVersion, setNewVersion] = useState(null)
 
   // Initial version check
   useEffect(() => {
@@ -38,6 +39,7 @@ const UpdateChecker = () => {
 
         if (data.version !== currentVersion) {
           setUpdateAvailable(true)
+          setNewVersion(data.version)
           clearInterval(interval)
         }
       } catch (error) {
@@ -66,7 +68,10 @@ const UpdateChecker = () => {
       okText='Update Now'
       cancelText='Later'
     >
-      <p>A new version of the app is available. Please update to get the latest features and improvements.</p>
+      <p>A new version of the app is available.</p>
+      <p>Current version: {currentVersion}</p>
+      <p>New version: {newVersion}</p>
+      <p>Please update to get the latest features and improvements.</p>
     </Modal>
   )
 }
