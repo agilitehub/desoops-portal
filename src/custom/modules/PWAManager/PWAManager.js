@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BellOutlined } from '@ant-design/icons'
-import { Modal, Collapse, Button } from 'antd'
+import { Modal, Button, Space } from 'antd'
 import { usePWAManager } from './controller'
 import styles from './style.module.sass'
 import UpdateChecker from './PWAUpdateChecker'
-import { faBell, faBellSlash } from '@fortawesome/free-solid-svg-icons'
+import { faBell, faBellSlash, faCheck, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const IOSInstructions = () => (
@@ -34,13 +34,21 @@ const NotificationInstructions = () => (
 
 const PWAManager = ({ disabled = false, forceShow = false }) => {
   const [showModal, setShowModal] = useState(false)
-  const {
-    isVisible,
-    support,
-    dismiss,
-    triggerInstallPrompt,
-    notificationPermission
-  } = usePWAManager(forceShow)
+  const [stepsVisible, setStepsVisible] = useState(false)
+  const [currentStep, setCurrentStep] = useState(0)
+  const [steps, setSteps] = useState([
+    {
+      label: 'Requesting Notification Permissions'
+    },
+    {
+      label: 'Obtaining Token'
+    },
+    {
+      label: 'Initializing Notifications'
+    }
+  ])
+
+  const { isVisible, support, dismiss, triggerInstallPrompt, notificationPermission } = usePWAManager(forceShow)
 
   const handleEnable = async () => {
     try {
@@ -50,7 +58,10 @@ const PWAManager = ({ disabled = false, forceShow = false }) => {
         return
       }
 
+      setStepsVisible(true)
+
       if (notificationPermission === 'default') {
+        setCurrentStep(0)
         await Notification.requestPermission()
       }
 
@@ -72,6 +83,14 @@ const PWAManager = ({ disabled = false, forceShow = false }) => {
     setShowModal(false)
   }
 
+  useEffect(() => {
+    if (notificationPermission === 'granted') {
+      setCurrentStep(currentStep + 1)
+    }
+
+    // eslint-disable-next-line
+  }, [notificationPermission])
+
   return (
     <>
       {(forceShow || (!disabled && isVisible)) && (
@@ -85,28 +104,47 @@ const PWAManager = ({ disabled = false, forceShow = false }) => {
             open={showModal}
             onCancel={() => setShowModal(false)}
             footer={null}
+            maskClosable={!stepsVisible}
+            closable={!stepsVisible}
           >
-            {support.type === 'ios' && support.needsInstall ? <IOSInstructions /> : <NotificationInstructions />}
+            {stepsVisible ? (
+              <ul>
+                {steps.map((step, index) => (
+                  <li key={index}>
+                    {index < currentStep ? (
+                      <Space style={{ color: 'green' }}>
+                        {step.label} <FontAwesomeIcon icon={faCheck} />
+                      </Space>
+                    ) : index === currentStep ? (
+                      <Space style={{ color: 'blue' }}>
+                        {step.label} <FontAwesomeIcon icon={faSpinner} className={styles.spinningIcon} />
+                      </Space>
+                    ) : (
+                      <div style={{ color: '#aaa' }}>{step.label}</div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <>{support.type === 'ios' && support.needsInstall ? <IOSInstructions /> : <NotificationInstructions />}</>
+            )}
 
-            <div className={styles.buttonContainer}>
-              <Button
-                type="primary"
-                size="large"
-                icon={<FontAwesomeIcon icon={faBell} />}
-                onClick={handleEnable}
-              >
-                {support.type === 'ios' && support.needsInstall ? 'Got it!' : 'Enable'}
-              </Button>
-              <Button
-                size="large"
-                icon={<FontAwesomeIcon icon={faBellSlash} />}
-                onClick={() => handleDontShowAgain()}
-              >
-                Don't Show Again
-              </Button>
-            </div>
+            {!stepsVisible ? (
+              <div className={styles.buttonContainer}>
+                <Button type='primary' size='large' icon={<FontAwesomeIcon icon={faBell} />} onClick={handleEnable}>
+                  {support.type === 'ios' && support.needsInstall ? 'Got it!' : 'Enable'}
+                </Button>
+                <Button
+                  size='large'
+                  icon={<FontAwesomeIcon icon={faBellSlash} />}
+                  onClick={() => handleDontShowAgain()}
+                >
+                  Don't Show Again
+                </Button>
+              </div>
+            ) : undefined}
 
-            <Collapse
+            {/* <Collapse
               className={styles.debugSection}
               items={[
                 {
@@ -127,7 +165,7 @@ const PWAManager = ({ disabled = false, forceShow = false }) => {
                   )
                 }
               ]}
-            />
+            /> */}
           </Modal>
         </>
       )}
