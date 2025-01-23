@@ -105,6 +105,7 @@ const EditProfile = ({ isVisible, desoData, setDeSoData }) => {
 
       dispatch(setEditProfileVisible(false))
       setImageUrl(undefined)
+      setImageChanged(false)
       form.setFieldsValue({
         username: formValues.username,
         bio: formValues.bio
@@ -150,6 +151,7 @@ const EditProfile = ({ isVisible, desoData, setDeSoData }) => {
           )
           dispatch(setEditProfileVisible(false))
           setImageUrl(undefined)
+          setImageChanged(false)
           form.resetFields()
         } catch (e) {
           console.error(e)

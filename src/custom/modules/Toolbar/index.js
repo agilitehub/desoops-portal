@@ -57,7 +57,15 @@ const Toolbar = ({ state, setState, onNotificationsClick }) => {
                 gap: '32px'
               }}
             >
-              <div className='toolbar-header-item' onClick={() => showComingSoon('Wallet Dashboard Coming Soon', 'Soon you\'ll be able to view true moneytary values across all your crypto assets in your DeSo Wallet.')}>
+              <div
+                className='toolbar-header-item'
+                onClick={() =>
+                  showComingSoon(
+                    'Wallet Dashboard Coming Soon',
+                    "Soon you'll be able to view true moneytary values across all your crypto assets in your DeSo Wallet."
+                  )
+                }
+              >
                 <FontAwesomeIcon icon={faWallet} className='toolbar-header-icon-disabled' />
                 <span className='toolbar-header-text-disabled'>Wallet</span>
               </div>
@@ -67,10 +75,6 @@ const Toolbar = ({ state, setState, onNotificationsClick }) => {
               >
                 <FontAwesomeIcon className='toolbar-header-icon' icon={faMoneyBillTransfer} />
                 <span className='toolbar-header-text'>Distribute</span>
-              </div>
-              <div className='toolbar-header-item' onClick={() => showComingSoon('Messages Coming Soon', 'Soon you\'ll be able to send and receive direct and group messages with other DeSo users.')}>
-                <FontAwesomeIcon className='toolbar-header-icon-disabled' icon={faMessage} />
-                <span className='toolbar-header-text-disabled'>Messages</span>
               </div>
               <div className='toolbar-header-item' onClick={onNotificationsClick}>
                 <FontAwesomeIcon className='toolbar-header-icon' icon={faCommentsDollar} />
@@ -97,7 +101,15 @@ const Toolbar = ({ state, setState, onNotificationsClick }) => {
               padding: '8px 20px'
             }}
           >
-            <Col className='toolbar-footer-item' onClick={() => showComingSoon('Wallet Dashboard Coming Soon', 'Soon you\'ll be able to view true moneytary values across all your crypto assets in your DeSo Wallet.')}>
+            <Col
+              className='toolbar-footer-item'
+              onClick={() =>
+                showComingSoon(
+                  'Wallet Dashboard Coming Soon',
+                  "Soon you'll be able to view true moneytary values across all your crypto assets in your DeSo Wallet."
+                )
+              }
+            >
               <FontAwesomeIcon icon={faWallet} className='toolbar-footer-icon-disabled' />
               <div className='toolbar-footer-text-disabled'>Wallet</div>
             </Col>
@@ -108,7 +120,15 @@ const Toolbar = ({ state, setState, onNotificationsClick }) => {
               <FontAwesomeIcon className='toolbar-footer-icon' icon={faMoneyBillTransfer} />
               <div className='toolbar-footer-text'>Distribute</div>
             </Col>
-            <Col className='toolbar-footer-item' onClick={() => showComingSoon('Messages Coming Soon', 'Soon you\'ll be able to send and receive direct and group messages with other DeSo users.')}>
+            <Col
+              className='toolbar-footer-item'
+              onClick={() =>
+                showComingSoon(
+                  'Messages Coming Soon',
+                  "Soon you'll be able to send and receive direct and group messages with other DeSo users."
+                )
+              }
+            >
               <FontAwesomeIcon className='toolbar-footer-icon-disabled' icon={faMessage} />
               <div className='toolbar-footer-text-disabled'>Messages</div>
             </Col>
