@@ -38,12 +38,14 @@ import { initUserSession, getDistributionTemplates, updateFCMToken } from '../..
 import { renderApp } from './controller'
 import { getDeSoPricing, getInitialDeSoData } from '../../lib/deso-controller-graphql'
 import { GQL_GET_INITIAL_DESO_DATA } from '../../lib/graphql-models'
+import { cloneDeep } from 'lodash'
 
-import './style.sass'
 import { initializeMessaging } from '../../lib/firebase-controller'
 import EditNotifications from '../EditNotifications'
 import ComingSoon from '../ComingSoon'
-import { cloneDeep } from 'lodash'
+import WalletDashboardWrapper from '../WalletDashboard'
+
+import './style.sass'
 
 const initialState = {
   initializing: false,
@@ -188,7 +190,7 @@ const CoreApp = () => {
     try {
       const desoPrice = await getDeSoPricing(currDeSoPrice)
       dispatch(setDeSoPrice(desoPrice))
-    } catch (e) { }
+    } catch (e) {}
   }
 
   const handleNotificationsEnabled = async () => {
@@ -262,6 +264,8 @@ const CoreApp = () => {
             <Notifications />
           </>
         )
+      case Enums.appRenderState.WALLET_DASHBOARD:
+        return <WalletDashboardWrapper />
       case Enums.appRenderState.LOGIN:
         return (
           <>
