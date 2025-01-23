@@ -58,16 +58,13 @@ const Toolbar = ({ state, setState, onNotificationsClick }) => {
               }}
             >
               <div
-                className='toolbar-header-item'
-                onClick={() =>
-                  showComingSoon(
-                    'Wallet Dashboard Coming Soon',
-                    "Soon you'll be able to view true moneytary values across all your crypto assets in your DeSo Wallet."
-                  )
-                }
+                className={`toolbar-header-item ${
+                  state.renderState === Enums.appRenderState.WALLET_DASHBOARD ? 'active' : ''
+                }`}
+                onClick={() => handleNavigate(Enums.appRenderState.WALLET_DASHBOARD)}
               >
-                <FontAwesomeIcon icon={faWallet} className='toolbar-header-icon-disabled' />
-                <span className='toolbar-header-text-disabled'>Wallet</span>
+                <FontAwesomeIcon icon={faWallet} className='toolbar-header-icon' />
+                <span className='toolbar-header-text'>Wallet</span>
               </div>
               <div
                 className={`toolbar-header-item ${state.renderState === Enums.appRenderState.DISTRO ? 'active' : ''}`}
@@ -102,16 +99,15 @@ const Toolbar = ({ state, setState, onNotificationsClick }) => {
             }}
           >
             <Col
-              className='toolbar-footer-item'
-              onClick={() =>
-                showComingSoon(
-                  'Wallet Dashboard Coming Soon',
-                  "Soon you'll be able to view true moneytary values across all your crypto assets in your DeSo Wallet."
-                )
-              }
+              className={`toolbar-footer-item ${
+                state.renderState === Enums.appRenderState.WALLET_DASHBOARD ? 'active' : ''
+              }`}
+              onClick={() => {
+                handleNavigate(Enums.appRenderState.WALLET_DASHBOARD)
+              }}
             >
-              <FontAwesomeIcon icon={faWallet} className='toolbar-footer-icon-disabled' />
-              <div className='toolbar-footer-text-disabled'>Wallet</div>
+              <FontAwesomeIcon icon={faWallet} className='toolbar-footer-icon' />
+              <div className='toolbar-footer-text'>Wallet</div>
             </Col>
             <Col
               className={`toolbar-footer-item ${state.renderState === Enums.appRenderState.DISTRO ? 'active' : ''}`}
@@ -119,18 +115,6 @@ const Toolbar = ({ state, setState, onNotificationsClick }) => {
             >
               <FontAwesomeIcon className='toolbar-footer-icon' icon={faMoneyBillTransfer} />
               <div className='toolbar-footer-text'>Distribute</div>
-            </Col>
-            <Col
-              className='toolbar-footer-item'
-              onClick={() =>
-                showComingSoon(
-                  'Messages Coming Soon',
-                  "Soon you'll be able to send and receive direct and group messages with other DeSo users."
-                )
-              }
-            >
-              <FontAwesomeIcon className='toolbar-footer-icon-disabled' icon={faMessage} />
-              <div className='toolbar-footer-text-disabled'>Messages</div>
             </Col>
             <Col className={'toolbar-footer-item'} onClick={onNotificationsClick}>
               <FontAwesomeIcon className='toolbar-footer-icon' icon={faCommentsDollar} />
