@@ -8,11 +8,11 @@ const { Text } = Typography
 
 const BalanceOverview = ({ totalBalance, userProfile, onCopyToClipboard }) => (
   <Card>
-    <Row justify='center' className={styles.userRow}>
+    <Row justify='space-around' className={styles.userRow}>
       <Col>
         <Space direction='vertical' size='large'>
           <Space size='middle'>
-            <Avatar src={userProfile.profilePic} size={48} />
+            <Avatar src={userProfile.profilePicUrl} size={48} />
             <Space direction='vertical' size={0}>
               <Text strong>{userProfile.username}</Text>
               <Button
@@ -32,9 +32,7 @@ const BalanceOverview = ({ totalBalance, userProfile, onCopyToClipboard }) => (
           </Button>
         </Space>
       </Col>
-    </Row>
-    <Row justify='center' className={styles.balanceRow}>
-      <Col>
+      <Col className={styles.balanceCol}>
         <Text type='secondary'>Total Balance</Text>
         <h1 className={styles.balanceTitle}>${totalBalance.toLocaleString()}</h1>
         <Text type='secondary'>*Includes $USDC, $DESO, creator tokens and project tokens</Text>
