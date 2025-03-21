@@ -300,7 +300,7 @@ const OptOut = () => {
     try {
       await identity.login()
     } catch (e) {
-      message.error(e)
+      message.error(e.message || 'An error occurred. Please try again.')
     }
   }
 

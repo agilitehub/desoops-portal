@@ -30,11 +30,58 @@ const Login = () => {
 
   const { isTablet, isSmartphone } = useSelector((state) => state.custom.userAgent)
 
+  // Function to create modal effect elements
+  const createWaveEffects = () => {
+    return (
+      <>
+        <div className="modal-wave-container">
+          <div className="modal-wave modal-wave1"></div>
+          <div className="modal-wave modal-wave2"></div>
+        </div>
+        <div className="modal-orb1"></div>
+        <div className="modal-orb2"></div>
+      </>
+    )
+  }
+
   const handleLogin = async () => {
     try {
+      // Add modal wave effect class to DeSo login modal
+      document.addEventListener('DOMNodeInserted', (event) => {
+        if (event.target.classList && event.target.classList.contains('ant-modal-root')) {
+          const modalContent = event.target.querySelector('.ant-modal-content')
+          if (modalContent) {
+            modalContent.className += ' deso-login-modal'
+            
+            // Add wave effects to DeSo login modal
+            const waveContainer = document.createElement('div')
+            waveContainer.className = 'modal-wave-container'
+            
+            const wave1 = document.createElement('div')
+            wave1.className = 'modal-wave modal-wave1'
+            
+            const wave2 = document.createElement('div')
+            wave2.className = 'modal-wave modal-wave2'
+            
+            const orb1 = document.createElement('div')
+            orb1.className = 'modal-orb1'
+            
+            const orb2 = document.createElement('div')
+            orb2.className = 'modal-orb2'
+            
+            waveContainer.appendChild(wave1)
+            waveContainer.appendChild(wave2)
+            
+            modalContent.appendChild(waveContainer)
+            modalContent.appendChild(orb1)
+            modalContent.appendChild(orb2)
+          }
+        }
+      }, {once: true})
+      
       await identity.login()
     } catch (e) {
-      message.error(e)
+      message.error(e.message || 'Login failed. Please try again.')
     }
   }
 
@@ -71,6 +118,14 @@ const Login = () => {
     contentBorderRadius: isSmartphone ? 12 : 30,
     bulletPointFontSize: isSmartphone ? 14 : 16,
     logoWidth: isSmartphone ? 200 : 300
+  }
+
+  const SectionTitle = ({ title }) => {
+    return (
+      <div className={styles.sectionTitle}>
+        <h2>{title}</h2>
+      </div>
+    )
   }
 
   const renderTabContent = () => {
@@ -237,7 +292,7 @@ const Login = () => {
             <Row gutter={[16, 16]} className={styles.ctaSection}>
               <Col xs={24} md={12}>
                 <div className={styles.ctaContent}>
-                  <h2>Ready to get started?</h2>
+                  <SectionTitle title="Ready to get started?" />
                   <p>Sign in with your DeSo account to access all features</p>
                   <div className={styles.ctaButtons}>
                     <Button type='primary' size='large' onClick={handleLogin} className={styles.signInButton}>
@@ -274,10 +329,8 @@ const Login = () => {
             {/* Testimonials Section */}
             <Row className={styles.testimonialsRow}>
               <Col span={24}>
-                <div className={styles.sectionTitle}>
-                  <h2>What Our Users Say</h2>
-                  <p className={styles.sectionDescription}>Hear from people who are using DeSoOps</p>
-                </div>
+                <SectionTitle title="What Our Users Say" />
+                <p className={styles.sectionDescription}>Hear from people who are using DeSoOps</p>
               </Col>
               <Col span={24}>
                 <div className={styles.testimonialCards}>
@@ -323,10 +376,8 @@ const Login = () => {
             {/* FAQ Section */}
             <Row className={styles.faqRow}>
               <Col span={24}>
-                <div className={styles.sectionTitle}>
-                  <h2>Frequently Asked Questions</h2>
-                  <p className={styles.sectionDescription}>Get answers to common questions about DeSoOps</p>
-                </div>
+                <SectionTitle title="Frequently Asked Questions" />
+                <p className={styles.sectionDescription}>Get answers to common questions about DeSoOps</p>
               </Col>
               <Col span={24}>
                 <div className={styles.faqContainer}>
@@ -401,7 +452,11 @@ const Login = () => {
         return (
           <div className={styles.coinSwapTabContent}>
             <div className={styles.coinSwapTab}>
-              <CoinSwapModal embedded={true} />
+              <CoinSwapModal 
+                embedded={true} 
+                className={styles.coinSwapModal}
+                waveEffects={createWaveEffects()}
+              />
             </div>
           </div>
         )
@@ -473,6 +528,7 @@ const Login = () => {
         title={state.videoModalTitle}
         url={state.videoUrl}
         onCloseModal={() => setState({ openVideoModal: false })}
+        waveEffects={createWaveEffects()}
       />
     </>
   )

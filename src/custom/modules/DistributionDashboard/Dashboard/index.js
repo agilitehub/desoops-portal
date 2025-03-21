@@ -198,7 +198,7 @@ const _BatchTransactionsForm = () => {
 
       return
     } catch (e) {
-      message.error(e)
+      message.error(e.message || 'An error occurred. Please try again.')
     }
   }
 
@@ -237,7 +237,7 @@ const _BatchTransactionsForm = () => {
 
       return
     } catch (e) {
-      message.error(e)
+      message.error(e.message || 'An error occurred. Please try again.')
     }
   }
 
@@ -407,7 +407,7 @@ const _BatchTransactionsForm = () => {
       })
     } catch (e) {
       console.error(e)
-      message.error(e.message)
+      message.error(e.message || 'An error occurred. Please try again.')
     }
 
     setState({ loading: false })
@@ -450,7 +450,7 @@ const _BatchTransactionsForm = () => {
       })
     } catch (e) {
       console.error(e)
-      message.error(e.message)
+      message.error(e.message || 'An error occurred. Please try again.')
       setState({ loading: false, isExecuting: false })
     }
   }
@@ -591,7 +591,7 @@ const _BatchTransactionsForm = () => {
       setState(tmpState)
     } catch (e) {
       console.error(e)
-      message.error(e.message)
+      message.error(e.message || 'An error occurred. Please try again.')
     }
 
     setState({ loading: false, isExecuting: false })
@@ -652,7 +652,7 @@ const _BatchTransactionsForm = () => {
       })
     } catch (e) {
       console.error(e)
-      message.error(e.message)
+      message.error(e.message || 'An error occurred. Please try again.')
     }
 
     setState({ loading: false })
@@ -669,7 +669,7 @@ const _BatchTransactionsForm = () => {
       setState({ loading: false })
     } catch (e) {
       console.error(e)
-      message.error(e.message)
+      message.error(e.message || 'An error occurred. Please try again.')
     }
 
     setState({ loading: false })
@@ -700,7 +700,7 @@ const _BatchTransactionsForm = () => {
       })
     } catch (e) {
       console.error(e)
-      message.error(e.message)
+      message.error(e.message || 'An error occurred. Please try again.')
     }
   }
 
@@ -1107,7 +1107,7 @@ const _BatchTransactionsForm = () => {
         paymentModal
       })
 
-      message.error(e.message)
+      message.error(e.message || 'An error occurred. Please try again.')
     }
   }
 

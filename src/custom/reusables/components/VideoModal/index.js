@@ -6,7 +6,7 @@ import ReactPlayer from 'react-player/youtube'
 
 import { Row, Modal, Col } from 'antd'
 
-const VideoModal = ({ isOpen, title, url, onCloseModal }) => {
+const VideoModal = ({ isOpen, title, url, onCloseModal, waveEffects }) => {
   return (
     <Modal
       title={title}
@@ -17,7 +17,8 @@ const VideoModal = ({ isOpen, title, url, onCloseModal }) => {
       cancelButtonProps={{ style: { display: 'none' } }}
       destroyOnClose
     >
-      <Row style={{ height: 400 }}>
+      {waveEffects}
+      <Row style={{ height: 400, position: 'relative', zIndex: 1 }}>
         <Col span={24}>
           <ReactPlayer url={url} width='100%' height='100%' controls playing />
         </Col>

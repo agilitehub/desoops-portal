@@ -7,7 +7,7 @@ import { Modal, Tabs, App } from 'antd'
 import HeroSwap from './HeroSwap'
 import StealthEX from './StealthEX'
 
-const CoinSwapModal = ({ isOpen, onCloseModal, embedded = false }) => {
+const CoinSwapModal = ({ isOpen, onCloseModal, embedded = false, className, waveEffects }) => {
   const { modal } = App.useApp()
   const [tab, setTab] = useState('1')
 
@@ -41,7 +41,10 @@ const CoinSwapModal = ({ isOpen, onCloseModal, embedded = false }) => {
     return (
       <div className="embedded-coin-swap">
         <h2>Coin Swap</h2>
-        <Tabs onChange={setTab} items={tabItems} activeKey={tab} size='small' />
+        {waveEffects}
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <Tabs onChange={setTab} items={tabItems} activeKey={tab} size='small' />
+        </div>
       </div>
     )
   }
@@ -55,8 +58,12 @@ const CoinSwapModal = ({ isOpen, onCloseModal, embedded = false }) => {
       okText='Close'
       cancelButtonProps={{ style: { display: 'none' } }}
       destroyOnClose
+      className={className}
     >
-      <Tabs onChange={setTab} items={tabItems} activeKey={tab} size='small' />
+      {waveEffects}
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <Tabs onChange={setTab} items={tabItems} activeKey={tab} size='small' />
+      </div>
     </Modal>
   )
 }
