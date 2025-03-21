@@ -7,7 +7,7 @@ import { Modal, Tabs, App } from 'antd'
 import HeroSwap from './HeroSwap'
 import StealthEX from './StealthEX'
 
-const CoinSwapModal = ({ isOpen, onCloseModal }) => {
+const CoinSwapModal = ({ isOpen, onCloseModal, embedded = false }) => {
   const { modal } = App.useApp()
   const [tab, setTab] = useState('1')
 
@@ -37,6 +37,15 @@ const CoinSwapModal = ({ isOpen, onCloseModal }) => {
     })
   }
 
+  if (embedded) {
+    return (
+      <div className="embedded-coin-swap">
+        <h2>Coin Swap</h2>
+        <Tabs onChange={setTab} items={tabItems} activeKey={tab} size='small' />
+      </div>
+    )
+  }
+
   return (
     <Modal
       title='Coin Swap'
@@ -52,10 +61,10 @@ const CoinSwapModal = ({ isOpen, onCloseModal }) => {
   )
 }
 
-const app = ({ isOpen, onCloseModal }) => {
+const app = ({ isOpen, onCloseModal, embedded = false }) => {
   return (
     <App>
-      <CoinSwapModal isOpen={isOpen} onCloseModal={onCloseModal} />
+      <CoinSwapModal isOpen={isOpen} onCloseModal={onCloseModal} embedded={embedded} />
     </App>
   )
 }

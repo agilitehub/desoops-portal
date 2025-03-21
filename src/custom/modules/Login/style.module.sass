@@ -1,59 +1,810 @@
 @import ../../../styles/helpers
 
+@keyframes gradientAnimation
+  0%
+    background-position: 0% 50%
+  50%
+    background-position: 100% 50%
+  100%
+    background-position: 0% 50%
+
+@keyframes float
+  0%
+    transform: translateY(0px)
+  50%
+    transform: translateY(-20px)
+  100%
+    transform: translateY(0px)
+
+@keyframes pulse
+  0%
+    box-shadow: 0 0 0 0 rgba(24, 142, 255, 0.6)
+  70%
+    box-shadow: 0 0 0 15px rgba(24, 142, 255, 0)
+  100%
+    box-shadow: 0 0 0 0 rgba(24, 142, 255, 0)
+
+@keyframes rotateCircle
+  0%
+    transform: rotate(0deg)
+  100%
+    transform: rotate(360deg)
+
+@keyframes shimmer
+  0%
+    background-position: -1000px 0
+  100%
+    background-position: 1000px 0
+
+@keyframes morphBlob
+  0%
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%
+  50%
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%
+  100%
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%
+
+@keyframes fadeInOut
+  0%
+    opacity: 0.4
+  50% 
+    opacity: 0.8
+  100%
+    opacity: 0.4
+
+@keyframes colorShift
+  0% 
+    filter: hue-rotate(0deg)
+  50%
+    filter: hue-rotate(15deg)
+  100%
+    filter: hue-rotate(0deg)
+
+@keyframes prismEffect
+  0%
+    background-position: 0% 0%
+    opacity: 0.4
+  50%
+    background-position: 100% 100%
+    opacity: 0.7
+  100%
+    background-position: 0% 0%
+    opacity: 0.4
+
+@keyframes waveAnimation
+  0%
+    transform: translateX(0) translateZ(0) scaleY(1)
+  50%
+    transform: translateX(-25%) translateZ(0) scaleY(0.8)
+  100%
+    transform: translateX(-50%) translateZ(0) scaleY(1)
+
+@keyframes waveAnimationReverse
+  0%
+    transform: translateX(0) translateZ(0) scaleY(1)
+  50%
+    transform: translateX(25%) translateZ(0) scaleY(0.8)
+  100%
+    transform: translateX(50%) translateZ(0) scaleY(1)
+
+@keyframes waveRise
+  0%
+    transform: translateY(5%)
+  50%
+    transform: translateY(0%)
+  100%
+    transform: translateY(5%)
+
 .wrapper
-  justify-content: center
   min-height: 100vh
-  align-items: center
-
-.card
-  border: none
-  background: none
-  padding-top: 24px
-  padding-bottom: 24px
-
-.cardContent
-    padding-top: 20px,
-    padding-bottom: 20px,
-    background: rgba(255,255,255, 0.95)
-
-.btnWrapper
+  width: 100%
+  background: linear-gradient(-45deg, rgba(24, 142, 255, 0.25), rgba(255, 127, 80, 0.25), rgba(24, 142, 255, 0.25), rgba(255, 127, 80, 0.25))
+  background-size: 400% 400%
+  animation: gradientAnimation 15s ease infinite
+  position: relative
+  overflow-x: hidden
   display: flex
-  justify-content: center
+  flex-direction: column
+  
+  .wave-container
+    position: absolute
+    width: 100%
+    height: 100%
+    top: 0
+    left: 0
+    z-index: 0
+    overflow: hidden
+  
+  .wave
+    position: absolute
+    width: 200%
+    height: 100%
+    bottom: -25%
+    left: 0
+    background: transparent
+    opacity: 0.3
+    border-radius: 0
+    filter: blur(30px)
+    
+  .wave1
+    bottom: -5%
+    height: 250px
+    background: rgba(24, 142, 255, 0.5)
+    animation: waveAnimation 15s linear infinite, waveRise 8s ease-in-out infinite
+    transform-origin: center bottom
+    
+  .wave2
+    bottom: -10%
+    height: 280px
+    background: rgba(255, 127, 80, 0.5)
+    animation: waveAnimation 18s linear infinite reverse, waveRise 10s ease-in-out infinite
+    transform-origin: center bottom
+    animation-delay: 2s
+    
+  .wave3
+    bottom: 0%
+    height: 200px
+    background: rgba(24, 142, 255, 0.4)
+    animation: waveAnimationReverse 20s linear infinite, waveRise 9s ease-in-out infinite
+    transform-origin: center bottom
+    animation-delay: 1s
+    
+  .wave4
+    bottom: -15%
+    height: 300px
+    background: rgba(255, 127, 80, 0.4)
+    animation: waveAnimationReverse 25s linear infinite reverse, waveRise 12s ease-in-out infinite
+    transform-origin: center bottom
+    animation-delay: 3s
+  
+  .wave5
+    top: -5%
+    height: 250px
+    background: rgba(24, 142, 255, 0.3)
+    animation: waveAnimation 22s linear infinite reverse, waveRise 11s ease-in-out infinite
+    transform-origin: center top
+    
+  .wave6
+    top: -10%
+    height: 220px
+    background: rgba(255, 127, 80, 0.3)
+    animation: waveAnimationReverse 28s linear infinite, waveRise 13s ease-in-out infinite
+    transform-origin: center top
+    animation-delay: 2s
+  
+  &::before
+    content: ''
+    position: absolute
+    top: -10%
+    right: -10%
+    width: 700px
+    height: 700px
+    background: radial-gradient(circle, rgba(24, 142, 255, 0.45) 0%, rgba(24, 142, 255, 0) 70%)
+    z-index: 0
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%
+    animation: float 8s ease-in-out infinite, rotateCircle 30s linear infinite, morphBlob 15s ease-in-out infinite
+    
+  &::after
+    content: ''
+    position: absolute
+    bottom: -10%
+    left: -10%
+    width: 700px
+    height: 700px
+    background: radial-gradient(circle, rgba(255, 127, 80, 0.45) 0%, rgba(255, 127, 80, 0) 70%)
+    z-index: 0
+    border-radius: 40% 60% 70% 30% / 40% 60% 30% 70%
+    animation: float 12s ease-in-out infinite, rotateCircle 25s linear infinite reverse, morphBlob 12s ease-in-out infinite alternate
+  
+  .bgEffect1, .bgEffect2, .bgEffect3, .bgEffect4
+    position: absolute
+    opacity: 0.8
+    z-index: 0
+    filter: blur(70px)
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%
+    
+  .bgEffect1
+    width: 650px
+    height: 650px
+    top: 10%
+    left: 0%
+    background: radial-gradient(circle at 30% 30%, rgba(24, 142, 255, 0.65), rgba(24, 142, 255, 0) 70%)
+    animation: float 20s ease-in-out infinite alternate, morphBlob 15s ease-in-out infinite, fadeInOut 8s infinite alternate
+    
+  .bgEffect2
+    width: 600px
+    height: 600px
+    top: 30%
+    right: 0%
+    background: radial-gradient(circle at 70% 30%, rgba(255, 127, 80, 0.65), rgba(255, 127, 80, 0) 70%)
+    animation: float 15s ease-in-out infinite alternate-reverse, morphBlob 18s ease-in-out infinite reverse, fadeInOut 12s infinite alternate-reverse
+    
+  .bgEffect3
+    width: 700px
+    height: 700px
+    bottom: 15%
+    right: -5%
+    background: radial-gradient(circle at 70% 70%, rgba(24, 142, 255, 0.6), rgba(24, 142, 255, 0) 70%)
+    animation: float 18s ease-in-out infinite alternate, morphBlob 22s ease-in-out infinite, fadeInOut 15s infinite alternate
+    
+  .bgEffect4
+    width: 600px
+    height: 600px
+    bottom: 5%
+    left: 0%
+    background: radial-gradient(circle at 30% 70%, rgba(255, 127, 80, 0.6), rgba(255, 127, 80, 0) 70%)
+    animation: float 22s ease-in-out infinite alternate-reverse, morphBlob 17s ease-in-out infinite reverse, fadeInOut 10s infinite alternate-reverse
 
-  button
+  .bgExtra1, .bgExtra2
+    position: absolute
+    z-index: 0
+  
+  .bgExtra1
+    top: 45%
+    left: 25%
+    width: 25px
+    height: 25px
+    background-color: rgba(24, 142, 255, 1)
+    border-radius: 50%
+    box-shadow: 0 0 50px 20px rgba(24, 142, 255, 0.9)
+    animation: float 6s ease-in-out infinite, fadeInOut 4s infinite alternate
+  
+  .bgExtra2
+    top: 20%
+    right: 30%
+    width: 20px
+    height: 20px
+    background-color: rgba(255, 127, 80, 1)
+    border-radius: 50%
+    box-shadow: 0 0 40px 15px rgba(255, 127, 80, 0.9)
+    animation: float 8s ease-in-out infinite reverse, fadeInOut 5s infinite alternate-reverse
+
+  .lightRay
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    height: 100%
+    background: linear-gradient(90deg, transparent, rgba(24, 142, 255, 0.3), transparent)
+    background-size: 2000px 100%
+    animation: shimmer 8s infinite linear
+    pointer-events: none
+    z-index: 0
+    
+  .diagonalLightRay1, .diagonalLightRay2
+    position: absolute
+    width: 150%
+    height: 250vh
+    opacity: 0.7
+    pointer-events: none
+    z-index: 0
+    transform-origin: top left
+    
+  .diagonalLightRay1
+    top: -50%
+    left: -50%
+    background: linear-gradient(45deg, transparent, rgba(24, 142, 255, 0.08), transparent, rgba(255, 127, 80, 0.08), transparent)
+    background-size: 200% 200%
+    transform: rotate(45deg)
+    animation: shimmer 15s infinite linear reverse, prismEffect 20s infinite ease-in-out
+    
+  .diagonalLightRay2
+    bottom: -50%
+    right: -50%
+    background: linear-gradient(-45deg, transparent, rgba(255, 127, 80, 0.08), transparent, rgba(24, 142, 255, 0.08), transparent)
+    background-size: 200% 200%
+    transform: rotate(-45deg)
+    animation: shimmer 12s infinite linear, prismEffect 15s infinite ease-in-out alternate
+
+.navbar
+  display: flex
+  justify-content: space-between
+  align-items: center
+  padding: 16px 32px
+  background-color: rgba(255, 255, 255, 0.9)
+  backdrop-filter: blur(5px)
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1)
+  position: relative
+  z-index: 10
+  
+  +xs
+    padding: 12px
+    flex-direction: column
+    
+  .navLogo
+    img
+      height: 40px
+      
+      +xs
+        height: 30px
+      
+  .navLinks
     display: flex
-    flex-direction: row
-    align-items: center
-    width: 'auto'
-    padding: 8px
     gap: 12px
-    border-radius: 8px
-    border: 1px rgba(0, 0, 0, 0) solid
-    cursor: pointer
+    align-items: center
+    
+    +xs
+      margin-top: 10px
+      flex-wrap: wrap
+      justify-content: center
 
-    .icon
-      font-size: 20px
-      margin-left: 10px
+.content
+  padding: 2rem
+  max-width: 1200px
+  margin: 0 auto
+  position: relative
+  z-index: 1
+  flex: 1
+  display: flex
+  flex-direction: column
+  
+  +xs
+    padding: 1rem
+
+.heroSection
+  text-align: center
+  margin-bottom: 3rem
+  padding: 3rem 1rem
+  
+  .logoContainer
+    display: flex
+    flex-direction: column
+    align-items: center
+    justify-content: center
+    margin-bottom: 2rem
+    
+    img
+      max-width: 350px
+      margin-bottom: 1rem
+      
       +xs
-        font-size: 16px
-        margin-left: 5px
-    .text
-      font-size: 16px
+        max-width: 250px
+    
+    h1
+      font-size: 3rem
+      color: $blue1
+      margin: 0 0 1rem
+      background: linear-gradient(90deg, $blue1, $orange1)
+      -webkit-background-clip: text
+      -webkit-text-fill-color: transparent
+      
       +xs
-        font-size: 14px
+        font-size: 2rem
+    
+    .heroParagraph
+      font-size: 1.25rem
+      color: #666
+      max-width: 600px
+      margin: 0 auto
+      
+      +xs
+        font-size: 1rem
+  
+  .heroButtons
+    display: flex
+    justify-content: center
+    gap: 1rem
+    margin-top: 2rem
+    
+    +xs
+      flex-direction: column
+      align-items: center
+
+.benefitsBar
+  background-color: $blue1
+  border-radius: 12px
+  padding: 1.5rem
+  margin-bottom: 4rem
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15)
+  
+  .benefitItem
+    display: flex
+    align-items: center
+    justify-content: center
+    color: white
+    font-weight: 500
+    font-size: 1.1rem
+    
+    +xs
+      margin-bottom: 1rem
+      font-size: 1rem
+    
+    .benefitIcon
+      font-size: 1.5rem
+      margin-right: 0.75rem
+
+.sectionTitle
+  text-align: center
+  margin-bottom: 2rem
+  
+  h2
+    font-size: 2.25rem
+    color: $blue1
+    position: relative
+    display: inline-block
+    margin-bottom: 0.5rem
+    
+    &::after
+      content: ''
+      position: absolute
+      bottom: -10px
+      left: 0
+      width: 100%
+      height: 3px
+      background: linear-gradient(90deg, $blue1, $orange1)
+      border-radius: 3px
+      
+    +xs
+      font-size: 1.75rem
+  
+  .sectionDescription
+    font-size: 1.1rem
+    color: #666
+    max-width: 700px
+    margin: 1.5rem auto 0
+    
+    +xs
+      font-size: 1rem
+
+.testimonialsRow
+  margin-bottom: 4rem
+
+.testimonialCards
+  .testimonialCard
+    background: white
+    border-radius: 12px
+    padding: 2rem
+    height: 100%
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1)
+    transition: transform 0.3s ease, box-shadow 0.3s ease
+    display: flex
+    flex-direction: column
+    
+    &:hover
+      transform: translateY(-5px)
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15)
+    
+    .testimonialContent
+      flex: 1
+      
+      p
+        font-size: 1.1rem
+        color: #555
+        font-style: italic
+        line-height: 1.6
+        position: relative
+        
+        &::before
+          content: '"'
+          font-size: 4rem
+          color: rgba(24, 142, 255, 0.1)
+          position: absolute
+          top: -2rem
+          left: -1rem
+          z-index: 0
+    
+    .testimonialAuthor
+      margin-top: 1.5rem
+      border-top: 1px solid #eee
+      padding-top: 1rem
+      
+      h4
+        font-size: 1.1rem
+        color: $blue1
+        margin: 0 0 0.25rem
+      
+      p
+        font-size: 0.9rem
+        color: #777
+        margin: 0
+
+.faqRow
+  margin-bottom: 4rem
+
+.faqContainer
+  background: white
+  border-radius: 16px
+  padding: 2rem
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1)
+  
+  .faqItem
+    margin-bottom: 1.5rem
+    border-bottom: 1px solid #eee
+    padding-bottom: 1.5rem
+    
+    &:last-child
+      margin-bottom: 0
+      border-bottom: none
+      padding-bottom: 0
+    
+    .faqQuestion
+      display: flex
+      align-items: center
+      margin-bottom: 0.75rem
+      
+      .faqIcon
+        font-size: 1.25rem
+        color: $blue1
+        margin-right: 0.75rem
+      
+      h3
+        font-size: 1.25rem
+        color: #333
+        margin: 0
+    
+    .faqAnswer
+      padding-left: 2.25rem
+      
+      p
+        font-size: 1rem
+        color: #666
+        line-height: 1.6
+        margin: 0
+
+.contactRow
+  margin-bottom: 4rem
+
+.contactContainer
+  background: linear-gradient(135deg, $blue1, darken($blue1, 15%))
+  border-radius: 16px
+  padding: 3rem
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15)
+  color: white
+  text-align: center
+  
+  .contactContent
+    max-width: 600px
+    margin: 0 auto
+    
+    h2
+      font-size: 2.25rem
+      margin-bottom: 1rem
+    
+    p
+      font-size: 1.1rem
+      margin-bottom: 2rem
+      opacity: 0.9
+    
+    .contactButton
+      background: white
+      color: $blue1
+      border: none
+      font-weight: 600
+      height: auto
+      padding: 0.75rem 2rem
+      
+      &:hover
+        background: rgba(255, 255, 255, 0.9)
+        color: darken($blue1, 10%)
+
+.footerRow
+  margin-top: auto
+  margin-bottom: 0
+
+.footer
+  padding: 3rem 1rem 1.5rem
+  border-top: 1px solid #eee
+  text-align: center
+  
+  .footerLogo
+    margin-bottom: 1.5rem
+    
+    img
+      height: 40px
+  
+  .footerLinks
+    display: flex
+    justify-content: center
+    gap: 2rem
+    margin-bottom: 1.5rem
+    flex-wrap: wrap
+    
+    a
+      color: #666
+      font-size: 1rem
+      text-decoration: none
+      transition: color 0.2s ease
+      
+      &:hover
+        color: $blue1
+  
+  .footerCopyright
+    color: #999
+    font-size: 0.9rem
+
+.featuresRow
+  margin-bottom: 4rem
+  
+.featureCard
+  background: white
+  border-radius: 12px
+  padding: 2rem
+  height: 100%
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1)
+  transition: transform 0.3s ease, box-shadow 0.3s ease
+  text-align: center
+  
+  &:hover
+    transform: translateY(-5px)
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15)
+  
+  h3
+    color: $blue1
+    margin: 1rem 0
+    font-size: 1.3rem
+  
+  p
+    color: #666
+    line-height: 1.5
+  
+  .featureIcon
+    width: 70px
+    height: 70px
+    margin: 0 auto
+    background: rgba(24, 142, 255, 0.1)
+    border-radius: 50%
+    display: flex
+    align-items: center
+    justify-content: center
+    
+    .featureIconShape
+      font-size: 32px
+      color: $blue1
+
+.ctaSection
+  background: white
+  border-radius: 16px
+  padding: 3rem 2rem
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1)
+  margin-bottom: 4rem
+  overflow: hidden
+  position: relative
+  
+  &::before
+    content: ''
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 5px
+    background: linear-gradient(90deg, $blue1, $orange1)
+  
+  .ctaContent
+    h2
+      font-size: 2rem
+      color: #333
+      margin-bottom: 1rem
+      
+      +xs
+        font-size: 1.5rem
+    
+    p
+      font-size: 1.1rem
+      color: #666
+      margin-bottom: 2rem
+      
+      +xs
+        font-size: 1rem
+    
+    .ctaButtons
+      display: flex
+      gap: 1rem
+      flex-wrap: wrap
+
+  .ctaImage
+    display: flex
+    align-items: center
+    justify-content: center
+    
+    .notificationPreview
+      width: 100%
+      max-width: 350px
+      background: white
+      border-radius: 12px
+      overflow: hidden
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15)
+      border: 1px solid #eee
+      animation: pulse 2s infinite
+      
+      .notificationHeader
+        background: $blue1
+        color: white
+        padding: 12px 16px
+        display: flex
+        align-items: center
+        gap: 8px
+        font-weight: 600
+      
+      .notificationContent
+        padding: 16px
+        
+        p
+          font-size: 1rem
+          color: #333
+          margin-bottom: 8px
+        
+        .notificationTime
+          font-size: 0.8rem
+          color: #999
+
+.videoSectionRow
+  margin-bottom: 4rem
+
+.videosWrapper
+  background: linear-gradient(to bottom right, white, rgba(24, 142, 255, 0.05))
+  border-radius: 16px
+  padding: 2rem
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1)
+
+.videoContainer
+  margin-bottom: 1.5rem
+  border-radius: 8px
+  overflow: hidden
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15)
+  transition: transform 0.3s ease, box-shadow 0.3s ease
+  background-color: rgba(0, 0, 0, 0.05)
+  
+  &:hover
+    transform: scale(1.05)
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2)
+  
+  iframe
+    min-height: 350px
+    +xs
+      min-height: 200px
+      
+  .videoTitle
+    padding: 16px
+    font-weight: 600
+    color: $blue1
+    text-align: center
+    font-size: 1.1rem
+    background: linear-gradient(90deg, rgba(24, 142, 255, 0.05), rgba(255, 127, 80, 0.05))
 
 .signInButton 
   color: white
-  background: #188EFF
+  background: $blue1
   margin-right: 10px
+  border: none
+  transition: all 0.3s ease
+  
+  &:hover
+    background: darken($blue1, 10%)
+    transform: translateY(-2px)
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1)
 
 .signUpButton
   color: white
   background: #58afff
+  border: none
+  transition: all 0.3s ease
+  
+  &:hover
+    background: darken(#58afff, 10%)
+    transform: translateY(-2px)
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1)
 
 .coinSwapButton
   color: white
-  background: #4CAF50
-
+  background: $green1
+  
 .checkColor
-  color:#ff7f50
+  color: $orange1
+
+.coinSwapTab
+  background: white
+  border-radius: 16px
+  padding: 2rem
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1)
+  margin-top: 2rem
+
+.homeTabContent
+  display: flex
+  flex-direction: column
+  flex: 1
+
+.coinSwapTabContent
+  display: flex
+  flex-direction: column
+  flex: 1
+  justify-content: flex-start
