@@ -26,3 +26,4 @@ alwaysApply: true
 - Break down large components into smaller, more manageable ones.
 - Each component should have a single responsibility.
 - Use memoization (useMemo, useCallback) for performance optimization.
+- Reference .prettierrc and .eslintrc.json files in the root directly for linting rules.
