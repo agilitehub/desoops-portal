@@ -1,0 +1,106 @@
+/* Agilite Core Styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-white text-agilite-slate transition-colors duration-200;
+    background-image: linear-gradient(to bottom right, rgba(230, 230, 255, 1) 0%, rgba(255, 235, 235, 1) 50%, rgba(255, 255, 255, 1) 100%);
+    border-top: none !important;
+  }
+
+  .dark body {
+    @apply bg-gray-900 text-white;
+    background-image: linear-gradient(to bottom right, rgba(20, 20, 40, 1) 0%, rgba(40, 20, 20, 1) 50%, rgba(20, 20, 20, 1) 100%);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+
+  h1 {
+    @apply text-4xl font-bold md:text-5xl;
+  }
+
+  h2 {
+    @apply text-3xl font-bold md:text-4xl;
+  }
+
+  h3 {
+    @apply text-2xl font-bold md:text-3xl;
+  }
+  
+  /* Light mode custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-800;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-agilite-red/70 rounded-full hover:bg-agilite-red;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-agilite-red;
+  }
+  
+  /* Remove any potential border on top of page elements */
+  nav, header, div {
+    border-top: none !important;
+  }
+}
+
+@layer components {
+  .container {
+    @apply px-4 mx-auto max-w-7xl sm:px-6 lg:px-8;
+  }
+  
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent 
+      text-sm font-medium rounded-md shadow-sm transition-colors duration-200
+      focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply btn bg-agilite-red hover:bg-red-700 text-white focus:ring-agilite-red;
+  }
+
+  .btn-secondary {
+    @apply btn bg-agilite-slate hover:bg-agilite-slate/90 text-white focus:ring-agilite-slate;
+  }
+
+  .btn-outline {
+    @apply btn border-agilite-red text-agilite-red hover:bg-agilite-red/10 focus:ring-agilite-red;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-agilite-slate dark:text-white shadow-none;
+  }
+
+  .container-padded {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  nav, header, div {
+    border-top: initial; /* Override any border-top styles that might cause bugs */
+  }
+}
+
+/* Add custom transitions */
+@layer utilities {
+  .transition-all-fast {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  .transition-all-medium {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .transition-all-slow {
+    @apply transition-all duration-500 ease-in-out;
+  }
+} 
