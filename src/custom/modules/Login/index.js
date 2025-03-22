@@ -1,7 +1,7 @@
 import React, { useReducer, useState } from 'react'
 import { identity, configure } from 'deso-protocol'
 import { Col, Row, message, Card, Button, Space, Tabs, Divider } from 'antd'
-import { faCheckCircle, faBitcoinSign, faPlay, faGlobe, faUsers, faChartLine, faGem, faQuestionCircle, faEnvelope } from '@fortawesome/free-solid-svg-icons'
+import { faCheckCircle, faBitcoinSign, faPlay, faGlobe, faUsers, faChartLine, faGem, faQuestionCircle, faEnvelope, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 import { LoginOutlined, UserAddOutlined } from '@ant-design/icons'
 
 // Utils
@@ -123,7 +123,7 @@ const Login = () => {
   const SectionTitle = ({ title }) => {
     return (
       <div className={styles.sectionTitle}>
-        <h2>{title}</h2>
+        <h2 data-text={title}>{title}</h2>
       </div>
     )
   }
@@ -138,7 +138,7 @@ const Login = () => {
               <Col span={24} className={styles.heroSection}>
                 <div className={styles.logoContainer}>
                   <img src={logo} alt='DeSoOps Portal' />
-                  <h1>Welcome to DeSoOps Portal</h1>
+                  <h1 data-text="Welcome to DeSoOps Portal">Welcome to DeSoOps Portal</h1>
                   <p className={styles.heroParagraph}>Your comprehensive solution for DeSo operations and management</p>
                 </div>
                 <div className={styles.heroButtons}>
@@ -408,6 +408,15 @@ const Login = () => {
                       <p>Our bulk distribution system allows you to send tokens to multiple wallet addresses in a single transaction, saving time and reducing transaction costs. You can target specific user groups like followers, NFT holders, or custom lists.</p>
                     </div>
                   </div>
+                  <div className={styles.faqItem}>
+                    <div className={styles.faqQuestion}>
+                      <FontAwesomeIcon icon={faQuestionCircle} className={styles.faqIcon} />
+                      <h3>What is Focus.xyz?</h3>
+                    </div>
+                    <div className={styles.faqAnswer}>
+                      <p>Focus.xyz is a partner platform that provides additional DeSo ecosystem tools and services. Visit <a href="https://focus.xyz" target="_blank" rel="noopener noreferrer" className={styles.inlineLink}>Focus.xyz</a> to explore complementary features for your DeSo experience.</p>
+                    </div>
+                  </div>
                 </div>
               </Col>
             </Row>
@@ -439,6 +448,7 @@ const Login = () => {
                     <a href='#'>Privacy Policy</a>
                     <a href='#'>About</a>
                     <a href='#'>Contact</a>
+                    <a href='https://focus.xyz' target="_blank" rel="noopener noreferrer">Focus.xyz</a>
                   </div>
                   <div className={styles.footerCopyright}>
                     <p>© {new Date().getFullYear()} DeSoOps. All rights reserved.</p>
@@ -477,6 +487,8 @@ const Login = () => {
         <div className={styles.lightRay}></div>
         <div className={styles.diagonalLightRay1}></div>
         <div className={styles.diagonalLightRay2}></div>
+        <div className={styles['duotone-band1']}></div>
+        <div className={styles['duotone-band2']}></div>
         <div className={styles['wave-container']}>
           <div className={`${styles.wave} ${styles.wave1}`}></div>
           <div className={`${styles.wave} ${styles.wave2}`}></div>
@@ -502,6 +514,14 @@ const Login = () => {
             >
               <FontAwesomeIcon icon={faBitcoinSign} /> Coin Swap
             </Button>
+            <a 
+              href="https://focus.xyz" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className={styles.focusLink}
+            >
+              <FontAwesomeIcon icon={faExternalLinkAlt} style={{ marginRight: 8 }} /> Focus.xyz
+            </a>
             <Button 
               type='primary' 
               ghost 

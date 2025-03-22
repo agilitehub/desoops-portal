@@ -96,126 +96,134 @@
     transform: translateY(5%)
 
 .wrapper
-  min-height: 100vh
-  width: 100%
-  background: linear-gradient(135deg, rgba(240, 248, 255, 0.98), rgba(250, 250, 255, 0.95))
   position: relative
+  width: 100%
+  min-height: 100vh
+  background: linear-gradient(135deg, rgba(0, 18, 36, 0.92), rgba(0, 0, 0, 0.95))
   overflow: hidden
-  display: flex
-  flex-direction: column
   
-  .wave-container
-    position: fixed
-    width: 100%
-    height: 100vh
+  &:before
+    content: ""
+    position: absolute
     top: 0
     left: 0
+    width: 100%
+    height: 100%
+    background: linear-gradient(135deg, rgba(24, 142, 255, 0.15), rgba(255, 127, 80, 0.15))
     z-index: 0
+    
+  &:after
+    content: ""
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.6))
+    z-index: 0
+  
+  .wave-container
+    position: absolute
+    width: 100%
+    height: 100%
     overflow: hidden
-    pointer-events: none
+    z-index: 0
+    opacity: 0.6
   
   .wave
     position: absolute
-    width: 200%
-    height: 100%
-    left: 0
+    width: 140%
+    height: 140%
+    opacity: 0.5
+    border-radius: 39% 61% 70% 30% / 30% 41% 59% 70%
+    transform-origin: 50% 48%
+    left: -20%
+    top: -20%
     background: transparent
-    opacity: 0.8
-    border-radius: 0
-    filter: blur(30px)
     
   .wave1
     bottom: 0
-    height: 350px
-    background: rgba(14, 122, 235, 0.8)
+    height: 280px
+    background: rgba(24, 142, 255, 0.5)
     animation: waveAnimation 15s linear infinite, waveRise 8s ease-in-out infinite
     transform-origin: center bottom
     
   .wave2
     bottom: 0
-    height: 250px
-    background: rgba(235, 107, 60, 0.5)
+    height: 260px
+    background: rgba(255, 127, 80, 0.5)
     animation: waveAnimation 18s linear infinite reverse, waveRise 10s ease-in-out infinite
     transform-origin: center bottom
     animation-delay: 2s
     
   .wave3
     bottom: 0
-    height: 320px
-    background: rgba(14, 122, 235, 0.65)
+    height: 240px
+    background: rgba(24, 142, 255, 0.4)
     animation: waveAnimationReverse 20s linear infinite, waveRise 9s ease-in-out infinite
     transform-origin: center bottom
     animation-delay: 1s
     
   .wave4
     bottom: 0
-    height: 280px
-    background: rgba(255, 255, 255, 0.7)
+    height: 300px
+    background: rgba(255, 127, 80, 0.4)
     animation: waveAnimationReverse 25s linear infinite reverse, waveRise 12s ease-in-out infinite
     transform-origin: center bottom
     animation-delay: 3s
   
   .wave5
     top: -5%
-    height: 300px
-    background: rgba(14, 122, 235, 0.6)
+    height: 250px
+    background: rgba(24, 142, 255, 0.3)
     animation: waveAnimation 22s linear infinite reverse, waveRise 11s ease-in-out infinite
     transform-origin: center top
     
   .wave6
     top: -10%
-    height: 270px
-    background: rgba(255, 255, 255, 0.7)
+    height: 220px
+    background: rgba(255, 127, 80, 0.3)
     animation: waveAnimationReverse 28s linear infinite, waveRise 13s ease-in-out infinite
     transform-origin: center top
     animation-delay: 2s
-  
-  &::before
-    content: ''
-    position: absolute
-    top: 0
-    left: 0
-    width: 100%
-    height: 100%
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E")
-    z-index: 0
-    opacity: 0.3
-    mix-blend-mode: multiply
-    pointer-events: none
-  
-  &::after
-    content: ''
-    position: absolute
-    top: 0
-    left: 0
-    width: 100%
-    height: 100%
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath opacity='.5' d='M96 95h4v1h-4v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4h-9v4h-1v-4H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15v-9H0v-1h15V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h9V0h1v15h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9h4v1h-4v9zm-1 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm9-10v-9h-9v9h9zm-10 0v-9h-9v9h9zm-10 0v-9h-9v9h9zm-9-10h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9zm10 0h9v-9h-9v9z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")
-    z-index: 0
-    mix-blend-mode: overlay
-    opacity: 0.5
   
   .duotone-band1, .duotone-band2
     position: absolute
     width: 100%
     height: 100%
-    opacity: 0.9
+    opacity: 0.4
     z-index: 0
-    mix-blend-mode: multiply
+    mix-blend-mode: soft-light
     
   .duotone-band1
-    top: 0
-    left: 0
-    background: radial-gradient(ellipse at top left, rgba(14, 122, 235, 0.7), rgba(14, 122, 235, 0) 70%)
+    top: -30%
+    left: -20%
+    width: 100%
+    height: 120%
+    background: rgba(24, 142, 255, 0.4)
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%
+    filter: blur(60px)
+    z-index: 0
+    mix-blend-mode: soft-light
+    transform: rotate(-15deg) scale(1.5)
+    animation: floatBand1 25s infinite alternate ease-in-out
     
   .duotone-band2
-    bottom: 0
-    right: 0
-    background: radial-gradient(ellipse at bottom right, rgba(235, 107, 60, 0.4), rgba(235, 107, 60, 0) 70%)
+    bottom: -30%
+    right: -20%
+    width: 100%
+    height: 120%
+    background: rgba(255, 127, 80, 0.4)
+    border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%
+    filter: blur(60px)
+    z-index: 0
+    mix-blend-mode: soft-light
+    transform: rotate(15deg) scale(1.5)
+    animation: floatBand2 30s infinite alternate ease-in-out
   
   .bgEffect1, .bgEffect2, .bgEffect3, .bgEffect4
     position: absolute
-    opacity: 0.6
+    opacity: 0.3
     z-index: 0
     filter: blur(80px)
     border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%
@@ -225,7 +233,7 @@
     height: 550px
     top: 10%
     left: 0%
-    background: radial-gradient(circle at 30% 30%, rgba(14, 122, 235, 0.8), rgba(14, 122, 235, 0) 70%)
+    background: radial-gradient(circle at 30% 30%, rgba(24, 142, 255, 0.6), rgba(24, 142, 255, 0) 70%)
     animation: float 20s ease-in-out infinite alternate, morphBlob 15s ease-in-out infinite, fadeInOut 8s infinite alternate
     
   .bgEffect2
@@ -233,7 +241,7 @@
     height: 500px
     top: 30%
     right: 0%
-    background: radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 70%)
+    background: radial-gradient(circle at 70% 30%, rgba(255, 127, 80, 0.6), rgba(255, 127, 80, 0) 70%)
     animation: float 15s ease-in-out infinite alternate-reverse, morphBlob 18s ease-in-out infinite reverse, fadeInOut 12s infinite alternate-reverse
     
   .bgEffect3
@@ -241,7 +249,7 @@
     height: 600px
     bottom: 15%
     right: -5%
-    background: radial-gradient(circle at 70% 70%, rgba(14, 122, 235, 0.7), rgba(14, 122, 235, 0) 70%)
+    background: radial-gradient(circle at 70% 70%, rgba(24, 142, 255, 0.5), rgba(24, 142, 255, 0) 70%)
     animation: float 18s ease-in-out infinite alternate, morphBlob 22s ease-in-out infinite, fadeInOut 15s infinite alternate
     
   .bgEffect4
@@ -249,22 +257,22 @@
     height: 500px
     bottom: 5%
     left: 0%
-    background: radial-gradient(circle at 30% 70%, rgba(235, 107, 60, 0.4), rgba(235, 107, 60, 0) 70%)
+    background: radial-gradient(circle at 30% 70%, rgba(255, 127, 80, 0.5), rgba(255, 127, 80, 0) 70%)
     animation: float 22s ease-in-out infinite alternate-reverse, morphBlob 17s ease-in-out infinite reverse, fadeInOut 10s infinite alternate-reverse
 
   .bgExtra1, .bgExtra2
     position: absolute
     z-index: 0
-    opacity: 0.8
+    opacity: 0.6
   
   .bgExtra1
     top: 45%
     left: 25%
-    width: 20px
-    height: 20px
-    background-color: rgba(14, 122, 235, 1)
+    width: 15px
+    height: 15px
+    background-color: rgba(24, 142, 255, 1)
     border-radius: 50%
-    box-shadow: 0 0 40px 20px rgba(14, 122, 235, 0.9)
+    box-shadow: 0 0 30px 10px rgba(24, 142, 255, 0.7)
     animation: float 6s ease-in-out infinite, fadeInOut 4s infinite alternate
   
   .bgExtra2
@@ -272,9 +280,9 @@
     right: 30%
     width: 12px
     height: 12px
-    background-color: rgba(235, 107, 60, 1)
+    background-color: rgba(255, 127, 80, 1)
     border-radius: 50%
-    box-shadow: 0 0 25px 10px rgba(235, 107, 60, 0.6)
+    box-shadow: 0 0 25px 8px rgba(255, 127, 80, 0.7)
     animation: float 8s ease-in-out infinite reverse, fadeInOut 5s infinite alternate-reverse
 
   .lightRay
@@ -283,7 +291,7 @@
     left: 0
     right: 0
     height: 100%
-    background: linear-gradient(90deg, transparent, rgba(14, 122, 235, 0.35), transparent)
+    background: linear-gradient(90deg, transparent, rgba(24, 142, 255, 0.15), transparent)
     background-size: 2000px 100%
     animation: shimmer 8s infinite linear
     pointer-events: none
@@ -293,7 +301,7 @@
     position: absolute
     width: 150%
     height: 250vh
-    opacity: 0.7
+    opacity: 0.2
     pointer-events: none
     z-index: 0
     transform-origin: top left
@@ -301,7 +309,7 @@
   .diagonalLightRay1
     top: -50%
     left: -50%
-    background: linear-gradient(45deg, transparent, rgba(14, 122, 235, 0.15), transparent, rgba(255, 255, 255, 0.2), transparent)
+    background: linear-gradient(45deg, transparent, rgba(24, 142, 255, 0.05), transparent, rgba(255, 127, 80, 0.05), transparent)
     background-size: 200% 200%
     transform: rotate(45deg)
     animation: shimmer 15s infinite linear reverse, prismEffect 20s infinite ease-in-out
@@ -309,7 +317,7 @@
   .diagonalLightRay2
     bottom: -50%
     right: -50%
-    background: linear-gradient(-45deg, transparent, rgba(235, 107, 60, 0.05), transparent, rgba(14, 122, 235, 0.15), transparent)
+    background: linear-gradient(-45deg, transparent, rgba(255, 127, 80, 0.05), transparent, rgba(24, 142, 255, 0.05), transparent)
     background-size: 200% 200%
     transform: rotate(-45deg)
     animation: shimmer 12s infinite linear, prismEffect 15s infinite ease-in-out alternate
@@ -320,11 +328,10 @@
   align-items: center
   padding: 16px 32px
   background-color: rgba(255, 255, 255, 0.9)
-  backdrop-filter: blur(10px)
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15)
+  backdrop-filter: blur(5px)
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2)
   position: relative
   z-index: 10
-  border-bottom: 1px solid rgba(14, 122, 235, 0.3)
   
   +xs
     padding: 12px
@@ -347,7 +354,7 @@
       letter-spacing: 0.2px
     
     .focusLink
-      color: #0e7aeb
+      color: $blue1
       font-weight: 700
       font-size: 1rem
       text-decoration: none
@@ -355,15 +362,15 @@
       letter-spacing: 0.5px
       position: relative
       transition: all 0.3s ease
-      background: linear-gradient(90deg, rgba(14, 122, 235, 0.1), rgba(51, 153, 255, 0.1))
+      background: linear-gradient(90deg, rgba(46, 134, 222, 0.1), rgba(75, 123, 236, 0.1))
       border-radius: 6px
       display: flex
       align-items: center
       
       &:hover
-        color: darken(#0e7aeb, 10%)
+        color: darken($blue1, 10%)
         transform: translateY(-2px)
-        background: linear-gradient(90deg, rgba(14, 122, 235, 0.2), rgba(51, 153, 255, 0.2))
+        background: linear-gradient(90deg, rgba(46, 134, 222, 0.2), rgba(75, 123, 236, 0.2))
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1)
         
         &:after
@@ -376,7 +383,7 @@
         left: 12px
         width: 0
         height: 2px
-        background: linear-gradient(90deg, #0e7aeb, #3399ff)
+        background: linear-gradient(90deg, $blue1, #4b7bec)
         transition: width 0.3s ease
     
     +xs
@@ -401,11 +408,10 @@
   text-align: center
   margin-bottom: 3rem
   padding: 3rem 1rem
-  background-color: rgba(255, 255, 255, 0.95)
+  background-color: rgba(255, 255, 255, 0.85)
   border-radius: 16px
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25)
   backdrop-filter: blur(5px)
-  border: 1px solid rgba(14, 122, 235, 0.25)
   
   .logoContainer
     display: flex
@@ -423,29 +429,18 @@
     
     h1
       font-size: 3.2rem
+      color: $blue1
       margin: 0 0 1rem
-      background: linear-gradient(135deg, #eb6b3c 0%, #ffffff 100%)
+      background: linear-gradient(90deg, $blue1, $orange1)
       -webkit-background-clip: text
       -webkit-text-fill-color: transparent
       background-clip: text
       position: relative
       display: inline-block
       letter-spacing: 0.5px
-      filter: none
-      -webkit-text-stroke: 1px rgba(235, 107, 60, 0.3)
-      text-stroke: 1px rgba(235, 107, 60, 0.3)
-      
-      &:before
-        content: attr(data-text)
-        position: absolute
-        left: 0
-        top: 0
-        z-index: -1
-        background: none
-        -webkit-text-fill-color: transparent
-        -webkit-text-stroke: 4px rgba(235, 107, 60, 0.2)
-        text-stroke: 4px rgba(235, 107, 60, 0.2)
-        filter: none
+      filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.8))
+      -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.15)
+      text-stroke: 0.5px rgba(255, 255, 255, 0.15)
       
       +xs
         font-size: 2.2rem
@@ -455,7 +450,7 @@
       color: #333
       max-width: 600px
       margin: 0 auto
-      text-shadow: none
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5)
       font-weight: 500
       letter-spacing: 0.2px
       
@@ -473,11 +468,11 @@
       align-items: center
 
 .benefitsBar
-  background: linear-gradient(135deg, rgba(14, 122, 235, 0.95), rgba(46, 124, 212, 0.95))
+  background-color: $blue1
   border-radius: 12px
   padding: 1.5rem
   margin-bottom: 4rem
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35)
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3)
   
   .benefitItem
     display: flex
@@ -499,13 +494,14 @@
   text-align: center
   margin-bottom: 35px
   position: relative
+  padding: 10px
   
   &:before
     content: ""
     position: absolute
     width: 120px
     height: 120px
-    background: radial-gradient(circle, rgba(46, 124, 212, 0.25), rgba(235, 127, 57, 0) 70%)
+    background: radial-gradient(circle, rgba(46, 134, 222, 0.15), rgba(255, 159, 67, 0) 70%)
     border-radius: 50%
     top: 50%
     left: 50%
@@ -513,33 +509,33 @@
     z-index: -1
     filter: blur(10px)
   
+  &:after
+    content: ""
+    position: absolute
+    width: 100%
+    height: 100%
+    top: 0
+    left: 0
+    background: rgba(0, 0, 0, 0.2)
+    border-radius: 12px
+    z-index: -1
+    filter: blur(15px)
+  
   h2
     font-size: 2.5rem
     font-weight: 800
     margin-bottom: 15px
-    background: linear-gradient(135deg, #eb6b3c 0%, #ffffff 100%)
+    background: linear-gradient(135deg, #2e86de 0%, #ff9f43 100%)
     -webkit-background-clip: text
     background-clip: text
     -webkit-text-fill-color: transparent
     position: relative
     display: inline-block
     letter-spacing: 0.5px
-    filter: none
-    
-    -webkit-text-stroke: 1px rgba(235, 107, 60, 0.3)
-    text-stroke: 1px rgba(235, 107, 60, 0.3)
-    
-    &:before
-      content: attr(data-text)
-      position: absolute
-      left: 0
-      top: 0
-      z-index: -1
-      background: none
-      -webkit-text-fill-color: transparent
-      -webkit-text-stroke: 3px rgba(235, 107, 60, 0.2)
-      text-stroke: 3px rgba(235, 107, 60, 0.2)
-      filter: blur(4px)
+    filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.8))
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.8)
+    -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.2)
+    text-stroke: 0.5px rgba(255, 255, 255, 0.2)
     
     &:after
       content: ""
@@ -548,9 +544,9 @@
       height: 4px
       bottom: -8px
       left: 7.5%
-      background: linear-gradient(90deg, #eb6b3c, rgba(255, 255, 255, 0.7))
+      background: linear-gradient(90deg, #2e86de, #ff9f43)
       border-radius: 6px
-      box-shadow: 0 1px 5px rgba(235, 107, 60, 0.7)
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5)
     
     +xs
       font-size: 2rem
@@ -558,19 +554,14 @@
   .sectionDescription
     text-align: center
     margin-bottom: 30px
-    color: rgba(0, 0, 0, 0.8)
+    color: rgba(255, 255, 255, 1)
     font-size: 1.25rem
     position: relative
     display: inline-block
     width: 100%
-    text-shadow: none
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8)
     font-weight: 600
     letter-spacing: 0.3px
-    background-color: rgba(255, 255, 255, 0.7)
-    border-radius: 8px
-    padding: 10px 16px
-    backdrop-filter: blur(2px)
-    border: 1px solid rgba(235, 107, 60, 0.2)
     
     &:after
       content: ""
@@ -579,29 +570,27 @@
       height: 3px
       bottom: -12px
       left: calc(50% - 30px)
-      background: linear-gradient(90deg, #eb6b3c, rgba(255, 255, 255, 0.7))
+      background: linear-gradient(90deg, #2e86de, #ff9f43)
       border-radius: 6px
-      box-shadow: 0 1px 2px rgba(235, 107, 60, 0.5)
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5)
 
 .testimonialsRow
   margin-bottom: 4rem
 
 .testimonialCards
   .testimonialCard
-    background: rgba(255, 255, 255, 0.95)
+    background: white
     border-radius: 12px
     padding: 2rem
     height: 100%
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2)
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25)
     transition: transform 0.3s ease, box-shadow 0.3s ease
     display: flex
     flex-direction: column
-    border: 1px solid rgba(235, 107, 60, 0.15)
     
     &:hover
       transform: translateY(-5px)
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3)
-      border-color: rgba(235, 107, 60, 0.35)
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35)
     
     .testimonialContent
       flex: 1
@@ -643,11 +632,10 @@
   margin-bottom: 4rem
 
 .faqContainer
-  background: rgba(255, 255, 255, 0.95)
+  background: white
   border-radius: 16px
   padding: 2rem
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2)
-  border: 1px solid rgba(14, 122, 235, 0.15)
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25)
   
   .faqItem
     margin-bottom: 1.5rem
@@ -673,15 +661,14 @@
         font-size: 1.35rem
         font-weight: 800
         margin: 0
-        background: linear-gradient(90deg, darken(#0e7aeb, 15%), darken(#4b7bec, 15%))
+        background: linear-gradient(90deg, #2e86de, #4b7bec)
         -webkit-background-clip: text
         background-clip: text
         -webkit-text-fill-color: transparent
         letter-spacing: 0.3px
-        filter: none
-        -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.3)
-        text-stroke: 0.5px rgba(255, 255, 255, 0.3)
-        position: relative
+        filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7))
+        -webkit-text-stroke: 0.3px rgba(255, 255, 255, 0.1)
+        text-stroke: 0.3px rgba(255, 255, 255, 0.1)
     
     .faqAnswer
       padding-left: 2.25rem
@@ -707,10 +694,10 @@
   margin-bottom: 4rem
 
 .contactContainer
-  background: linear-gradient(135deg, #0e7aeb, darken(#0e7aeb, 15%))
+  background: linear-gradient(135deg, $blue1, darken($blue1, 15%))
   border-radius: 16px
   padding: 3rem
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35)
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3)
   color: white
   text-align: center
   
@@ -721,13 +708,7 @@
     h2
       font-size: 2.25rem
       margin-bottom: 1rem
-      background: linear-gradient(135deg, #eb6b3c 0%, #ffffff 100%)
-      -webkit-background-clip: text
-      background-clip: text
-      -webkit-text-fill-color: transparent
-      display: inline-block
-      -webkit-text-stroke: 1px rgba(235, 107, 60, 0.3)
-      text-stroke: 1px rgba(235, 107, 60, 0.3)
+      text-shadow: 0 5px 15px rgba(0, 0, 0, 0.35)
     
     p
       font-size: 1.1rem
@@ -742,13 +723,10 @@
       font-weight: 600
       height: auto
       padding: 0.75rem 2rem
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2)
       
       &:hover
         background: rgba(255, 255, 255, 0.9)
         color: darken($blue1, 10%)
-        transform: translateY(-2px)
-        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3)
 
 .footerRow
   margin-top: auto
@@ -759,12 +737,12 @@
 
 .footer
   padding: 3rem 1rem 1.5rem
-  border-top: 2px solid rgba(14, 122, 235, 0.4)
+  border-top: 2px solid rgba(24, 142, 255, 0.3)
   text-align: center
   position: relative
   z-index: 2
   width: 100%
-  background: linear-gradient(135deg, rgba(14, 122, 235, 0.95), rgba(51, 153, 255, 0.95))
+  background: linear-gradient(135deg, rgba(24, 142, 255, 0.85), rgba(255, 127, 80, 0.85))
   backdrop-filter: blur(10px)
   box-shadow: 0 -15px 35px rgba(0, 0, 0, 0.3)
   color: white
@@ -776,7 +754,7 @@
     left: 0
     right: 0
     height: 4px
-    background: linear-gradient(90deg, rgba(14, 122, 235, 1), rgba(235, 107, 60, 0.8))
+    background: linear-gradient(90deg, rgba(24, 142, 255, 1), rgba(255, 127, 80, 1))
     z-index: 3
   
   .footerLogo
@@ -846,35 +824,33 @@
   margin-bottom: 4rem
   
 .featureCard
-  background: rgba(255, 255, 255, 0.95)
+  background: white
   border-radius: 12px
   padding: 2rem
   height: 100%
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2)
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25)
   transition: transform 0.3s ease, box-shadow 0.3s ease
   text-align: center
-  border: 1px solid rgba(14, 122, 235, 0.15)
   
   &:hover
     transform: translateY(-5px)
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3)
-    border-color: rgba(14, 122, 235, 0.35)
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35)
   
   h3
-    color: #0e7aeb
+    color: #2e86de
     margin: 1.25rem 0
     font-size: 1.5rem
     font-weight: 800
-    background: linear-gradient(90deg, darken(#0e7aeb, 15%), darken(#4b7bec, 15%))
+    background: linear-gradient(90deg, #2e86de, #4b7bec)
     -webkit-background-clip: text
     background-clip: text
     -webkit-text-fill-color: transparent
     position: relative
     display: inline-block
     letter-spacing: 0.3px
-    filter: none
-    -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.3)
-    text-stroke: 0.5px rgba(255, 255, 255, 0.3)
+    filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7))
+    -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.1)
+    text-stroke: 0.5px rgba(255, 255, 255, 0.1)
     
     &:after
       content: ""
@@ -883,9 +859,9 @@
       height: 2px
       bottom: -5px
       left: 25%
-      background: linear-gradient(90deg, darken(#0e7aeb, 10%), darken(#4b7bec, 10%))
+      background: linear-gradient(90deg, #2e86de, #4b7bec)
       border-radius: 4px
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6)
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4)
   
   p
     color: #444
@@ -907,14 +883,13 @@
       color: $blue1
 
 .ctaSection
-  background: rgba(255, 255, 255, 0.95)
+  background: white
   border-radius: 16px
   padding: 3rem 2rem
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15)
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25)
   margin-bottom: 4rem
   overflow: hidden
   position: relative
-  border: 1px solid rgba(24, 142, 255, 0.2)
   
   &::before
     content: ''
@@ -928,14 +903,9 @@
   .ctaContent
     h2
       font-size: 2rem
+      color: #222
       margin-bottom: 1rem
-      background: linear-gradient(135deg, #eb6b3c 0%, #ffffff 100%)
-      -webkit-background-clip: text
-      background-clip: text
-      -webkit-text-fill-color: transparent
-      display: inline-block
-      -webkit-text-stroke: 1px rgba(235, 107, 60, 0.3)
-      text-stroke: 1px rgba(235, 107, 60, 0.3)
+      text-shadow: 0 4px 10px rgba(0, 0, 0, 0.25)
       
       +xs
         font-size: 1.5rem
@@ -994,11 +964,10 @@
   margin-bottom: 4rem
 
 .videosWrapper
-  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85))
+  background: linear-gradient(to bottom right, white, rgba(24, 142, 255, 0.05))
   border-radius: 16px
   padding: 2rem
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2)
-  border: 1px solid rgba(24, 142, 255, 0.2)
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25)
 
 .videoContainer
   margin-bottom: 1.5rem
@@ -1027,38 +996,30 @@
 
 .signInButton 
   color: white
-  background: #0e7aeb
+  background: $blue1
   margin-right: 10px
   border: none
   transition: all 0.3s ease
-  box-shadow: 0 5px 15px rgba(14, 122, 235, 0.5)
   
   &:hover
-    background: darken(#0e7aeb, 10%)
+    background: darken($blue1, 10%)
     transform: translateY(-2px)
-    box-shadow: 0 8px 15px rgba(14, 122, 235, 0.6)
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2)
 
 .signUpButton
   color: white
-  background: #4a9df8
+  background: #58afff
   border: none
   transition: all 0.3s ease
-  box-shadow: 0 5px 15px rgba(74, 157, 248, 0.5)
   
   &:hover
-    background: darken(#4a9df8, 10%)
+    background: darken(#58afff, 10%)
     transform: translateY(-2px)
-    box-shadow: 0 8px 15px rgba(74, 157, 248, 0.6)
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2)
 
 .coinSwapButton
   color: white
   background: $green1
-  box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4)
-
-  &:hover
-    background: darken($green1, 10%)
-    transform: translateY(-2px)
-    box-shadow: 0 8px 15px rgba(46, 204, 113, 0.5)
 
 .checkColor
   color: $orange1
@@ -1094,12 +1055,12 @@
 // Add styles for modal backgrounds with wave effects
 :global
   .ant-modal-content
-    background: linear-gradient(-45deg, rgba(14, 122, 235, 0.2), rgba(255, 255, 255, 0.25))
+    background: linear-gradient(-45deg, rgba(24, 142, 255, 0.1), rgba(255, 127, 80, 0.1))
     backdrop-filter: blur(10px)
     border-radius: 16px
     overflow: hidden
     position: relative
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4)
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3)
     
     &::before
       content: ''
@@ -1108,7 +1069,7 @@
       left: 0
       right: 0
       height: 4px
-      background: linear-gradient(90deg, rgba(14, 122, 235, 1), rgba(235, 107, 60, 0.7))
+      background: linear-gradient(90deg, rgba(24, 142, 255, 1), rgba(255, 127, 80, 1))
       z-index: 3
     
     .modal-wave-container
@@ -1126,20 +1087,20 @@
       height: 60px
       left: 0
       background: transparent
-      opacity: 0.4
+      opacity: 0.2
       border-radius: 0
       filter: blur(8px)
       
     .modal-wave1
       bottom: 0
       height: 40px
-      background: rgba(14, 122, 235, 0.8)
+      background: rgba(24, 142, 255, 0.6)
       animation: waveAnimation 15s linear infinite
       
     .modal-wave2
       bottom: 20px
       height: 35px
-      background: rgba(235, 107, 60, 0.5)
+      background: rgba(255, 127, 80, 0.5)
       animation: waveAnimationReverse 12s linear infinite
     
     .ant-modal-header
@@ -1165,14 +1126,14 @@
 .coinSwapModal
   :global
     .ant-modal-content
-      background: linear-gradient(-45deg, rgba(14, 122, 235, 0.2), rgba(235, 107, 60, 0.2))
+      background: linear-gradient(-45deg, rgba(24, 142, 255, 0.15), rgba(255, 127, 80, 0.15))
       
       .ant-table
-        background: rgba(255, 255, 255, 0.9)
+        background: rgba(255, 255, 255, 0.85)
         backdrop-filter: blur(5px)
         border-radius: 12px
         overflow: hidden
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2)
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15)
         
       .ant-form-item
         position: relative
@@ -1185,11 +1146,11 @@
       
       .modal-orb1
         position: absolute
-        width: 160px
-        height: 160px
+        width: 150px
+        height: 150px
         top: 10%
         right: -5%
-        background: radial-gradient(circle, rgba(14, 122, 235, 0.4), rgba(14, 122, 235, 0) 70%)
+        background: radial-gradient(circle, rgba(24, 142, 255, 0.3), rgba(24, 142, 255, 0) 70%)
         border-radius: 50%
         filter: blur(20px)
         animation: float 10s ease-in-out infinite alternate
@@ -1197,11 +1158,11 @@
       
       .modal-orb2
         position: absolute
-        width: 130px
-        height: 130px
+        width: 120px
+        height: 120px
         bottom: 10%
         left: -5%
-        background: radial-gradient(circle, rgba(235, 107, 60, 0.4), rgba(235, 107, 60, 0) 70%)
+        background: radial-gradient(circle, rgba(255, 127, 80, 0.3), rgba(255, 127, 80, 0) 70%)
         border-radius: 50%
         filter: blur(20px)
         animation: float 8s ease-in-out infinite alternate-reverse
@@ -1210,12 +1171,12 @@
 // DeSo Login Modal Styling
 :global
   .deso-login-modal
-    background: linear-gradient(-45deg, rgba(14, 122, 235, 0.25), rgba(255, 255, 255, 0.35))
+    background: linear-gradient(-45deg, rgba(24, 142, 255, 0.2), rgba(255, 127, 80, 0.2))
     backdrop-filter: blur(10px)
     border-radius: 16px
     overflow: hidden
     position: relative
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4)
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3)
     
     &::before
       content: ''
@@ -1224,7 +1185,7 @@
       left: 0
       right: 0
       height: 4px
-      background: linear-gradient(90deg, rgba(14, 122, 235, 1), rgba(235, 107, 60, 0.7))
+      background: linear-gradient(90deg, rgba(24, 142, 255, 1), rgba(255, 127, 80, 1))
       z-index: 3
     
     .modal-wave-container
@@ -1242,29 +1203,29 @@
       height: 60px
       left: 0
       background: transparent
-      opacity: 0.4
+      opacity: 0.2
       border-radius: 0
       filter: blur(8px)
       
     .modal-wave1
       bottom: 0
       height: 40px
-      background: rgba(14, 122, 235, 0.8)
+      background: rgba(24, 142, 255, 0.6)
       animation: waveAnimation 15s linear infinite
       
     .modal-wave2
       bottom: 20px
       height: 35px
-      background: rgba(235, 107, 60, 0.5)
+      background: rgba(255, 127, 80, 0.5)
       animation: waveAnimationReverse 12s linear infinite
     
     .modal-orb1
       position: absolute
-      width: 180px
-      height: 180px
+      width: 150px
+      height: 150px
       top: 10%
       right: -5%
-      background: radial-gradient(circle, rgba(14, 122, 235, 0.5), rgba(14, 122, 235, 0) 70%)
+      background: radial-gradient(circle, rgba(24, 142, 255, 0.3), rgba(24, 142, 255, 0) 70%)
       border-radius: 50%
       filter: blur(20px)
       animation: float 10s ease-in-out infinite alternate
@@ -1272,11 +1233,11 @@
     
     .modal-orb2
       position: absolute
-      width: 100px
-      height: 100px
+      width: 120px
+      height: 120px
       bottom: 10%
       left: -5%
-      background: radial-gradient(circle, rgba(235, 107, 60, 0.3), rgba(235, 107, 60, 0) 70%)
+      background: radial-gradient(circle, rgba(255, 127, 80, 0.3), rgba(255, 127, 80, 0) 70%)
       border-radius: 50%
       filter: blur(20px)
       animation: float 8s ease-in-out infinite alternate-reverse
@@ -1289,7 +1250,7 @@
       z-index: 1
       
     h1, h2, h3, h4, h5, h6
-      text-shadow: none
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15)
     
     p
-      text-shadow: none
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1)
