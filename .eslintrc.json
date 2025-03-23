@@ -1,11 +1,9 @@
 {
-  // "extends": ["react-app", "plugin:react/recommended"],
   "extends": ["react-app"],
   "rules": {
     "default-case": 0,
     "no-tabs": ["error", { "allowIndentationTabs": true }],
     "max-len": 0,
-    // "indent": ["error", 2, { "SwitchCase": 1 }],
     "indent": 0,
     "linebreak-style": 0,
     "quotes": ["error", "single", { "avoidEscape": true }],

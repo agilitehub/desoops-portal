@@ -102,5 +102,4 @@ dist
 build
 .firebase
 .vscode
-env-templates
 .firebaserc

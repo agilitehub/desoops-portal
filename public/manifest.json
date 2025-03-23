@@ -8,19 +8,18 @@
       "type": "image/x-icon"
     },
     {
-      "src": "icon-192x192.png",
+      "src": "agilite-logo.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512x512.png",
+      "src": "agilite-logo.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "gcm_sender_id": "1017377581725",
   "theme_color": "#000000",
   "background_color": "#ffffff"
 }

@@ -1,12 +1,9 @@
 import React from 'react'
-import { useTheme } from '../../index'
 
 /**
  * Theming Guide page that explains how to use and customize theming
  */
 const ThemingGuide = () => {
-  const { darkMode } = useTheme()
-  
   // Sample color palette
   const brandColors = [
     { name: 'agilite-red', value: '#E30613', textColor: 'text-white' },

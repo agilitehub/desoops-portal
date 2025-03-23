@@ -1,15 +1,13 @@
 import React, { useState } from 'react'
-import { Logo, ThemeToggle, BackgroundEffect, useTheme } from '../../index'
+import { Logo, ThemeToggle, BackgroundEffect } from '../../index'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCode, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
+import { faCode } from '@fortawesome/free-solid-svg-icons'
 
 /**
  * Component showcase page that demonstrates all available components
  * with examples and code snippets
  */
 const ComponentsShowcase = () => {
-  const { darkMode } = useTheme()
-  
   return (
     <div className="space-y-16">
       <div className="text-center">

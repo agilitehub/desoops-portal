@@ -3,6 +3,12 @@
   "description": "A management hub for Content Creators on the DeSo platform",
   "version": "2.7.0-rc-21",
   "private": false,
+  "scripts": {
+    "start": "craco start",
+    "build": "craco build",
+    "eject": "craco eject",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
+  },
   "devDependencies": {
     "@craco/craco": "^7.1.0",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
@@ -11,7 +17,6 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "antd": "^5.24.4",
-    "firebase": "^11.5.0",
     "prettier": "^3.5.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -22,13 +27,6 @@
   },
   "dependencies": {
     "agilite-utils": "7.7.0-rc-3"
-  },
-  "scripts": {
-    "start": "craco start",
-    "build": "node update-version.js && craco build",
-    "eject": "craco eject",
-    "deploy": "node update-version.js && craco build && firebase deploy",
-    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
   },
   "eslintConfig": {
     "extends": [
