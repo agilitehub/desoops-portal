@@ -4,6 +4,8 @@
 // Load environment variables from .env files using agilite-utils
 require('agilite-utils/dist/dotenv').default.config()
 
+const path = require('path')
+
 module.exports = {
   webpack: {
     // Customize webpack configuration
@@ -23,6 +25,12 @@ module.exports = {
         })
       },
       resolve: {
+        ...config.resolve,
+        // Add alias configuration
+        alias: {
+          ...config.resolve.alias,
+          '@': path.resolve(__dirname, 'src')
+        },
         // Disable the crypto polyfill as it's not needed
         fallback: {
           crypto: false

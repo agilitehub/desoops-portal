@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './agilite-core/styles/core.css' // Import consolidated styles
-import BoilerplateApp from './agilite-core/boilerplate-demo' // Boilerplate demo app
+import App from './app'
 import reportWebVitals from './reportWebVitals'
 
 // Import Font Awesome CSS
@@ -15,7 +15,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'))
 
 root.render(
   <React.StrictMode>
-    <BoilerplateApp />
+    <App />
   </React.StrictMode>
 )
 
