@@ -45,14 +45,36 @@ function App() {
 }
 ```
 
-For Tailwind configuration, import the core config in your tailwind.config.js:
+## Tailwind Configuration
+
+The core provides a base Tailwind configuration that should not be modified directly. Instead, extend it in your application:
+
+### Recommended Approach
+
+Create a tailwind.config.js in your application folder that extends the core configuration:
 
 ```js
-const agiliteCore = require('./src/agilite-core/config/tailwind.config');
+const agiliteCore = require('../agilite-core/config/tailwind.config');
+const merge = require('lodash/merge');
 
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   darkMode: 'class',
-  theme: agiliteCore.theme,
+  theme: {
+    ...merge({}, agiliteCore.theme, {
+      extend: {
+        // Your customizations here
+        colors: {
+          'custom-color': '#7e22ce',
+        },
+      },
+    }),
+  },
   plugins: []
-} 
+}
+```
+
+This approach is demonstrated in the boilerplate demo, where the core configuration is extended in:
+`src/agilite-core/boilerplate-demo/config/tailwind.config.js`
+
+Refer to the documentation in that directory for more details on customization.

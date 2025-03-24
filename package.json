@@ -26,7 +26,8 @@
     "web-vitals": "^4.2.4"
   },
   "dependencies": {
-    "agilite-utils": "7.7.0-rc-3"
+    "agilite-utils": "7.7.0-rc-3",
+    "lodash": "^4.17.21"
   },
   "eslintConfig": {
     "extends": [
