@@ -18,7 +18,7 @@ const ComponentSection = ({ title, description, usage, example, codeExample, pro
       </div>
       
       {/* Import usage */}
-      <div className="p-4 bg-gray-100 dark:bg-gray-850 border-b border-gray-200 dark:border-gray-700 font-mono text-sm">
+      <div className="p-4 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 font-mono text-sm text-gray-800 dark:text-gray-200">
         {usage}
       </div>
       
@@ -80,7 +80,7 @@ const PropsTable = ({ props }) => {
           </thead>
           <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {props.map((prop, index) => (
-              <tr key={index} className={index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-850'}>
+              <tr key={index} className={index % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-900'}>
                 <td className="px-4 py-4 text-sm font-medium text-agilite-red">{prop.name}</td>
                 <td className="px-4 py-4 text-sm font-mono text-gray-900 dark:text-gray-300">{prop.type}</td>
                 <td className="px-4 py-4 text-sm font-mono text-gray-900 dark:text-gray-300">{prop.default}</td>

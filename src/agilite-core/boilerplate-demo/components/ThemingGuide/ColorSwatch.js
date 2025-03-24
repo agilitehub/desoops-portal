@@ -15,7 +15,7 @@ const ColorSwatch = ({ color }) => {
           <div className="text-sm opacity-90">{color.value}</div>
         </div>
       </div>
-      <div className="bg-white dark:bg-gray-850 p-3 text-sm border-t dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-900 p-3 text-sm border-t dark:border-gray-700 text-gray-800 dark:text-gray-200">
         <code className="font-mono">
           bg-{color.name}
         </code>
