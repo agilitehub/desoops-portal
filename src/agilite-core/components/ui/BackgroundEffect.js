@@ -1,5 +1,21 @@
-import React from 'react'
+import React, { memo } from 'react'
+import PropTypes from 'prop-types'
 
+/**
+ * BackgroundEffect component provides a dynamic, animated background
+ * with different styles for light and dark modes
+ * 
+ * @component
+ * @example
+ * // Basic usage in a container
+ * <div className="relative">
+ *   <BackgroundEffect />
+ *   <div className="relative z-10">Your content here</div>
+ * </div>
+ * 
+ * // With custom opacity
+ * <BackgroundEffect className="opacity-50" />
+ */
 const BackgroundEffect = ({ className = '' }) => {
   return (
     <div className={`absolute inset-0 overflow-hidden z-0 ${className}`}>
@@ -42,4 +58,10 @@ const BackgroundEffect = ({ className = '' }) => {
   )
 }
 
-export default BackgroundEffect 
+BackgroundEffect.propTypes = {
+  /** Additional CSS classes to apply to the background container */
+  className: PropTypes.string
+}
+
+// Memoize the component since it's purely presentational
+export default memo(BackgroundEffect) 

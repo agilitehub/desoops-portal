@@ -1,56 +1,46 @@
-import React from 'react'
+import React, { memo } from 'react'
+import PropTypes from 'prop-types'
 import { useTheme } from '../../context/ThemeContext'
 
 /**
- * Logo component that displays the Agilit-e brand logo
- * Uses different logo files for light and dark modes
+ * Logo component that automatically switches between light and dark mode versions
+ * 
+ * @component
+ * @example
+ * // Basic usage
+ * <Logo />
+ * 
+ * // With custom size and additional classes
+ * <Logo className="w-16 h-16 my-4" />
+ * 
+ * // With custom alt text
+ * <Logo alt="Company Logo" />
  */
-const Logo = ({
-  className = '',
-  textColor = 'text-agilite-slate',
-  showText = true,
-  variant = 'color', // 'color' or 'grayscale'
-  size = 'medium' // 'small', 'medium', 'large'
-}) => {
+const Logo = memo(({ className = '', alt = 'Logo' }) => {
   const { darkMode } = useTheme()
-
-  // Size mapping
-  const sizeMap = {
-    small: 'h-10',
-    medium: 'h-16',
-    large: 'h-24'
-  }
-
-  const logoSize = sizeMap[size] || sizeMap.medium
   
-  // Apply grayscale filter if variant is grayscale
-  const logoFilter = variant === 'grayscale' ? 'filter grayscale' : ''
-  
-  // Use different logos for light and dark modes
-  const logoSrc = darkMode ? '/logo-dark.png' : '/logo-default.png'
-
   return (
-    <div className={`flex items-center ${className}`}>
-      {/* PNG Logo */}
-      <div className={`relative ${logoSize} mr-4`}>
-        <img 
-          src={logoSrc}
-          alt="Agilit-e Logo" 
-          className={`${logoSize} w-auto object-contain ${logoFilter}`}
-        />
-      </div>
-
-      {/* Agilit-e text */}
-      {showText && (
-        <span
-          className={`text-3xl font-normal tracking-wider ${darkMode ? 'text-white' : textColor}`}
-          style={{ fontFamily: 'Arial, sans-serif' }}
-        >
-          AGILIT-E
-        </span>
-      )}
-    </div>
+    <img
+      src={darkMode ? '/logo-dark.png' : '/logo-default.png'}
+      alt={alt}
+      className={`h-12 w-auto ${className}`}
+    />
   )
+})
+
+Logo.propTypes = {
+  /** Additional CSS classes to apply to the logo */
+  className: PropTypes.string,
+  /** Alternative text for the logo image */
+  alt: PropTypes.string
 }
+
+Logo.defaultProps = {
+  className: '',
+  alt: 'Logo'
+}
+
+// Display name for React DevTools
+Logo.displayName = 'Logo'
 
 export default Logo 
