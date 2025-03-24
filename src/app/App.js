@@ -3,6 +3,9 @@ import { ThemeProvider } from '@/agilite-core/context/ThemeContext'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import { Routes, Route, BrowserRouter as Router } from 'react-router-dom'
+import Home from './pages/Home'
+import About from './pages/About'
+import SignUp from './pages/SignUp'
 
 /**
  * Main App component for the Agilit-e Core boilerplate demo
@@ -16,7 +19,9 @@ const App = () => {
           <Header />
           <main className="flex-grow container-padded py-8">
             <Routes>
-
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/signup" element={<SignUp />} />
             </Routes>
           </main>
           <Footer />

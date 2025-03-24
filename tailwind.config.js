@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-const boilerplateConfig = require('./src/agilite-core/boilerplate-demo/config/tailwind.config')
+const config = require('./src/app/config/tailwind.config')
 
 // This is the Tailwind CSS configuration file that:
 // 1. Processes all JS/JSX/TS/TSX files in the src directory for Tailwind classes
@@ -9,6 +9,6 @@ const boilerplateConfig = require('./src/agilite-core/boilerplate-demo/config/ta
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   darkMode: 'class', // Enable class-based dark mode
-  theme: boilerplateConfig.theme,
-  plugins: boilerplateConfig.plugins || []
+  theme: config.theme,
+  plugins: config.plugins || []
 }

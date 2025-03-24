@@ -1,5 +1,5 @@
 /**
- * Centralized navigation configuration for the entire application
+ * Centralized navigation configuration for DeSo Ops
  * This serves as a single source of truth for all navigation-related data
  */
 
@@ -14,16 +14,24 @@ export const MAIN_NAV_ITEMS = [
     showInFooter: false
   },
   {
-    path: '/components',
-    label: 'Components',
+    path: 'https://focus.xyz',
+    label: 'Focus Platform ↗',
+    exact: false,
+    type: 'external',
+    showInHeader: true,
+    showInFooter: true
+  },
+  {
+    path: '/coin-swap',
+    label: 'Coin Swap',
     exact: false,
     type: 'internal',
     showInHeader: true,
     showInFooter: true
   },
   {
-    path: '/theming',
-    label: 'Theming Guide',
+    path: '/about',
+    label: 'About',
     exact: false,
     type: 'internal',
     showInHeader: true,
@@ -34,7 +42,32 @@ export const MAIN_NAV_ITEMS = [
 // External links, primarily for footer
 export const EXTERNAL_LINKS = [
   {
-    path: 'https://github.com/agilite',
+    path: 'https://focus.xyz',
+    label: 'Focus Platform',
+    description: 'The premier DeSo social platform',
+    icon: 'external-link',
+    type: 'external',
+    showInHeader: false,
+    showInFooter: true
+  },
+  {
+    path: 'https://twitter.com/desoops',
+    label: 'Twitter',
+    icon: 'twitter',
+    type: 'external',
+    showInHeader: false,
+    showInFooter: true
+  },
+  {
+    path: 'https://discord.gg/desoops',
+    label: 'Discord',
+    icon: 'discord',
+    type: 'external',
+    showInHeader: false,
+    showInFooter: true
+  },
+  {
+    path: 'https://github.com/desoops',
     label: 'GitHub',
     icon: 'github',
     type: 'external',
@@ -47,8 +80,8 @@ export const EXTERNAL_LINKS = [
 export const getHeaderNavItems = () => 
   MAIN_NAV_ITEMS.filter(item => item.showInHeader)
 
-export const getFooterResourceItems = () => 
+export const getFooterResourceItems = () =>
   MAIN_NAV_ITEMS.filter(item => item.showInFooter)
 
-export const getFooterConnectItems = () => 
+export const getFooterConnectItems = () =>
   EXTERNAL_LINKS.filter(item => item.showInFooter) 
