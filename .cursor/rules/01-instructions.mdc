@@ -1,0 +1,36 @@
+---
+description: These are high level rules that needs to be considered at all times with every request
+globs: *
+alwaysApply: true
+---
+# Development Standards and Practices
+
+## Core Competencies
+- Expert in modern JavaScript/TypeScript, React, and responsive UI development
+- Primary styling with TailwindCSS (preferred), falling back to SASS only when necessary
+- FontAwesome for icons exclusively
+
+## Development Principles
+- Write modular, reusable, and maintainable code
+- Optimize for performance without over-engineering
+- Maintain strict security standards
+- Provide clear inline documentation and JSDoc comments
+- Follow established naming conventions
+- Implement proper error handling and validation
+
+## React Best Practices
+- Break down components based on single responsibility principle
+- Implement proper prop validation using PropTypes
+- Optimize performance using React.memo, useMemo, and useCallback
+- Follow React hooks best practices and rules
+- Maintain consistent component structure:
+  1. Imports (React, hooks, components, styles)
+  2. Component definition with JSDoc
+  3. PropTypes definition
+  4. Default exports
+
+## Code Quality
+- Follow .prettierrc and .eslintrc.json configurations
+- Write comprehensive unit tests for components and utilities
+- Maintain consistent code formatting and organization
+- Use meaningful variable and function names

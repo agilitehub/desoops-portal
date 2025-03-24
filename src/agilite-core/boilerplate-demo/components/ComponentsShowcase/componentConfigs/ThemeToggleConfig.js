@@ -5,8 +5,8 @@ import { ThemeToggle } from '../../../../index'
  * Configuration for ThemeToggle component showcase
  */
 const ThemeToggleConfig = {
-  title: "ThemeToggle",
-  description: "The ThemeToggle component provides a toggle switch for users to switch between light and dark modes. It works in conjunction with the ThemeProvider context.",
+  title: 'Theme Toggle',
+  description: 'Interactive component for switching between light and dark modes',
   usage: "import { ThemeToggle, ThemeProvider } from './agilite-core';",
   example: (
     <div className="p-8 flex items-center justify-center">

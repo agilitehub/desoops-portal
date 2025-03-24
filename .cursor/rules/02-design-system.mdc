@@ -1,0 +1,53 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Agilite Design System Guidelines
+
+## Core Components
+- All components must support both light and dark modes
+- Components should be compatible with the ThemeProvider context
+- Follow established component architecture in agilite-core
+
+## Styling Standards
+- Use TailwindCSS classes following the agilite-core configuration
+- Follow the established color palette:
+  - Primary: agilite-red
+  - Secondary: agilite-slate
+  - Dark mode: agilite-black
+- Maintain consistent spacing and sizing using Tailwind's scale
+
+## Component Requirements
+1. Base Structure:
+   - Implement proper PropTypes
+   - Use memo for performance optimization
+   - Include comprehensive JSDoc documentation
+   - Support className prop for customization
+
+2. Theme Integration:
+   - Use useTheme hook for dark mode support
+   - Implement smooth transitions between modes
+   - Follow established gradient patterns
+
+3. Accessibility:
+   - Include proper ARIA labels
+   - Support keyboard navigation
+   - Maintain sufficient color contrast
+
+## Design Patterns
+- Use TRANSITIONS utility for consistent animations
+- Follow established container patterns
+- Implement responsive designs using Tailwind breakpoints
+- Use consistent shadow and border styles
+
+## File Organization
+- Components go in agilite-core/components/ui
+- Contexts in agilite-core/context
+- Styles and constants in agilite-core/styles
+- Configuration in agilite-core/config
+
+## Example Components Reference
+- Logo.js: Brand consistency and theme switching
+- ThemeToggle.js: Interactive component patterns
+- BackgroundEffect.js: Layout and styling patterns

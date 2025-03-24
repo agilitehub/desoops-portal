@@ -7,7 +7,7 @@ import { getHeaderNavItems } from '../../config/navigation'
  * Accepts custom classNames, link styles, and click handlers
  */
 const Navigation = ({ 
-  containerClassName = "", 
+  containerClassName = '', 
   navLinkClassName, 
   onLinkClick = () => {},
   items = getHeaderNavItems() 

@@ -5,9 +5,9 @@ import { BackgroundEffect } from '../../../../index'
  * Configuration for BackgroundEffect component showcase
  */
 const BackgroundEffectConfig = {
-  title: "BackgroundEffect",
-  description: "The BackgroundEffect component adds a decorative background with subtle animations and gradients. It automatically adjusts for light and dark modes.",
-  usage: "import { BackgroundEffect } from './agilite-core';",
+  title: 'Background Effect',
+  description: 'A component that provides a dynamic background effect with gradient animations',
+  usage: 'BackgroundEffect',
   example: (
     <div className="relative h-64 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
       <BackgroundEffect />
@@ -27,9 +27,9 @@ const BackgroundEffectConfig = {
 </div>
 `,
   props: [
-    { name: 'className', type: 'string', default: "''", description: 'Additional CSS classes to apply (e.g., "opacity-50" for a more subtle effect)' }
+    { name: 'className', type: 'string', default: "''", description: 'Additional CSS classes to apply (e.g., \'opacity-50\' for a more subtle effect)' }
   ],
-  notes: "The BackgroundEffect component should be used within a relative positioned container with your content having a higher z-index."
+  notes: 'The BackgroundEffect component should be used within a relative positioned container with your content having a higher z-index.'
 }
 
 export default BackgroundEffectConfig 

@@ -4,9 +4,9 @@ import React from 'react'
  * Configuration for CSS Utilities showcase
  */
 const CssUtilitiesConfig = {
-  title: "CSS Utilities",
-  description: "The Agilit-e Core library includes a set of utility classes built on top of TailwindCSS for common styling needs.",
-  usage: "/* These are automatically imported with the core CSS */",
+  title: 'CSS Utilities',
+  description: 'Core CSS utilities for consistent styling across components',
+  usage: 'Import from agilite-core/styles',
   codeExample: `
 <!-- Buttons -->
 <button className="btn-primary">Primary Button</button>
@@ -32,7 +32,8 @@ const CssUtilitiesConfig = {
       <button className="btn-ghost">Ghost Button</button>
     </div>
   ),
-  notes: "These utility classes are part of the core CSS and follow the TailwindCSS semantic naming convention."
+  notes: 'These utility classes are part of the core CSS and follow the TailwindCSS semantic naming convention.',
+  documentation: 'See styles/index.css for available utilities'
 }
 
 export default CssUtilitiesConfig 

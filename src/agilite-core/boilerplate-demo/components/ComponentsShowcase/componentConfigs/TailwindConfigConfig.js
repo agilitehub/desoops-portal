@@ -4,9 +4,9 @@ import React from 'react'
  * Configuration for Tailwind Configuration showcase
  */
 const TailwindConfigConfig = {
-  title: "Tailwind Configuration",
-  description: "The Agilit-e Core library includes a custom Tailwind configuration with predefined colors, animations, and utilities.",
-  usage: "// In your tailwind.config.js file",
+  title: 'Tailwind Config',
+  description: 'Core Tailwind configuration with Agilit-e theme settings',
+  usage: 'Extend your tailwind.config.js',
   codeExample: `
 const agiliteCore = require('./src/agilite-core/config/tailwind.config');
 
@@ -17,7 +17,7 @@ module.exports = {
   plugins: []
 }
 `,
-  notes: "The core Tailwind configuration includes Agilit-e brand colors, custom animations, and other useful theme extensions."
+  notes: 'The configuration includes custom colors, spacing, and other theme settings'
 }
 
 export default TailwindConfigConfig 
