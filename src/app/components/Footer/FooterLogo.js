@@ -1,5 +1,5 @@
 import React from 'react'
-import { Logo } from '@/agilite-core/index'
+import Logo from '@/agilite-core/components/ui/Logo'
 
 /**
  * Footer logo section with description

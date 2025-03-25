@@ -48,14 +48,14 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [darkMode])
 
-  const toggleDarkMode = () => {
+  const toggleDarkMode = React.useCallback(() => {
     setDarkMode(!darkMode)
-  }
+  }, [darkMode])
 
   const value = React.useMemo(() => ({
     darkMode,
     toggleDarkMode
-  }), [darkMode])
+  }), [darkMode, toggleDarkMode])
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }

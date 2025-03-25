@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ThemeToggle } from '@/agilite-core/index'
+import ThemeToggle from '@/agilite-core/components/ui/ThemeToggle'
 import DesktopNavigation from './DesktopNavigation'
 import MobileNavigation from './MobileNavigation'
 import MobileMenuButton from './MobileMenuButton'
