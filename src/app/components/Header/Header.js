@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import ThemeToggle from '@/agilite-core/components/ui/ThemeToggle'
+import Logo from '@/agilite-core/components/ui/Logo'
 import DesktopNavigation from './DesktopNavigation'
 import MobileNavigation from './MobileNavigation'
 import MobileMenuButton from './MobileMenuButton'
@@ -21,7 +22,7 @@ const Header = () => {
           {/* Logo */}
           <div className="flex-shrink-0 pr-8 flex items-center gap-3 pl-4">
             <Link to="/" className="flex items-center gap-3">
-              <img src="/logo-default.png" alt="DeSo Logo" className="h-8 w-8" />
+              <Logo className="h-14 w-14" alt="DeSoOps Logo" />
               <span className="text-xl font-semibold text-white">DeSoOps</span>
             </Link>
           </div>
