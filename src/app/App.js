@@ -6,6 +6,7 @@ import { Routes, Route, BrowserRouter as Router } from 'react-router-dom'
 import Home from './pages/Home'
 import About from './pages/About'
 import SignUp from './pages/SignUp'
+import Dashboard from './pages/Dashboard'
 
 /**
  * Main App component for the Agilit-e Core boilerplate demo
@@ -22,6 +23,7 @@ const App = () => {
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/signup" element={<SignUp />} />
+              <Route path="/dashboard" element={<Dashboard />} />
             </Routes>
           </main>
           <Footer />

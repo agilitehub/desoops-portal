@@ -14,7 +14,7 @@ const DesktopNavigation = () => {
 
   return (
     <Navigation
-      containerClassName="hidden md:flex space-x-6"
+      containerClassName="hidden md:flex items-center space-x-8"
       navLinkClassName={navLinkClasses}
     />
   )

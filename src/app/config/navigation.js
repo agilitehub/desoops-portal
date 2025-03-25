@@ -14,10 +14,10 @@ export const MAIN_NAV_ITEMS = [
     showInFooter: false
   },
   {
-    path: 'https://focus.xyz',
-    label: 'Focus Platform ↗',
+    path: '/dashboard',
+    label: 'Dashboard',
     exact: false,
-    type: 'external',
+    type: 'internal',
     showInHeader: true,
     showInFooter: true
   },
@@ -41,15 +41,6 @@ export const MAIN_NAV_ITEMS = [
 
 // External links, primarily for footer
 export const EXTERNAL_LINKS = [
-  {
-    path: 'https://focus.xyz',
-    label: 'Focus Platform',
-    description: 'The premier DeSo social platform',
-    icon: 'external-link',
-    type: 'external',
-    showInHeader: false,
-    showInFooter: true
-  },
   {
     path: 'https://twitter.com/desoops',
     label: 'Twitter',

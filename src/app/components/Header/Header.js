@@ -5,6 +5,7 @@ import Logo from '@/agilite-core/components/ui/Logo'
 import DesktopNavigation from './DesktopNavigation'
 import MobileNavigation from './MobileNavigation'
 import MobileMenuButton from './MobileMenuButton'
+import styles from '@/custom/modules/Login/style.module.sass'
 
 /**
  * Header component for DeSo Ops
@@ -16,43 +17,47 @@ const Header = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
 
   return (
-    <header className="bg-deso-primary dark:bg-deso-secondary shadow-lg sticky top-0 z-50">
+    <header className="bg-gradient-to-r from-deso-primary/90 to-deso-accent/85 dark:from-deso-secondary/60 dark:to-deso-accent/60 shadow-lg sticky top-0 z-50 backdrop-blur-sm">
       <div className="container-padded">
-        <div className="flex justify-between h-16 items-center -ml-4">
+        <div className="flex justify-between h-16 items-center">
           {/* Logo */}
-          <div className="flex-shrink-0 pr-8 flex items-center gap-3 pl-4">
-            <Link to="/" className="flex items-center gap-3">
-              <Logo className="h-14 w-14" alt="DeSoOps Logo" />
-              <span className="text-xl font-semibold text-white">DeSoOps</span>
+          <div className="flex-shrink-0 flex items-center gap-3 w-[200px]">
+            <Link to="/" className="flex items-center gap-3 group">
+              <Logo className="h-14 w-14 transition-transform duration-300 group-hover:scale-105" alt="DeSoOps Logo" />
+              <span className={styles.brandText}>DeSoOps</span>
             </Link>
           </div>
 
           {/* Desktop Navigation - Centered */}
-          <div className="flex-grow flex justify-center">
-            <div className="px-8">
+          <div className="flex-grow flex justify-center max-w-xl">
+            <div className="w-full flex justify-center">
               <DesktopNavigation />
             </div>
           </div>
 
           {/* Theme Toggle, Auth Links, and Mobile Menu Button */}
-          <div className="flex items-center pl-8">
-            <div className="hidden md:flex items-center space-x-4 border-l border-deso-light/20 pl-8">
-              <Link 
-                to="/signin" 
-                className="bg-deso-light/20 text-white hover:bg-deso-light/30 transition-all duration-200 
-                  px-4 py-2 rounded-md text-sm font-medium border border-deso-light/30"
-              >
-                Sign In with DeSo
-              </Link>
-              <Link 
-                to="/signup" 
-                className="bg-deso-accent text-white px-4 py-2 rounded-md text-sm font-medium 
-                  hover:bg-deso-accent/90 transition-colors"
-              >
-                Create DeSo Account
-              </Link>
+          <div className="flex items-center w-[400px] justify-end">
+            <div className="hidden md:flex items-center gap-6">
+              <div className="flex items-center gap-4">
+                <Link 
+                  to="/signin" 
+                  className="bg-deso-light/15 text-white hover:bg-deso-light/25 transition-all duration-200 
+                    px-4 py-2 rounded-md text-sm font-medium border border-deso-light/25 whitespace-nowrap"
+                >
+                  Sign In with DeSo
+                </Link>
+                <Link 
+                  to="/signup" 
+                  className="bg-deso-accent/95 text-white px-4 py-2 rounded-md text-sm font-medium 
+                    hover:bg-deso-accent/85 transition-colors whitespace-nowrap"
+                >
+                  Create DeSo Account
+                </Link>
+              </div>
               <div className="pl-4 border-l border-deso-light/20">
-                <ThemeToggle />
+                <div className={styles.themeToggleWrapper}>
+                  <ThemeToggle />
+                </div>
               </div>
             </div>
             <div className="md:hidden pl-4">

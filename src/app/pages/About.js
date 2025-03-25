@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
   faServer, 
@@ -14,6 +14,13 @@ import {
 import PageLayout from '../components/Layout/PageLayout'
 
 const About = () => {
+  const navigate = useNavigate()
+
+  const handleGetStarted = () => {
+    navigate('/signup')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
     <PageLayout>
       <div className="container-padded py-16">
@@ -170,8 +177,8 @@ const About = () => {
             Whether you're a solo dev, a DAO, or a business exploring the decentralized frontier, DeSoOps is your launchpad.
           </p>
           <div className="flex justify-center gap-6">
-            <Link 
-              to="/contact" 
+            <button 
+              onClick={handleGetStarted}
               className="btn-primary inline-flex items-center text-base bg-deso-primary hover:bg-deso-blue text-white 
                 px-6 py-3 rounded-lg transition-all duration-200 transform hover:scale-105 
                 shadow-[0_8px_24px_rgba(19,66,146,0.5)] hover:shadow-[0_12px_32px_rgba(19,66,146,0.6)]
@@ -179,7 +186,7 @@ const About = () => {
             >
               <FontAwesomeIcon icon={faRocket} className="mr-2" />
               Get Started
-            </Link>
+            </button>
           </div>
         </div>
       </div>

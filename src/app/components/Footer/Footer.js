@@ -16,8 +16,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div className="col-span-1 md:col-span-1">
-            <Logo size="small" className="mb-4" />
-            <p className="text-white text-lg mt-4 max-w-md font-semibold leading-relaxed drop-shadow-sm">
+            <Logo size="large" className="mb-6 hover:opacity-90 transition-opacity duration-200 drop-shadow-lg" />
+            <p className="text-white text-lg mt-6 max-w-md font-semibold leading-relaxed drop-shadow-sm">
               DeSo Ops - Your comprehensive platform for managing decentralized social operations, 
               token distributions, and crypto asset management.
             </p>
