@@ -34,12 +34,17 @@ const Hero = () => {
         <div className="mt-14 flex flex-col sm:flex-row justify-center gap-8">
           <Link 
             to="/dashboard" 
-            className="btn-primary inline-flex items-center text-xl font-semibold bg-deso-primary hover:bg-deso-blue text-white 
-              px-10 py-5 rounded-lg transition-all duration-200 transform hover:scale-105 
-              shadow-lg hover:shadow-xl"
+            className="btn-primary inline-flex items-center text-xl font-extrabold bg-gradient-to-r from-deso-primary via-deso-blue to-deso-accent
+              px-12 py-6 rounded-lg transition-all duration-300 transform hover:scale-105 
+              shadow-[0_8px_24px_rgba(19,66,146,0.3)] hover:shadow-[0_12px_32px_rgba(19,66,146,0.5)]
+              dark:from-deso-light dark:via-deso-dodger dark:to-deso-accent
+              dark:shadow-[0_8px_24px_rgba(100,190,255,0.3)] dark:hover:shadow-[0_12px_32px_rgba(100,190,255,0.5)]
+              relative overflow-hidden group"
           >
-            <FontAwesomeIcon icon={faRocket} className="mr-4 text-2xl" />
-            Launch Dashboard
+            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 
+              translate-x-[-100%] animate-shimmer group-hover:translate-x-[100%] transition-transform duration-1000" />
+            <FontAwesomeIcon icon={faRocket} className="mr-4 text-2xl group-hover:animate-bounce text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]" />
+            <span className="relative text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]">Launch Dashboard</span>
           </Link>
           <Link 
             to="/about" 
