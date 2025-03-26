@@ -1,26 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
-  faServer,
-  faWallet,
-  faGear,
-  faArrowTrendUp,
-  faRotate,
-  faCopy,
-  faLink,
-  faArrowRightArrowLeft,
   faCoins,
-  faSave,
-  faTimes,
   faChevronRight
 } from '@fortawesome/free-solid-svg-icons'
 import PageLayout from '../components/Layout/PageLayout'
 
 const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState('general')
   const [selectedDistribution, setSelectedDistribution] = useState('')
   const [myHolders, setMyHolders] = useState(false)
-  const [searchUser, setSearchUser] = useState('')
   const [distributionType, setDistributionType] = useState('')
   const [showDistributionSummary, setShowDistributionSummary] = useState(false)
 
@@ -28,54 +16,54 @@ const Dashboard = () => {
     <PageLayout>
       <div className="container-padded py-4 md:py-8 max-w-4xl mx-auto">
         {/* Wallet Overview - Grid layout for multiple currencies */}
-        <div className="bg-white dark:bg-deso-secondary rounded-xl p-2 md:p-4 shadow-lg mb-6">
+        <div className="bg-white/90 dark:bg-deso-secondary/95 backdrop-blur-sm rounded-xl p-2 md:p-4 shadow-lg mb-6 border border-gray-100 dark:border-gray-700">
           <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-3">
             {/* DESO Balance */}
-            <div className="bg-gradient-to-r from-deso-primary to-deso-accent p-2 md:p-3 rounded-lg text-white">
+            <div className="bg-gradient-to-br from-deso-primary via-deso-primary/90 to-deso-accent p-2 md:p-3 rounded-lg text-white shadow-md">
               <div className="text-[10px] md:text-xs font-medium">$DESO</div>
               <div className="text-xs md:text-sm font-bold mt-0.5">0.0005</div>
-              <div className="text-[10px] md:text-xs opacity-75">≈ $0.00</div>
+              <div className="text-[10px] md:text-xs opacity-90">≈ $0.00</div>
             </div>
 
             {/* DAO Token */}
-            <div className="bg-gradient-to-r from-deso-primary/90 to-deso-accent/90 p-2 md:p-3 rounded-lg text-white">
+            <div className="bg-gradient-to-br from-deso-primary via-deso-primary/85 to-deso-accent/90 p-2 md:p-3 rounded-lg text-white shadow-md">
               <div className="text-[10px] md:text-xs font-medium">DAO</div>
               <div className="text-xs md:text-sm font-bold mt-0.5">25.3</div>
-              <div className="text-[10px] md:text-xs opacity-75">≈ $12.65</div>
+              <div className="text-[10px] md:text-xs opacity-90">≈ $12.65</div>
             </div>
 
             {/* Creator Coin */}
-            <div className="bg-gradient-to-r from-deso-primary/80 to-deso-accent/80 p-2 md:p-3 rounded-lg text-white">
+            <div className="bg-gradient-to-br from-deso-primary via-deso-primary/80 to-deso-accent/85 p-2 md:p-3 rounded-lg text-white shadow-md">
               <div className="text-[10px] md:text-xs font-medium">Creator</div>
               <div className="text-xs md:text-sm font-bold mt-0.5">150</div>
-              <div className="text-[10px] md:text-xs opacity-75">≈ $75.00</div>
+              <div className="text-[10px] md:text-xs opacity-90">≈ $75.00</div>
             </div>
 
             {/* NFT Balance */}
-            <div className="bg-gradient-to-r from-deso-primary/70 to-deso-accent/70 p-2 md:p-3 rounded-lg text-white">
+            <div className="bg-gradient-to-br from-deso-primary via-deso-primary/75 to-deso-accent/80 p-2 md:p-3 rounded-lg text-white shadow-md">
               <div className="text-[10px] md:text-xs font-medium">NFTs</div>
               <div className="text-xs md:text-sm font-bold mt-0.5">12</div>
-              <div className="text-[10px] md:text-xs opacity-75">Owned</div>
+              <div className="text-[10px] md:text-xs opacity-90">Owned</div>
             </div>
 
             {/* Diamonds */}
-            <div className="bg-gradient-to-r from-deso-primary/60 to-deso-accent/60 p-2 md:p-3 rounded-lg text-white">
+            <div className="bg-gradient-to-br from-deso-primary via-deso-primary/70 to-deso-accent/75 p-2 md:p-3 rounded-lg text-white shadow-md">
               <div className="text-[10px] md:text-xs font-medium">Diamonds</div>
               <div className="text-xs md:text-sm font-bold mt-0.5">532</div>
-              <div className="text-[10px] md:text-xs opacity-75">Received</div>
+              <div className="text-[10px] md:text-xs opacity-90">Received</div>
             </div>
 
             {/* Focus */}
-            <div className="bg-gradient-to-r from-deso-primary/50 to-deso-accent/50 p-2 md:p-3 rounded-lg text-white">
+            <div className="bg-gradient-to-br from-deso-primary via-deso-primary/65 to-deso-accent/70 p-2 md:p-3 rounded-lg text-white shadow-md">
               <div className="text-[10px] md:text-xs font-medium">Focus</div>
               <div className="text-xs md:text-sm font-bold mt-0.5">1.2k</div>
-              <div className="text-[10px] md:text-xs opacity-75">Points</div>
+              <div className="text-[10px] md:text-xs opacity-90">Points</div>
             </div>
           </div>
         </div>
 
-        {/* Setup Wizard - Mobile-friendly steps */}
-        <div className="bg-white dark:bg-deso-secondary rounded-xl shadow-lg mb-6">
+        {/* Setup Wizard - Mobile-friendly steps with dark mode */}
+        <div className="bg-white/90 dark:bg-deso-secondary/95 backdrop-blur-sm rounded-xl shadow-lg mb-6 border border-gray-100 dark:border-gray-700">
           <div className="p-4 border-b dark:border-gray-700">
             <h2 className="text-lg font-bold text-deso-primary dark:text-white flex items-center">
               <span className="mr-2">1.</span> Select Distribution Type
@@ -90,14 +78,14 @@ const Dashboard = () => {
               value={selectedDistribution}
               onChange={(e) => setSelectedDistribution(e.target.value)}
             >
-              <option value="" className="text-gray-500">Select who to distribute to</option>
-              <option value="creator-coin-holders" className="text-deso-primary">Creator Coin Holders</option>
-              <option value="dao-token-holders" className="text-deso-primary">DAO Token Holders</option>
-              <option value="desoops-users" className="text-deso-primary">DeSoOps Users</option>
-              <option value="followers" className="text-deso-primary">Followers</option>
-              <option value="following" className="text-deso-primary">Following</option>
-              <option value="nft-owners" className="text-deso-primary">NFT Owners</option>
-              <option value="poll-voters" className="text-deso-primary">Poll Voters</option>
+              <option value="" className="text-gray-500 dark:text-gray-400">Select who to distribute to</option>
+              <option value="creator-coin-holders" className="text-deso-primary dark:text-deso-accent">Creator Coin Holders</option>
+              <option value="dao-token-holders" className="text-deso-primary dark:text-deso-accent">DAO Token Holders</option>
+              <option value="desoops-users" className="text-deso-primary dark:text-deso-accent">DeSoOps Users</option>
+              <option value="followers" className="text-deso-primary dark:text-deso-accent">Followers</option>
+              <option value="following" className="text-deso-primary dark:text-deso-accent">Following</option>
+              <option value="nft-owners" className="text-deso-primary dark:text-deso-accent">NFT Owners</option>
+              <option value="poll-voters" className="text-deso-primary dark:text-deso-accent">Poll Voters</option>
             </select>
 
             <div className="flex flex-col md:flex-row gap-4">
@@ -166,7 +154,8 @@ const Dashboard = () => {
             )}
           </div>
 
-          <div className="p-4 border-t dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800 dark:to-gray-700">
+          <div className="p-4 border-t dark:border-gray-700 bg-gradient-to-r from-gray-50 to-white 
+            dark:from-gray-800 dark:to-gray-700">
             <button 
               onClick={() => setShowDistributionSummary(true)}
               className="w-full py-3 bg-gradient-to-r from-deso-primary to-deso-accent text-white rounded-lg
@@ -180,7 +169,7 @@ const Dashboard = () => {
 
         {/* Distribution Summary - Shown after setup */}
         {showDistributionSummary && (
-          <div className="bg-white dark:bg-deso-secondary rounded-xl shadow-lg">
+          <div className="bg-white/90 dark:bg-deso-secondary/95 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 dark:border-gray-700">
             <div className="p-4 border-b dark:border-gray-700">
               <h2 className="text-lg font-bold text-deso-primary dark:text-white flex items-center">
                 <span className="mr-2">2.</span> Review & Execute
@@ -229,7 +218,7 @@ const Dashboard = () => {
         )}
 
         {/* User Table - Optimized for mobile */}
-        <div className="bg-white dark:bg-deso-secondary rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-white/90 dark:bg-deso-secondary/95 backdrop-blur-sm rounded-xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700">
           <div className="p-4 border-b dark:border-gray-700">
             <h2 className="text-lg font-bold text-deso-primary dark:text-white">
               Recipients
