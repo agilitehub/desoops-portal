@@ -10,7 +10,7 @@ import { Logo } from '@/agilite-core/index'
  */
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-b from-deso-primary to-deso-primary/95 dark:from-deso-secondary dark:to-deso-secondary/95">
+    <footer className="bg-gradient-to-b from-deso-primary to-deso-primary/95 dark:from-deso-secondary dark:to-deso-secondary/98">
       <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8">

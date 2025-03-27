@@ -23,7 +23,7 @@ const Logo = memo(({ className = '', alt = 'DeSoOps Logo' }) => {
     <img
       src={darkMode ? '/logo-dark.png' : '/logo-default.png'}
       alt={alt}
-      className={`h-10 w-auto object-contain transition-all duration-300 ${className}`}
+      className={`h-10 w-auto object-contain transition-all duration-300 ${darkMode ? 'drop-shadow-[0_2px_4px_rgba(255,127,80,0.2)]' : ''} ${className}`}
     />
   )
 })

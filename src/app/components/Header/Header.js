@@ -39,21 +39,14 @@ const Header = () => {
           </div>
 
           {/* Theme Toggle, Auth Links, and Mobile Menu Button */}
-          <div className="flex items-center w-[400px] justify-end">
-            <div className="hidden md:flex items-center gap-6">
-              <div className="flex items-center gap-4">
+          <div className="flex items-center">
+            <div className="hidden md:flex items-center">
+              <div className="flex items-center space-x-4">
                 <Link 
                   to="/signin" 
-                  className="bg-gradient-to-r from-deso-light/20 to-deso-accent/20 text-white 
-                    hover:from-deso-light/30 hover:to-deso-accent/30
-                    transition-all duration-300 transform hover:scale-105
-                    px-5 py-2.5 rounded-lg text-sm font-semibold border border-deso-light/25 
-                    shadow-[0_4px_12px_rgba(100,190,255,0.25)] hover:shadow-[0_6px_16px_rgba(100,190,255,0.35)]
-                    whitespace-nowrap relative overflow-hidden group"
+                  className="text-white hover:text-deso-light transition-colors duration-200"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 
-                    translate-x-[-100%] animate-shimmer group-hover:translate-x-[100%] transition-transform duration-1000" />
-                  <span className="relative">Sign In with DeSo</span>
+                  Sign in
                 </Link>
                 <Link 
                   to="/signup" 
@@ -75,7 +68,11 @@ const Header = () => {
                 </div>
               </div>
             </div>
-            <div className="md:hidden pl-4">
+            {/* Mobile Theme Toggle and Menu Button */}
+            <div className="md:hidden flex items-center">
+              <div className="mr-2">
+                <ThemeToggle />
+              </div>
               <MobileMenuButton isMenuOpen={isMenuOpen} toggleMenu={toggleMenu} />
             </div>
           </div>

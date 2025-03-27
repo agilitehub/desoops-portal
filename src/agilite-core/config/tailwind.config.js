@@ -40,14 +40,15 @@ module.exports = {
         'float-particle': 'float-particle 15s ease-in-out infinite',
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'pulse-slower': 'pulse 5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        ping: 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',
-        slide: 'slide 20s linear infinite',
-        glow: 'glow 10s ease-in-out infinite',
+        'ping': 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',
+        'slide': 'slide 20s linear infinite',
+        'glow': 'glow 10s ease-in-out infinite',
         'float-1': 'float-1 8s ease-in-out infinite',
         'float-2': 'float-2 12s ease-in-out infinite',
         'float-3': 'float-3 10s ease-in-out infinite',
         'ping-slow': 'ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite',
-        'fade-in': 'fade-in 1s ease-out forwards'
+        'fade-in': 'fade-in 1s ease-out forwards',
+        'float-icon': 'float-icon 3s ease-in-out infinite'
       },
       keyframes: {
         'slow-pulse': {
@@ -68,17 +69,17 @@ module.exports = {
           '50%': { transform: 'translate(-15px, -35px) rotate(180deg)' },
           '75%': { transform: 'translate(-25px, -10px) rotate(270deg)' }
         },
-        ping: {
+        'ping': {
           '75%, 100%': {
             transform: 'scale(2)',
             opacity: 0
           }
         },
-        slide: {
+        'slide': {
           '0%': { transform: 'translateX(0) translateY(0)' },
           '100%': { transform: 'translateX(50px) translateY(50px)' }
         },
-        glow: {
+        'glow': {
           '0%, 100%': { opacity: 0.5, transform: 'scale(1)' },
           '50%': { opacity: 1, transform: 'scale(1.1)' }
         },
@@ -103,6 +104,11 @@ module.exports = {
         'fade-in': {
           '0%': { opacity: 0 },
           '100%': { opacity: 1 }
+        },
+        'float-icon': {
+          '0%': { transform: 'translateY(0px) scale(1)' },
+          '50%': { transform: 'translateY(-12px) scale(1.1)' },
+          '100%': { transform: 'translateY(0px) scale(1)' }
         }
       },
       container: {
