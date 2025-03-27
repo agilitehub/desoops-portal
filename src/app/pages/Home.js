@@ -3,7 +3,7 @@ import { PageLayout } from '../components'
 import { Hero } from '../components/Home'
 
 /**
- * Home page component for DeSo Ops
+ * Home page component for DeSoOps
  */
 const Home = () => {
   return (

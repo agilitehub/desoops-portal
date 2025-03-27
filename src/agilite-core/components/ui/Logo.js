@@ -14,16 +14,16 @@ import { useTheme } from '../../context/ThemeContext'
  * <Logo className="w-16 h-16 my-4" />
  * 
  * // With custom alt text
- * <Logo alt="Company Logo" />
+ * <Logo alt="DeSoOps Logo" />
  */
-const Logo = memo(({ className = '', alt = 'Logo' }) => {
+const Logo = memo(({ className = '', alt = 'DeSoOps Logo' }) => {
   const { darkMode } = useTheme()
   
   return (
     <img
       src={darkMode ? '/logo-dark.png' : '/logo-default.png'}
       alt={alt}
-      className={`h-12 w-auto ${className}`}
+      className={`h-10 w-auto object-contain transition-all duration-300 ${className}`}
     />
   )
 })
@@ -37,7 +37,7 @@ Logo.propTypes = {
 
 Logo.defaultProps = {
   className: '',
-  alt: 'Logo'
+  alt: 'DeSoOps Logo'
 }
 
 // Display name for React DevTools

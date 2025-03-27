@@ -1,5 +1,5 @@
 /**
- * Centralized navigation configuration for DeSo Ops
+ * Centralized navigation configuration for DeSoOps
  * This serves as a single source of truth for all navigation-related data
  */
 

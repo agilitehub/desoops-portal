@@ -9,62 +9,63 @@ import {
   faShieldHalved,
   faCoins,
   faUsers,
-  faRocket
+  faRocket,
+  faWallet,
+  faKey
 } from '@fortawesome/free-solid-svg-icons'
 import Video from './Video'
+import desoLogo from '../../assets/deso-logo.png'
 
 /**
- * Hero section for the DeSo Ops landing page
+ * Hero section for the DeSoOps landing page
  */
 const Hero = () => {
   return (
     <div className="py-16">
       {/* Main Hero Section */}
-      <div className="text-center mb-16">
-        <h1 className="mb-8 text-7xl font-bold tracking-tight text-deso-primary dark:text-white">
-          Welcome to <span className="text-deso-accent font-extrabold dark:text-deso-light">DeSoOps</span>
-        </h1>
-        <p className="mx-auto max-w-4xl text-3xl font-medium text-deso-primary/90 dark:text-white mb-8">
-          The ultimate decentralized admin portal for DeSo creators—manage your community, distribute tokens, and scale your blockchain operations with enterprise-grade tools.
-        </p>
-        <p className="mx-auto max-w-4xl text-2xl font-medium text-deso-primary/80 dark:text-gray-200">
-          Empower your DeSo projects with automated distribution systems, advanced holder management, and comprehensive analytics. Built by creators, for creators.
-        </p>
+      <div className="text-center mb-16 relative overflow-visible px-8">
+        <div className="pt-20">
+          <h1 className="mb-20 text-9xl transform scale-[2] font-extrabold tracking-tighter text-deso-primary dark:text-white 
+            drop-shadow-[0_24px_48px_rgba(19,66,146,0.15)] dark:drop-shadow-[0_24px_48px_rgba(255,127,80,0.15)]
+            max-w-[90vw] mx-auto">
+            Welcome to <span className="text-deso-accent font-black dark:text-deso-light 
+              bg-clip-text bg-gradient-to-r from-deso-accent via-deso-accent to-deso-accent/90">DeSoOps</span>
+          </h1>
+          <p className="mx-auto max-w-[95%] sm:max-w-[85%] md:max-w-[80%] text-8xl transform scale-[1.25] sm:scale-[1.35] md:scale-150 font-extrabold text-deso-primary/90 dark:text-white mb-16 leading-tight tracking-tight">
+            The ultimate decentralized admin portal for DeSo creators—manage your community and distribute tokens.
+          </p>
+        </div>
         
-        <div className="mt-14 flex flex-col sm:flex-row justify-center gap-8">
+        <div className="mt-14 flex flex-row justify-center gap-4 sm:gap-8 px-4 sm:px-0">
           <Link 
-            to="/dashboard" 
-            className="btn-primary inline-flex items-center text-xl font-extrabold bg-gradient-to-r from-deso-primary via-deso-blue to-deso-accent
-              px-12 py-6 rounded-lg transition-all duration-300 transform hover:scale-105 
-              shadow-[0_8px_24px_rgba(19,66,146,0.3)] hover:shadow-[0_12px_32px_rgba(19,66,146,0.5)]
-              dark:from-deso-light dark:via-deso-dodger dark:to-deso-accent
-              dark:shadow-[0_8px_24px_rgba(100,190,255,0.3)] dark:hover:shadow-[0_12px_32px_rgba(100,190,255,0.5)]
-              relative overflow-hidden group"
+            to="/signin" 
+            className="btn-primary inline-flex items-center text-base sm:text-xl font-extrabold bg-gradient-to-r from-[#FF7F50] via-[#FF6B3D] to-[#FF4500]
+              px-4 sm:px-12 py-4 sm:py-6 rounded-lg transition-all duration-300 transform hover:scale-105 
+              shadow-[0_8px_24px_rgba(255,127,80,0.3)] hover:shadow-[0_12px_32px_rgba(255,127,80,0.5)]
+              dark:from-[#FF7F50] dark:via-[#FF6B3D] dark:to-[#FF4500]
+              dark:shadow-[0_8px_24px_rgba(255,127,80,0.3)] dark:hover:shadow-[0_12px_32px_rgba(255,127,80,0.5)]
+              relative overflow-hidden group flex-1"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 
               translate-x-[-100%] animate-shimmer group-hover:translate-x-[100%] transition-transform duration-1000" />
-            <FontAwesomeIcon icon={faRocket} className="mr-4 text-2xl group-hover:animate-bounce text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]" />
-            <span className="relative text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]">Launch Dashboard</span>
+            <img src={desoLogo} alt="DeSo" className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3 group-hover:animate-bounce" />
+            <span className="relative text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]">Sign in with DeSo</span>
           </Link>
           <Link 
-            to="/about" 
-            className="btn-outline inline-flex items-center text-xl font-semibold border-2 border-deso-primary text-deso-primary 
-              hover:bg-deso-primary hover:text-white px-10 py-5 rounded-lg transition-all duration-200 transform hover:scale-105
-              shadow-lg hover:shadow-xl
-              dark:border-deso-light dark:text-deso-light dark:hover:bg-deso-light dark:hover:text-deso-dark"
+            to="https://deso.com" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary inline-flex items-center text-base sm:text-xl font-extrabold bg-gradient-to-r from-[#FF7F50] via-[#FF6B3D] to-[#FF4500]
+              px-4 sm:px-12 py-4 sm:py-6 rounded-lg transition-all duration-300 transform hover:scale-105 
+              shadow-[0_8px_24px_rgba(255,127,80,0.3)] hover:shadow-[0_12px_32px_rgba(255,127,80,0.5)]
+              dark:from-[#FF7F50] dark:via-[#FF6B3D] dark:to-[#FF4500]
+              dark:shadow-[0_8px_24px_rgba(255,127,80,0.3)] dark:hover:shadow-[0_12px_32px_rgba(255,127,80,0.5)]
+              relative overflow-hidden group flex-1"
           >
-            <FontAwesomeIcon icon={faShieldHalved} className="mr-4 text-2xl" />
-            Learn More
-          </Link>
-          <Link 
-            to="/contact" 
-            className="btn-outline inline-flex items-center text-xl font-semibold border-2 border-deso-primary text-deso-primary 
-              hover:bg-deso-primary hover:text-white px-10 py-5 rounded-lg transition-all duration-200 transform hover:scale-105
-              shadow-lg hover:shadow-xl
-              dark:border-deso-light dark:text-deso-light dark:hover:bg-deso-light dark:hover:text-deso-dark"
-          >
-            <FontAwesomeIcon icon={faHeadset} className="mr-4 text-2xl" />
-            Get Support
+            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 
+              translate-x-[-100%] animate-shimmer group-hover:translate-x-[100%] transition-transform duration-1000" />
+            <img src={desoLogo} alt="DeSo" className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3 group-hover:animate-bounce" />
+            <span className="relative text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]">Create DeSo Account</span>
           </Link>
         </div>
       </div>
@@ -81,33 +82,33 @@ const Hero = () => {
           {[
             {
               icon: faCoins,
-              title: 'Token Distribution',
-              description: 'Easily distribute $DESO, Creator Coins, and DAO Tokens to your holders. Support proportional or equal distribution with flexible targeting options.'
+              title: 'Share Your Tokens',
+              description: 'Send tokens to your supporters with just a few clicks. Perfect for rewarding your community members and growing your network.'
             },
             {
               icon: faUsers,
-              title: 'Community Management',
-              description: 'Advanced tools for managing coin holders, NFT owners, and supporters. Filter and segment your community based on holdings and engagement.'
+              title: 'NFT Holder Rewards',
+              description: 'Automatically reward your NFT collectors and loyal supporters. Set up custom rewards to keep your community engaged and growing.'
             },
             {
               icon: faServer,
-              title: 'Automated Operations',
-              description: 'Set up automated distribution rules, manage holder rewards, and streamline your DeSo operations with our intuitive dashboard.'
+              title: 'Diamond Shower Rewards',
+              description: 'Send diamond rewards to your favorite posts and creators. Easily target and reward engaging content from your community members.'
             },
             {
               icon: faChartLine,
-              title: 'Analytics & Insights',
-              description: 'Track holder metrics, monitor token performance, and gain valuable insights into your community engagement and growth.'
+              title: 'Poll Participant Rewards',
+              description: 'Reward users who engage with your polls. Automatically distribute tokens to participants and increase community interaction.'
             },
             {
               icon: faShieldHalved,
-              title: 'Security & Control',
-              description: 'Enterprise-grade security for your DeSo operations. Set conditions, manage permissions, and maintain full control over your distributions.'
+              title: 'Deposit Notifications',
+              description: 'Get instant notifications when tokens are sent to your account. Stay updated on all your incoming transactions in real-time.'
             },
             {
-              icon: faCode,
-              title: 'Developer Tools',
-              description: 'Built on modern tech stack including React 18, Redux, and the DeSo Protocol. Open-source and ready for customization.'
+              icon: faCoins,
+              title: 'Real-Time Crypto Values (Coming Soon)',
+              description: 'Stay updated with live cryptocurrency prices and market trends. Track your DeSo assets and make informed decisions in real-time.'
             }
           ].map((feature, index) => (
             <div 
@@ -130,51 +131,69 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Additional Info Section */}
+      {/* User Reviews Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
         <div className="bg-white/90 dark:bg-deso-secondary/95 backdrop-blur-sm rounded-xl p-8 
           shadow-lg border border-gray-100 dark:border-gray-700">
-          <h2 className="text-3xl font-bold mb-6 text-deso-primary dark:text-white">
-            Why Choose DeSoOps?
+          <h2 className="text-3xl font-bold mb-6 text-center text-deso-primary dark:text-white">
+            ⭐️ Voices of Success: DeSo Creators Share Their Stories
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h3 className="text-xl font-bold mb-4 text-deso-primary dark:text-white">
-                For Creators
-              </h3>
-              <ul className="space-y-3 text-deso-primary/80 dark:text-gray-200">
-                <li className="flex items-start">
-                  <FontAwesomeIcon icon={faChartLine} className="mt-1 mr-3 text-deso-accent" />
-                  <span>Manage and reward your community with automated token distributions</span>
-                </li>
-                <li className="flex items-start">
-                  <FontAwesomeIcon icon={faUsers} className="mt-1 mr-3 text-deso-accent" />
-                  <span>Target specific holder groups based on token ownership or engagement</span>
-                </li>
-                <li className="flex items-start">
-                  <FontAwesomeIcon icon={faCoins} className="mt-1 mr-3 text-deso-accent" />
-                  <span>Support for $DESO, Creator Coins, DAO Tokens, and NFT-based distributions</span>
-                </li>
-              </ul>
+            <div className="bg-gradient-to-br from-white/50 to-white/30 dark:from-deso-secondary/50 dark:to-deso-secondary/30 rounded-lg p-6">
+              <div className="flex items-start mb-4">
+                <FontAwesomeIcon icon={faWallet} className="text-deso-accent text-xl mt-1 mr-3" />
+                <div>
+                  <h3 className="text-xl font-bold text-deso-primary dark:text-white">
+                    Sarah K. | NFT Artist
+                  </h3>
+                  <p className="text-sm text-deso-accent dark:text-deso-light">Verified Creator</p>
+                </div>
+              </div>
+              <p className="text-deso-primary/80 dark:text-gray-200 italic">
+                "DeSoOps transformed how I manage my NFT drops. The automated distribution tools saved me countless hours, and my community engagement has never been better!"
+              </p>
             </div>
-            <div>
-              <h3 className="text-xl font-bold mb-4 text-deso-primary dark:text-white">
-                For Developers
-              </h3>
-              <ul className="space-y-3 text-deso-primary/80 dark:text-gray-200">
-                <li className="flex items-start">
-                  <FontAwesomeIcon icon={faCode} className="mt-1 mr-3 text-deso-accent" />
-                  <span>Built on React 18 with modern development practices</span>
-                </li>
-                <li className="flex items-start">
-                  <FontAwesomeIcon icon={faServer} className="mt-1 mr-3 text-deso-accent" />
-                  <span>Open-source codebase ready for customization and extension</span>
-                </li>
-                <li className="flex items-start">
-                  <FontAwesomeIcon icon={faRocket} className="mt-1 mr-3 text-deso-accent" />
-                  <span>Comprehensive documentation and developer support</span>
-                </li>
-              </ul>
+            <div className="bg-gradient-to-br from-white/50 to-white/30 dark:from-deso-secondary/50 dark:to-deso-secondary/30 rounded-lg p-6">
+              <div className="flex items-start mb-4">
+                <FontAwesomeIcon icon={faKey} className="text-deso-accent text-xl mt-1 mr-3" />
+                <div>
+                  <h3 className="text-xl font-bold text-deso-primary dark:text-white">
+                    Alex M. | DAO Founder
+                  </h3>
+                  <p className="text-sm text-deso-accent dark:text-deso-light">Top Contributor</p>
+                </div>
+              </div>
+              <p className="text-deso-primary/80 dark:text-gray-200 italic">
+                "Running our DAO became 10x easier with DeSoOps. The analytics tools give us incredible insights, and token distribution is now seamless!"
+              </p>
+            </div>
+            <div className="bg-gradient-to-br from-white/50 to-white/30 dark:from-deso-secondary/50 dark:to-deso-secondary/30 rounded-lg p-6">
+              <div className="flex items-start mb-4">
+                <FontAwesomeIcon icon={faRocket} className="text-deso-accent text-xl mt-1 mr-3" />
+                <div>
+                  <h3 className="text-xl font-bold text-deso-primary dark:text-white">
+                    Mike R. | Content Creator
+                  </h3>
+                  <p className="text-sm text-deso-accent dark:text-deso-light">Diamond Holder</p>
+                </div>
+              </div>
+              <p className="text-deso-primary/80 dark:text-gray-200 italic">
+                "The community management features are game-changing. I can now reward my most loyal supporters automatically. It's like having a full-time community manager!"
+              </p>
+            </div>
+            <div className="bg-gradient-to-br from-white/50 to-white/30 dark:from-deso-secondary/50 dark:to-deso-secondary/30 rounded-lg p-6">
+              <div className="flex items-start mb-4">
+                <FontAwesomeIcon icon={faHeadset} className="text-deso-accent text-xl mt-1 mr-3" />
+                <div>
+                  <h3 className="text-xl font-bold text-deso-primary dark:text-white">
+                    Lisa T. | Tech Founder
+                  </h3>
+                  <p className="text-sm text-deso-accent dark:text-deso-light">Early Adopter</p>
+                </div>
+              </div>
+              <p className="text-deso-primary/80 dark:text-gray-200 italic">
+                "The developer tools are robust and well-documented. We built our entire token strategy on DeSoOps, and the results have been phenomenal!"
+              </p>
             </div>
           </div>
         </div>

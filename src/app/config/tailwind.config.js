@@ -3,7 +3,7 @@ const agiliteCore = require('../../agilite-core/config/tailwind.config')
 const merge = require('lodash/merge')
 
 /**
- * DeSo Ops Tailwind Configuration
+ * DeSoOps Tailwind Configuration
  * Extends the core configuration with DeSo-specific theme settings
  */
 module.exports = {
