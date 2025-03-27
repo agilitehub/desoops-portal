@@ -56,10 +56,10 @@ const Hero = () => {
           </p>
         </div>
         
-        <div className="mt-14 flex flex-row justify-center gap-4 sm:gap-8 px-4 sm:px-0">
+        <div className="mt-14 flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 px-4 sm:px-0">
           <Link 
             to="/signin" 
-            className="btn-primary btn-hover interactive-hover inline-flex items-center text-base sm:text-xl font-extrabold bg-gradient-to-r from-[#FF7F50] via-[#FF6B3D] to-[#FF4500]
+            className="w-full sm:w-auto btn-primary btn-hover interactive-hover inline-flex items-center justify-center text-base sm:text-xl font-extrabold bg-gradient-to-r from-[#FF7F50] via-[#FF6B3D] to-[#FF4500]
               px-4 sm:px-12 py-4 sm:py-6 rounded-lg transition-all duration-300 
               shadow-[0_8px_24px_rgba(255,127,80,0.3)] hover:shadow-[0_12px_32px_rgba(255,127,80,0.5)]
               dark:from-[#FF7F50] dark:via-[#FF6B3D] dark:to-[#FF4500]
@@ -75,7 +75,7 @@ const Hero = () => {
             to="https://deso.com" 
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-primary btn-hover interactive-hover inline-flex items-center text-base sm:text-xl font-extrabold bg-gradient-to-r from-[#FF7F50] via-[#FF6B3D] to-[#FF4500]
+            className="w-full sm:w-auto btn-primary btn-hover interactive-hover inline-flex items-center justify-center text-base sm:text-xl font-extrabold bg-gradient-to-r from-[#FF7F50] via-[#FF6B3D] to-[#FF4500]
               px-4 sm:px-12 py-4 sm:py-6 rounded-lg transition-all duration-300
               shadow-[0_8px_24px_rgba(255,127,80,0.3)] hover:shadow-[0_12px_32px_rgba(255,127,80,0.5)]
               dark:from-[#FF7F50] dark:via-[#FF6B3D] dark:to-[#FF4500]
