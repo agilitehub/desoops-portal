@@ -68,7 +68,7 @@ const Hero = () => {
           >
             <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 
               translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-            <img src={desoLogo} alt="DeSo" className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3 animate-float" />
+            <img src={desoLogo} alt="DeSo" className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3 animate-float-1" />
             <span className="relative text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]">Sign in with DeSo</span>
           </Link>
           <Link 
@@ -84,7 +84,7 @@ const Hero = () => {
           >
             <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 
               translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-            <img src={desoLogo} alt="DeSo" className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3 animate-float" />
+            <img src={desoLogo} alt="DeSo" className="w-6 h-6 sm:w-8 sm:h-8 mr-2 sm:mr-3 animate-float-1" />
             <span className="relative text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]">Create DeSo Account</span>
           </Link>
         </div>
