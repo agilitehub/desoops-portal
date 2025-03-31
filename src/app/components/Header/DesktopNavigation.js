@@ -1,5 +1,6 @@
 import React from 'react'
 import Navigation from './Navigation'
+import { NavLink } from 'react-router-dom'
 
 /**
  * Desktop navigation menu for medium and larger screen sizes
@@ -16,7 +17,14 @@ const DesktopNavigation = () => {
     <Navigation
       containerClassName="hidden md:flex items-center space-x-8"
       navLinkClassName={navLinkClasses}
-    />
+    >
+      <NavLink to="/changelog" className={navLinkClasses}>
+        Changelog
+      </NavLink>
+      <NavLink to="/roadmap" className={navLinkClasses}>
+        Roadmap
+      </NavLink>
+    </Navigation>
   )
 }
 

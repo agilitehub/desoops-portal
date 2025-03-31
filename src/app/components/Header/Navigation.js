@@ -1,6 +1,7 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { getHeaderNavItems } from '../../config/navigation'
+import { faClipboardList } from '@fortawesome/free-solid-svg-icons'
 
 /**
  * Generic Navigation component that can be used for both mobile and desktop

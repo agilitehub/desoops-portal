@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Navigation from './Navigation'
+import { NavLink } from 'react-router-dom'
 
 /**
  * Mobile navigation menu that slides down when the menu button is clicked
@@ -23,7 +24,14 @@ const MobileNavigation = ({ isMenuOpen, setIsMenuOpen }) => {
           containerClassName="space-y-1"
           navLinkClassName={navLinkClasses}
           onLinkClick={() => setIsMenuOpen(false)}
-        />
+        >
+          <NavLink to="/changelog" className={navLinkClasses} onClick={() => setIsMenuOpen(false)}>
+            Changelog
+          </NavLink>
+          <NavLink to="/roadmap" className={navLinkClasses} onClick={() => setIsMenuOpen(false)}>
+            Roadmap
+          </NavLink>
+        </Navigation>
       </div>
     </div>
   )

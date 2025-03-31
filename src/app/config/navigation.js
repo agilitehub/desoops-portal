@@ -30,6 +30,22 @@ export const MAIN_NAV_ITEMS = [
     showInFooter: true
   },
   {
+    path: '/changelog',
+    label: 'Changelog',
+    exact: false,
+    type: 'internal',
+    showInHeader: true,
+    showInFooter: true
+  },
+  {
+    path: '/roadmap',
+    label: 'Roadmap',
+    exact: false,
+    type: 'internal',
+    showInHeader: true,
+    showInFooter: true
+  },
+  {
     path: '/about',
     label: 'About',
     exact: false,

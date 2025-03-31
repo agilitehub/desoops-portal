@@ -9,6 +9,8 @@ import SignUp from './pages/SignUp'
 import SignIn from './pages/SignIn'
 import Dashboard from './pages/Dashboard'
 import CoinSwap from './pages/CoinSwap'
+import Changelog from './components/Changelog/Changelog'
+import Roadmap from './components/Roadmap/Roadmap'
 
 /**
  * Main App component for the Agilit-e Core boilerplate demo
@@ -28,6 +30,8 @@ const App = () => {
               <Route path="/signin" element={<SignIn />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/coin-swap" element={<CoinSwap />} />
+              <Route path="/changelog" element={<Changelog />} />
+              <Route path="/roadmap" element={<Roadmap />} />
             </Routes>
           </main>
           <Footer />
