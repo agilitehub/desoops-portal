@@ -9,7 +9,7 @@ import React, { useEffect, useReducer } from 'react'
 import { Row, Modal, Col, Input, Spin, Image, Divider, message, Checkbox, Card } from 'antd'
 import { processNFTPost } from '../../../lib/deso-controller-graphql'
 import { desoNFTSearchModal } from './data-models'
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient } from '@apollo/client/react'
 import { GET_NFT_POST, GET_POLL_POST } from '../../../lib/graphql-models'
 
 const reducer = (state, newState) => ({ ...state, ...newState })

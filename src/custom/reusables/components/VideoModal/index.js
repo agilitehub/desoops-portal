@@ -2,7 +2,7 @@
 // Using react-player and a passed url, the video will be displayed in the Modal.
 // additional props can be passed to this component to control the video player.
 import React from 'react'
-import ReactPlayer from 'react-player/youtube'
+import ReactPlayer from 'react-player'
 
 import { Row, Modal, Col } from 'antd'
 

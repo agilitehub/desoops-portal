@@ -12,7 +12,7 @@ import { cloneDeep, debounce } from 'lodash'
 import Enums from '../../../lib/enums'
 import { SortAscendingOutlined } from '@ant-design/icons'
 import { SEARCH_PROFILES } from '../../../lib/graphql-models'
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient } from '@apollo/client/react'
 import { sortByKey } from '../../../lib/utils'
 
 const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfirm, onCancel }) => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Row, Col, Select, Divider, Space, Image, Switch, Spin, Button } from 'antd'
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient } from '@apollo/client/react'
 import Enums from '../../../../lib/enums'
 
 // App Components

@@ -25,7 +25,7 @@ import { createDistributionTransaction, updateDistributionTransaction } from '..
 import './style.sass'
 import { identity } from 'deso-protocol'
 import { GET_POSTS } from '../../../lib/graphql-models'
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient } from '@apollo/client/react'
 import { diamondPostModel } from '../../../lib/data-models'
 
 const styleParams = {

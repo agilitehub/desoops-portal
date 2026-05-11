@@ -45,7 +45,7 @@ import {
   updateDistributionTemplate,
   updateDistributionTransaction
 } from '../../../lib/agilite-controller'
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient } from '@apollo/client/react'
 import {
   FETCH_MULTIPLE_PROFILES,
   GET_FOLLOWERS,

@@ -1,7 +1,7 @@
 import React, { useEffect, useReducer } from 'react'
 import { identity, configure, getUsernameForPublicKey } from 'deso-protocol'
 import { useLoaderData } from 'react-router-dom'
-import { useApolloClient } from '@apollo/client'
+import { useApolloClient } from '@apollo/client/react'
 import { Col, Row, message, Card } from 'antd'
 import { LoginOutlined } from '@ant-design/icons'
 

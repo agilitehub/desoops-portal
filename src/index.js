@@ -2,7 +2,9 @@ import React from 'react'
 import { Provider } from 'react-redux'
 import { createRoot } from 'react-dom/client'
 import { DeSoIdentityProvider } from 'react-deso-protocol'
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
+import { ApolloClient, InMemoryCache } from '@apollo/client'
+import { HttpLink } from '@apollo/client/link/http'
+import { ApolloProvider } from '@apollo/client/react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 // Utilities
@@ -26,7 +28,7 @@ import { initAgilite } from './custom/lib/agilite-controller'
 
 // Init Apollo Client
 const client = new ApolloClient({
-  uri: Enums.values.GQL_API_URL,
+  link: new HttpLink({ uri: Enums.values.GQL_API_URL }),
   cache: new InMemoryCache()
 })
 
