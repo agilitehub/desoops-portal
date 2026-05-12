@@ -5,18 +5,18 @@ import { DeSoIdentityProvider } from 'react-deso-protocol'
 import { ApolloClient, InMemoryCache } from '@apollo/client'
 import { HttpLink } from '@apollo/client/link/http'
 import { ApolloProvider } from '@apollo/client/react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { RouterProvider } from 'react-router-dom'
 
 // Utilities
-import { initFirebase } from './custom/lib/firebase-controller'
-import App from './custom/modules/CoreApp'
-import OptOut, { loader as optOutLoader } from './custom/modules/OptOut'
-import Enums from './custom/lib/enums'
+import { initFirebase } from './core/infra/firebase-controller'
+import Enums from './core/infra/enums'
 import Store from './store'
 
 // Import default Stylesheet for application
 import './index.sass'
-import { initAgilite } from './custom/lib/agilite-controller'
+import { initAgilite } from './core/infra/agilite-controller'
+
+import { appRouter } from './routes'
 
 // TODO: Nullify console outputs for production
 // if (process.env.NODE_ENV === Enums.values.ENV_PRODUCTION) {
@@ -38,17 +38,7 @@ const init = async () => {
     initFirebase()
 
     // Initialize Router after Firebase is ready
-    const router = createBrowserRouter([
-      {
-        path: '/',
-        element: <App />
-      },
-      {
-        path: 'optout/:publicKey?',
-        element: <OptOut />,
-        loader: optOutLoader
-      }
-    ])
+    const router = appRouter
 
     // Render the app
     const root = createRoot(document.getElementById('root'))
