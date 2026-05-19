@@ -17,6 +17,20 @@ const slice = createSlice({
     setDeSoPrice: (state, data) => {
       state.desoData.desoPrice = data.payload
     },
+    /**
+     * Updates DESO/USD, Focus/DESO book mid, Focus/USD, and wallet USD labels derived from cached balances.
+     */
+    setMarketPrices: (state, data) => {
+      const { desoPrice, focusPriceDeso, focusPriceUsd } = data.payload
+      state.desoData.desoPrice = desoPrice
+      state.desoData.focusPriceDeso = focusPriceDeso
+      state.desoData.focusPriceUsd = focusPriceUsd
+      const desoBal = state.desoData.profile.desoBalance || 0
+      const focusBal = state.desoData.profile.focusBalance || 0
+      state.desoData.profile.desoBalanceUSD = Math.floor(desoBal * desoPrice * 100) / 100
+      state.desoData.profile.focusBalanceUSD =
+        focusPriceUsd > 0 ? Math.floor(focusBal * focusPriceUsd * 100) / 100 : 0
+    },
     setDiamondLevels: (state, data) => {
       state.desoData.setDiamondLevels = data.payload
     },
@@ -73,6 +87,7 @@ export const {
   setDeviceType,
   setLeftMenu,
   setDeSoPrice,
+  setMarketPrices,
   setDiamondLevels,
   setEditProfileVisible,
   setComingSoon,

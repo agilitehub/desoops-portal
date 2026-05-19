@@ -15,6 +15,7 @@ import {
 import BigNumber from 'bignumber.js'
 
 import Enums from './enums'
+import { fetchFocusMidPriceDesoPerCoin } from './focus-market'
 import { desoUserModel } from './data-models'
 import { calculateDaysSinceLastActive, cleanString, hexToInt, sortByKey } from './utils'
 import nftLogo from '../../assets/nft-default-logo.png'
@@ -188,6 +189,7 @@ export const getInitialDeSoData = async (desoData, gqlData, configData) => {
   let desoBalance = 0
   let daoBalance = 0
   let ccBalance = 0
+  let focusBalance = 0
   let newDeSoData = null
   let tmpGQLData = null
   let ownEntryCC = null
@@ -206,8 +208,16 @@ export const getInitialDeSoData = async (desoData, gqlData, configData) => {
       desoBalance = gqlData.accountByPublicKey?.desoBalance.balanceNanos / Enums.values.NANO_VALUE
     }
 
-    newDeSoData.desoPrice = await getDeSoPricing(newDeSoData.desoPrice)
-    newDeSoData.diamondLevels = await getDiamondLevels()
+    const [desoPrice, diamondLevels, focusPriceDesoRaw] = await Promise.all([
+      getDeSoPricing(newDeSoData.desoPrice),
+      getDiamondLevels(),
+      fetchFocusMidPriceDesoPerCoin()
+    ])
+    newDeSoData.desoPrice = desoPrice
+    newDeSoData.diamondLevels = diamondLevels
+    const focusPriceDeso = focusPriceDesoRaw != null ? focusPriceDesoRaw : 0
+    newDeSoData.focusPriceDeso = focusPriceDeso
+    newDeSoData.focusPriceUsd = focusPriceDesoRaw != null ? focusPriceDeso * desoPrice : 0
 
     // Next, we need to loop through the tokenBalancesAsHodler array to find the DAO and CC Balances
     // and then create hodlings arrays, but we also need to separate our own balances
@@ -221,6 +231,15 @@ export const getInitialDeSoData = async (desoData, gqlData, configData) => {
 
         // Skip if newEntry is null, because it means the user is invalid
         if (newEntry === null) continue
+
+        // FOCUS app token balance (DeSo Token / DAO coin), distinct from own-creator daoBalance
+        const isFocusToken =
+          entry.isDaoCoin &&
+          (entry.creatorPkid === Enums.values.FOCUS_TOKEN_CREATOR_PUBLIC_KEY ||
+            String(entry.creator?.username || '').toLowerCase() === Enums.values.FOCUS_TOKEN_USERNAME)
+        if (isFocusToken) {
+          focusBalance = newEntry.tokenBalance
+        }
 
         if (entry.isDaoCoin) {
           if (newEntry.publicKey === newDeSoData.profile.publicKey) {
@@ -249,6 +268,11 @@ export const getInitialDeSoData = async (desoData, gqlData, configData) => {
     // Finalize Data
     newDeSoData.profile.desoBalanceUSD = Math.floor(desoBalance * newDeSoData.desoPrice * 100) / 100
     newDeSoData.profile.desoBalance = Math.floor(desoBalance * 10000) / 10000
+    newDeSoData.profile.focusBalance = Math.floor(focusBalance * 10000) / 10000
+    newDeSoData.profile.focusBalanceUSD =
+      newDeSoData.focusPriceUsd > 0
+        ? Math.floor(focusBalance * newDeSoData.focusPriceUsd * 100) / 100
+        : 0
     newDeSoData.profile.daoBalance = daoBalance
     newDeSoData.profile.ccBalance = ccBalance
     newDeSoData.profile.daoHodlers = daoHodlers

@@ -5,7 +5,7 @@
 // We also display a loading spinner while we are fetching the user's DeSo data.
 
 import React, { useContext, useEffect, useReducer, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector, useStore } from 'react-redux'
 import { DeSoIdentityContext } from 'react-deso-protocol'
 import { isMobile, isTablet } from 'react-device-detect'
 import { useApolloClient } from '@apollo/client/react'
@@ -29,7 +29,7 @@ import {
   setConfigData,
   resetState,
   setDeviceType,
-  setDeSoPrice,
+  setMarketPrices,
   setDistributionTemplates,
   setEditProfileVisible
 } from 'core/store/slices/custom/reducer'
@@ -37,6 +37,7 @@ import { initUserSession, getDistributionTemplates, updateFCMToken } from 'core/
 
 import { renderApp } from './controllers'
 import { getDeSoPricing, getInitialDeSoData } from 'core/infra/deso-controller-graphql'
+import { fetchFocusMidPriceDesoPerCoin } from 'core/infra/focus-market'
 import { GQL_GET_INITIAL_DESO_DATA } from 'core/infra/graphql-models'
 
 import './style.sass'
@@ -57,6 +58,7 @@ const reducer = (state, newState) => ({ ...state, ...newState })
 
 const CoreApp = () => {
   const dispatch = useDispatch()
+  const store = useStore()
   const desoData = useSelector((state) => state.custom.desoData)
   const configData = useSelector((state) => state.custom.configData)
   const editProfileVisible = useSelector((state) => state.custom.editProfileVisible)
@@ -175,20 +177,34 @@ const CoreApp = () => {
     }
   }
 
-  // Update DeSo Price every x seconds
+  // Update DESO + Focus market prices on the same interval
   useEffect(() => {
     const interval = setInterval(() => {
-      if (state.renderState === Enums.appRenderState.LAUNCH) updateDeSoPrice(desoData.desoPrice)
+      if (state.renderState === Enums.appRenderState.LAUNCH) {
+        void updateLiveMarketPrices()
+      }
     }, Enums.defaults.UPDATE_DESO_PRICE_INTERVAL_SEC)
 
     return () => clearInterval(interval)
   }, [state.renderState]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const updateDeSoPrice = async (currDeSoPrice) => {
+  const updateLiveMarketPrices = async () => {
     try {
-      const desoPrice = await getDeSoPricing(currDeSoPrice)
-      dispatch(setDeSoPrice(desoPrice))
-    } catch (e) { }
+      const curr = store.getState().custom.desoData
+      const desoPrice = await getDeSoPricing(curr.desoPrice)
+      const focusDesoRaw = await fetchFocusMidPriceDesoPerCoin()
+      const focusPriceDeso = focusDesoRaw != null ? focusDesoRaw : 0
+      const focusPriceUsd = focusDesoRaw != null && desoPrice ? focusDesoRaw * desoPrice : 0
+      dispatch(
+        setMarketPrices({
+          desoPrice,
+          focusPriceDeso,
+          focusPriceUsd
+        })
+      )
+    } catch (e) {
+      /* keep last known prices */
+    }
   }
 
   const handleNotificationsEnabled = async () => {

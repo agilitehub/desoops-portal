@@ -6,6 +6,8 @@ const desoData = {
     desoBalance: 0,
     desoBalanceUSD: 0,
     daoBalance: 0,
+    focusBalance: 0,
+    focusBalanceUSD: 0,
     ccBalance: 0,
     totalFollowers: 0,
     totalFollowing: 0,
@@ -19,6 +21,8 @@ const desoData = {
   fetchedFollowers: false,
   fetchedFollowing: false,
   desoPrice: 0,
+  focusPriceDeso: 0,
+  focusPriceUsd: 0,
   diamondLevels: null
 }
 

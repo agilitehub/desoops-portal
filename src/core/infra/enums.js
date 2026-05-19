@@ -25,7 +25,13 @@ const Enums = {
     SELECTED_USERS: 'Selected Users in Table',
     DESO_VIDEO_URL: 'https://www.youtube.com/watch?v=Qf2DMRo_Fyc',
     DESOOPS_VIDEO_URL: 'https://www.youtube.com/watch?v=PAQELCazfs8',
-    GQL_API_URL: 'https://graphql-prod.deso.com/graphql'
+    GQL_API_URL: 'https://graphql-prod.deso.com/graphql',
+    /** Focus app / FOCUS DeSo token creator (order book + GraphQL token rows) */
+    FOCUS_TOKEN_CREATOR_PUBLIC_KEY: 'BC1YLjEayZDjAPitJJX4Boy7LsEfN3sWAkYb3hgE9kGBirztsc2re1N',
+    /** Match token balance rows where username may be returned as "focus" */
+    FOCUS_TOKEN_USERNAME: 'focus',
+    /** Second leg for token<>DESO markets in get-dao-coin-limit-orders */
+    DESO_ORDER_BOOK_IDENTIFIER: 'DESO'
   },
   paymentTypes: {
     DESO: '$DESO',

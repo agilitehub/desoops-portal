@@ -40,12 +40,20 @@ const styleParams = {
   colRightXS: 24
 }
 
+/** USD/market row must keep enough decimals for sub-cent valuations; balance×price uses full precision. */
+function formatFocusPriceUsd (focusPriceUsd) {
+  if (!(focusPriceUsd > 0)) return '—'
+  if (focusPriceUsd >= 1) return `$${focusPriceUsd.toFixed(2)}`
+  if (focusPriceUsd >= 0.01) return `$${focusPriceUsd.toFixed(4)}`
+  return `$${focusPriceUsd.toFixed(6)}`
+}
+
 const reducer = (state, newState) => ({ ...state, ...newState })
 
 const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshDashboard, deviceType }) => {
   const [state, setState] = useReducer(reducer, distributionSummaryState())
   const { modal, message } = App.useApp()
-  const { desoPrice } = desoData
+  const { desoPrice, focusPriceUsd } = desoData
   const client = useApolloClient()
 
   const styleProps = {
@@ -293,6 +301,27 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
     }, 3000)
   }, [desoPrice]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    let focusPriceClass = ''
+
+    if (state.prevFocusPrice === null || state.prevFocusPrice === undefined) {
+      setState({ prevFocusPrice: desoData.focusPriceUsd })
+      return
+    }
+
+    if (desoData.focusPriceUsd > state.prevFocusPrice) {
+      focusPriceClass = 'updated-positive'
+    } else if (desoData.focusPriceUsd < state.prevFocusPrice) {
+      focusPriceClass = 'updated-negative'
+    }
+
+    setState({ focusPriceClass, prevFocusPrice: desoData.focusPriceUsd })
+
+    setTimeout(() => {
+      setState({ focusPriceClass: '' })
+    }, 3000)
+  }, [desoData.focusPriceUsd]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleBeforeUnload = (e) => {
     e.preventDefault()
     e.returnValue = 'Token distribution is still in progress. Are you sure you want to leave this page?'
@@ -319,8 +348,8 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
       rootState.distributionType === CoreEnums.paymentTypes.DIAMONDS
         ? tokenName
         : rootState.paymentType === CoreEnums.paymentTypes.USD
-        ? `${(rootState.distributionAmount / desoPrice).toFixed(3)} ${tokenName}`
-        : `${rootState.distributionAmount} ${tokenName}`
+          ? `${(rootState.distributionAmount / desoPrice).toFixed(3)} ${tokenName}`
+          : `${rootState.distributionAmount} ${tokenName}`
 
     const users = rootState.distributionType === CoreEnums.paymentTypes.DIAMONDS ? 'posts' : 'users'
     let title = `Please confirm you are ready to distribute ${amount}`
@@ -750,6 +779,27 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
           lg={styleParams.valueColLG}
         >
           <span style={styleProps.fieldValue} className={state.desoPriceClass}>{`$${desoPrice}`}</span>
+        </Col>
+      </Row>
+      <Row>
+        <Col
+          xs={styleParams.labelColXS}
+          sm={styleParams.labelColSM}
+          md={styleParams.labelColMD}
+          lg={styleParams.labelColLG}
+          style={styleParams.labelColStyle}
+        >
+          <span style={styleProps.fieldLabel}>$FOCUS price:</span>
+        </Col>
+        <Col
+          xs={styleParams.valueColXS}
+          sm={styleParams.valueColSM}
+          md={styleParams.valueColMD}
+          lg={styleParams.valueColLG}
+        >
+          <span style={styleProps.fieldValue} className={state.focusPriceClass}>
+            {formatFocusPriceUsd(focusPriceUsd)}
+          </span>
         </Col>
       </Row>
       <Row>

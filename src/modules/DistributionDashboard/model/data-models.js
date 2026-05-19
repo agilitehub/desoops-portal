@@ -64,7 +64,9 @@ export const distributionSummaryState = () => {
     isInFinalStage: false,
     executeDisabled: true,
     prevDeSoPrice: '',
-    desoPriceClass: ''
+    desoPriceClass: '',
+    prevFocusPrice: null,
+    focusPriceClass: ''
   }
 }
 
