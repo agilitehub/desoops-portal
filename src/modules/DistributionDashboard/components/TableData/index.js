@@ -3,14 +3,13 @@ import { Table, Image, App } from 'antd'
 import { CheckCircleOutlined } from '@ant-design/icons'
 
 import theme from '../../../../core/utils/theme'
-import { calculateEstimatedPayment, updateTableSelection } from '../../controllers'
+import { calculateEstimatedPayment, updateTableSelection, distributionAmountAsPayingTokens } from '../../controllers'
 import Enums from 'core/infra/enums'
 import { copyTextToClipboard } from 'core/infra/utils'
 import { cloneDeep } from 'lodash'
 
 const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
   const [tableData, setTableData] = useState([])
-  const { desoPrice } = desoData
   const { message } = App.useApp()
 
   const handleSelectionChange = async (updatedKeys) => {
@@ -39,11 +38,12 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
         finalHodlers,
         desoData
       )
-    } else if (rootState.distributionType === Enums.paymentTypes.DESO) {
+    } else if (
+      rootState.distributionType === Enums.paymentTypes.DESO ||
+      rootState.distributionType === Enums.paymentTypes.FOCUS
+    ) {
       await calculateEstimatedPayment(
-        rootState.paymentType === Enums.paymentTypes.USD
-          ? newState.distributionAmount / desoPrice
-          : newState.distributionAmount,
+        distributionAmountAsPayingTokens(newState, desoData),
         newState.distributionType,
         newState.spreadAmountBasedOn,
         finalHodlers,
@@ -81,7 +81,10 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
         render: (value, entry) => {
           let estimatedPaymentLabel = entry.estimatedPaymentLabel
 
-          if (rootState.distributionType === Enums.paymentTypes.DESO) {
+          if (
+            rootState.distributionType === Enums.paymentTypes.DESO ||
+            rootState.distributionType === Enums.paymentTypes.FOCUS
+          ) {
             if (entry.estimatedPaymentUSD >= 0.001) {
               estimatedPaymentLabel += ` (~$${entry.estimatedPaymentUSD})`
             } else {
@@ -155,7 +158,10 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
         render: (value, entry) => {
           let estimatedPaymentLabel = entry.estimatedPaymentLabel
 
-          if (rootState.distributionType === Enums.paymentTypes.DESO) {
+          if (
+            rootState.distributionType === Enums.paymentTypes.DESO ||
+            rootState.distributionType === Enums.paymentTypes.FOCUS
+          ) {
             if (entry.estimatedPaymentUSD >= 0.001) {
               estimatedPaymentLabel += ` (~$${entry.estimatedPaymentUSD})`
             } else {

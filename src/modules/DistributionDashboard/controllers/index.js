@@ -5,6 +5,32 @@ import Enums from 'core/infra/enums'
 import { distributionTemplateModel, distributionTransactionModel } from 'core/infra/data-models'
 import { cloneDeep } from 'lodash'
 
+/**
+ * Converts the Summary "Amount to distribute" field into the token units actually sent.
+ * ($DESO: USD → DESO; $FOCUS: USD → FOCUS via focusPriceUsd, or amount is already FOCUS tokens.)
+ */
+export const distributionAmountAsPayingTokens = (rootState, desoData) => {
+  const amt = rootState.distributionAmount
+  if (amt === null || amt === undefined || amt === '') return 0
+  if (typeof amt === 'number' && Number.isNaN(amt)) return 0
+
+  if (rootState.distributionType === Enums.paymentTypes.DESO) {
+    if (rootState.paymentType === Enums.paymentTypes.USD) {
+      return desoData.desoPrice > 0 ? amt / desoData.desoPrice : 0
+    }
+    return amt
+  }
+
+  if (rootState.distributionType === Enums.paymentTypes.FOCUS) {
+    if (rootState.paymentType === Enums.paymentTypes.USD) {
+      return desoData.focusPriceUsd > 0 ? amt / desoData.focusPriceUsd : 0
+    }
+    return amt
+  }
+
+  return amt
+}
+
 export const setupHodlers = async (hodlers, rootState, desoData) => {
   try {
     let percentResult = null
@@ -14,9 +40,7 @@ export const setupHodlers = async (hodlers, rootState, desoData) => {
 
     percentResult = await calculatePercentages(filterResult.hodlers)
     percentResult.hodlers = await calculateEstimatedPayment(
-      rootState.paymentType === Enums.paymentTypes.USD
-        ? rootState.distributionAmount / desoData.desoPrice
-        : rootState.distributionAmount,
+      distributionAmountAsPayingTokens(rootState, desoData),
       rootState.distributionType,
       rootState.spreadAmountBasedOn,
       percentResult.hodlers,
@@ -52,9 +76,7 @@ export const updateTableSelection = async (hodlers, rootState, desoData, selecte
 
     percentResult = await calculatePercentages(tmpHodlers)
     percentResult.hodlers = await calculateEstimatedPayment(
-      rootState.paymentType === Enums.paymentTypes.USD
-        ? rootState.distributionAmount / desoData.desoPrice
-        : rootState.distributionAmount,
+      distributionAmountAsPayingTokens(rootState, desoData),
       rootState.distributionType,
       rootState.spreadAmountBasedOn,
       percentResult.hodlers,
@@ -147,6 +169,7 @@ export const calculateEstimatedPayment = (
     // Ignore if there is no amount
     if (distributionAmount === '') return hodlers
     if (distributionType === Enums.paymentTypes.DESO) desoPrice = desoData.desoPrice
+    if (distributionType === Enums.paymentTypes.FOCUS) desoPrice = desoData.focusPriceUsd
 
     // Count the number of active hodlers based on the `isActive` property being set to true
     activeHodlers = hodlers.reduce((total, entry) => {

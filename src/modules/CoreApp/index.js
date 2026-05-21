@@ -37,7 +37,7 @@ import { initUserSession, getDistributionTemplates, updateFCMToken } from 'core/
 
 import { renderApp } from './controllers'
 import { getDeSoPricing, getInitialDeSoData } from 'core/infra/deso-controller-graphql'
-import { fetchFocusMidPriceDesoPerCoin } from 'core/infra/focus-market'
+import { fetchFocusMidPriceUsdPerCoin } from 'core/infra/focus-market'
 import { GQL_GET_INITIAL_DESO_DATA } from 'core/infra/graphql-models'
 
 import './style.sass'
@@ -192,9 +192,9 @@ const CoreApp = () => {
     try {
       const curr = store.getState().custom.desoData
       const desoPrice = await getDeSoPricing(curr.desoPrice)
-      const focusDesoRaw = await fetchFocusMidPriceDesoPerCoin()
-      const focusPriceDeso = focusDesoRaw != null ? focusDesoRaw : 0
-      const focusPriceUsd = focusDesoRaw != null && desoPrice ? focusDesoRaw * desoPrice : 0
+      const focusUsdRaw = await fetchFocusMidPriceUsdPerCoin()
+      const focusPriceUsd = focusUsdRaw != null ? focusUsdRaw : 0
+      const focusPriceDeso = focusUsdRaw != null && desoPrice > 0 ? focusUsdRaw / desoPrice : 0
       dispatch(
         setMarketPrices({
           desoPrice,

@@ -135,6 +135,7 @@ const GeneralTab = ({
     switch (rootState.distributionType) {
       case Enums.paymentTypes.DAO:
         for (const entry of desoProfile.daoHodlings) {
+          if (entry.publicKey === Enums.values.FOCUS_QUOTE_CURRENCY_PUBLIC_KEY) continue
           if (!configData.otherCryptoKeys.includes(entry.publicKey)) {
             tmpTokenOwnerList.push({
               index: index.toString(),
@@ -424,6 +425,7 @@ const GeneralTab = ({
               >
                 <Select.Option value={Enums.values.EMPTY_STRING}>- Select -</Select.Option>
                 <Select.Option value={Enums.paymentTypes.DESO}>$DESO</Select.Option>
+                <Select.Option value={Enums.paymentTypes.FOCUS}>$FOCUS</Select.Option>
                 <Select.Option value={Enums.paymentTypes.CREATOR}>Creator Coin</Select.Option>
                 <Select.Option value={Enums.paymentTypes.DAO}>DAO Token</Select.Option>
                 <Select.Option value={Enums.paymentTypes.DIAMONDS}>Diamonds</Select.Option>

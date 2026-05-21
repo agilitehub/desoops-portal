@@ -296,6 +296,24 @@ const _BatchTransactionsForm = () => {
       return
     }
 
+    if (distributionType === Enums.paymentTypes.FOCUS) {
+      const tmpState = cloneDeep(state)
+      tmpState.distributionType = distributionType
+      tmpState.tokenToUse = Enums.values.FOCUS_QUOTE_CURRENCY_PUBLIC_KEY
+      tmpState.tokenToUseLabel = 'FOCUS'
+      tmpState.distributionAmount = null
+      tmpState.spreadAmountBasedOn = 'Ownership'
+
+      const tmpHodlers = cloneDeep(state.originalHodlers)
+      const { finalHodlers, tokenTotal, selectedTableKeys } = await setupHodlers(tmpHodlers, tmpState, desoData)
+
+      tmpState.finalHodlers = finalHodlers
+      tmpState.tokenTotal = tokenTotal
+      tmpState.selectedTableKeys = selectedTableKeys
+      setState(tmpState)
+      return
+    }
+
     setState({
       distributionType,
       tokenToUse: Enums.values.EMPTY_STRING,
@@ -481,6 +499,10 @@ const _BatchTransactionsForm = () => {
       tmpState.myHodlers = template.myHodlers
       tmpState.distributeDeSoUser = template.distributeDeSoUser
       tmpState.tokenToUse = template.tokenToUse
+      if (tmpState.distributionType === Enums.paymentTypes.FOCUS) {
+        tmpState.tokenToUse = Enums.values.FOCUS_QUOTE_CURRENCY_PUBLIC_KEY
+        tmpState.tokenToUseLabel = 'FOCUS'
+      }
       tmpState.distributionAmount = template.distributionAmount
       tmpState.paymentType = template.paymentType
       tmpState.rulesEnabled = template.rules.enabled
@@ -939,6 +961,7 @@ const _BatchTransactionsForm = () => {
               break
             case Enums.paymentTypes.DAO:
             case Enums.paymentTypes.OTHER_CRYPTO:
+            case Enums.paymentTypes.FOCUS:
               await sendDAOTokens(
                 desoData.profile.publicKey,
                 hodler.publicKey,

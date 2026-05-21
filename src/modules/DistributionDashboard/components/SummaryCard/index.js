@@ -6,6 +6,7 @@ import { RightCircleOutlined } from '@ant-design/icons'
 import CoreEnums from 'core/infra/enums'
 import {
   calculateEstimatedPayment,
+  distributionAmountAsPayingTokens,
   prepDistributionTransaction,
   prepDistributionTransactionUpdate,
   slimRootState
@@ -151,6 +152,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
           break
         case CoreEnums.paymentTypes.DAO:
         case CoreEnums.paymentTypes.OTHER_CRYPTO:
+        case CoreEnums.paymentTypes.FOCUS:
           desoGasFeesNanos = configData.desoGasFeesSendDAONanos * noOfPaymentTransactions
           break
         case CoreEnums.paymentTypes.DIAMONDS:
@@ -201,12 +203,24 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
             case CoreEnums.paymentTypes.OTHER_CRYPTO:
               selectedToken = desoData.profile.daoHodlings.find((hodling) => hodling.publicKey === rootState.tokenToUse)
               break
+            case CoreEnums.paymentTypes.FOCUS:
+              selectedToken = {
+                username: CoreEnums.paymentTypes.FOCUS,
+                tokenBalance: desoData.profile.focusBalance,
+                publicKey: CoreEnums.values.FOCUS_QUOTE_CURRENCY_PUBLIC_KEY
+              }
+              break
           }
 
           if (selectedToken) {
             tokenToDistribute = `${selectedToken.username} (~${selectedToken.tokenBalance})`
 
-            if (distributionAmount > selectedToken.tokenBalance) {
+            const payingTokens =
+              rootState.distributionType === CoreEnums.paymentTypes.FOCUS
+                ? distributionAmountAsPayingTokens(rootState, desoData)
+                : distributionAmount
+
+            if (payingTokens > selectedToken.tokenBalance) {
               amountExceeded = true
               warningMsg = `The Amount exceeds your ${rootState.distributionType} Balance.`
             }
@@ -266,7 +280,8 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
     desoData.profile.desoBalance,
     desoData.profile.daoHodlings,
     desoData.profile.ccHodlings,
-    desoData.desoPrice,
+    desoData.profile.focusBalance,
+    desoData.focusPriceUsd,
     configData.estimateTimePerTransactionSeconds,
     configData.desoGasFeesSendDESONanos,
     configData.desoGasFeesSendCCNanos,
@@ -315,12 +330,29 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
       focusPriceClass = 'updated-negative'
     }
 
+    if (rootState.distributionAmount && rootState.distributionType === CoreEnums.paymentTypes.FOCUS) {
+      void handleDistributionAmount(rootState.distributionAmount)
+    }
+
     setState({ focusPriceClass, prevFocusPrice: desoData.focusPriceUsd })
 
     setTimeout(() => {
       setState({ focusPriceClass: '' })
     }, 3000)
   }, [desoData.focusPriceUsd]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (
+      rootState.distributionAmount == null ||
+      rootState.distributionAmount === '' ||
+      (rootState.distributionType !== CoreEnums.paymentTypes.DESO &&
+        rootState.distributionType !== CoreEnums.paymentTypes.FOCUS)
+    ) {
+      return
+    }
+    void handleDistributionAmount(rootState.distributionAmount)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rootState.paymentType])
 
   const handleBeforeUnload = (e) => {
     e.preventDefault()
@@ -332,7 +364,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
     let finalHodlers = cloneDeep(rootState.finalHodlers)
 
     await calculateEstimatedPayment(
-      rootState.paymentType === CoreEnums.paymentTypes.USD ? distributionAmount / desoPrice : distributionAmount,
+      distributionAmountAsPayingTokens({ ...rootState, distributionAmount }, desoData),
       rootState.distributionType,
       rootState.spreadAmountBasedOn,
       finalHodlers,
@@ -343,13 +375,18 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
 
   const handleConfirmExecute = () => {
     const tokenName = rootState.tokenToUseLabel ? `$${rootState.tokenToUseLabel} token(s)` : rootState.distributionType
+    const payingTokens = distributionAmountAsPayingTokens(rootState, desoData)
 
     const amount =
       rootState.distributionType === CoreEnums.paymentTypes.DIAMONDS
         ? tokenName
-        : rootState.paymentType === CoreEnums.paymentTypes.USD
-          ? `${(rootState.distributionAmount / desoPrice).toFixed(3)} ${tokenName}`
-          : `${rootState.distributionAmount} ${tokenName}`
+        : rootState.distributionType === CoreEnums.paymentTypes.DESO
+          ? rootState.paymentType === CoreEnums.paymentTypes.USD
+            ? `${payingTokens.toFixed(3)} ${tokenName}`
+            : `${rootState.distributionAmount} ${tokenName}`
+          : rootState.distributionType === CoreEnums.paymentTypes.FOCUS
+            ? `${Number(payingTokens).toFixed(4)} ${CoreEnums.paymentTypes.FOCUS}`
+            : `${rootState.distributionAmount} ${tokenName}`
 
     const users = rootState.distributionType === CoreEnums.paymentTypes.DIAMONDS ? 'posts' : 'users'
     let title = `Please confirm you are ready to distribute ${amount}`
@@ -552,6 +589,7 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
               break
             case CoreEnums.paymentTypes.DAO:
             case CoreEnums.paymentTypes.OTHER_CRYPTO:
+            case CoreEnums.paymentTypes.FOCUS:
               await sendDAOTokens(
                 desoData.profile.publicKey,
                 hodler.publicKey,
@@ -732,9 +770,23 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
           }}
         />
       )
-    } else {
-      return null
     }
+    if (rootState.distributionType === CoreEnums.paymentTypes.FOCUS) {
+      return (
+        <Select
+          value={rootState.paymentType ? rootState.paymentType : CoreEnums.paymentTypes.DESO}
+          style={{ width: 100 }}
+          options={[
+            { label: 'FOCUS', value: CoreEnums.paymentTypes.DESO },
+            { label: 'USD', value: CoreEnums.paymentTypes.USD }
+          ]}
+          onChange={(value) => {
+            setRootState({ paymentType: value })
+          }}
+        />
+      )
+    }
+    return null
   }
 
   return (
@@ -929,6 +981,21 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
                     <span>≈ {(rootState.distributionAmount / desoPrice).toFixed(3)} DESO</span>
                   )}
                 </>
+              ) : rootState.distributionType === CoreEnums.paymentTypes.FOCUS ? (
+                rootState.paymentType === CoreEnums.paymentTypes.USD ? (
+                  <span>
+                    ≈{' '}
+                    {desoData.focusPriceUsd > 0
+                      ? ((rootState.distributionAmount || 0) / desoData.focusPriceUsd).toFixed(4)
+                      : '0'}{' '}
+                    $FOCUS
+                  </span>
+                ) : (
+                  <span>
+                    ≈ ${(Math.floor((rootState.distributionAmount || 0) * desoData.focusPriceUsd * 100) / 100).toFixed(2)}{' '}
+                    USD
+                  </span>
+                )
               ) : undefined}
             </Col>
           </Row>

@@ -1,3 +1,6 @@
+/** Focus (FOCUS) creator coin / quote currency — balances + get-quote-currency-price-in-usd */
+const FOCUS_TOKEN_PUBLIC_KEY_BASE58 = 'BC1YLjEayZDjAPitJJX4Boy7LsEfN3sWAkYb3hgE9kGBirztsc2re1N'
+
 // These are generic enums used throughout the app.
 const Enums = {
   values: {
@@ -26,15 +29,18 @@ const Enums = {
     DESO_VIDEO_URL: 'https://www.youtube.com/watch?v=Qf2DMRo_Fyc',
     DESOOPS_VIDEO_URL: 'https://www.youtube.com/watch?v=PAQELCazfs8',
     GQL_API_URL: 'https://graphql-prod.deso.com/graphql',
-    /** Focus app / FOCUS DeSo token creator (order book + GraphQL token rows) */
-    FOCUS_TOKEN_CREATOR_PUBLIC_KEY: 'BC1YLjEayZDjAPitJJX4Boy7LsEfN3sWAkYb3hgE9kGBirztsc2re1N',
+    /** Focus app / FOCUS DeSo token creator (GraphQL token balance rows). Same PK as quote currency below. */
+    FOCUS_TOKEN_CREATOR_PUBLIC_KEY: FOCUS_TOKEN_PUBLIC_KEY_BASE58,
+    /**
+     * Focus “wallet” / quote currency for POST api/v0/get-quote-currency-price-in-usd (MidPrice = USD per 1 FOCUS).
+     */
+    FOCUS_QUOTE_CURRENCY_PUBLIC_KEY: FOCUS_TOKEN_PUBLIC_KEY_BASE58,
     /** Match token balance rows where username may be returned as "focus" */
-    FOCUS_TOKEN_USERNAME: 'focus',
-    /** Second leg for token<>DESO markets in get-dao-coin-limit-orders */
-    DESO_ORDER_BOOK_IDENTIFIER: 'DESO'
+    FOCUS_TOKEN_USERNAME: 'focus'
   },
   paymentTypes: {
     DESO: '$DESO',
+    FOCUS: '$FOCUS',
     DAO: 'DAO',
     CREATOR: 'CC',
     DIAMONDS: 'Diamonds',

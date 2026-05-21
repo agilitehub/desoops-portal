@@ -4,7 +4,7 @@
 
 import React from 'react'
 import { Row, Col, Select, Divider, InputNumber, Radio, Switch, message } from 'antd'
-import { calculateEstimatedPayment, setupHodlers } from '../../../controllers'
+import { calculateEstimatedPayment, setupHodlers, distributionAmountAsPayingTokens } from '../../../controllers'
 import { cloneDeep } from 'lodash'
 import Enums from 'core/infra/enums'
 
@@ -90,7 +90,7 @@ const RulesTab = ({ desoData, rootState, setRootState, deviceType }) => {
     let tmpHodlers = cloneDeep(rootState.finalHodlers)
 
     await calculateEstimatedPayment(
-      rootState.distributionAmount,
+      distributionAmountAsPayingTokens(rootState, desoData),
       rootState.distributionType,
       spreadAmountBasedOn,
       tmpHodlers,

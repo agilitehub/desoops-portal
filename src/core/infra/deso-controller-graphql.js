@@ -15,7 +15,7 @@ import {
 import BigNumber from 'bignumber.js'
 
 import Enums from './enums'
-import { fetchFocusMidPriceDesoPerCoin } from './focus-market'
+import { fetchFocusMidPriceUsdPerCoin } from './focus-market'
 import { desoUserModel } from './data-models'
 import { calculateDaysSinceLastActive, cleanString, hexToInt, sortByKey } from './utils'
 import nftLogo from '../../assets/nft-default-logo.png'
@@ -35,6 +35,10 @@ const desoConfigure = {
     },
     DAOCoinOperationLimitMap: {
       '': {
+        transfer: 'UNLIMITED'
+      },
+      // deso-protocol transferDeSoToken reads DAOCoinOperationLimitMap[ProfilePublicKey]; '' alone is not used for concrete tokens.
+      [Enums.values.FOCUS_TOKEN_CREATOR_PUBLIC_KEY]: {
         transfer: 'UNLIMITED'
       }
     },
@@ -208,16 +212,17 @@ export const getInitialDeSoData = async (desoData, gqlData, configData) => {
       desoBalance = gqlData.accountByPublicKey?.desoBalance.balanceNanos / Enums.values.NANO_VALUE
     }
 
-    const [desoPrice, diamondLevels, focusPriceDesoRaw] = await Promise.all([
+    const [desoPrice, diamondLevels, focusPriceUsdRaw] = await Promise.all([
       getDeSoPricing(newDeSoData.desoPrice),
       getDiamondLevels(),
-      fetchFocusMidPriceDesoPerCoin()
+      fetchFocusMidPriceUsdPerCoin()
     ])
     newDeSoData.desoPrice = desoPrice
     newDeSoData.diamondLevels = diamondLevels
-    const focusPriceDeso = focusPriceDesoRaw != null ? focusPriceDesoRaw : 0
-    newDeSoData.focusPriceDeso = focusPriceDeso
-    newDeSoData.focusPriceUsd = focusPriceDesoRaw != null ? focusPriceDeso * desoPrice : 0
+    const focusPriceUsd = focusPriceUsdRaw != null ? focusPriceUsdRaw : 0
+    newDeSoData.focusPriceUsd = focusPriceUsd
+    newDeSoData.focusPriceDeso =
+      focusPriceUsdRaw != null && desoPrice > 0 ? focusPriceUsdRaw / desoPrice : 0
 
     // Next, we need to loop through the tokenBalancesAsHodler array to find the DAO and CC Balances
     // and then create hodlings arrays, but we also need to separate our own balances
@@ -756,13 +761,13 @@ export const sendDESO = async (sender, recipient, amount) => {
   let response = null
 
   try {
+    const amountNanos = Math.round(amount * Enums.values.NANO_VALUE)
     response = await sendDeso({
       SenderPublicKeyBase58Check: sender,
       RecipientPublicKeyOrUsername: recipient,
-      AmountNanos: Math.round(amount * Enums.values.NANO_VALUE),
+      AmountNanos: amountNanos,
       MinFeeRateNanosPerKB: 1000
     })
-
     return response
   } catch (e) {
     throw new Error(e)
@@ -791,14 +796,17 @@ export const sendDAOTokens = async (sender, recipient, token, amount) => {
     hexAmount = finalAmount.toString(16)
     finalAmount = Enums.values.HEX_PREFIX + hexAmount
 
-    response = await transferDeSoToken({
+    const payload = {
       SenderPublicKeyBase58Check: sender,
       ProfilePublicKeyBase58CheckOrUsername: token,
       ReceiverPublicKeyBase58CheckOrUsername: recipient,
       DAOCoinToTransferNanos: finalAmount,
       MinFeeRateNanosPerKB: 1000
-    })
+    }
 
+    // deso-protocol defaults txLimitCount from identity.transactionSpendingLimitOptions.DAOCoinOperationLimitMap[token].transfer
+    // which throws if that token key was never granted — not fixable by a static map for every creator coin. UNLIMITED matches app limits.
+    response = await transferDeSoToken(payload, { txLimitCount: 'UNLIMITED' })
     return response
   } catch (e) {
     throw new Error(e)
@@ -820,14 +828,14 @@ export const sendCreatorCoins = async (sender, recipient, creatorCoin, amount) =
   let response = null
 
   try {
+    const creatorCoinNanos = Math.floor(amount * Enums.values.NANO_VALUE)
     response = await transferCreatorCoin({
       SenderPublicKeyBase58Check: sender,
       CreatorPublicKeyBase58Check: creatorCoin,
       ReceiverUsernameOrPublicKeyBase58Check: recipient,
-      CreatorCoinToTransferNanos: Math.floor(amount * Enums.values.NANO_VALUE),
+      CreatorCoinToTransferNanos: creatorCoinNanos,
       MinFeeRateNanosPerKB: 1000
     })
-
     return response
   } catch (e) {
     throw new Error(e)
