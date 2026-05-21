@@ -12,7 +12,7 @@ import { useApolloClient } from '@apollo/client/react'
 import { Spin } from 'antd'
 import { Outlet } from 'react-router-dom'
 import { usePwaFeatures } from '../PWADetector/hooks'
-import { setNotificationsVisible } from 'core/store/slices/custom/reducer'
+// import { setNotificationsVisible } from 'core/store/slices/custom/reducer'
 
 // App Components
 import PWAManager from '../PWAManager'
@@ -288,7 +288,9 @@ const CoreApp = () => {
 
   return (
     <>
-      <AppToolbar onNotificationsClick={() => dispatch(setNotificationsVisible(true))} />
+      {/* Temporarily: deposits toolbar opens notifications — restore when deposits tab returns */}
+      {/* <AppToolbar onNotificationsClick={() => dispatch(setNotificationsVisible(true))} /> */}
+      <AppToolbar />
       {handleGetState()}
       <PWAManager
         disabled={!state.appReady && !(state.renderState === Enums.appRenderState.LOGIN && standaloneRequired)}

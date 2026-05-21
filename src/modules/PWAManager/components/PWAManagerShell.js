@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { BellOutlined } from '@ant-design/icons'
+// import { BellOutlined } from '@ant-design/icons'
 import { Modal, Button, Space, Alert } from 'antd'
 import { usePWAManager } from '../controllers'
 import styles from '../style.module.sass'
@@ -58,7 +58,7 @@ const PWAManager = ({ disabled = false, stepStatuses, forceShow = false }) => {
     }
   })
 
-  const { isVisible, support, dismiss, notificationPermission } = usePWAManager(forceShow)
+  const { support, dismiss, notificationPermission } = usePWAManager(forceShow)
 
   const handleEnable = async () => {
     try {
@@ -138,6 +138,8 @@ const PWAManager = ({ disabled = false, stepStatuses, forceShow = false }) => {
 
   return (
     <>
+      {/* Temporarily hidden — floating deposit-notification bell. To restore: uncomment
+          `BellOutlined` import above, add `isVisible` back to usePWAManager destructure, and uncomment:
       {(forceShow || (!disabled && isVisible)) && (
         <>
           <div className={styles.bellContainer} onClick={() => setShowModal(true)}>
@@ -145,6 +147,7 @@ const PWAManager = ({ disabled = false, stepStatuses, forceShow = false }) => {
           </div>
         </>
       )}
+      */}
       <UpdateChecker />
       <Modal
         title={support?.type === 'ios' && support?.needsInstall ? 'Install App' : 'Enable Deposit Notifications'}

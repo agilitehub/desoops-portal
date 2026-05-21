@@ -1,4 +1,5 @@
-import { faCommentsDollar, faMoneyBillTransfer, faWallet } from '@fortawesome/free-solid-svg-icons'
+// import { faCommentsDollar, faMoneyBillTransfer, faWallet } from '@fortawesome/free-solid-svg-icons'
+import { faMoneyBillTransfer, faWallet } from '@fortawesome/free-solid-svg-icons'
 
 import { ROUTE_SEGMENTS } from '../../constants/paths'
 
@@ -15,11 +16,12 @@ export const MAIN_TOOLBAR_ITEMS = [
     segment: ROUTE_SEGMENTS.DISTRIBUTE,
     icon: faMoneyBillTransfer,
     label: 'Distribute'
-  },
-  {
-    key: 'deposits',
-    icon: faCommentsDollar,
-    label: 'Deposits',
-    deposits: true
   }
+  // Temporarily hidden — restore deposits tab when notification UX is re-enabled:
+  // {
+  //   key: 'deposits',
+  //   icon: faCommentsDollar,
+  //   label: 'Deposits',
+  //   deposits: true
+  // }
 ]
