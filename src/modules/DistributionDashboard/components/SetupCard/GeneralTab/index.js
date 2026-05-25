@@ -7,6 +7,7 @@ import Enums from 'core/infra/enums'
 import _, { debounce } from 'lodash'
 import { Link } from 'react-scroll'
 import { SEARCH_PROFILES } from 'core/infra/graphql-models'
+import { filterExcludedDistributionSearchOptions } from 'core/infra/utils'
 import { UsergroupAddOutlined } from '@ant-design/icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGem } from '@fortawesome/free-regular-svg-icons'
@@ -222,13 +223,15 @@ const GeneralTab = ({
             return
           }
 
-          const result = newOptions.data.profiles.nodes.map((entry) => {
-            return {
-              key: entry.publicKey,
-              label: entry.username,
-              value: entry.publicKey
-            }
-          })
+          const result = filterExcludedDistributionSearchOptions(
+            newOptions.data.profiles.nodes.map((entry) => {
+              return {
+                key: entry.publicKey,
+                label: entry.username,
+                value: entry.publicKey
+              }
+            })
+          )
 
           setOptions(result)
           setFetching(false)
@@ -396,10 +399,12 @@ const GeneralTab = ({
                 mode='multiple'
                 value={rootState.distributeDeSoUser}
                 onChange={(desoUser) => {
-                  const normalizedUser = desoUser.map((user) => ({
-                    ...user,
-                    key: user.key ?? user.value
-                  }))
+                  const normalizedUser = filterExcludedDistributionSearchOptions(
+                    desoUser.map((user) => ({
+                      ...user,
+                      key: user.key ?? user.value
+                    }))
+                  )
                   onDistributeDeSoUser(normalizedUser)
                 }}
                 style={styleProps.searchField}

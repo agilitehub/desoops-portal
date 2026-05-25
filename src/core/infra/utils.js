@@ -121,6 +121,17 @@ export const randomize = (input, separator = ' ', x = 1, performance = false, du
   })
 }
 
+export const isExcludedDistributionPublicKey = (publicKey) => {
+  return publicKey === Enums.values.EXCLUDED_DISTRIBUTION_PUBLIC_KEY
+}
+
+export const filterExcludedDistributionSearchOptions = (options = []) => {
+  return options.filter((option) => {
+    const id = option?.publicKey ?? option?.key ?? option?.value
+    return !isExcludedDistributionPublicKey(id)
+  })
+}
+
 // Create a function that sorts an array of objects by a key value
 export const sortByKey = (array, key) => {
   return array.sort((a, b) => {

@@ -13,7 +13,7 @@ import Enums from 'core/infra/enums'
 import { SortAscendingOutlined } from '@ant-design/icons'
 import { SEARCH_PROFILES } from 'core/infra/graphql-models'
 import { useApolloClient } from '@apollo/client/react'
-import { sortByKey } from 'core/infra/utils'
+import { sortByKey, filterExcludedDistributionSearchOptions, isExcludedDistributionPublicKey } from 'core/infra/utils'
 
 const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfirm, onCancel }) => {
   const [search, setSearch] = useState([])
@@ -23,9 +23,11 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
   useEffect(() => {
     if (isOpen) {
       // Map through rootState.customListModal.userList and create new array of key, label, value
-      const options = rootState.customListModal.userList.map((entry) => {
-        return { key: entry.publicKey, label: entry.username, value: entry.publicKey }
-      })
+      const options = filterExcludedDistributionSearchOptions(
+        rootState.customListModal.userList.map((entry) => {
+          return { key: entry.publicKey, label: entry.username, value: entry.publicKey }
+        })
+      )
 
       setSearch(options)
     } else {
@@ -38,6 +40,7 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
     let userList = []
 
     for (const entry of search) {
+      if (isExcludedDistributionPublicKey(entry.value)) continue
       userList.push(entry.value)
     }
 
@@ -79,13 +82,15 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
             return
           }
 
-          const result = newOptions.data.profiles.nodes.map((entry) => {
-            return {
-              key: entry.publicKey,
-              label: entry.username,
-              value: entry.publicKey
-            }
-          })
+          const result = filterExcludedDistributionSearchOptions(
+            newOptions.data.profiles.nodes.map((entry) => {
+              return {
+                key: entry.publicKey,
+                label: entry.username,
+                value: entry.publicKey
+              }
+            })
+          )
 
           setOptions(result)
           setFetching(false)
@@ -131,7 +136,7 @@ const DeSoUserSearchModal = ({ isOpen, publicKey, rootState, deviceType, onConfi
             value={search}
             placeholder='Search users'
             onChange={(search) => {
-              setSearch(search)
+              setSearch(filterExcludedDistributionSearchOptions(search))
             }}
             style={styleProps.searchField}
           />

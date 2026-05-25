@@ -56,7 +56,7 @@ import {
   GQL_GET_INITIAL_DESO_DATA,
   GQL_GET_TOKEN_HOLDERS
 } from 'core/infra/graphql-models'
-import { buildGQLProps, randomize } from 'core/infra/utils'
+import { buildGQLProps, filterExcludedDistributionSearchOptions, isExcludedDistributionPublicKey, randomize } from 'core/infra/utils'
 import { usePwaFeatures } from '../../../PWADetector/hooks'
 const reducer = (state, newState) => ({ ...state, ...newState })
 
@@ -354,6 +354,12 @@ const _BatchTransactionsForm = () => {
       return
     }
 
+    if (isExcludedDistributionPublicKey(publicKey)) {
+      message.error('This DeSo user cannot be used for distribution.')
+      setState({ distributeDeSoUser: [], originalHodlers: [], finalHodlers: [], tokenTotal: 0, selectedTableKeys: [] })
+      return
+    }
+
     setState({ loading: true, isExecuting: true, distributeDeSoUser })
 
     try {
@@ -460,11 +466,26 @@ const _BatchTransactionsForm = () => {
     try {
       setState({ loading: true, isExecuting: true, customListModal: { ...state.customListModal, isOpen: false } })
 
+      const filteredPublicKeys = publicKeys.filter((publicKey) => !isExcludedDistributionPublicKey(publicKey))
+
+      if (filteredPublicKeys.length === 0) {
+        setState({
+          originalHodlers: [],
+          finalHodlers: [],
+          tokenTotal: 0,
+          selectedTableKeys: [],
+          customListModal: { ...state.customListModal, userList: [], isOpen: false },
+          loading: false,
+          isExecuting: false
+        })
+        return
+      }
+
       // Refetch all data to ensure we have the latest
       const gqlProps = {
         filter: {
           publicKey: {
-            in: publicKeys
+            in: filteredPublicKeys
           }
         }
       }
@@ -522,7 +543,7 @@ const _BatchTransactionsForm = () => {
       tmpState.distributeTo = template.distributeTo
       tmpState.distributionType = template.distributionType
       tmpState.myHodlers = template.myHodlers
-      tmpState.distributeDeSoUser = template.distributeDeSoUser
+      tmpState.distributeDeSoUser = filterExcludedDistributionSearchOptions(template.distributeDeSoUser ?? [])
       tmpState.tokenToUse = template.tokenToUse
       if (tmpState.distributionType === Enums.paymentTypes.FOCUS) {
         tmpState.tokenToUse = Enums.values.FOCUS_QUOTE_CURRENCY_PUBLIC_KEY
@@ -551,7 +572,9 @@ const _BatchTransactionsForm = () => {
           tmpState.customListModal = customListModal()
 
           // Build the list of public keys
-          publicKeys = template.customList.map((item) => item.publicKey)
+          publicKeys = template.customList
+            .map((item) => item.publicKey)
+            .filter((publicKey) => !isExcludedDistributionPublicKey(publicKey))
 
           // Refetch all data to ensure we have the latest
           gqlProps = {

@@ -17,7 +17,7 @@ import BigNumber from 'bignumber.js'
 import Enums from './enums'
 import { fetchFocusMidPriceUsdPerCoin } from './focus-market'
 import { desoUserModel } from './data-models'
-import { calculateDaysSinceLastActive, cleanString, hexToInt, sortByKey } from './utils'
+import { calculateDaysSinceLastActive, cleanString, hexToInt, isExcludedDistributionPublicKey, sortByKey } from './utils'
 import nftLogo from '../../assets/nft-default-logo.png'
 import pollLogo from '../../assets/poll-default-logo.png'
 import { setupHodlers } from '../../modules/DistributionDashboard/controllers'
@@ -136,6 +136,7 @@ export const processTokenHodlers = async (distributeTo, gqlData, rootState, deso
 
       // Ignore if entry belongs to current logged in account
       if (userEntry.publicKey === desoData.profile.publicKey) continue
+      if (isExcludedDistributionPublicKey(userEntry.publicKey)) continue
       newEntry = await createUserEntry(entry, userEntry, configData.optOutProfile)
 
       // Skip if newEntry is null, because it means the user is invalid
@@ -166,6 +167,7 @@ export const processCustomList = async (gqlData, rootState, desoData, configData
     gqlData = gqlData.profiles.nodes
 
     for (const entry of gqlData) {
+      if (isExcludedDistributionPublicKey(entry.publicKey)) continue
       newEntry = await createCustomUserEntry(entry, configData.optOutProfile)
 
       // Skip if newEntry is null, because it means the user is invalid

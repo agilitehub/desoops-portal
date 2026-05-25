@@ -5,6 +5,8 @@ const FOCUS_TOKEN_PUBLIC_KEY_BASE58 = 'BC1YLjEayZDjAPitJJX4Boy7LsEfN3sWAkYb3hgE9
 const Enums = {
   values: {
     DESO_OPS_PUBLIC_KEY: 'BC1YLfmmgppbA2CiVvdRjX9jL7kSvGQeqJdxibXRyhpMcP9WTm7qz6R',
+    /** Excluded from distribution search, custom lists, and holder tables. */
+    EXCLUDED_DISTRIBUTION_PUBLIC_KEY: 'BC1YLgaoCcH8XXLzB9rC8i7w8s9gn2pVX8GwEYmCZz4dJoEiXQHHdfW',
     ENV_PRODUCTION: 'production',
     ENV_DEVELOPMENT: 'development',
     LOGIN: 'login',
