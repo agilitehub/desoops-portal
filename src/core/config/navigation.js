@@ -1,22 +1,23 @@
 // import { faCommentsDollar, faMoneyBillTransfer, faWallet } from '@fortawesome/free-solid-svg-icons'
-import { faMoneyBillTransfer, faWallet } from '@fortawesome/free-solid-svg-icons'
+// import { faMoneyBillTransfer, faWallet } from '@fortawesome/free-solid-svg-icons'
 
-import { ROUTE_SEGMENTS } from '../../constants/paths'
+// import { ROUTE_SEGMENTS } from '../../constants/paths'
 
 /** Items rendered in the main app toolbar (desktop header + mobile footer). */
 export const MAIN_TOOLBAR_ITEMS = [
-  {
-    key: 'wallet',
-    segment: ROUTE_SEGMENTS.WALLET,
-    icon: faWallet,
-    label: 'Wallet'
-  },
-  {
-    key: 'distribute',
-    segment: ROUTE_SEGMENTS.DISTRIBUTE,
-    icon: faMoneyBillTransfer,
-    label: 'Distribute'
-  }
+  // Temporarily hidden — app defaults to Distribute after login:
+  // {
+  //   key: 'wallet',
+  //   segment: ROUTE_SEGMENTS.WALLET,
+  //   icon: faWallet,
+  //   label: 'Wallet'
+  // },
+  // {
+  //   key: 'distribute',
+  //   segment: ROUTE_SEGMENTS.DISTRIBUTE,
+  //   icon: faMoneyBillTransfer,
+  //   label: 'Distribute'
+  // }
   // Temporarily hidden — restore deposits tab when notification UX is re-enabled:
   // {
   //   key: 'deposits',
