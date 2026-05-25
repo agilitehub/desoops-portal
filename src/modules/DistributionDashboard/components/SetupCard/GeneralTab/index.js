@@ -396,7 +396,11 @@ const GeneralTab = ({
                 mode='multiple'
                 value={rootState.distributeDeSoUser}
                 onChange={(desoUser) => {
-                  onDistributeDeSoUser(desoUser)
+                  const normalizedUser = desoUser.map((user) => ({
+                    ...user,
+                    key: user.key ?? user.value
+                  }))
+                  onDistributeDeSoUser(normalizedUser)
                 }}
                 style={styleProps.searchField}
               />

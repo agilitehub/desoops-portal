@@ -105,14 +105,16 @@ export const processTokenHodlers = async (distributeTo, gqlData, rootState, deso
     switch (distributeTo) {
       case Enums.values.DAO:
       case Enums.values.CREATOR:
-        gqlData = gqlData.accountByPublicKey.tokenBalancesAsCreator.nodes
+        gqlData = gqlData.accountByPublicKey?.tokenBalancesAsCreator?.nodes ?? []
         break
       case Enums.values.FOLLOWERS:
-        gqlData = gqlData.accountByPublicKey.followers.nodes
+        gqlData = gqlData.accountByPublicKey?.followers?.nodes ?? []
         break
       case Enums.values.FOLLOWING:
-        gqlData = gqlData.accountByPublicKey.following.nodes
+        gqlData = gqlData.accountByPublicKey?.following?.nodes ?? []
         break
+      default:
+        gqlData = []
     }
 
     for (let entry of gqlData) {

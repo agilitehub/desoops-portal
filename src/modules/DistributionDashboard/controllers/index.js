@@ -9,6 +9,12 @@ import { cloneDeep } from 'lodash'
  * Converts the Summary "Amount to distribute" field into the token units actually sent.
  * ($DESO: USD → DESO; $FOCUS: USD → FOCUS via focusPriceUsd, or amount is already FOCUS tokens.)
  */
+/** Resolves the public key from a distributeDeSoUser Select entry (labelInValue uses `value`, not `key`). */
+export const getDistributeDeSoUserPublicKey = (distributeDeSoUser) => {
+  if (!distributeDeSoUser?.length) return ''
+  return distributeDeSoUser[0].key ?? distributeDeSoUser[0].value ?? ''
+}
+
 export const distributionAmountAsPayingTokens = (rootState, desoData) => {
   const amt = rootState.distributionAmount
   if (amt === null || amt === undefined || amt === '') return 0
@@ -54,7 +60,13 @@ export const setupHodlers = async (hodlers, rootState, desoData) => {
       tokenTotal: percentResult.tokenTotal
     }
   } catch (e) {
-    return e
+    console.error(e)
+    return {
+      originalHodlers: hodlers ?? [],
+      finalHodlers: [],
+      selectedTableKeys: [],
+      tokenTotal: 0
+    }
   }
 }
 
@@ -89,7 +101,12 @@ export const updateTableSelection = async (hodlers, rootState, desoData, selecte
       tokenTotal: percentResult.tokenTotal
     }
   } catch (e) {
-    return e
+    console.error(e)
+    return {
+      finalHodlers: hodlers ?? [],
+      selectedTableKeys: selectedTableKeys ?? [],
+      tokenTotal: 0
+    }
   }
 }
 
@@ -407,8 +424,7 @@ export const prepDistributionTransaction = async (desoData, rootState, summarySt
     distTransaction.feePerTransactionUSD = rootState.feePerTransactionUSD
     distTransaction.distributeTo = rootState.distributeTo
     distTransaction.myHodlers = rootState.myHodlers
-    distTransaction.distributeDeSoUser =
-      rootState.distributeDeSoUser.length > 0 ? rootState.distributeDeSoUser[0].key : ''
+    distTransaction.distributeDeSoUser = getDistributeDeSoUserPublicKey(rootState.distributeDeSoUser)
     distTransaction.distributionType = rootState.distributionType
     distTransaction.distributionAmount = rootState.distributionAmount
     distTransaction.tokenToUse = rootState.tokenToUse
@@ -501,7 +517,7 @@ export const prepDistributionTemplate = async (desoData, rootState, name, rulesE
     transaction.publicKey = desoData.profile.publicKey
     transaction.distributeTo = rootState.distributeTo
     transaction.myHodlers = rootState.myHodlers
-    transaction.distributeDeSoUser = rootState.distributeDeSoUser.length > 0 ? rootState.distributeDeSoUser[0].key : ''
+    transaction.distributeDeSoUser = getDistributeDeSoUserPublicKey(rootState.distributeDeSoUser)
     transaction.distributionType = rootState.distributionType
     transaction.distributionAmount = rootState.distributionAmount
     transaction.tokenToUse = rootState.tokenToUse

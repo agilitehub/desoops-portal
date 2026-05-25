@@ -112,7 +112,9 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
       if (isNaN(distributionAmount)) distributionAmount = 0
 
       // Calculate the number of payment transactions
-      noOfPaymentTransactions = rootState.finalHodlers.filter((hodler) => hodler.isActive && hodler.isVisible).length
+      noOfPaymentTransactions = (rootState.finalHodlers ?? []).filter(
+        (hodler) => hodler.isActive && hodler.isVisible
+      ).length
 
       // If Distribution Type is Diamonds, apply additional logic
       if (rootState.distributionType === CoreEnums.paymentTypes.DIAMONDS) {

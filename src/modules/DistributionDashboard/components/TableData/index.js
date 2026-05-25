@@ -16,7 +16,7 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
     let newState = cloneDeep(rootState)
 
     const { finalHodlers, tokenTotal, selectedTableKeys } = await updateTableSelection(
-      rootState.finalHodlers,
+      rootState.finalHodlers ?? [],
       rootState,
       desoData,
       updatedKeys
@@ -57,7 +57,7 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
   // Create a useState and useEffect hook to monitor rootState.finalHodlers and update the table data array...
   // ...to only include hodlers that have an isVisible = true
   useEffect(() => {
-    const filteredHodlers = rootState.finalHodlers.filter((hodler) => hodler.isVisible)
+    const filteredHodlers = (rootState.finalHodlers ?? []).filter((hodler) => hodler.isVisible)
     setTableData(filteredHodlers)
   }, [rootState.finalHodlers]) // eslint-disable-line react-hooks/exhaustive-deps
 

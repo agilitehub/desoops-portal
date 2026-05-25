@@ -20,7 +20,8 @@ import {
   calculateEstimatedPayment,
   prepDistributionTemplate,
   prepDistributionTransactionUpdate,
-  setupHodlers
+  setupHodlers,
+  getDistributeDeSoUserPublicKey
 } from '../../controllers'
 import { customListModal, diamondOptionsModal, distributionDashboardState, paymentModal } from '../../model/data-models'
 import { setDeSoData, setConfigData, setDistributionTemplates } from 'core/store/slices/custom/reducer'
@@ -163,7 +164,7 @@ const _BatchTransactionsForm = () => {
 
       // Now we need to determine which public key to use based on myHodlers
       if (!state.myHodlers && state.distributeDeSoUser) {
-        publicKey = state.distributeDeSoUser[0].key
+        publicKey = getDistributeDeSoUserPublicKey(state.distributeDeSoUser)
       } else {
         publicKey = desoData.profile.publicKey
       }
@@ -347,17 +348,41 @@ const _BatchTransactionsForm = () => {
       return
     }
 
-    setState({ loading: true, isExecuting: true, distributeDeSoUser })
-    const hodlerData = await fetchUsersFromDeSo(state.distributeTo, distributeDeSoUser[0].key, state)
+    const publicKey = getDistributeDeSoUserPublicKey(distributeDeSoUser)
+    if (!publicKey) {
+      message.error('Could not resolve the selected DeSo user.')
+      return
+    }
 
-    setState({
-      originalHodlers: hodlerData.originalHodlers,
-      finalHodlers: hodlerData.finalHodlers,
-      tokenTotal: hodlerData.tokenTotal,
-      selectedTableKeys: hodlerData.selectedTableKeys,
-      loading: false,
-      isExecuting: false
-    })
+    setState({ loading: true, isExecuting: true, distributeDeSoUser })
+
+    try {
+      const hodlerData = await fetchUsersFromDeSo(state.distributeTo, publicKey, state)
+
+      if (!Array.isArray(hodlerData?.finalHodlers)) {
+        throw new Error(hodlerData?.message || 'Failed to load holders for the selected user.')
+      }
+
+      setState({
+        originalHodlers: hodlerData.originalHodlers ?? [],
+        finalHodlers: hodlerData.finalHodlers,
+        tokenTotal: hodlerData.tokenTotal ?? 0,
+        selectedTableKeys: hodlerData.selectedTableKeys ?? [],
+        loading: false,
+        isExecuting: false
+      })
+    } catch (e) {
+      console.error(e)
+      message.error(e.message || 'Failed to load holders for the selected user.')
+      setState({
+        loading: false,
+        isExecuting: false,
+        originalHodlers: [],
+        finalHodlers: [],
+        tokenTotal: 0,
+        selectedTableKeys: []
+      })
+    }
   }
 
   const handleTokenToUse = async (tokenToUse, tokenToUseLabel) => {
@@ -870,7 +895,13 @@ const _BatchTransactionsForm = () => {
 
       return hodlerData
     } catch (e) {
-      return e
+      console.error(e)
+      return {
+        originalHodlers: [],
+        finalHodlers: [],
+        tokenTotal: 0,
+        selectedTableKeys: []
+      }
     }
   }
 
