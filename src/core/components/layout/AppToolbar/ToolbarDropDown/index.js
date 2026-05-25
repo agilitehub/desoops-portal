@@ -61,7 +61,7 @@ const ToolbarDropDown = () => {
         } else {
           setProfilePic(false)
         }
-      } catch (e) { }
+      } catch (e) {}
     }
 
     if (profile.profilePicUrl) {
@@ -88,8 +88,8 @@ const ToolbarDropDown = () => {
           ) : (
             <UserOutlined style={{ fontSize: 20 }} />
           )}
-          {profile.username}
-          <DownOutlined />
+          <span style={{ color: 'white' }}>{profile.username}</span>
+          <DownOutlined style={{ color: 'white' }} />
         </Space>
       </Dropdown>
     </div>
