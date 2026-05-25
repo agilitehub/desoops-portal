@@ -3,12 +3,11 @@ import { NavLink } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { Badge, Col, Layout, Row } from 'antd'
 import { Footer, Header } from 'antd/es/layout/layout'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import ToolbarDropDown from './ToolbarDropDown'
 import Logo from './Logo'
 import './style.sass'
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { MAIN_TOOLBAR_ITEMS } from 'core/config/navigation'
 import { buildAppPath } from '../../../../constants/paths'
@@ -20,6 +19,7 @@ const AppToolbar = ({ onNotificationsClick }) => {
   const profile = useSelector((sel) => sel.custom.desoData.profile)
   const unreadCount = useSelector((sel) => sel.custom.unreadCount)
   const [topOffset, setTopOffset] = useState(15)
+  const isAuthenticated = Boolean(profile?.publicKey)
 
   useEffect(() => {
     setTopOffset(unreadCount >= 10 ? 25 : 15)
@@ -67,35 +67,14 @@ const AppToolbar = ({ onNotificationsClick }) => {
         </div>
 
         <div className='toolbar-header-center'>
-          {profile?.publicKey ? (
-            <Row
-              justify='center'
-              align='middle'
-              style={{
-                height: '100%',
-                gap: '32px'
-              }}
-            >
-              {desktopNavItems}
-            </Row>
-          ) : undefined}
+          {isAuthenticated ? <nav className='toolbar-header-nav'>{desktopNavItems}</nav> : null}
         </div>
 
-        <div className='toolbar-header-right'>{profile?.publicKey ? <ToolbarDropDown /> : null}</div>
+        <div className='toolbar-header-right'>{isAuthenticated ? <ToolbarDropDown /> : null}</div>
       </Header>
-      {profile?.publicKey && (
+      {isAuthenticated && (
         <Footer className='toolbar-footer'>
-          <Row
-            justify='space-between'
-            align='middle'
-            style={{
-              width: '100%',
-              maxWidth: '400px',
-              margin: '0 auto',
-              height: '100%',
-              padding: '8px 20px'
-            }}
-          >
+          <Row className='toolbar-footer-row' justify='space-between' align='middle'>
             {footerNavItems}
           </Row>
         </Footer>

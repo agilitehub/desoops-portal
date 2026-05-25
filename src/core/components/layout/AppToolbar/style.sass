@@ -3,59 +3,70 @@
 .toolbar-layout
     margin: 0
     padding: 0
-    border-bottom: 1px solid $border-color
+    position: sticky
+    top: 0
+    z-index: 50
+    box-shadow: 0 4px 16px rgba($blue2-dark, 0.18)
 
 .toolbar-header
     display: flex
     flex-direction: row
     justify-content: space-between
     align-items: center
-    background-color: $blue2-dark
-    height: 60px
+    background: linear-gradient(90deg, $blue2-dark 0%, rgba($blue1-dark, 0.96) 38%, rgba($orange1, 0.92) 100%)
+    height: 64px
+    line-height: 1
     padding: 0 24px
+    border-bottom: none
     +xs
-        height: 45px
+        height: 52px
+        padding: 0 12px
 
 .toolbar-header-left
-    width: 200px
-    padding-left: 16px
+    flex-shrink: 0
     display: flex
     align-items: center
+    min-width: 0
     +xs
-        width: auto
+        max-width: 55%
 
 .toolbar-header-center
     flex: 1
     display: flex
     justify-content: center
     align-items: center
-    // Hide on mobile
+    min-width: 0
     +xs
         display: none
 
-.toolbar-header-right
-    width: 200px
+.toolbar-header-nav
     display: flex
-    padding-right: 16px
-    margin-bottom: 16px
+    align-items: center
+    justify-content: center
+    gap: 32px
+    height: 100%
+
+.toolbar-header-right
+    flex-shrink: 0
+    display: flex
     justify-content: flex-end
     align-items: center
-    height: 100%
+    min-width: 120px
     +xs
-        width: auto
+        min-width: 0
 
 .toolbar-header-icon
-    font-size: 24px
+    font-size: 22px
     color: $white
-    transition: transform 0.2s ease
+    transition: color 0.2s ease, transform 0.2s ease
 
 .toolbar-header-icon-disabled
-    font-size: 24px
+    font-size: 22px
     color: $white
     opacity: 0.5
 
 .toolbar-header-icon-active
-    font-size: 24px
+    font-size: 22px
     color: $orange2
     cursor: pointer
     border-radius: 20%
@@ -67,12 +78,20 @@
     padding: 0
     text-align: center
     z-index: 100
-    background-color: $blue2-dark
+    background: linear-gradient(90deg, $blue2-dark 0%, rgba($blue1-dark, 0.96) 38%, rgba($orange1, 0.92) 100%)
     height: 70px
     display: none
     align-items: center
+    border-top: 1px solid rgba($white, 0.12)
     +xs
         display: flex
+
+.toolbar-footer-row
+    width: 100%
+    max-width: 400px
+    margin: 0 auto
+    height: 100%
+    padding: 8px 20px
 
 .toolbar-footer-item
     text-align: center
@@ -85,7 +104,7 @@
 
     &.active
         .toolbar-footer-icon, .toolbar-footer-text
-            color: $orange2
+            color: $white
         &:after
             content: ''
             position: absolute
@@ -93,27 +112,29 @@
             left: 0
             width: 100%
             height: 2px
-            background-color: $orange2
+            background-color: $white
 
 .toolbar-footer-icon
-    font-size: 28px
-    color: $white
+    font-size: 26px
+    color: rgba($white, 0.88)
     margin-bottom: 4px
+    transition: color 0.2s ease
     +xs
-        font-size: 26px
+        font-size: 24px
 
 .toolbar-footer-icon-disabled
-    font-size: 28px
+    font-size: 26px
     color: $white
     opacity: 0.5
     margin-bottom: 4px
     +xs
-        font-size: 26px
+        font-size: 24px
 
 .toolbar-footer-text
     font-size: 12px
-    color: $white
+    color: rgba($white, 0.88)
     margin-top: 2px
+    transition: color 0.2s ease
 
 .toolbar-footer-text-disabled
     font-size: 12px
@@ -127,30 +148,40 @@
     gap: 8px
     cursor: pointer
     position: relative
-    padding-bottom: 0
-    transition: transform 0.2s ease
+    padding: 8px 12px
+    border-radius: 8px
+    text-decoration: none
+    transition: background-color 0.2s ease, transform 0.2s ease
 
     &:hover
-        transform: scale(1.1)
+        background-color: rgba($white, 0.12)
+        transform: none
+
+        .toolbar-header-icon, .toolbar-header-text
+            color: $white
 
     &.active
+        background-color: rgba($white, 0.18)
+
         .toolbar-header-icon, .toolbar-header-text
-            color: $orange2
+            color: $white
+
         &:after
             content: ''
             position: absolute
-            bottom: 10px
-            left: 0
-            width: 100%
+            bottom: 4px
+            left: 12px
+            right: 12px
+            width: auto
             height: 2px
-            background-color: $orange2
+            background-color: $white
 
 .toolbar-header-text
-    color: $white
+    color: rgba($white, 0.92)
     font-size: 14px
-    transition: transform 0.2s ease
-
-    // Hide on mobile
+    font-weight: 600
+    letter-spacing: 0.02em
+    transition: color 0.2s ease
     +xs
         display: none
 
