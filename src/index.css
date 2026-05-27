@@ -44,7 +44,7 @@
   }
 
   .login-bg {
-    @apply pointer-events-none absolute inset-0 z-0 overflow-hidden;
+    @apply pointer-events-none fixed inset-0 z-0 overflow-hidden;
     background: linear-gradient(
       125deg,
       rgba(255, 160, 122, 0.22) 0%,

@@ -29,18 +29,19 @@ const Login = () => {
   }
 
   return (
-    <Row className='relative min-h-screen items-start justify-center overflow-x-hidden bg-background'>
-      <Col span={24} className='relative w-full max-w-full'>
+    <Row className='relative min-h-screen w-full min-w-0 items-start justify-center overflow-x-clip'>
+      <Col span={24} className='relative w-full min-w-0 max-w-full'>
         <LoginBackground />
-        <div className='relative z-[1] mx-auto box-border w-full max-w-[80rem] px-4 pb-10 pt-6 sm:px-6 lg:px-8'>
-          <section className='relative z-[1] px-4 pb-2 pt-6 text-center' aria-labelledby='login-welcome-heading'>
+        <div className='relative z-[1] mx-auto box-border w-full min-w-0 max-w-[80rem] px-4 pb-16 pt-6 max-sm:pb-24 sm:px-6 lg:px-8'>
+          <section className='relative z-[1] min-w-0 px-4 pb-2 pt-6 text-center' aria-labelledby='login-welcome-heading'>
             <h1
               id='login-welcome-heading'
               className='mb-4 border-0 text-[clamp(2rem,5vw,3.25rem)] font-extrabold leading-tight tracking-tight text-deso-blue-deep shadow-none'
             >
-              Welcome to <span className='text-deso-orange'>DeSoOps</span>
+              Welcome to{' '}
+              <span className='text-[length:inherit] text-deso-orange'>DeSoOps</span>
             </h1>
-            <p className='mx-auto mb-7 w-full max-w-none px-2 text-[1.0625rem] font-bold leading-snug text-foreground max-md:text-balance max-md:text-lg max-lg:whitespace-nowrap max-sm:text-[1.0625rem] max-sm:leading-[1.45]'>
+            <p className='mx-auto mb-7 w-full max-w-none px-2 text-balance text-[1.0625rem] font-bold leading-snug text-foreground max-md:text-lg max-sm:text-[1.0625rem] max-sm:leading-[1.45]'>
               The ultimate decentralized admin portal for DeSo creators—manage your community and distribute tokens.
             </p>
             <div className='mb-0 flex flex-wrap justify-center gap-3'>

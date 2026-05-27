@@ -48,15 +48,15 @@ const FEATURES = [
 ]
 
 const LoginFeaturesGrid = () => (
-  <section className='mx-auto mt-8 w-full' aria-labelledby='login-features-heading'>
+  <section className='mx-auto mt-8 w-full min-w-0' aria-labelledby='login-features-heading'>
     <h2 id='login-features-heading' className='mb-10 text-center text-[clamp(1.125rem,2.2vw,1.5rem)] font-bold leading-tight text-deso-blue-deep'>
       Powerful Features for DeSo Creators
     </h2>
-    <div className='mx-auto grid w-full grid-cols-1 gap-[18px] md:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-8'>
+    <div className='mx-auto grid w-full min-w-0 grid-cols-1 gap-[18px] md:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-8'>
       {FEATURES.map((feature) => (
         <article
           key={feature.title}
-          className='rounded-xl border-2 border-deso-orange/40 bg-white/95 p-[18px_22px_20px] text-left shadow-[0_4px_12px_rgba(28,75,115,0.08)] transition-[box-shadow,transform] duration-200 hover:-translate-y-px hover:shadow-[0_8px_20px_rgba(28,75,115,0.12)]'
+          className='min-w-0 rounded-xl border-2 border-deso-orange/40 bg-white/95 p-[18px_22px_20px] text-left shadow-[0_4px_12px_rgba(28,75,115,0.08)] transition-[box-shadow,transform] duration-200 hover:-translate-y-px hover:shadow-[0_8px_20px_rgba(28,75,115,0.12)]'
         >
           <div className='mb-3 flex justify-center text-[1.75rem] text-deso-orange'>
             <FontAwesomeIcon icon={feature.icon} />
