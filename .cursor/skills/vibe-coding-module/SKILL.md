@@ -2,9 +2,9 @@
 name: vibe-coding-module
 description: >-
   Feature module folder layout, thin UI vs controllers/model/hooks, Ant Design,
-  Tailwind and SASS, Font Awesome icons, Agilit-e / GraphQL / Firebase touch
-  points, and when to add shared components under src/core. Use with the
-  vibe-coding index skill when building or refactoring feature code in
+  Tailwind-only styling with theme tokens, Font Awesome icons, Agilit-e / GraphQL /
+  Firebase touch points, and when to add shared components under src/core. Use with
+  the vibe-coding index skill when building or refactoring feature code in
   desoops-portal.
 ---
 
@@ -28,7 +28,6 @@ Under `src/modules/<FeatureName>/` use:
 | Folder | Purpose |
 |--------|---------|
 | **`components/`** | React screens, modals, forms, and presentational pieces for this feature. |
-| **`styles/`** | Module-scoped CSS/SASS for Ant Design overrides and selectors that Tailwind cannot express cleanly. Import from components that need them. Prefer **Tailwind** on wrappers first; reserve `styles/` for deep `.ant-*` overrides and legacy cohesion. |
 | **`controllers/`** | Remote/session access: Agilit-e API usage, Firebase helpers, GraphQL operations composed for the UI, error mapping. Primary surface `controllers/index.js`; split files when large (e.g. `controllers/distribution.js`). |
 | **`model/`** | Pure logic: transforms, validators, defaults (`model/index.js`). No network I/O. |
 | **`hooks/`** | `use*` hooks for state, effects, and glue between controllers/model and UI. |
@@ -41,7 +40,7 @@ Under `src/modules/<FeatureName>/` use:
 
 ### Thin components; logic in `controllers`, `model`, `hooks`
 
-- **Components:** layout, Ant Design usage, **Font Awesome** icons, local UI state (modals, selection), callbacks.
+- **Components:** layout, Ant Design usage, **Font Awesome** icons, Tailwind `className`, local UI state (modals, selection), callbacks.
 - **`controllers/`:** Agilit-e / Firebase / GraphQL orchestration and error shaping for the UI.
 - **`model/`:** validation, transforms, enums/helpers without I/O.
 - **`hooks/`:** shared feature state/effects (e.g. `{ data, loading, error, refetch }`).
@@ -49,28 +48,34 @@ Under `src/modules/<FeatureName>/` use:
 
 ### `src/core` — default: hands off
 
-**Avoid changing** for routine feature work: global theme helpers, unrelated layout internals, auth wiring, Redux store slices you do not own, and infra you are not promoting.
+**Avoid changing** for routine feature work: unrelated layout internals, auth wiring, Redux store slices you do not own, and infra you are not promoting.
 
 **Exceptions:**
 
 1. **`src/core/config/navigation.js`** — toolbar config (see **vibe-coding-navigation**).
 2. **`src/core/components/layout/AppToolbar/`** — shell toolbar layout only when necessary.
 3. **`src/core/components/`** — when promoting **reused** widgets (see below).
+4. **`src/core/theme/`** — design tokens, Ant token map, `ThemeProvider` when extending the theme system.
 
 ### Ant Design (AntD)
 
 - Prefer Ant Design for interactive primitives: `Button`, `Table`, `Form`, `Modal`, `Input`, `Select`, `Card`, `Tabs`, `Typography`, `message` / `notification`, etc.
 - Use existing project wrappers under `src/core/components` once they exist post-migration; until then match the file’s existing import style.
+- Wrap app in **`ThemeProvider`** from `src/core/theme/ThemeProvider.js` for Ant token sync.
 
 ### Icons
 
-- Use **Font Awesome** (`@fortawesome/react-fontawesome` + `@fortawesome/free-solid-svg-icons` etc.) consistently with `.cursor/rules/instructions.mdc`. Avoid Ant Design’s icon package for **new** UI unless touching a file already committed to Ant icons.
+- Use **Font Awesome** (`@fortawesome/react-fontawesome` + `@fortawesome/free-solid-svg-icons` etc.) consistently. Avoid Ant Design’s icon package for **new** UI unless touching a file already committed to Ant icons.
 
-### Styling: Tailwind + Ant Design + module `styles/`
+### Styling: Tailwind + Ant Design + theme tokens
 
-- Prefer **Tailwind** `className` for spacing, flex/grid, responsive layout, and utility styling when Tailwind is available in the build.
-- Pass `className` / `rootClassName` into AntD components where supported.
-- **Ant overrides** that target `.ant-*` or portals often belong in **`styles/`** beside the feature, not inlined ad hoc across many components.
+- **Tailwind only** — all component styling via `className` utilities.
+- **Semantic tokens:** `bg-background`, `text-foreground`, `text-muted`, `border-border`, `bg-surface-muted` (from `src/core/theme/tokens.css` via `tailwind.config.js`).
+- **Brand/status colors:** `text-deso-blue`, `text-deso-orange`, `text-success`, `text-error`, etc. (defined in `tailwind.config.js`).
+- **Global Ant overrides:** `src/index.css` `@layer components` for `.ant-*` selectors shared app-wide.
+- **Per-component Ant tuning:** Ant `classNames` / `styles` props, or Tailwind arbitrary selectors (`[&_.ant-btn]:rounded-lg`).
+- **No** `.sass`, `.module.sass`, or module `styles/` folders — do not add them.
+- Avoid `style={{}}` unless the value is dynamic (computed at runtime).
 
 ### Redux and global state
 
@@ -99,13 +104,13 @@ When a piece is **reused across unrelated features**:
 
 | Role | Path |
 |------|------|
-| Feature modules | `src/modules/<Feature>/` with `components/`, `controllers/`, `model/`, `hooks/`, `styles/` as each feature adopts them |
+| Feature modules | `src/modules/<Feature>/` with `components/`, `controllers/`, `model/`, `hooks/` as each feature adopts them |
 | Example | `DistributionDashboard/components/`, `controllers/`, `model/` |
-| Shared UI | `src/core/components/` (e.g. former reusables: `Spinner`, `CoinSwapModal`, …) |
+| Shared UI | `src/core/components/` (e.g. `Spinner`, `CoinSwapModal`, …) |
+| Theme / tokens | `src/core/theme/tokens.css`, `antd-tokens.js`, `ThemeProvider.js` |
+| Global styles | `src/index.css`, `tailwind.config.js`, `postcss.config.js` |
 | Infra | `src/core/infra/` |
 | Static assets | `src/assets/` |
-| Theme / tokens | `src/core/utils/antd-theme.js`, `theme.js` |
-| Global styles | `src/index.sass`, `src/styles/` |
 
 Mirror a **neighbor feature** (`DistributionDashboard`, `Login`, `PWAManager`) when adding folders.
 
@@ -115,9 +120,10 @@ Mirror a **neighbor feature** (`DistributionDashboard`, `Login`, `PWAManager`) w
 
 | Task | Where |
 |------|--------|
-| Feature UI + logic split | `src/modules/<Feature>/{components,controllers,model,hooks,styles}/` |
+| Feature UI + logic split | `src/modules/<Feature>/{components,controllers,model,hooks}/` |
 | Shared cross-feature widgets | `src/core/components/` |
 | App-wide infra | `src/core/infra/` |
+| Theme tokens + Tailwind config | `src/core/theme/`, `tailwind.config.js` |
 | Toolbar + routes | **vibe-coding-navigation** (`navigation.js`, `routes.js`, `AppToolbar`) |
 
 When unsure, open **DistributionDashboard**, **Login**, or **Notifications** and mirror layout, naming, and import style.

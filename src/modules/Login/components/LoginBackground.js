@@ -1,24 +1,22 @@
 import React from 'react'
 
-import styles from '../styles/login.module.sass'
-
 const SHAPES = [
-  { className: 'shapeHeroCoral', layer: 'layerBack' },
-  { className: 'shapeHeroCoralAccent', layer: 'layerMid' },
-  { className: 'shapeCoralLeft', layer: 'layerBack' },
-  { className: 'shapeBlueCenter', layer: 'layerMid' },
-  { className: 'shapeCoralOverlap', layer: 'layerMid' },
-  { className: 'shapeBlueRight', layer: 'layerBack' },
-  { className: 'shapePinkFloat', layer: 'layerFront' },
-  { className: 'shapeCyanTop', layer: 'layerBack' },
-  { className: 'shapeCoralBottom', layer: 'layerMid' },
-  { className: 'shapeBlueLower', layer: 'layerFront' }
+  { className: 'login-shape-hero-coral', layer: 'login-shape-back' },
+  { className: 'login-shape-hero-coral-accent', layer: 'login-shape-mid' },
+  { className: 'login-shape-coral-left', layer: 'login-shape-back' },
+  { className: 'login-shape-blue-center', layer: 'login-shape-mid' },
+  { className: 'login-shape-coral-overlap', layer: 'login-shape-mid' },
+  { className: 'login-shape-blue-right', layer: 'login-shape-back' },
+  { className: 'login-shape-pink-float', layer: 'login-shape-front' },
+  { className: 'login-shape-cyan-top', layer: 'login-shape-back' },
+  { className: 'login-shape-coral-bottom', layer: 'login-shape-mid' },
+  { className: 'login-shape-blue-lower', layer: 'login-shape-front' }
 ]
 
 const LoginBackground = () => (
-  <div className={styles.background} aria-hidden='true'>
+  <div className='login-bg' aria-hidden='true'>
     {SHAPES.map(({ className, layer }) => (
-      <div key={className} className={`${styles.shape} ${styles[layer]} ${styles[className]}`} />
+      <div key={className} className={`login-shape ${layer} ${className}`} />
     ))}
   </div>
 )

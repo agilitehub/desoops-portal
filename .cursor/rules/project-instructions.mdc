@@ -8,7 +8,7 @@ alwaysApply: true
 
 - You are a master developer in JavaScript, ReactJS, ReduxJS, and responsive User Interface Design.
 - When designing for the UI, you use Ant Design, TailwindCSS, and FontAwesome.
-- You only want to use TailwindCSS, and only resort to custom CSS (SASS) when absolutely required.
+- You use **TailwindCSS only** for all styling — no SASS or module CSS files.
 - You use FontAwesome for all icons, ignoring Ant Design's icon library.
 - You build apps and solutions with the following in mind… no exceptions!
   - Best coding and design practices
@@ -27,8 +27,8 @@ alwaysApply: true
 
 - Write concise **plain JavaScript** (`.js` / `.jsx`) — **no TypeScript** unless the repo explicitly adopts it later.
 - Avoid explanatory comments unless the logic is **hard to infer** from the code alone (edge cases, security constraints, non-standard algorithms).
-- **Styling:** prefer **Tailwind** `className` utilities where practical, including arbitrary values (e.g. `top-[37%]`). Use **module-scoped SASS** (`.sass`, `*.module.sass`) under a feature's `styles/` (or co-located with components) for Ant Design `.ant-*` overrides and patterns Tailwind cannot express cleanly. Avoid React **`style={{}}`** unless a value truly cannot be expressed otherwise.
-- Global bases live in **`src/index.sass`** and **`src/styles/`**; feature-specific styling stays in the module.
+- **Styling:** use **Tailwind** `className` utilities (including arbitrary values, e.g. `top-[37%]`). Global Ant Design overrides live in `src/index.css` `@layer components`. Per-component Ant tuning uses `classNames`/`styles` props or arbitrary Tailwind selectors (e.g. `[&_.ant-btn]:rounded-lg`). Avoid React **`style={{}}`** unless a value is truly dynamic.
+- Global styles live in **`src/index.css`** and **`src/core/theme/tokens.css`**; component styling is Tailwind on JSX.
 - Break large UIs into small components with a single responsibility.
 - Use **`useMemo` / `useCallback`** only where they materially help.
 
@@ -42,7 +42,7 @@ alwaysApply: true
 | Build          | **Create React App** via **CRACO** (`craco start` / `craco build`)                                                |
 | Routing        | **React Router** v7 — `src/routes.js` (`createBrowserRouter`)                                                     |
 | State          | **Redux Toolkit** — store in `src/store.js`, app slice under `src/core/store/slices/custom/` (mount key `custom`) |
-| UI             | **Ant Design**, **Font Awesome**, **Tailwind** (preferred for layout) + **SASS** where needed                     |
+| UI             | **Ant Design**, **Font Awesome**, **Tailwind** (sole styling system)                                              |
 | Backend / APIs | **Agilit-e**, **GraphQL** (Apollo), **Firebase**, **deso-protocol** / **react-deso-protocol**                     |
 
 Webpack aliases (see `craco.config.js`): **`core`** → `src/core`, **`assets`** → `src/assets`. Import shared infra as `core/infra/...`.
@@ -62,9 +62,10 @@ Put **cross-cutting, non-feature** pieces here only:
 | **`components/`**                   | Reusable widgets shared across modules (e.g. modals, layout **AppToolbar**) |
 | **`components/layout/AppToolbar/`** | Authenticated shell toolbar                                                 |
 | **`config/`**                       | App-wide config (e.g. **`navigation.js`** for toolbar items)                |
+| **`theme/`**                        | Design tokens (`tokens.css`), Ant token map (`antd-tokens.js`), `ThemeProvider.js` |
 | **`infra/`**                        | Agilit-e, GraphQL models, Firebase, enums, shared controllers               |
 | **`store/slices/custom/`**          | Redux reducer/state for the `custom` slice                                  |
-| **`utils/`**                        | Theme tokens, Ant Design theme helpers                                      |
+| **`utils/`**                        | Shared non-theme utilities                                                  |
 
 Keep these **generic** — no feature workflows, domain rules, or route-only behaviour.
 
@@ -72,7 +73,7 @@ Keep these **generic** — no feature workflows, domain rules, or route-only beh
 
 ## `src/modules` — all custom / feature logic
 
-Every **feature or route-level screen** lives under **`src/modules/<FeatureName>/`** (e.g. `DistributionDashboard`, `Login`, `CoreApp`, `WalletDashboard`, `OptOut`). Compose **`core`** for shell UI; implement forms, fetching, validation, and feature UI **here**.
+Every **feature or route-level screen** lives under **`src/modules/<FeatureName>/` (e.g. `DistributionDashboard`, `Login`, `CoreApp`, `WalletDashboard`, `OptOut`). Compose **`core`** for shell UI; implement forms, fetching, validation, and feature UI **here**.
 
 ### Standard folders inside each module
 
@@ -81,14 +82,13 @@ Mirror neighboring features (`DistributionDashboard`, `Login`, `PWAManager`) whe
 | Folder             | Purpose                                                           |
 | ------------------ | ----------------------------------------------------------------- |
 | **`components/`**  | Screens, modals, forms, presentational UI for this feature        |
-| **`styles/`**      | Module-scoped SASS for Ant overrides and non-Tailwind styling     |
 | **`controllers/`** | Agilit-e / Firebase / GraphQL orchestration, error mapping for UI |
 | **`model/`**       | Pure transforms, validators, enums — **no** network I/O           |
 | **`hooks/`**       | Feature-scoped `use*` hooks (state, effects, glue)                |
 
 **Entry point:** feature root **`index.js`** re-exports route-facing components. **`src/routes.js`** imports from `src/modules/<Feature>` — keep route files **thin**; logic belongs in `controllers/`, `model/`, and `hooks/`.
 
-For new modules, add the folders the feature needs (`components/` at minimum; add `controllers/`, `model/`, `hooks/`, `styles/` as complexity grows).
+For new modules, add the folders the feature needs (`components/` at minimum; add `controllers/`, `model/`, `hooks/` as complexity grows).
 
 ## Other `src/` locations
 
@@ -97,7 +97,8 @@ For new modules, add the folders the feature needs (`components/` at minimum; ad
 | **`src/routes.js`**                     | Browser router and route → module mapping                                                                                               |
 | **`src/constants/`**                    | Shared constants (e.g. path segments)                                                                                                   |
 | **`src/assets/`**                       | Static images and shared assets                                                                                                         |
-| **`src/styles/`**, **`src/index.sass`** | Global SASS and Ant overrides                                                                                                           |
+| **`src/index.css`**, **`src/core/theme/`** | Global Tailwind entry, design tokens, Ant overrides                                                                                  |
+| **`tailwind.config.js`**                | Tailwind theme extension (semantic colors, brand palette, screens, keyframes)                                                           |
 | **`src/custom/`**                       | **Legacy** code during migration — prefer **`src/modules`** and **`src/core`** for new work; do not extend `custom/` unless unavoidable |
 
 ## Redux and global state

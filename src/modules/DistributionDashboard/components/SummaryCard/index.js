@@ -23,7 +23,6 @@ import {
 import { randomize } from 'core/infra/utils'
 import { createDistributionTransaction, updateDistributionTransaction } from 'core/infra/agilite-controller'
 
-import './style.sass'
 import { identity } from 'deso-protocol'
 import { GET_POSTS } from 'core/infra/graphql-models'
 import { useApolloClient } from '@apollo/client/react'
@@ -301,9 +300,9 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
     }
 
     if (desoData.desoPrice > state.prevDesoPrice) {
-      desoPriceClass = 'updated-positive'
+      desoPriceClass = 'text-success transition-colors duration-1000'
     } else {
-      desoPriceClass = 'updated-negative'
+      desoPriceClass = 'text-error transition-colors duration-1000'
     }
 
     // The price of $DESO changed. If there is an amount to distribute and it's $DESO, we need to update the estimated payment values
@@ -327,9 +326,9 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
     }
 
     if (desoData.focusPriceUsd > state.prevFocusPrice) {
-      focusPriceClass = 'updated-positive'
+      focusPriceClass = 'text-success transition-colors duration-1000'
     } else if (desoData.focusPriceUsd < state.prevFocusPrice) {
-      focusPriceClass = 'updated-negative'
+      focusPriceClass = 'text-error transition-colors duration-1000'
     }
 
     if (rootState.distributionAmount && rootState.distributionType === CoreEnums.paymentTypes.FOCUS) {

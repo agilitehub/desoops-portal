@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Modal, Form, Switch, Select, Card, Row, Col, Divider, Space, message, Button, Alert } from 'antd'
 import { useDispatch, useSelector } from 'react-redux'
-import styles from '../styles/edit-notifications.module.sass'
 import { setEditNotificationsVisible } from 'core/store/slices/custom/reducer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faBellSlash } from '@fortawesome/free-regular-svg-icons'
@@ -132,7 +131,7 @@ const EditNotifications = ({ isVisible }) => {
         </Button>
       </Col>
       <Col>
-        <Button className={styles.finishButton} loading={loading} onClick={handleOk}>
+        <Button className='bg-[#02c23c] text-white' loading={loading} onClick={handleOk}>
           Save
         </Button>
       </Col>

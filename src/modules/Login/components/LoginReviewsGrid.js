@@ -3,8 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGoogle } from '@fortawesome/free-brands-svg-icons'
 import { faWallet, faKey, faRocket, faHeadset } from '@fortawesome/free-solid-svg-icons'
 
-import styles from '../styles/login.module.sass'
-
 const REVIEWS = [
   {
     icon: faWallet,
@@ -41,25 +39,28 @@ const REVIEWS = [
 ]
 
 const LoginReviewsGrid = () => (
-  <section className={styles.reviewsSection} aria-labelledby='login-reviews-heading'>
-    <h2 id='login-reviews-heading' className={styles.reviewsTitle}>
+  <section className='mx-auto mt-12 w-full' aria-labelledby='login-reviews-heading'>
+    <h2 id='login-reviews-heading' className='mb-10 text-center text-[clamp(1.125rem,2.2vw,1.5rem)] font-bold leading-tight text-deso-blue-deep'>
       What Our Users Say
     </h2>
-    <div className={styles.reviewsGrid}>
+    <div className='mx-auto grid w-full grid-cols-1 gap-[18px] lg:grid-cols-2 lg:gap-8'>
       {REVIEWS.map((review) => (
-        <article key={review.name} className={styles.reviewCard}>
-          <div className={styles.reviewHeader}>
-            <div className={styles.reviewIconWrap}>
+        <article
+          key={review.name}
+          className='rounded-xl border border-deso-orange/40 bg-gradient-to-br from-white/55 to-white/[0.32] p-6 shadow-[0_4px_12px_rgba(255,127,80,0.1),0_0_8px_rgba(24,142,255,0.08)] transition-[box-shadow,transform] duration-200 hover:-translate-y-px hover:shadow-[0_6px_16px_rgba(28,75,115,0.12)]'
+        >
+          <div className='mb-3 flex items-start gap-3'>
+            <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-deso-orange to-[#e86a3a] text-lg text-white'>
               <FontAwesomeIcon icon={review.icon} />
             </div>
             <div>
-              <h3 className={styles.reviewName}>{review.name}</h3>
-              <p className={styles.reviewBadge}>{review.badge}</p>
+              <h3 className='m-0 text-base font-bold leading-snug text-foreground'>{review.name}</h3>
+              <p className='mt-0.5 text-[0.8125rem] font-semibold text-deso-orange'>{review.badge}</p>
             </div>
           </div>
-          <p className={styles.reviewQuote}>&ldquo;{review.quote}&rdquo;</p>
+          <p className='mb-3 text-sm font-medium italic leading-[1.45] text-foreground/85'>&ldquo;{review.quote}&rdquo;</p>
           <a
-            className={styles.reviewLink}
+            className='inline-flex items-center gap-1.5 text-xs font-semibold text-deso-blue underline hover:text-[#1478d9]'
             href={review.reviewUrl}
             target='_blank'
             rel='noopener noreferrer'

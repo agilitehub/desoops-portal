@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { Table, Image, App } from 'antd'
 import { CheckCircleOutlined } from '@ant-design/icons'
 
-import theme from '../../../../core/utils/theme'
 import { calculateEstimatedPayment, updateTableSelection, distributionAmountAsPayingTokens } from '../../controllers'
 import Enums from 'core/infra/enums'
 import { copyTextToClipboard } from 'core/infra/utils'
@@ -98,24 +97,20 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
                 src={entry.profilePicUrl}
                 width={18}
                 height={18}
-                style={{ borderRadius: '50%', marginTop: -1 }}
+                className='-mt-px rounded-full'
                 fallback='https://openfund.com/images/ghost-profile-image.svg'
                 preview={false}
               />
-              <span style={{ color: theme.twitterBootstrap.primary, marginLeft: 5, fontSize: 14 }}>{`${entry.username
+              <span className='ml-[5px] text-sm text-deso-blue'>{`${entry.username
                 } (${entry.tokenBalanceLabel}${entry.isCustom ? '' : ' token(s)'})`}</span>
               <br />
-              <span
-                style={{ color: theme.twitterBootstrap.primary, fontSize: 12 }}
-              >{`Ownership: ${entry.percentOwnershipLabel}% - Amount: ${estimatedPaymentLabel}`}</span>
+              <span className='text-xs text-deso-blue'>{`Ownership: ${entry.percentOwnershipLabel}% - Amount: ${estimatedPaymentLabel}`}</span>
               <br />
-              <span
-                style={{ color: theme.twitterBootstrap.primary, fontSize: 12 }}
-              >{`Last Active: ${entry.lastActiveDays} day(s) ago`}</span>
+              <span className='text-xs text-deso-blue'>{`Last Active: ${entry.lastActiveDays} day(s) ago`}</span>
               <br />
 
               {entry.optedOut ? (
-                <span style={{ color: theme.twitterBootstrap.danger, fontSize: 12 }}>Opted Out</span>
+                <span className='text-xs text-error'>Opted Out</span>
               ) : null}
             </>
           )
@@ -136,11 +131,11 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
                 src={entry.profilePicUrl}
                 width={20}
                 height={20}
-                style={{ borderRadius: '50%', marginTop: -3 }}
+                className='-mt-[3px] rounded-full'
                 fallback='https://openfund.com/images/ghost-profile-image.svg'
                 preview={false}
               />
-              <span style={{ color: theme.twitterBootstrap.primary, marginLeft: 5 }}>{`${value} (${rootState.distributeTo === Enums.values.DESO_OPS
+              <span className='ml-[5px] text-deso-blue'>{`${value} (${rootState.distributeTo === Enums.values.DESO_OPS
                 ? entry.deSoOpsTransactionCount
                 : entry.tokenBalanceLabel
                 }${entry.isCustom ? '' : rootState.distributeTo === Enums.values.DESO_OPS ? ' transaction(s)' : ' token(s)'
@@ -171,9 +166,9 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
 
           return (
             <>
-              <span style={{ color: theme.twitterBootstrap.primary }}>{`${value}% -> `}</span>
+              <span className='text-deso-blue'>{`${value}% -> `}</span>
               <span
-                style={{ color: theme.twitterBootstrap.primary, cursor: 'pointer' }}
+                className='cursor-pointer text-deso-blue'
                 onClick={async (e) => {
                   await copyTextToClipboard(entry.estimatedPaymentToken)
                   message.success(`Full payment value for ${entry.username} copied to clipboard`)
@@ -192,7 +187,7 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
         width: '20%',
         render: (value, entry) => {
           let tmpVal = value === 0 ? 'Today' : value && value !== 'undefined' ? `${value} day(s) ago` : 'Unknown'
-          return <span style={{ color: theme.twitterBootstrap.primary }}>{tmpVal}</span>
+          return <span className='text-deso-blue'>{tmpVal}</span>
         }
       },
       {
@@ -203,7 +198,7 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
         render: (value) => {
           if (value) {
             return (
-              <CheckCircleOutlined style={{ fontSize: 18, color: theme.twitterBootstrap.danger, marginLeft: 10 }} />
+              <CheckCircleOutlined className='ml-2.5 text-lg text-error' />
             )
           }
         }

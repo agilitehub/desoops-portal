@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 // import { BellOutlined } from '@ant-design/icons'
 import { Modal, Button, Space, Alert } from 'antd'
 import { usePWAManager } from '../controllers'
-import styles from '../style.module.sass'
 import UpdateChecker from './PWAUpdateChecker'
 import { faBell, faBellSlash, faCheck, faSpinner, faTimes } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -10,7 +9,7 @@ import { useDispatch } from 'react-redux'
 import { setEditNotificationsVisible } from 'core/store/slices/custom/reducer'
 
 const IOSInstructions = () => (
-  <div style={{ fontSize: '15px' }}>
+  <div className='text-[15px]'>
     <p>To receive deposit notifications, you need to install DeSoOps by adding it to your home screen.</p>
     <ol>
       <li>Tap the share button (📤) in Safari's toolbar</li>
@@ -22,7 +21,7 @@ const IOSInstructions = () => (
 )
 
 const NotificationInstructions = () => (
-  <div style={{ fontSize: '15px' }}>
+  <div className='text-[15px]'>
     <p>Receive deposit notifications to your device when receiving:</p>
     <ul>
       <li>Diamonds</li>
@@ -159,7 +158,7 @@ const PWAManager = ({ disabled = false, stepStatuses, forceShow = false }) => {
       >
         <>
           {support?.type === 'ios' && support?.needsInstall ? <IOSInstructions /> : <NotificationInstructions />}{' '}
-          <div className={styles.buttonContainer}>
+          <div className='mt-5 flex justify-center text-center [&_button]:mx-2 [&_button]:px-5 [&_button]:py-1.5'>
             <Button
               type='primary'
               size='large'
@@ -181,19 +180,19 @@ const PWAManager = ({ disabled = false, stepStatuses, forceShow = false }) => {
         </>
 
         {stepsVisible && (
-          <ol style={{ listStyleType: 'none', paddingLeft: 25 }}>
+          <ol className='list-none pl-[25px]'>
             {Object.values(steps).map((step, index) => (
               <li key={index}>
                 {step.status === 'success' ? (
-                  <Space style={{ color: 'green' }}>
+                  <Space className='text-success'>
                     <FontAwesomeIcon icon={faCheck} /> {step.label}
                   </Space>
                 ) : step.status === 'pending' ? (
-                  <Space style={{ color: 'blue' }}>
-                    <FontAwesomeIcon icon={faSpinner} className={styles.spinningIcon} /> {step.label}
+                  <Space className='text-deso-blue'>
+                    <FontAwesomeIcon icon={faSpinner} className='animate-spin' /> {step.label}
                   </Space>
                 ) : step.status === 'error' ? (
-                  <Space style={{ color: 'red' }}>
+                  <Space className='text-error'>
                     <FontAwesomeIcon icon={faTimes} /> {step.label}
                   </Space>
                 ) : (
@@ -205,13 +204,13 @@ const PWAManager = ({ disabled = false, stepStatuses, forceShow = false }) => {
         )}
 
         {errorContent && (
-          <div style={{ marginTop: 10 }}>
+          <div className='mt-2.5'>
             <Alert
               message='Error'
               description={
                 <div>
-                  <div style={{ marginBottom: 10 }}>{errorContent}</div>
-                  <div className={styles.buttonContainer}>
+                  <div className='mb-2.5'>{errorContent}</div>
+                  <div className='mt-5 flex justify-center text-center [&_button]:mx-2 [&_button]:px-5 [&_button]:py-1.5'>
                     <Button
                       size='small'
                       danger
@@ -233,16 +232,16 @@ const PWAManager = ({ disabled = false, stepStatuses, forceShow = false }) => {
         )}
 
         {isSuccess && (
-          <div style={{ marginTop: 10 }}>
+          <div className='mt-2.5'>
             <Alert
               message='Success'
               description={
                 <div>
-                  <div style={{ marginBottom: 10 }}>
+                  <div className='mb-2.5'>
                     Notifications have been successfully initialized. Tap the 'Deposit Settings' button below should you
                     wish to manage your deposit notification settings.
                   </div>
-                  <div className={styles.buttonContainer}>
+                  <div className='mt-5 flex justify-center text-center [&_button]:mx-2 [&_button]:px-5 [&_button]:py-1.5'>
                     <Button
                       size='small'
                       type='primary'

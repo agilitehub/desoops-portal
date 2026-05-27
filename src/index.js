@@ -13,7 +13,9 @@ import Enums from './core/infra/enums'
 import Store from './store'
 
 // Import default Stylesheet for application
-import './index.sass'
+import './core/theme/tokens.css'
+import './index.css'
+import { ThemeProvider } from './core/theme/ThemeProvider'
 import { initAgilite } from './core/infra/agilite-controller'
 
 import { appRouter } from './routes'
@@ -44,13 +46,15 @@ const init = async () => {
     const root = createRoot(document.getElementById('root'))
     root.render(
       <React.StrictMode>
-        <Provider store={Store}>
-          <DeSoIdentityProvider>
-            <ApolloProvider client={client}>
-              <RouterProvider router={router} />
-            </ApolloProvider>
-          </DeSoIdentityProvider>
-        </Provider>
+        <ThemeProvider>
+          <Provider store={Store}>
+            <DeSoIdentityProvider>
+              <ApolloProvider client={client}>
+                <RouterProvider router={router} />
+              </ApolloProvider>
+            </DeSoIdentityProvider>
+          </Provider>
+        </ThemeProvider>
       </React.StrictMode>
     )
   } catch (error) {

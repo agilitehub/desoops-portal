@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { Col, Form, Input, message, Modal, Row, Space, Tooltip } from 'antd'
 import { getSingleProfile, updateProfile } from 'deso-protocol'
 
-import styles from '../styles/edit-profile.module.sass'
 import { CopyTwoTone, LoadingOutlined, PlusOutlined } from '@ant-design/icons'
 import { useDispatch, useSelector } from 'react-redux'
 import { setEditProfileVisible } from 'core/store/slices/custom/reducer'
@@ -180,7 +179,7 @@ const EditProfile = ({ isVisible, desoData, setDeSoData }) => {
       title={<center>Edit Your Profile</center>}
       open={isVisible}
       okText='Save'
-      okButtonProps={{ className: styles.finishButton, loading: loading }}
+      okButtonProps={{ className: '!bg-[#02c23c] !text-white', loading: loading }}
       maskProps={{ style: { backgroundColor: 'rgba(0, 0, 0, 0.8)' } }}
       closable={false}
       maskClosable={false}

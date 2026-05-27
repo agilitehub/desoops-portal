@@ -1,11 +1,15 @@
 import React, { useEffect, useReducer } from 'react'
 import { Col, Row, Card, Button, Space } from 'antd'
 
-import styles from './style.module.sass'
 import { getUsernameForPublicKey } from 'deso-protocol'
 import { desoLogout } from 'core/infra/deso-controller-graphql'
 import Enums from 'core/infra/enums'
-import theme from '../../../core/utils/theme'
+
+const HEADER_CLASS = {
+  headerSuccess: 'text-[22px] text-success max-sm:text-[19px]',
+  headerConflict: 'text-[22px] text-deso-orange max-sm:text-[19px]',
+  headerError: 'text-[22px] text-error max-sm:text-[19px]'
+}
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
@@ -50,15 +54,10 @@ const Completion = ({ rootState, setRootState, handleOptIn, handleOptOut }) => {
               </div>
             )
             extraContent = (
-              <div style={{ fontSize: 16 }}>
+              <div className='text-base'>
                 <Row justify='center'>
                   <Col>
-                    <Button
-                      type='primary'
-                      size='large'
-                      onClick={() => handleConfirm(true)}
-                      style={{ backgroundColor: theme.twitterBootstrap.success, fontSize: 18 }}
-                    >
+                    <Button type='primary' size='large' onClick={() => handleConfirm(true)} className='!bg-success text-lg'>
                       <Space>Opt Back In</Space>
                     </Button>
                   </Col>
@@ -76,15 +75,10 @@ const Completion = ({ rootState, setRootState, handleOptIn, handleOptOut }) => {
               </div>
             )
             extraContent = (
-              <div style={{ fontSize: 16 }}>
+              <div className='text-base'>
                 <Row justify='center'>
                   <Col>
-                    <Button
-                      type='primary'
-                      size='large'
-                      onClick={() => handleConfirm(true)}
-                      style={{ backgroundColor: theme.twitterBootstrap.success, fontSize: 18 }}
-                    >
+                    <Button type='primary' size='large' onClick={() => handleConfirm(true)} className='!bg-success text-lg'>
                       <Space>Opt Back In</Space>
                     </Button>
                   </Col>
@@ -111,15 +105,10 @@ const Completion = ({ rootState, setRootState, handleOptIn, handleOptOut }) => {
               </div>
             )
             extraContent = (
-              <div style={{ fontSize: 16 }}>
+              <div className='text-base'>
                 <Row justify='center'>
                   <Col>
-                    <Button
-                      type='primary'
-                      size='large'
-                      onClick={() => handleConfirm(false)}
-                      style={{ backgroundColor: theme.twitterBootstrap.danger, fontSize: 18 }}
-                    >
+                    <Button type='primary' size='large' onClick={() => handleConfirm(false)} className='!bg-error text-lg'>
                       <Space>Opt Out</Space>
                     </Button>
                   </Col>
@@ -137,15 +126,10 @@ const Completion = ({ rootState, setRootState, handleOptIn, handleOptOut }) => {
               </div>
             )
             extraContent = (
-              <div style={{ fontSize: 16 }}>
+              <div className='text-base'>
                 <Row justify='center'>
                   <Col>
-                    <Button
-                      type='primary'
-                      size='large'
-                      onClick={() => handleConfirm(false)}
-                      style={{ backgroundColor: theme.twitterBootstrap.danger, fontSize: 18 }}
-                    >
+                    <Button type='primary' size='large' onClick={() => handleConfirm(false)} className='!bg-error text-lg'>
                       <Space>Opt Out</Space>
                     </Button>
                   </Col>
@@ -165,7 +149,7 @@ const Completion = ({ rootState, setRootState, handleOptIn, handleOptOut }) => {
               </div>
             )
             extraContent = (
-              <div style={{ fontSize: 16 }}>
+              <div className='text-base'>
                 <Row justify='center'>
                   <Col>
                     <Button
@@ -178,7 +162,7 @@ const Completion = ({ rootState, setRootState, handleOptIn, handleOptOut }) => {
                           handleOptOut()
                         }
                       }}
-                      style={{ backgroundColor: theme.twitterBootstrap.warning, fontSize: 18 }}
+                      className='!bg-deso-orange text-lg'
                     >
                       <Space>Yes - {rootState.isOptIn ? 'Opt In' : 'Opt Out'}</Space>
                     </Button>
@@ -204,9 +188,9 @@ const Completion = ({ rootState, setRootState, handleOptIn, handleOptOut }) => {
 
   const renderSwitchAccount = (renderNo) => {
     return (
-      <Row justify='center' style={{ marginTop: 10 }}>
+      <Row justify='center' className='mt-2.5'>
         <Col>
-          <Button size='large' type='primary' onClick={() => handleDesoLogout()} style={{ fontSize: 18 }}>
+          <Button size='large' type='primary' onClick={() => handleDesoLogout()} className='text-lg'>
             {renderNo ? 'No - ' : ''}Switch Account
           </Button>
         </Col>
@@ -235,15 +219,15 @@ const Completion = ({ rootState, setRootState, handleOptIn, handleOptOut }) => {
   }
 
   return (
-    <Card type='inner' size='small' className={styles.card} loading={state.loading}>
+    <Card type='inner' size='small' className='border-none bg-transparent' loading={state.loading}>
       <Row>
         <Col span={24}>
           <center>
-            <span className={styles[state.headerClass]}>{state.headerMessage}</span>
+            <span className={HEADER_CLASS[state.headerClass] || ''}>{state.headerMessage}</span>
           </center>
         </Col>
       </Row>
-      <Row justify='center' style={{ marginTop: 10 }}>
+      <Row justify='center' className='mt-2.5'>
         <Col>{state.extraContent}</Col>
       </Row>
     </Card>

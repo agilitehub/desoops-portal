@@ -18,7 +18,6 @@ import { optOutModel } from 'core/infra/data-models'
 import Completion from '../Completion'
 
 import logo from 'assets/deso-ops-logo-full.png'
-import styles from '../style.module.sass'
 import { cloneDeep } from 'lodash'
 import { setDeSoData } from 'core/store/slices/custom/reducer'
 
@@ -307,14 +306,14 @@ const OptOut = () => {
   return (
     <>
       <AppToolbar />
-      <Row className={styles.wrapper}>
+      <Row className='justify-center'>
         <Col span={24}>
-          <Card type='inner' size='small' className={styles.card}>
+          <Card type='inner' size='small' className='border-none bg-transparent'>
             <Row>
               <Col span={24}>
                 <center>
-                  <img src={logo} alt='DeSoOps Portal' className={styles.logo} />
-                  <span className={styles.header}>OPT IN/OUT OF DESO OPS TAGGING</span>
+                  <img src={logo} alt='DeSoOps Portal' className='h-[200px] w-[200px]' />
+                  <span className='block text-2xl font-bold'>OPT IN/OUT OF DESO OPS TAGGING</span>
                 </center>
                 {state.renderState === Enums.appRenderState.PREP ? <Spinner tip={Enums.spinnerMessages.PREP} /> : null}
 
@@ -339,18 +338,21 @@ const OptOut = () => {
                   <Row>
                     <Col span={24}>
                       <center>
-                        <p className={styles.paragraph}>
+                        <p className='text-lg max-sm:text-base'>
                           You will need to sign into your DeSo account to Opt Out of receiving notifications via DeSoOps
                           tagging.
                         </p>
                       </center>
                     </Col>
-                    <Col span={24} className={styles.btnWrapper}>
-                      <button onClick={handleLogin}>
-                        <div className={styles.icon}>
-                          <LoginOutlined style={{ fontSize: 20 }} />
+                    <Col span={24} className='mt-5 flex justify-center'>
+                      <button
+                        onClick={handleLogin}
+                        className='mr-2.5 flex cursor-pointer flex-row items-center gap-3 rounded-lg border border-transparent bg-deso-blue px-2 py-2 text-white'
+                      >
+                        <div className='ml-2.5 text-xl max-sm:ml-[5px] max-sm:text-base'>
+                          <LoginOutlined className='text-xl max-sm:text-base' />
                         </div>
-                        <span className={styles.text}>SIGN IN WITH DESO</span>
+                        <span className='text-base max-sm:text-sm'>SIGN IN WITH DESO</span>
                       </button>
                     </Col>
                   </Row>

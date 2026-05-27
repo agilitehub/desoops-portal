@@ -4,8 +4,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { BellOutlined, DownOutlined, UserOutlined } from '@ant-design/icons'
 
 import { desoLogout } from 'core/infra/deso-controller-graphql'
-
-import './style.sass'
 import { setEditProfileVisible, setEditNotificationsVisible } from 'core/store/slices/custom/reducer'
 
 const ToolbarDropDown = () => {
@@ -16,33 +14,33 @@ const ToolbarDropDown = () => {
   const handleGetItems = () => {
     const dropDownItems = {
       editProfile: {
-        icon: <UserOutlined style={{ fontSize: 16 }} />,
+        icon: <UserOutlined className='text-base' />,
         danger: false,
         key: 'Edit Profile',
         label: 'Profile',
-        className: 'dropdown-item',
+        className: 'text-lg max-sm:text-sm',
         onClick: () => dispatch(setEditProfileVisible(true))
       },
       editNotifications: {
-        icon: <BellOutlined style={{ fontSize: 16 }} />,
+        icon: <BellOutlined className='text-base' />,
         danger: false,
         key: 'Deposit Settings',
         label: 'Deposit Settings',
-        className: 'dropdown-item',
+        className: 'text-lg max-sm:text-sm',
         onClick: () => dispatch(setEditNotificationsVisible(true))
       },
       signOut: {
         danger: true,
         key: 'Sign Out',
         label: 'Sign Out',
-        className: 'dropdown-item',
+        className: 'text-lg max-sm:text-sm',
         onClick: desoLogout
       },
       version: {
         key: 'version',
         disabled: true,
         label: `Version ${process.env.REACT_APP_VERSION}`,
-        className: 'dropdown-item'
+        className: 'text-lg max-sm:text-sm'
       }
     }
 
@@ -76,20 +74,20 @@ const ToolbarDropDown = () => {
   return (
     <div>
       <Dropdown
-        className='toolbar-dropdown'
+        className='mr-[-25px] mt-3 flex h-10 justify-end border-0 bg-transparent text-lg text-white max-sm:mr-[-35px] max-sm:mt-[9px] max-sm:h-[35px] max-sm:text-sm'
         trigger={['click']}
         menu={{
           items: handleGetItems()
         }}
       >
-        <Space style={{ cursor: 'pointer', marginTop: 10 }}>
+        <Space className='mt-2.5 cursor-pointer'>
           {profilePic ? (
-            <Image src={profile.profilePicUrl} className='toolbar-dropdown-btn-icon' preview={false} />
+            <Image src={profile.profilePicUrl} className='!mt-[-2px] !h-[35px] !w-[35px] rounded-lg max-sm:!h-[25px] max-sm:!w-[25px]' preview={false} />
           ) : (
-            <UserOutlined style={{ fontSize: 20 }} />
+            <UserOutlined className='text-xl' />
           )}
-          <span style={{ color: 'white' }}>{profile.username}</span>
-          <DownOutlined style={{ color: 'white' }} />
+          <span className='text-white'>{profile.username}</span>
+          <DownOutlined className='text-white' />
         </Space>
       </Dropdown>
     </div>

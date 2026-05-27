@@ -1,0 +1,37 @@
+:root {
+  --color-background: 247 249 249;
+  --color-surface: 255 255 255;
+  --color-surface-muted: 237 237 237;
+  --color-border: 228 235 235;
+  --color-border-input: 209 213 219;
+  --color-foreground: 43 45 45;
+  --color-muted: 155 155 155;
+  --color-subtle: 107 114 128;
+  --color-placeholder: 204 204 204;
+  --color-ring-offset: 255 255 255;
+  --color-overlay-hover: rgb(0 0 0 / 0.06);
+  --color-success: 41 167 69;
+  --color-warning: 255 194 14;
+  --color-error: 220 54 69;
+  --color-info: 23 162 184;
+  --color-mask: rgb(0 0 0 / 0.5);
+}
+
+.dark {
+  --color-background: 27 27 27;
+  --color-surface: 51 51 51;
+  --color-surface-muted: 36 36 36;
+  --color-border: 43 43 50;
+  --color-border-input: 55 65 81;
+  --color-foreground: 245 245 245;
+  --color-muted: 128 128 128;
+  --color-subtle: 156 163 175;
+  --color-placeholder: 128 128 128;
+  --color-ring-offset: 27 27 27;
+  --color-overlay-hover: rgb(255 255 255 / 0.08);
+  --color-success: 41 167 69;
+  --color-warning: 255 194 14;
+  --color-error: 220 54 69;
+  --color-info: 23 162 184;
+  --color-mask: rgb(0 0 0 / 0.5);
+}

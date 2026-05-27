@@ -1,0 +1,268 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply m-0 min-h-screen bg-background font-sans text-base text-foreground antialiased;
+    font-family: 'Roboto', sans-serif;
+  }
+
+  th,
+  span {
+    @apply font-sans text-base;
+  }
+}
+
+@layer components {
+  .ant-tabs-tab {
+    @apply !text-base max-sm:!px-0 max-sm:!py-[5px] max-sm:!text-sm;
+  }
+
+  .ant-tabs-nav-list {
+    @apply max-sm:-mt-2.5;
+  }
+
+  .ant-tabs-nav {
+    @apply max-sm:!mb-[5px];
+  }
+
+  .ant-radio-button-wrapper {
+    @apply max-sm:text-sm;
+  }
+
+  .ant-table-cell {
+    @apply max-sm:!p-[5px_10px_5px_5px];
+  }
+
+  .ant-table-selection-column {
+    @apply max-sm:align-middle;
+  }
+
+  .ant-drawer-body {
+    @apply max-sm:!p-0;
+  }
+
+  .login-bg {
+    @apply pointer-events-none absolute inset-0 z-0 overflow-hidden;
+    background: linear-gradient(
+      125deg,
+      rgba(255, 160, 122, 0.22) 0%,
+      rgba(255, 127, 80, 0.1) 16%,
+      rgb(var(--color-background)) 38%,
+      rgba(255, 160, 122, 0.14) 52%,
+      rgb(var(--color-background)) 68%,
+      rgba(24, 142, 255, 0.08) 100%
+    );
+  }
+
+  .login-bg::after {
+    content: '';
+    @apply pointer-events-none absolute inset-0;
+    background: linear-gradient(to bottom, transparent 0%, transparent 65%, rgba(75, 156, 211, 0.05) 100%);
+  }
+
+  .login-shape {
+    @apply pointer-events-none absolute origin-center rounded-[80px] will-change-transform;
+    filter: none;
+    box-shadow: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .login-shape {
+      animation: none !important;
+    }
+  }
+
+  .login-shape-back {
+    @apply z-0;
+  }
+
+  .login-shape-mid {
+    @apply z-[1];
+  }
+
+  .login-shape-front {
+    @apply z-[2];
+  }
+
+  .login-shape-hero-coral {
+    --login-rotate: -9deg;
+    left: -14%;
+    top: -4vh;
+    width: min(64vw, 720px);
+    height: min(46vh, 440px);
+    border-radius: 110px;
+    background: linear-gradient(145deg, rgba(255, 127, 80, 0.48) 0%, rgba(255, 160, 122, 0.34) 40%, rgba(255, 190, 175, 0.18) 65%, transparent 85%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 50%, transparent 88%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 50%, transparent 88%);
+    @apply animate-login-float-up-left;
+  }
+
+  .login-shape-hero-coral-accent {
+    --login-rotate: 11deg;
+    right: 8%;
+    left: auto;
+    top: 10vh;
+    width: min(40vw, 440px);
+    height: min(34vh, 320px);
+    border-radius: 96px;
+    background: linear-gradient(210deg, rgba(255, 160, 122, 0.42) 0%, rgba(255, 127, 80, 0.3) 48%, transparent 78%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 70%, transparent 95%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 70%, transparent 95%);
+    animation: loginFloatScale 22s ease-in-out -5s infinite;
+  }
+
+  .login-shape-coral-left {
+    --login-rotate: -11deg;
+    left: -6%;
+    top: 48%;
+    width: min(36vw, 400px);
+    height: min(58vh, 600px);
+    border-radius: 100px;
+    background: linear-gradient(155deg, rgba(255, 127, 80, 0.4) 0%, rgba(255, 160, 122, 0.28) 42%, transparent 76%);
+    animation: loginFloatUpLeft 26s ease-in-out infinite;
+  }
+
+  .login-shape-blue-center {
+    --login-rotate: 5deg;
+    left: 22%;
+    top: 54%;
+    width: min(56vw, 560px);
+    height: min(28vh, 280px);
+    border-radius: 88px;
+    background: linear-gradient(90deg, transparent 0%, rgba(120, 200, 255, 0.2) 30%, rgba(24, 142, 255, 0.3) 52%, transparent 88%);
+    animation: loginFloatDown 22s ease-in-out -4s infinite;
+  }
+
+  .login-shape-coral-overlap {
+    --login-rotate: 16deg;
+    left: 58%;
+    top: 50%;
+    width: min(34vw, 380px);
+    height: min(48vh, 500px);
+    border-radius: 92px;
+    background: linear-gradient(205deg, rgba(255, 160, 122, 0.38) 0%, rgba(255, 127, 80, 0.26) 48%, transparent 78%);
+    animation: loginFloatScale 20s ease-in-out -8s infinite;
+  }
+
+  .login-shape-blue-right {
+    --login-rotate: 14deg;
+    right: -14%;
+    left: auto;
+    top: 38%;
+    width: min(46vw, 500px);
+    height: min(52vh, 540px);
+    border-radius: 110px;
+    background: linear-gradient(225deg, rgba(24, 142, 255, 0.38) 0%, rgba(100, 195, 255, 0.26) 45%, transparent 74%);
+    animation: loginFloatDown 24s ease-in-out -12s infinite;
+  }
+
+  .login-shape-pink-float {
+    --login-rotate: 4deg;
+    left: 28%;
+    top: 20vh;
+    width: min(48vw, 520px);
+    height: min(20vh, 200px);
+    border-radius: 72px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 160, 122, 0.38) 28%, rgba(255, 127, 80, 0.3) 52%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 85%, transparent 100%);
+    animation: loginFloatScale 18s ease-in-out -2s infinite;
+  }
+
+  .login-shape-cyan-top {
+    --login-rotate: 42deg;
+    right: -12%;
+    left: auto;
+    top: -18%;
+    width: min(44vw, 500px);
+    height: min(44vw, 500px);
+    border-radius: 120px;
+    background: linear-gradient(to bottom, rgba(120, 210, 255, 0.24) 0%, rgba(24, 142, 255, 0.14) 40%, transparent 68%);
+    animation: loginFloatUpLeft 21s ease-in-out -6s infinite;
+  }
+
+  .login-shape-coral-bottom {
+    --login-rotate: -15deg;
+    left: -20%;
+    top: 70%;
+    width: min(58vw, 640px);
+    height: min(36vw, 400px);
+    border-radius: 140px;
+    background: linear-gradient(to top right, rgba(255, 127, 80, 0.38) 0%, rgba(255, 160, 122, 0.24) 50%, transparent 78%);
+    animation: loginFloatDown 28s ease-in-out -10s infinite;
+  }
+
+  .login-shape-blue-lower {
+    --login-rotate: -10deg;
+    right: 6%;
+    left: auto;
+    top: 58%;
+    width: min(30vw, 320px);
+    height: min(30vw, 320px);
+    border-radius: 68px;
+    background: linear-gradient(140deg, rgba(75, 156, 211, 0.36) 0%, rgba(24, 142, 255, 0.24) 50%, transparent 80%);
+    animation: loginFloatUpLeft 23s ease-in-out -14s infinite;
+  }
+
+  .login-cta-button {
+    @apply inline-flex min-h-12 cursor-pointer items-center justify-center gap-2.5 rounded-[10px] border-none px-6 py-3 text-base font-bold text-white transition-[transform,box-shadow] duration-200 max-sm:w-full max-sm:max-w-[340px];
+    background: linear-gradient(135deg, #ff9166 0%, #ff7f50 45%, #e86a3a 100%);
+    box-shadow: 0 8px 24px rgba(255, 127, 80, 0.35);
+  }
+
+  .login-cta-button:hover {
+    @apply -translate-y-px;
+    box-shadow: 0 12px 32px rgba(255, 127, 80, 0.45);
+  }
+
+  .login-cta-button:active {
+    @apply translate-y-0;
+  }
+
+  .toolbar-header-gradient {
+    background: linear-gradient(90deg, #1c4b73 0%, rgba(75, 156, 211, 0.96) 38%, rgba(255, 127, 80, 0.92) 100%);
+  }
+
+  .toolbar-header-item {
+    @apply relative flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2 no-underline transition-[background-color,transform] duration-200;
+  }
+
+  .toolbar-header-item:hover {
+    @apply bg-white/10;
+  }
+
+  .toolbar-header-item:hover .toolbar-header-icon,
+  .toolbar-header-item:hover .toolbar-header-text {
+    @apply text-white;
+  }
+
+  .toolbar-header-item.active {
+    @apply bg-white/[0.18];
+  }
+
+  .toolbar-header-item.active .toolbar-header-icon,
+  .toolbar-header-item.active .toolbar-header-text {
+    @apply text-white;
+  }
+
+  .toolbar-header-item.active::after {
+    content: '';
+    @apply absolute bottom-1 left-3 right-3 h-0.5 bg-white;
+  }
+
+  .toolbar-footer-item {
+    @apply relative flex cursor-pointer flex-col items-center pb-[5px] text-center;
+  }
+
+  .toolbar-footer-item.active .toolbar-footer-icon,
+  .toolbar-footer-item.active .toolbar-footer-text {
+    @apply text-white;
+  }
+
+  .toolbar-footer-item.active::after {
+    content: '';
+    @apply absolute -bottom-1 left-0 h-0.5 w-full bg-white;
+  }
+}

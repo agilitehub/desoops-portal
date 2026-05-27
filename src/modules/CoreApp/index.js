@@ -40,7 +40,6 @@ import { getDeSoPricing, getInitialDeSoData } from 'core/infra/deso-controller-g
 import { fetchFocusMidPriceUsdPerCoin } from 'core/infra/focus-market'
 import { GQL_GET_INITIAL_DESO_DATA } from 'core/infra/graphql-models'
 
-import './style.sass'
 import { initializeMessaging } from 'core/infra/firebase-controller'
 import EditNotifications from '../EditNotifications'
 import ComingSoon from '../ComingSoon'
@@ -261,12 +260,12 @@ const CoreApp = () => {
       case Enums.appRenderState.SIGNING_IN:
         return (
           <>
-            <div className='cs-spin-wrapper'>
+            <div className='mt-5 flex h-full flex-col items-center justify-center'>
               <Spin size='large' />
-              <span>{state.spinTip}</span>
+              <span className='mt-[15px] text-xl text-foreground'>{state.spinTip}</span>
             </div>
             <center>
-              <img src={logo} alt={process.env.REACT_APP_NAME} style={{ width: 300 }} />
+              <img src={logo} alt={process.env.REACT_APP_NAME} className='w-[300px]' />
             </center>
           </>
         )

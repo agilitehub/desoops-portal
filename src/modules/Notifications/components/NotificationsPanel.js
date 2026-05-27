@@ -8,8 +8,6 @@ import { formatNotifications, categorizeNotifications, formatDate } from '../con
 import { fetchUserNotifications, markNotificationsAsRead } from 'core/infra/agilite-controller'
 import { setUnreadCount as setUnreadCountRedux, setNotificationsVisible } from 'core/store/slices/custom/reducer'
 
-import styles from '../styles/notifications.module.sass'
-
 const Notifications = () => {
   // Hooks
   const dispatch = useDispatch()
@@ -192,7 +190,7 @@ const Notifications = () => {
   return (
     <Drawer
       title={
-        <Space className={styles.drawerTitle}>
+        <Space className='w-full justify-between'>
           <span>{`Deposits (${initialUnreadCount} unread)`}</span>
         </Space>
       }
@@ -200,14 +198,14 @@ const Notifications = () => {
       onClose={handleOnClose}
       open={notificationsVisible}
       width={500}
-      className={styles.drawer}
+      className='[&_.ant-drawer-body]:h-[calc(100%-60px)] [&_.ant-drawer-body]:overflow-hidden [&_.ant-drawer-body]:p-0 [&_.ant-drawer-header]:sticky [&_.ant-drawer-header]:top-0 [&_.ant-drawer-header]:z-[1] [&_.ant-drawer-header]:border-b [&_.ant-drawer-header]:border-[#f0f0f0]'
     >
-      <div className={styles.drawerContent} ref={drawerContentRef}>
+      <div className='h-full overflow-y-auto scroll-smooth p-4 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb]:bg-[#888] [&::-webkit-scrollbar-track]:bg-[#f1f1f1] [&::-webkit-scrollbar]:w-1.5' ref={drawerContentRef}>
         <>
           {newNotifications.length > 0 && (
-            <div className={styles.newNotificationsBar}>
-              <Button type='primary' onClick={handleShowNewNotifications}>
-                <FontAwesomeIcon icon={faBell} className={styles.bellIcon} />
+            <div className='sticky z-[1] -mt-[18px] mb-2 flex items-center justify-center border-b border-[#f0f0f0] bg-white/95 px-2 py-3 backdrop-blur-sm'>
+              <Button type='primary' onClick={handleShowNewNotifications} className='min-w-[200px] bg-deso-blue-deep/90 hover:!bg-deso-blue-deep'>
+                <FontAwesomeIcon icon={faBell} className='mr-2 text-sm' />
                 Show {newNotifications.length} New Notification{newNotifications.length !== 1 ? 's' : ''}
               </Button>
             </div>
@@ -226,32 +224,34 @@ const Notifications = () => {
                         itemLayout='horizontal'
                         dataSource={items}
                         renderItem={(notification) => (
-                          <List.Item className={`${notification.unread ? styles.unread : styles.read} ${styles.card}`}>
+                          <List.Item
+                            className={`!mb-0.5 !rounded-[10px] !p-[3px] max-md:mx-[5px] last:!mb-0 ${notification.unread ? 'border-l-[3px] border-l-[#1890ff] bg-[#e6f7ff]' : ''}`}
+                          >
                             <List.Item.Meta
                               avatar={
                                 <Avatar
                                   size={30}
                                   src={notification.senderPic}
                                   icon={!notification.senderPic && <UserOutlined />}
-                                  className={styles.avatar}
+                                  className='mr-3 h-10 w-10'
                                 />
                               }
                               title={
-                                <div className={styles.notificationHeader}>
-                                  <span className={styles.username}>{notification.sender}</span>
-                                  <span className={styles.timestamp}>{notification.shortDate}</span>
+                                <div className='-ml-5 mt-[3px] flex items-center justify-between'>
+                                  <span className='mr-2 font-semibold'>{notification.sender}</span>
+                                  <span className='mr-[5px] whitespace-nowrap text-xs text-black/45'>{notification.shortDate}</span>
                                 </div>
                               }
                               description={
                                 <>
-                                  <div className={styles.description}>{notification.description}</div>
-                                  <div className={styles.fullTimestamp}>{notification.fullDate}</div>
+                                  <div className='-ml-5 mr-[25px] break-words text-black/85'>{notification.description}</div>
+                                  <div className='mr-[5px] mt-2 whitespace-nowrap text-right text-xs text-black/35'>{notification.fullDate}</div>
                                 </>
                               }
                             />
                             {notification.icon && (
-                              <div className={styles.iconContainer}>
-                                <FontAwesomeIcon icon={notification.icon} className={styles.typeIcon} />
+                              <div className='absolute right-2.5 flex h-full items-center'>
+                                <FontAwesomeIcon icon={notification.icon} className='text-lg text-deso-blue-deep/80' />
                               </div>
                             )}
                           </List.Item>
@@ -262,12 +262,12 @@ const Notifications = () => {
               )}
 
               {hasMore && (
-                <div className={styles.loadMoreContainer}>
+                <div className='flex justify-center py-4'>
                   <Button
                     onClick={handleLoadMore}
                     loading={loadingMore}
                     disabled={!hasMore}
-                    className={styles.loadMoreButton}
+                    className='min-w-[200px] cursor-pointer rounded border-none bg-deso-blue-deep/90 px-4 py-1.5 font-medium text-white transition-colors hover:!bg-deso-blue-deep disabled:cursor-not-allowed disabled:bg-deso-blue-deep/50'
                   >
                     {loadingMore ? 'Loading...' : 'Load More'}
                   </Button>

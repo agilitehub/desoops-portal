@@ -3,6 +3,11 @@ require('agilite-utils/dist/dotenv').default.config()
 const path = require('path')
 
 module.exports = {
+  style: {
+    postcss: {
+      mode: 'file',
+    },
+  },
   webpack: {
     /** Required for vibe-coding imports: `core/infra/…`, `core/store/…`, `assets/…`. */
     alias: {
