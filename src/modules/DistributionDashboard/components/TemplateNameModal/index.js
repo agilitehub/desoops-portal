@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Col, Input, Modal, Row, Spin } from 'antd'
+import { Input, Modal, Spin } from 'antd'
 
 const TemplateNameModal = ({
   isOpen,
@@ -12,10 +12,8 @@ const TemplateNameModal = ({
   const [templateName, setTemplateName] = useState(templateNameModal.name)
   const [errMsg, setErrMsg] = useState('')
 
-  const handleOnOk = (e) => {
-    // Validate that there is a value and is not the same as the passed value
+  const handleOnOk = () => {
     if (templateName && templateName !== templateNameModal.name) {
-      // Check if the templateName already exists using case insensitive search
       const template = distributionTemplates.find(
         (template) =>
           templateNameModal.id !== template._id && template.name.toLowerCase() === templateName.toLowerCase()
@@ -29,7 +27,6 @@ const TemplateNameModal = ({
     } else if (!templateName) {
       setErrMsg('Template Name cannot be empty')
     } else {
-      // The templateName is not empty and is the same as the passed value
       onCancel()
     }
   }
@@ -41,37 +38,45 @@ const TemplateNameModal = ({
   return (
     <Modal
       open={isOpen}
-      title={'Save Setup'}
+      title={
+        <span className='dashboard-modal-title'>
+          Save{' '}
+          <span className='text-[length:inherit] font-[inherit] leading-[inherit] tracking-[inherit] text-deso-orange'>
+            Setup
+          </span>
+        </span>
+      }
+      centered
+      width={480}
       cancelText='Close'
       okText='Save'
       onCancel={onCancel}
       onOk={handleOnOk}
-      cancelButtonProps={{
-        style: { color: 'red' }
+      okButtonProps={{ className: 'dashboard-modal-primary-btn', loading: isLoading }}
+      cancelButtonProps={{ className: 'dashboard-modal-cancel-btn', disabled: isLoading }}
+      classNames={{
+        content: 'dashboard-modal-content',
+        header: 'dashboard-modal-header',
+        body: 'dashboard-modal-body',
+        footer: 'dashboard-modal-footer'
       }}
     >
-      <Row style={{ marginTop: 20, justifyContent: 'center' }}>
-        <Col span={24}>
-          <Input
-            status={errMsg ? 'error' : null}
-            placeholder='Provide a name for this setup'
-            value={templateName}
-            // style={{ width: deviceType.isSmartphone ? '100%' : 250 }}
-            disabled={isLoading}
-            onChange={handleOnChange}
-          />
-        </Col>
-        {errMsg ? (
-          <Col span={24}>
-            <span style={{ fontSize: 12, color: '#DC3645' }}>{errMsg}</span>
-          </Col>
-        ) : null}
+      <div className='flex flex-col gap-2'>
+        <Input
+          status={errMsg ? 'error' : null}
+          placeholder='Provide a name for this setup'
+          value={templateName}
+          disabled={isLoading}
+          onChange={handleOnChange}
+        />
+        {errMsg ? <span className='text-xs text-error'>{errMsg}</span> : null}
         {isLoading ? (
-          <Col span={24}>
-            <Spin size='small' /> <span style={{ fontSize: 12 }}>Saving...</span>
-          </Col>
+          <div className='flex items-center gap-2 text-sm text-muted'>
+            <Spin size='small' />
+            <span>Saving...</span>
+          </div>
         ) : null}
-      </Row>
+      </div>
     </Modal>
   )
 }

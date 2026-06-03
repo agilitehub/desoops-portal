@@ -1,13 +1,19 @@
-import React, { useReducer } from 'react'
+import React, { lazy, Suspense, useReducer } from 'react'
 import { App, Card, Button, Modal, Row, Col } from 'antd'
-import { ReloadOutlined, CopyOutlined, RollbackOutlined, LinkOutlined } from '@ant-design/icons'
+import {
+  ReloadOutlined,
+  CopyOutlined,
+  RollbackOutlined,
+  LinkOutlined,
+  SwapOutlined
+} from '@ant-design/icons'
 import { copyTextToClipboard } from 'core/infra/utils'
+import { showConfirm } from 'core/utils/confirmModal'
 import RandomizeDialogContent from './RandomizeDialog'
 import { generateOptOutLink, prepUsersForClipboard } from '../../controllers'
-import CoinSwapModal from 'core/components/CoinSwapModal'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBitcoinSign } from '@fortawesome/free-solid-svg-icons'
 import AgiliteUtils from 'agilite-utils'
+
+const CoinSwapModal = lazy(() => import('core/components/CoinSwapModal'))
 
 const initialState = {
   ctcLoading: false,
@@ -27,30 +33,16 @@ const QuickActionsCard = ({ desoData, configData, onResetDashboard, onRefreshDas
   const { modal, message } = App.useApp()
   const [state, setState] = useReducer(reducer, initialState)
 
-  const styleProps = {
-    title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
-    headStyle: { background: '#DDE6ED', minHeight: deviceType.isSmartphone ? 30 : 40 },
-    bodyStyle: { height: deviceType.isTablet ? 70 : 75 },
-    actionWrapper: { marginTop: deviceType.isSmartphone ? -5 : -3 },
-    iconReset: { color: '#17A2B8', borderColor: '#17A2B8', backgroundColor: 'white' },
-    iconRefresh: { color: '#996C00', borderColor: '#996C00', backgroundColor: 'white' },
-    iconCopy: { color: '#800080', borderColor: '#800080', backgroundColor: 'white' },
-    iconOptOut: { color: '#DC3847', borderColor: '#DC3847', backgroundColor: 'white' },
-    labelReset: { color: '#17A2B8', fontSize: deviceType.isSmartphone ? 12 : 16 },
-    labelRefresh: { color: '#996C00', fontSize: deviceType.isSmartphone ? 12 : 16 },
-    labelCopy: { color: '#800080', fontSize: deviceType.isSmartphone ? 12 : 16 },
-    labelOptOut: { color: '#DC3847', fontSize: deviceType.isSmartphone ? 12 : 16 },
-    iconSwap: { color: '#4CAF50', borderColor: '#4CAF50', backgroundColor: 'white' },
-    labelSwap: { color: '#4CAF50', fontSize: deviceType.isSmartphone ? 12 : 16 }
-  }
+  const bodyMinHeight = deviceType.isSmartphone ? 64 : deviceType.isTablet ? 78 : 82
 
   const handleResetDashboard = () => {
     setState({ resetLoading: true })
 
-    modal.confirm({
+    showConfirm(modal, {
       title: 'Reset Dashboard',
       content: 'Are you sure you want to reset the dashboard? This action cannot be undone.',
-      okText: 'Confirm',
+      okText: 'Reset',
+      cancelText: 'Cancel',
       okType: 'danger',
       onOk: async () => {
         await onResetDashboard()
@@ -66,10 +58,11 @@ const QuickActionsCard = ({ desoData, configData, onResetDashboard, onRefreshDas
   const handleRefreshDashboardValues = () => {
     setState({ refreshLoading: true })
 
-    modal.confirm({
+    showConfirm(modal, {
       title: 'Refresh Dashboard',
       content: 'Are you sure you want to refresh the Dashboard? This action cannot be undone.',
-      okText: 'Confirm',
+      okText: 'Refresh',
+      cancelText: 'Cancel',
       okType: 'danger',
       onOk: () => {
         handleRefreshDashboardValuesExtended()
@@ -157,77 +150,65 @@ const QuickActionsCard = ({ desoData, configData, onResetDashboard, onRefreshDas
 
   return (
     <Card
-      title={<span style={styleProps.title}>Quick Actions</span>}
+      title={<span className='font-semibold text-foreground text-sm sm:text-base'>Quick Actions</span>}
       size='small'
-      styles={{
-        body: styleProps.bodyStyle,
-        header: styleProps.headStyle
-      }}
+      className='dashboard-card dashboard-card-quick-actions h-full'
+      styles={{ body: { minHeight: bodyMinHeight } }}
     >
-      <Row style={{ textAlign: 'center' }}>
-        <Col span={5}>
-          <Col span={24} style={styleProps.actionWrapper}>
-            <Button
-              shape='circle'
-              style={styleProps.iconReset}
-              icon={<RollbackOutlined />}
-              loading={state.resetLoading}
-              disabled={state.resetLoading || rootState.isExecuting}
-              onClick={handleResetDashboard}
-            />
-            <div style={styleProps.labelReset}>Reset</div>
-          </Col>
+      <Row className='w-full text-center' justify='space-around' align='middle' gutter={[4, 4]}>
+        <Col className='flex flex-col items-center'>
+          <Button
+            shape='circle'
+            className='dashboard-action-btn !border-info !text-info'
+            icon={<RollbackOutlined />}
+            loading={state.resetLoading}
+            disabled={state.resetLoading || rootState.isExecuting}
+            onClick={handleResetDashboard}
+          />
+          <div className='dashboard-action-label text-info'>Reset</div>
         </Col>
-        <Col span={5}>
-          <Col span={24} style={styleProps.actionWrapper}>
-            <Button
-              shape='circle'
-              style={styleProps.iconRefresh}
-              icon={<ReloadOutlined />}
-              loading={state.refreshLoading}
-              disabled={state.refreshLoading || rootState.isExecuting}
-              onClick={handleRefreshDashboardValues}
-            />
-            <div style={styleProps.labelRefresh}>Refresh</div>
-          </Col>
+        <Col className='flex flex-col items-center'>
+          <Button
+            shape='circle'
+            className='dashboard-action-btn !border-warning !text-warning'
+            icon={<ReloadOutlined />}
+            loading={state.refreshLoading}
+            disabled={state.refreshLoading || rootState.isExecuting}
+            onClick={handleRefreshDashboardValues}
+          />
+          <div className='dashboard-action-label text-warning'>Refresh</div>
         </Col>
-        <Col span={5}>
-          <Col span={24} style={styleProps.actionWrapper}>
-            <Button
-              shape='circle'
-              style={styleProps.iconCopy}
-              icon={<CopyOutlined />}
-              loading={state.ctcLoading}
-              disabled={state.ctcLoading || rootState.isExecuting}
-              onClick={handleCopyToClipboard}
-            />
-            <div style={styleProps.labelCopy}>Copy</div>
-          </Col>
+        <Col className='flex flex-col items-center'>
+          <Button
+            shape='circle'
+            className='dashboard-action-btn !border-[#800080] !text-[#800080]'
+            icon={<CopyOutlined />}
+            loading={state.ctcLoading}
+            disabled={state.ctcLoading || rootState.isExecuting}
+            onClick={handleCopyToClipboard}
+          />
+          <div className='dashboard-action-label text-[#800080]'>Copy</div>
         </Col>
-        <Col span={5}>
-          <Col span={24} style={styleProps.actionWrapper}>
-            <Button
-              shape='circle'
-              style={styleProps.iconOptOut}
-              icon={<LinkOutlined />}
-              loading={state.ctcLoading}
-              disabled={state.ctcLoading || rootState.isExecuting}
-              onClick={handleOptOutLink}
-            />
-            <div style={styleProps.labelOptOut}>Opt Out Link</div>
-          </Col>
+        <Col className='flex flex-col items-center'>
+          <Button
+            shape='circle'
+            className='dashboard-action-btn !border-error !text-error'
+            icon={<LinkOutlined />}
+            loading={state.ctcLoading}
+            disabled={state.ctcLoading || rootState.isExecuting}
+            onClick={handleOptOutLink}
+          />
+          <div className='dashboard-action-label text-error'>Opt Out Link</div>
         </Col>
-        <Col span={4}>
-          <Col span={24} style={styleProps.actionWrapper}>
-            <Button
-              shape='circle'
-              style={styleProps.iconSwap}
-              icon={<FontAwesomeIcon icon={faBitcoinSign} />}
-              disabled={rootState.isExecuting}
-              onClick={handleCoinSwap}
-            />
-            <div style={styleProps.labelSwap}>Swap</div>
-          </Col>
+        <Col className='flex flex-col items-center'>
+          <Button
+            shape='circle'
+            className='dashboard-action-btn !border-success !text-success'
+            icon={<SwapOutlined />}
+            disabled={rootState.isExecuting}
+            onClick={handleCoinSwap}
+          />
+          <div className='dashboard-action-label text-success'>Swap</div>
         </Col>
       </Row>
       {/* <Divider style={styleParams.dividerStyle} />
@@ -253,37 +234,52 @@ const QuickActionsCard = ({ desoData, configData, onResetDashboard, onRefreshDas
           </Dropdown>
         </Col>
       </Row> */}
-      <Modal
-        title={`Return Random Users From - ${state.randomUserKey}`}
-        open={state.loadRandomizeModal}
-        onOk={handleCloseRandomizeDialog}
-        okText='Close'
-        cancelText='Copy Users To Clipboard'
-        closable={false}
-        maskClosable={false}
-        keyboard={false}
-        okButtonProps={{
-          disabled: state.randomizeInProgress
-        }}
-        cancelButtonProps={{
-          disabled: !state.randomUsers || state.randomizeInProgress,
-          style: { color: 'orange' }
-        }}
-      >
-        <RandomizeDialogContent
-          copyToClipboard={copyTextToClipboard}
-          setRandomizeState={setRandomizeState}
-          randomUserKey={state.randomUserKey}
-        />
-      </Modal>
-      {state.openCoinSwapModal && (
-        <CoinSwapModal isOpen={state.openCoinSwapModal} onCloseModal={() => setState({ openCoinSwapModal: false })} />
-      )}
+      {state.loadRandomizeModal ? (
+        <Modal
+          title={`Return Random Users From - ${state.randomUserKey}`}
+          open
+          onOk={handleCloseRandomizeDialog}
+          okText='Close'
+          cancelText='Copy Users To Clipboard'
+          closable={false}
+          maskClosable={false}
+          keyboard={false}
+          destroyOnHidden
+          okButtonProps={{
+            disabled: state.randomizeInProgress
+          }}
+          cancelButtonProps={{
+            disabled: !state.randomUsers || state.randomizeInProgress,
+            style: { color: 'orange' }
+          }}
+        >
+          <RandomizeDialogContent
+            copyToClipboard={copyTextToClipboard}
+            setRandomizeState={setRandomizeState}
+            randomUserKey={state.randomUserKey}
+          />
+        </Modal>
+      ) : null}
+      {state.openCoinSwapModal ? (
+        <Suspense fallback={null}>
+          <CoinSwapModal
+            isOpen={state.openCoinSwapModal}
+            onCloseModal={() => setState({ openCoinSwapModal: false })}
+          />
+        </Suspense>
+      ) : null}
     </Card>
   )
 }
 
-const app = ({ desoData, configData, onResetDashboard, onRefreshDashboard, rootState, deviceType }) => {
+const QuickActionsCardWithApp = ({
+  desoData,
+  configData,
+  onResetDashboard,
+  onRefreshDashboard,
+  rootState,
+  deviceType
+}) => {
   return (
     <App>
       <QuickActionsCard
@@ -298,4 +294,4 @@ const app = ({ desoData, configData, onResetDashboard, onRefreshDashboard, rootS
   )
 }
 
-export default app
+export default QuickActionsCardWithApp

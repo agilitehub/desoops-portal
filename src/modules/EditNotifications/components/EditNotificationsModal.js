@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { Modal, Form, Switch, Select, Card, Row, Col, Divider, Space, message, Button, Alert } from 'antd'
+import { Modal, Form, Switch, Select, Card, Row, Col, Divider, Space, message, Alert } from 'antd'
 import { useDispatch, useSelector } from 'react-redux'
 import { setEditNotificationsVisible } from 'core/store/slices/custom/reducer'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faBellSlash } from '@fortawesome/free-regular-svg-icons'
 import { updateUserRecord } from 'core/infra/agilite-controller'
-import { isMobile } from 'react-device-detect'
+import { showStaticConfirm } from 'core/utils/confirmModal'
 import { usePwaFeatures } from '../../PWADetector/hooks'
 
 /** Default rule rows — merged with API payload so older profiles missing keys (e.g. socialTokens) never break the form. */
@@ -97,11 +97,12 @@ const EditNotifications = ({ isVisible }) => {
   }
 
   const handleCancel = () => {
-    Modal.confirm({
-      title: 'Confirmation',
+    showStaticConfirm({
+      title: 'Discard changes?',
       content: 'Are you sure you want to cancel?',
-      okText: 'Yes',
+      okText: 'Yes, discard',
       cancelText: 'No',
+      okType: 'danger',
       onOk: () => {
         dispatch(setEditNotificationsVisible(false))
       }
@@ -123,61 +124,79 @@ const EditNotifications = ({ isVisible }) => {
     setFormState(newState)
   }
 
-  const modalButtons = (
-    <Row justify='center' align='middle' gutter={[16, 16]}>
-      <Col>
-        <Button disabled={loading} onClick={handleCancel}>
-          Cancel
-        </Button>
-      </Col>
-      <Col>
-        <Button className='bg-[#02c23c] text-white' loading={loading} onClick={handleOk}>
-          Save
-        </Button>
-      </Col>
-    </Row>
-  )
+  const pushColClassName = notificationPermission === 'denied' ? 'hidden' : 'flex items-center justify-center'
 
-  const modalTitle = (
-    <>
-      <Row justify='center' align='middle'>
-        <Col>Deposit Notification Settings</Col>
-      </Row>
-      {isMobile && (
-        <Row justify='center' align='middle' style={{ marginTop: 8 }}>
-          <Col>{modalButtons}</Col>
-        </Row>
-      )}
-    </>
-  )
+  const pushSwitchProps = {
+    checkedChildren: (
+      <Space>
+        <FontAwesomeIcon icon={faBell} /> Yes
+      </Space>
+    ),
+    unCheckedChildren: (
+      <Space>
+        <FontAwesomeIcon icon={faBellSlash} /> No
+      </Space>
+    )
+  }
+
+  const renderPushSwitch = (name, visible) =>
+    visible ? (
+      <Form.Item name={name} className='notifications-push-switch !mb-0'>
+        <Switch {...pushSwitchProps} />
+      </Form.Item>
+    ) : null
 
   return (
     <Modal
-      title={modalTitle}
+      title={
+        <span className='dashboard-modal-title'>
+          Deposit Notification{' '}
+          <span className='text-[length:inherit] font-[inherit] leading-[inherit] tracking-[inherit] text-deso-orange'>
+            Settings
+          </span>
+        </span>
+      }
       open={isVisible}
-      footer={modalButtons}
-      maskProps={{ style: { backgroundColor: 'rgba(0, 0, 0, 0.8)' } }}
+      centered
+      width={560}
+      okText='Save'
+      cancelText='Cancel'
+      onOk={handleOk}
+      onCancel={handleCancel}
+      okButtonProps={{ className: 'dashboard-modal-primary-btn', loading }}
+      cancelButtonProps={{ className: 'dashboard-modal-cancel-btn', disabled: loading }}
       closable={false}
       maskClosable={false}
-      className='full-screen-modal'
       destroyOnClose
+      classNames={{
+        content: 'dashboard-modal-content',
+        header: 'dashboard-modal-header',
+        body: 'dashboard-modal-body',
+        footer: 'dashboard-modal-footer'
+      }}
     >
       <Form form={form} layout='vertical' initialValues={formState} onFieldsChange={handleFieldsChange}>
-        <Card size='small' type='inner'>
-          {errorMessage && (
-            <Alert message='Warning' description={errorMessage} type='warning' showIcon style={{ marginTop: 10 }} />
-          )}
-          <div style={{ marginTop: 8 }}>
+        <Card size='small' className='dashboard-card'>
+          {errorMessage ? (
+            <Alert
+              message='Warning'
+              description={errorMessage}
+              type='warning'
+              showIcon
+              className='mb-3 rounded-lg'
+            />
+          ) : null}
+          <div className='mt-1'>
             <Row>
               <Col span={12}>
-                <p style={{ marginBottom: 2, fontWeight: 600, fontSize: 15, textAlign: 'center' }}>In-app</p>
+                <p className='mb-0.5 text-center text-sm font-semibold text-foreground'>In-app</p>
               </Col>
-              <Col span={12} style={{ display: notificationPermission === 'denied' ? 'none' : 'block' }}>
-                <p style={{ marginBottom: 2, fontWeight: 600, fontSize: 15, textAlign: 'center' }}>Push</p>
+              <Col span={12} className={notificationPermission === 'denied' ? 'hidden' : undefined}>
+                <p className='mb-0.5 text-center text-sm font-semibold text-foreground'>Push</p>
               </Col>
             </Row>
-            <Divider style={{ margin: '1px 0' }} />
-            <p style={{ marginBottom: 2, fontWeight: 600, fontSize: 14 }}>Diamonds</p>
+            <Divider className='!my-1 !border-border/60' />
+            <p className='mb-0.5 text-sm font-semibold text-foreground'>Diamonds</p>
             <Row gutter={[16, 8]}>
               <Col span={12}>
                 <Form.Item name={['rules', 'diamonds', 'enabled']}>
@@ -192,30 +211,12 @@ const EditNotifications = ({ isVisible }) => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={12}>
-                <center>
-                  {formState.rules.diamonds.enabled !== 0 && (
-                    <Form.Item name={['rules', 'diamonds', 'pushEnabled']}>
-                      <Switch
-                        style={{ display: notificationPermission === 'denied' ? 'none' : 'block' }}
-                        checkedChildren={
-                          <Space>
-                            <FontAwesomeIcon icon={faBell} /> Yes
-                          </Space>
-                        }
-                        unCheckedChildren={
-                          <Space>
-                            <FontAwesomeIcon icon={faBellSlash} /> No
-                          </Space>
-                        }
-                      />
-                    </Form.Item>
-                  )}
-                </center>
+              <Col span={12} className={pushColClassName}>
+                {renderPushSwitch(['rules', 'diamonds', 'pushEnabled'], formState.rules.diamonds.enabled !== 0)}
               </Col>
             </Row>
-            <Divider style={{ margin: '1px 0' }} />
-            <p style={{ marginBottom: 2, fontWeight: 600, fontSize: 14 }}>$DESO</p>
+            <Divider className='!my-1 !border-border/60' />
+            <p className='mb-0.5 text-sm font-semibold text-foreground'>$DESO</p>
             <Row gutter={[16, 8]}>
               <Col span={12}>
                 <Form.Item name={['rules', 'deso', 'enabled']}>
@@ -225,30 +226,12 @@ const EditNotifications = ({ isVisible }) => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={12}>
-                <center>
-                  {formState.rules.deso.enabled && (
-                    <Form.Item name={['rules', 'deso', 'pushEnabled']}>
-                      <Switch
-                        style={{ display: notificationPermission === 'denied' ? 'none' : 'block' }}
-                        checkedChildren={
-                          <Space>
-                            <FontAwesomeIcon icon={faBell} /> Yes
-                          </Space>
-                        }
-                        unCheckedChildren={
-                          <Space>
-                            <FontAwesomeIcon icon={faBellSlash} /> No
-                          </Space>
-                        }
-                      />
-                    </Form.Item>
-                  )}
-                </center>
+              <Col span={12} className={pushColClassName}>
+                {renderPushSwitch(['rules', 'deso', 'pushEnabled'], formState.rules.deso.enabled)}
               </Col>
             </Row>
-            <Divider style={{ margin: '1px 0' }} />
-            <p style={{ marginBottom: 2, fontWeight: 600, fontSize: 14 }}>Creator Coins</p>
+            <Divider className='!my-1 !border-border/60' />
+            <p className='mb-0.5 text-sm font-semibold text-foreground'>Creator Coins</p>
             <Row gutter={[16, 8]}>
               <Col span={12}>
                 <Form.Item name={['rules', 'creatorCoins', 'enabled']}>
@@ -258,30 +241,12 @@ const EditNotifications = ({ isVisible }) => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={12}>
-                <center>
-                  {formState.rules.creatorCoins.enabled && (
-                    <Form.Item name={['rules', 'creatorCoins', 'pushEnabled']}>
-                      <Switch
-                        style={{ display: notificationPermission === 'denied' ? 'none' : 'block' }}
-                        checkedChildren={
-                          <Space>
-                            <FontAwesomeIcon icon={faBell} /> Yes
-                          </Space>
-                        }
-                        unCheckedChildren={
-                          <Space>
-                            <FontAwesomeIcon icon={faBellSlash} /> No
-                          </Space>
-                        }
-                      />
-                    </Form.Item>
-                  )}
-                </center>
+              <Col span={12} className={pushColClassName}>
+                {renderPushSwitch(['rules', 'creatorCoins', 'pushEnabled'], formState.rules.creatorCoins.enabled)}
               </Col>
             </Row>
-            <Divider style={{ margin: '1px 0' }} />
-            <p style={{ marginBottom: 2, fontWeight: 600, fontSize: 14 }}>Social/DAO</p>
+            <Divider className='!my-1 !border-border/60' />
+            <p className='mb-0.5 text-sm font-semibold text-foreground'>Social/DAO</p>
             <Row gutter={[16, 8]}>
               <Col span={12}>
                 <Form.Item name={['rules', 'socialTokens', 'enabled']}>
@@ -291,30 +256,12 @@ const EditNotifications = ({ isVisible }) => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={12}>
-                <center>
-                  {formState.rules.socialTokens.enabled && (
-                    <Form.Item name={['rules', 'socialTokens', 'pushEnabled']}>
-                      <Switch
-                        style={{ display: notificationPermission === 'denied' ? 'none' : 'block' }}
-                        checkedChildren={
-                          <Space>
-                            <FontAwesomeIcon icon={faBell} /> Yes
-                          </Space>
-                        }
-                        unCheckedChildren={
-                          <Space>
-                            <FontAwesomeIcon icon={faBellSlash} /> No
-                          </Space>
-                        }
-                      />
-                    </Form.Item>
-                  )}
-                </center>
+              <Col span={12} className={pushColClassName}>
+                {renderPushSwitch(['rules', 'socialTokens', 'pushEnabled'], formState.rules.socialTokens.enabled)}
               </Col>
             </Row>
-            <Divider style={{ margin: '1px 0' }} />
-            <p style={{ marginBottom: 2, fontWeight: 600, fontSize: 14 }}>Other Crypto</p>
+            <Divider className='!my-1 !border-border/60' />
+            <p className='mb-0.5 text-sm font-semibold text-foreground'>Other Crypto</p>
             <Row gutter={[16, 8]}>
               <Col span={12}>
                 <Form.Item name={['rules', 'otherCrypto', 'enabled']}>
@@ -324,26 +271,8 @@ const EditNotifications = ({ isVisible }) => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={12}>
-                <center>
-                  {formState.rules.otherCrypto.enabled && (
-                    <Form.Item name={['rules', 'otherCrypto', 'pushEnabled']}>
-                      <Switch
-                        style={{ display: notificationPermission === 'denied' ? 'none' : 'block' }}
-                        checkedChildren={
-                          <Space>
-                            <FontAwesomeIcon icon={faBell} /> Yes
-                          </Space>
-                        }
-                        unCheckedChildren={
-                          <Space>
-                            <FontAwesomeIcon icon={faBellSlash} /> No
-                          </Space>
-                        }
-                      />
-                    </Form.Item>
-                  )}
-                </center>
+              <Col span={12} className={pushColClassName}>
+                {renderPushSwitch(['rules', 'otherCrypto', 'pushEnabled'], formState.rules.otherCrypto.enabled)}
               </Col>
             </Row>
           </div>

@@ -208,7 +208,8 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
 
   return (
     <>
-      <Table
+      <div className='dashboard-card overflow-hidden p-2 sm:p-3'>
+        <Table
         rowKey={(hodler) => hodler.username}
         rowSelection={{
           selectedRowKeys: rootState.selectedTableKeys,
@@ -226,6 +227,7 @@ const TableData = ({ desoData, rootState, setRootState, deviceType }) => {
           showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
         }}
       />
+      </div>
     </>
   )
 }

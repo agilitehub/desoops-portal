@@ -4,6 +4,7 @@
 import React, { useState } from 'react'
 
 import { Modal, Tabs, App } from 'antd'
+import { showConfirm } from 'core/utils/confirmModal'
 import HeroSwap from './HeroSwap'
 import StealthEX from './StealthEX'
 
@@ -25,10 +26,11 @@ const CoinSwapModal = ({ isOpen, onCloseModal }) => {
   ]
 
   const handleOk = () => {
-    modal.confirm({
-      title: 'Warning',
+    showConfirm(modal, {
+      title: 'Close Coin Swap?',
       content: 'Are you sure you want to close Coin Swap and that your transactions have been completed?',
-      okText: 'Confirm',
+      okText: 'Yes, close',
+      cancelText: 'Cancel',
       okType: 'danger',
       onOk: () => {
         setTab('1')
@@ -39,13 +41,29 @@ const CoinSwapModal = ({ isOpen, onCloseModal }) => {
 
   return (
     <Modal
-      title='Coin Swap'
+      title={
+        <span className='coin-swap-modal-title'>
+          Coin{' '}
+          <span className='text-[length:inherit] font-[inherit] leading-[inherit] tracking-[inherit] text-deso-orange'>
+            Swap
+          </span>
+        </span>
+      }
       open={isOpen}
       onOk={handleOk}
       closeIcon={false}
       okText='Close'
+      width={600}
+      centered
       cancelButtonProps={{ style: { display: 'none' } }}
+      okButtonProps={{ className: 'coin-swap-close-btn' }}
       destroyOnClose
+      classNames={{
+        content: 'coin-swap-modal-content',
+        header: 'coin-swap-modal-header',
+        body: 'coin-swap-modal-body',
+        footer: 'coin-swap-modal-footer'
+      }}
     >
       <Tabs onChange={setTab} items={tabItems} activeKey={tab} size='small' />
     </Modal>

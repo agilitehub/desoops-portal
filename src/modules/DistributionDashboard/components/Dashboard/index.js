@@ -6,6 +6,7 @@ import { Row, Col, message, Divider } from 'antd'
 
 // Custom Components
 import ContainerCard from 'core/components/ContainerCard'
+import DashboardBackground from '../DashboardBackground'
 import WalletOverviewCard from '../WalletOverviewCard'
 import SetupCard from '../SetupCard'
 import QuickActionsCard from '../QuickActionsCard'
@@ -70,8 +71,7 @@ const _BatchTransactionsForm = () => {
   const { isTablet, isSmartphone, isMobile } = useSelector((state) => state.custom.userAgent)
   const { deviceType, browserType } = usePwaFeatures()
   const styleProps = {
-    divider: { margin: '4px 0', borderBlockStart: 0 },
-    verticalGutter: isSmartphone ? 6 : 12
+    verticalGutter: isSmartphone ? 8 : 14
   }
 
   const mobileType = { isSmartphone, isTablet, isMobile }
@@ -1190,72 +1190,89 @@ const _BatchTransactionsForm = () => {
 
   return (
     <>
-      <Row justify='center' gutter={[12, 12]}>
-        <Col xs={22} xl={20} xxl={16}>
-          <ContainerCard title={'Distribution Dashboard'} deviceType={mobileType}>
-            <Row gutter={[12, styleProps.verticalGutter]}>
-              <Col span={24}>
+      <div className='relative min-h-full w-full min-w-0'>
+        <DashboardBackground />
+        <div className='relative z-[1] mx-auto w-full min-w-0 max-w-[80rem] px-3 py-4 sm:px-5 sm:py-5 lg:px-6'>
+          <header className='mb-4 text-center sm:mb-5' aria-labelledby='distribution-dashboard-heading'>
+            <h1
+              id='distribution-dashboard-heading'
+              className='text-[clamp(1.5rem,4vw,1.75rem)] font-extrabold leading-tight tracking-tight text-deso-blue-deep'
+            >
+              Distribution{' '}
+              <span className='text-[length:inherit] text-deso-orange'>Dashboard</span>
+            </h1>
+            <p className='mx-auto mt-1.5 max-w-xl text-sm text-muted sm:text-[0.9375rem]'>
+              Configure recipients, set distribution rules, and execute payments to your community.
+            </p>
+          </header>
+          <Row justify='center' gutter={[12, 12]}>
+            <Col xs={24} xl={22} xxl={20}>
+              <ContainerCard>
                 <Row gutter={[12, styleProps.verticalGutter]}>
-                  <Col xs={24} md={12}>
-                    <WalletOverviewCard desoProfile={desoData.profile} deviceType={mobileType} />
-                  </Col>
-                  <Col xs={24} md={12}>
-                    <QuickActionsCard
-                      desoData={desoData}
-                      configData={configData}
-                      onResetDashboard={resetState}
-                      onRefreshDashboard={handleRefreshDashboard}
-                      rootState={state}
-                      deviceType={mobileType}
-                      setRootState={setState}
-                    />
+                  <Col span={24}>
+                    <Row gutter={[12, styleProps.verticalGutter]}>
+                      <Col xs={24} md={12}>
+                        <WalletOverviewCard desoProfile={desoData.profile} deviceType={mobileType} />
+                      </Col>
+                      <Col xs={24} md={12}>
+                        <QuickActionsCard
+                          desoData={desoData}
+                          configData={configData}
+                          onResetDashboard={resetState}
+                          onRefreshDashboard={handleRefreshDashboard}
+                          rootState={state}
+                          deviceType={mobileType}
+                          setRootState={setState}
+                        />
+                      </Col>
+                    </Row>
+                    <Divider className='!my-3 !border-border/60' />
+                    <Row gutter={[12, styleProps.verticalGutter]}>
+                      <Col xs={24} lg={12}>
+                        <SetupCard
+                          desoData={desoData}
+                          rootState={state}
+                          templateNameModal={state.templateNameModal}
+                          onDistributeTo={handleDistributeTo}
+                          onDistributeMyHodlers={handleDistributeMyHodlers}
+                          onDistributeDeSoUser={handleDistributeDeSoUser}
+                          onDistributionType={handleDistributionType}
+                          onTokenToUse={handleTokenToUse}
+                          setRootState={setState}
+                          onConfirmNFT={handleConfirmNFT}
+                          onConfirmCustomList={handleConfirmCustomList}
+                          onSelectTemplate={handleSelectTemplate}
+                          onDeleteTemplate={handleDeleteTemplate}
+                          onSetTemplateName={handleSetTemplateName}
+                          onConfirmDiamondOptions={handleConfirmDiamondOptions}
+                          deviceType={mobileType}
+                          isLoading={state.loading}
+                          distributionTemplates={distributionTemplates}
+                        />
+                      </Col>
+                      <Col xs={24} lg={12}>
+                        <SummaryCard
+                          desoData={desoData}
+                          configData={configData}
+                          rootState={state}
+                          setRootState={setState}
+                          onRefreshDashboard={handlePostDistributionRefresh}
+                          deviceType={mobileType}
+                        />
+                      </Col>
+                    </Row>
                   </Col>
                 </Row>
-                <Divider style={styleProps.divider} />
-                <Row gutter={[12, styleProps.verticalGutter]}>
-                  <Col xs={24} lg={12}>
-                    <SetupCard
-                      desoData={desoData}
-                      rootState={state}
-                      templateNameModal={state.templateNameModal}
-                      onDistributeTo={handleDistributeTo}
-                      onDistributeMyHodlers={handleDistributeMyHodlers}
-                      onDistributeDeSoUser={handleDistributeDeSoUser}
-                      onDistributionType={handleDistributionType}
-                      onTokenToUse={handleTokenToUse}
-                      setRootState={setState}
-                      onConfirmNFT={handleConfirmNFT}
-                      onConfirmCustomList={handleConfirmCustomList}
-                      onSelectTemplate={handleSelectTemplate}
-                      onDeleteTemplate={handleDeleteTemplate}
-                      onSetTemplateName={handleSetTemplateName}
-                      onConfirmDiamondOptions={handleConfirmDiamondOptions}
-                      deviceType={mobileType}
-                      isLoading={state.loading}
-                      distributionTemplates={distributionTemplates}
-                    />
-                  </Col>
-                  <Col xs={24} lg={12}>
-                    <SummaryCard
-                      desoData={desoData}
-                      configData={configData}
-                      rootState={state}
-                      setRootState={setState}
-                      onRefreshDashboard={handlePostDistributionRefresh}
-                      deviceType={mobileType}
-                    />
-                  </Col>
+                <Divider className='!my-3 !border-border/60' />
+                <Row>
+                  <TableData desoData={desoData} rootState={state} setRootState={setState} deviceType={mobileType} />
                 </Row>
-              </Col>
-            </Row>
-            <Divider style={styleProps.divider} />
-            <Row>
-              <TableData desoData={desoData} rootState={state} setRootState={setState} deviceType={mobileType} />
-            </Row>
-          </ContainerCard>
-        </Col>
-      </Row>
-      <div style={{ height: '100px' }}></div>
+              </ContainerCard>
+            </Col>
+          </Row>
+        </div>
+      </div>
+      <div className='h-24' />
       <PaymentModal props={state.paymentModal} onPaymentDone={handlePaymentDone} onRetryExecute={handleRetryExecute} />
     </>
   )

@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
-
-import { Row, Col, Spin, Alert, Space, Collapse } from 'antd'
-import Enums from 'core/infra/enums'
+import { Collapse, Spin } from 'antd'
 import { CaretRightOutlined } from '@ant-design/icons'
+import Enums from 'core/infra/enums'
 
 const HeroSwap = () => {
   const [isLoading, setIsLoading] = useState(true)
@@ -12,58 +11,40 @@ const HeroSwap = () => {
   }
 
   return (
-    <Row style={{ height: '100%' }}>
-      <Space direction='vertical' style={{ width: '100%' }}>
-        <Col span={24}>
-          <Alert
-            type='warning'
-            message={
-              <Collapse
-                size='small'
-                bordered={false}
-                expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
-                items={[
-                  {
-                    key: '1',
-                    label: 'Important Notes:',
-                    children: (
-                      <Space>
-                        <span>
-                          1. Transactions usually take a few minutes, but can take up to an hour depending on HeroSwap's
-                          Funding Pool.
-                        </span>
-                      </Space>
-                    )
-                  }
-                ]}
-              />
-            }
-          />
-        </Col>
-        <Col span={24} style={{ height: 450 }}>
-          {isLoading && (
-            <center
-              style={{
-                height: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexDirection: 'column'
-              }}
-            >
-              <Spin />
-              <span style={{ fontSize: 16, marginTop: 10 }}>Loading...</span>
-            </center>
-          )}
-          <iframe
-            title={Enums.coinSwap.heroSwap.title}
-            style={{ width: '100%', height: '100%', display: isLoading ? 'none' : 'block' }}
-            src={`${Enums.coinSwap.heroSwap.url}?depositTicker=${Enums.coinSwap.heroSwap.depositTicker}&destinationTicker=${Enums.coinSwap.heroSwap.destinationTicker}&affiliateAddress=${Enums.values.DESO_OPS_PUBLIC_KEY}`}
-            onLoad={handleLoad}
-          />
-        </Col>
-      </Space>
-    </Row>
+    <div className='flex w-full flex-col gap-2'>
+      <Collapse
+        size='small'
+        bordered={false}
+        className='coin-swap-notes shrink-0'
+        expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+        items={[
+          {
+            key: '1',
+            label: 'Important Notes',
+            children: (
+              <p className='m-0 text-sm text-foreground'>
+                Transactions usually take a few minutes, but can take up to an hour depending on
+                HeroSwap&apos;s Funding Pool.
+              </p>
+            )
+          }
+        ]}
+      />
+      <div className='relative h-[450px] w-full overflow-hidden rounded-[10px] shadow-[0_0_32px_rgba(0,0,0,0.06)]'>
+        {isLoading ? (
+          <div className='absolute inset-0 flex flex-col items-center justify-center bg-surface'>
+            <Spin />
+            <span className='mt-2.5 text-base text-foreground'>Loading...</span>
+          </div>
+        ) : null}
+        <iframe
+          title={Enums.coinSwap.heroSwap.title}
+          className={`h-full w-full border-0 ${isLoading ? 'invisible' : 'visible'}`}
+          src={`${Enums.coinSwap.heroSwap.url}?depositTicker=${Enums.coinSwap.heroSwap.depositTicker}&destinationTicker=${Enums.coinSwap.heroSwap.destinationTicker}&affiliateAddress=${Enums.values.DESO_OPS_PUBLIC_KEY}`}
+          onLoad={handleLoad}
+        />
+      </div>
+    </div>
   )
 }
 

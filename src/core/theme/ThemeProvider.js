@@ -56,6 +56,9 @@ export function ThemeProvider({ children }) {
           algorithm: darkMode ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
           token: darkMode ? darkAntdTokens : lightAntdTokens,
         }}
+        modal={{
+          centered: true
+        }}
       >
         {children}
       </ConfigProvider>

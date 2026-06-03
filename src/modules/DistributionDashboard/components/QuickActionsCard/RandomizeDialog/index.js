@@ -31,7 +31,7 @@ const initialState = {
 
 const reducer = (state, newState) => ({ ...state, ...newState })
 
-const RandomizeDialogContent = ({ randomUserKey, copyToClipboard, setRandomizeState }) => {
+function RandomizeDialogContent ({ randomUserKey, copyToClipboard, setRandomizeState }) {
   const [state, setState] = useReducer(reducer, initialState)
 
   const handleInputChange = (value) => {

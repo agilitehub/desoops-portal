@@ -21,6 +21,7 @@ import {
   sendDESO
 } from 'core/infra/deso-controller-graphql'
 import { randomize } from 'core/infra/utils'
+import { showConfirm } from 'core/utils/confirmModal'
 import { createDistributionTransaction, updateDistributionTransaction } from 'core/infra/agilite-controller'
 
 import { identity } from 'deso-protocol'
@@ -394,11 +395,11 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
     title += ` to ${state.noOfPaymentTransactions} ${users}.`
     title += ' This operation cannot be undone.'
 
-    modal.confirm({
+    showConfirm(modal, {
       title,
-      okText: 'Confirm',
-      okType: 'danger',
+      okText: 'Confirm distribution',
       cancelText: 'Cancel',
+      okType: 'danger',
       onOk: () => {
         setTimeout(() => {
           handleExecute()
@@ -792,9 +793,9 @@ const SummaryCard = ({ desoData, configData, rootState, setRootState, onRefreshD
 
   return (
     <Card
-      title={<span style={styleProps.title}>Step 2: Distribution Summary</span>}
+      title={<span className='font-semibold text-foreground text-sm sm:text-base'>Step 2: Distribution Summary</span>}
       size='small'
-      styles={{ header: { background: '#DDE6ED' } }}
+      className='dashboard-card h-full'
     >
       <Row>
         <Col

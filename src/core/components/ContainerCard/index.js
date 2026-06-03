@@ -1,31 +1,11 @@
-// This is a Card component that can be used to wrap other components.
-// It contains the necessary styling and defaults to match the rest of the app.
-
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Card } from 'antd'
 
-const ContainerCard = ({ title, deviceType, children, extra }) => {
-  const styleProps = {
-    card: { width: '100%', overflow: 'hidden', marginTop: 10 },
-    title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
-    header: { backgroundColor: '#FFA07A', minHeight: deviceType.isSmartphone ? 30 : 40 },
-    bodyStyle: { padding: 4, background: '#EDEDED' }
-  }
-
+const ContainerCard = ({ children, extra }) => {
   return (
     <Card
-      title={
-        <center>
-          <span style={styleProps.title}>{title}</span>
-        </center>
-      }
-      style={styleProps.card}
-      styles={{
-        header: styleProps.header,
-        body: styleProps.bodyStyle
-      }}
-      type='inner'
+      className='dashboard-shell-card mt-2 sm:mt-3'
       size='small'
       extra={extra}
     >
@@ -36,8 +16,7 @@ const ContainerCard = ({ title, deviceType, children, extra }) => {
 
 export default ContainerCard
 
-// Add Prop Types for this component
 ContainerCard.propTypes = {
-  title: PropTypes.string,
-  children: PropTypes.node
+  children: PropTypes.node,
+  extra: PropTypes.node
 }

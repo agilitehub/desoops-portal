@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import { Col, Form, Input, message, Modal, Row, Space, Tooltip } from 'antd'
+import React, { useEffect, useRef, useState } from 'react'
+import { Form, Input, message, Modal, Tooltip } from 'antd'
 import { getSingleProfile, updateProfile } from 'deso-protocol'
-
-import { CopyTwoTone, LoadingOutlined, PlusOutlined } from '@ant-design/icons'
+import { showStaticConfirm } from 'core/utils/confirmModal'
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCopy } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch, useSelector } from 'react-redux'
 import { setEditProfileVisible } from 'core/store/slices/custom/reducer'
 
@@ -12,7 +14,7 @@ const EditProfile = ({ isVisible, desoData, setDeSoData }) => {
   const [loading, setLoading] = useState(false)
   const [imageUrl, setImageUrl] = useState(undefined)
   const [imageChanged, setImageChanged] = useState(false)
-
+  const fileInputRef = useRef(null)
   const [form] = Form.useForm()
 
   const initialUsername = desoData.profile?.username || ''
@@ -41,13 +43,10 @@ const EditProfile = ({ isVisible, desoData, setDeSoData }) => {
     setLoading(true)
 
     try {
-      // Validate form first
       await form.validateFields()
 
-      // Check if username exists
       profileResponse = await getSingleProfile({ Username: form.getFieldValue('username') })
 
-      // When we get here it means the username exists
       if (profileResponse.Profile.Username && initialUsername !== profileResponse.Profile.Username) {
         form.setFields([
           {
@@ -60,7 +59,6 @@ const EditProfile = ({ isVisible, desoData, setDeSoData }) => {
       }
     } catch (e1) {
       if (e1.message && e1.message.indexOf('could not find profile for username') > -1) {
-        // When we get here it means that the username does not exist
         await handleOkExtended()
       }
     }
@@ -117,11 +115,12 @@ const EditProfile = ({ isVisible, desoData, setDeSoData }) => {
   }
 
   const handleCancel = async () => {
-    Modal.confirm({
-      title: 'Confirmation',
+    showStaticConfirm({
+      title: 'Cancel profile changes?',
       content: 'Are you sure you want to cancel editing your profile?',
-      okText: 'Yes',
+      okText: 'Yes, cancel',
       cancelText: 'No',
+      okType: 'danger',
       onOk: async () => {
         try {
           if (!desoData.profile?.extraData?.desoOpsUserProfilePrompt) {
@@ -174,108 +173,108 @@ const EditProfile = ({ isVisible, desoData, setDeSoData }) => {
     }
   }
 
+  const handleCopyPublicKey = () => {
+    navigator.clipboard.writeText(desoData.profile.publicKey)
+    message.success('Public Key copied to clipboard')
+  }
+
   return (
     <Modal
-      title={<center>Edit Your Profile</center>}
+      title={
+        <span className='dashboard-modal-title'>
+          Edit Your{' '}
+          <span className='text-[length:inherit] font-[inherit] leading-[inherit] tracking-[inherit] text-deso-orange'>
+            Profile
+          </span>
+        </span>
+      }
       open={isVisible}
+      centered
+      width={520}
       okText='Save'
-      okButtonProps={{ className: '!bg-[#02c23c] !text-white', loading: loading }}
-      maskProps={{ style: { backgroundColor: 'rgba(0, 0, 0, 0.8)' } }}
+      cancelText='Cancel'
+      okButtonProps={{ className: 'dashboard-modal-primary-btn', loading }}
+      cancelButtonProps={{ className: 'dashboard-modal-cancel-btn', disabled: loading }}
       closable={false}
       maskClosable={false}
       onOk={handleOk}
       onCancel={handleCancel}
-      className='full-screen-modal'
       destroyOnClose
+      classNames={{
+        content: 'dashboard-modal-content',
+        header: 'dashboard-modal-header',
+        body: 'dashboard-modal-body',
+        footer: 'dashboard-modal-footer'
+      }}
     >
-      <Row justify='center'>
-        <Col>
-          <div style={{ cursor: 'pointer', width: 150, height: 150, border: '1px dashed #aaa', borderRadius: '50%' }}>
+      <div className='flex flex-col gap-4'>
+        <div className='flex justify-center'>
+          <div
+            className='flex h-[150px] w-[150px] cursor-pointer items-center justify-center overflow-hidden rounded-full border border-dashed border-border-input bg-surface-muted/40 transition-colors hover:border-deso-orange/60'
+            onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
+            role='button'
+            tabIndex={0}
+          >
             <input
+              ref={fileInputRef}
               type='file'
-              style={{ display: 'none' }}
+              className='hidden'
               onChange={(e) => handleFileChange(e.target.files)}
               accept='image/*'
             />
             {imageUrl ? (
-              <img
-                src={imageUrl}
-                alt='avatar'
-                style={{ width: 150, height: 150, cursor: 'pointer', borderRadius: '50%' }}
-                onClick={() => document.querySelector('input[type="file"]').click()}
-              />
+              <img src={imageUrl} alt='Profile' className='h-full w-full object-cover' />
             ) : (
               <button
-                style={{
-                  border: 0,
-                  background: 'none',
-                  width: '100%',
-                  height: '100%',
-                  cursor: 'pointer',
-                  color: '#aaa'
-                }}
-                onClick={() => document.querySelector('input[type="file"]').click()}
                 type='button'
+                className='flex h-full w-full cursor-pointer flex-col items-center justify-center border-0 bg-transparent text-muted'
+                onClick={() => fileInputRef.current?.click()}
               >
-                {loading ? <LoadingOutlined /> : <PlusOutlined />}
-                <div style={{ marginTop: 8 }}>Add Profile Picture</div>
+                {loading ? <LoadingOutlined /> : <PlusOutlined className='text-2xl' />}
+                <span className='mt-2 text-sm'>Add Profile Picture</span>
               </button>
             )}
           </div>
-        </Col>
-      </Row>
-      <Row justify='center'>
-        <Col span={24}>
-          <Form
-            layout='vertical'
-            form={form}
-            initialValues={{
-              username: profile.username || '',
-              bio: profile.description || ''
-            }}
-          >
-            {desoData.profile?.publicKey ? (
-              <Row style={{ marginTop: 20 }} justify='center'>
-                <Col>
-                  <Tooltip title='Copy your Public Key'>
-                    <Space
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => {
-                        navigator.clipboard.writeText(desoData.profile.publicKey)
-                        message.success('Public Key copied to clipboard')
-                      }}
-                    >
-                      <CopyTwoTone />
-                      <p>
-                        {desoData.profile.publicKey.substring(0, 10)}...
-                        {desoData.profile.publicKey.substring(desoData.profile.publicKey.length - 10)}
-                      </p>
-                    </Space>
-                  </Tooltip>
-                </Col>
-              </Row>
-            ) : undefined}
-            <Row justify='center'>
-              <Col span={24}>
-                <Form.Item
-                  name='username'
-                  label='Username'
-                  rules={[{ required: true, message: 'Please enter your username' }]}
+        </div>
+
+        <Form
+          layout='vertical'
+          form={form}
+          initialValues={{
+            username: profile.username || '',
+            bio: profile.description || ''
+          }}
+        >
+          {desoData.profile?.publicKey ? (
+            <div className='mb-2 flex justify-center'>
+              <Tooltip title='Copy your Public Key'>
+                <button
+                  type='button'
+                  className='inline-flex cursor-pointer items-center gap-2 border-0 bg-transparent p-0 text-sm text-deso-blue hover:text-deso-orange'
+                  onClick={handleCopyPublicKey}
                 >
-                  <Input placeholder='Enter your username' />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row justify='center'>
-              <Col span={24}>
-                <Form.Item name='bio' label='Your Bio'>
-                  <Input.TextArea placeholder='Tell us about yourself...' rows={3} />
-                </Form.Item>
-              </Col>
-            </Row>
-          </Form>
-        </Col>
-      </Row>
+                  <FontAwesomeIcon icon={faCopy} />
+                  <span>
+                    {desoData.profile.publicKey.substring(0, 10)}...
+                    {desoData.profile.publicKey.substring(desoData.profile.publicKey.length - 10)}
+                  </span>
+                </button>
+              </Tooltip>
+            </div>
+          ) : null}
+          <Form.Item
+            name='username'
+            label='Username'
+            rules={[{ required: true, message: 'Please enter your username' }]}
+          >
+            <Input placeholder='Enter your username' />
+          </Form.Item>
+          <Form.Item name='bio' label='Your Bio'>
+            <Input.TextArea placeholder='Tell us about yourself...' rows={4} />
+          </Form.Item>
+        </Form>
+      </div>
     </Modal>
   )
 }

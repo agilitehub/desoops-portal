@@ -133,8 +133,6 @@ const SetupCard = ({
   ]
 
   const styleProps = {
-    title: { fontSize: deviceType.isSmartphone ? 14 : 18 },
-    headStyle: { background: '#DDE6ED', minHeight: deviceType.isSmartphone ? 30 : 40 },
     tabButton: {
       color: '#188EFF',
       borderColor: '#188EFF',
@@ -169,8 +167,12 @@ const SetupCard = ({
     <>
       <Card
         size='small'
-        title={<span style={styleProps.title}>👇 Step 1: Setup & Config (Start Here)</span>}
-        styles={{ header: styleProps.headStyle }}
+        className='dashboard-card'
+        title={
+          <span className='font-semibold text-foreground text-sm sm:text-base'>
+            Step 1: Setup &amp; Config
+          </span>
+        }
       >
         <Tabs
           disabled={true}
@@ -183,8 +185,8 @@ const SetupCard = ({
         />
         <center>
           {templateNameModal.id ? (
-            <div style={{ display: 'block', marginTop: 5 }}>
-              <span style={{ fontSize: 14, color: '#FF7F50' }}>{`Current Setup: ${templateNameModal.name}`}</span>
+            <div className='mt-1.5 block'>
+              <span className='text-sm font-medium text-deso-orange'>{`Current Setup: ${templateNameModal.name}`}</span>
             </div>
           ) : null}
         </center>

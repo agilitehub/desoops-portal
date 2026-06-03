@@ -221,6 +221,267 @@
     @apply translate-y-0;
   }
 
+  .dashboard-bg {
+    @apply pointer-events-none fixed inset-0 z-0 overflow-hidden;
+    background: linear-gradient(
+      125deg,
+      rgba(255, 160, 122, 0.07) 0%,
+      rgb(var(--color-background)) 32%,
+      rgb(var(--color-background)) 68%,
+      rgba(24, 142, 255, 0.05) 100%
+    );
+  }
+
+  .dashboard-shape {
+    @apply pointer-events-none absolute origin-center rounded-[88px];
+    filter: none;
+    box-shadow: none;
+  }
+
+  .dashboard-shape-coral {
+    left: -10%;
+    top: 8%;
+    width: min(38vw, 420px);
+    height: min(28vh, 260px);
+    background: linear-gradient(145deg, rgba(255, 127, 80, 0.14) 0%, rgba(255, 160, 122, 0.08) 45%, transparent 78%);
+  }
+
+  .dashboard-shape-blue {
+    right: -8%;
+    left: auto;
+    top: 42%;
+    width: min(34vw, 380px);
+    height: min(32vh, 300px);
+    background: linear-gradient(225deg, rgba(24, 142, 255, 0.12) 0%, rgba(75, 156, 211, 0.07) 50%, transparent 76%);
+  }
+
+  .dashboard-shell-card {
+    @apply w-full overflow-hidden rounded-2xl border border-border shadow-md backdrop-blur-sm;
+  }
+
+  .dashboard-shell-card .ant-card-head {
+    @apply border-b border-border/60 !px-4 !py-3 sm:!px-5;
+    background: linear-gradient(
+      90deg,
+      rgba(28, 75, 115, 0.92) 0%,
+      rgba(75, 156, 211, 0.88) 42%,
+      rgba(255, 127, 80, 0.86) 100%
+    );
+  }
+
+  .dashboard-shell-card .ant-card-head-title {
+    @apply !py-0;
+  }
+
+  .dashboard-shell-card .ant-card-body {
+    @apply bg-surface/95 p-3 sm:p-4 md:p-5;
+  }
+
+  .dashboard-card {
+    @apply overflow-hidden rounded-xl border border-border shadow-sm;
+  }
+
+  .dashboard-card .ant-card-head {
+    @apply border-b border-border/50 !min-h-9 !px-3 !py-2 sm:!min-h-10 sm:!px-4;
+    background: linear-gradient(
+      90deg,
+      rgba(28, 75, 115, 0.05) 0%,
+      rgba(75, 156, 211, 0.07) 55%,
+      rgba(255, 127, 80, 0.05) 100%
+    );
+  }
+
+  .dashboard-card .ant-card-body {
+    @apply bg-surface p-3 sm:p-4;
+  }
+
+  .dashboard-card .ant-table-wrapper .ant-table {
+    @apply bg-transparent;
+  }
+
+  .dashboard-card .ant-table-wrapper .ant-table-thead > tr > th {
+    @apply bg-surface-muted/80 text-foreground;
+  }
+
+  .dashboard-stat-tile {
+    @apply rounded-lg px-2 py-1.5 text-center sm:px-3 sm:py-2;
+    background: linear-gradient(135deg, rgba(255, 127, 80, 0.9) 0%, rgba(255, 160, 122, 0.85) 55%, rgba(232, 106, 58, 0.88) 100%);
+  }
+
+  .dashboard-stat-tile-label {
+    @apply text-[11px] font-bold text-white sm:text-sm;
+  }
+
+  .dashboard-stat-tile-value {
+    @apply -mt-0.5 text-[10px] leading-tight text-white/90 sm:text-xs;
+  }
+
+  .dashboard-action-btn {
+    @apply !h-10 !w-10 !border-2 !bg-surface transition-[transform,box-shadow] duration-200 hover:-translate-y-px hover:shadow-md;
+  }
+
+  .dashboard-action-label {
+    @apply mt-1.5 text-[11px] font-semibold leading-snug sm:text-sm;
+  }
+
+  .dashboard-card-quick-actions .ant-card-body {
+    @apply flex items-center;
+  }
+
+  .coin-swap-modal-content,
+  .dashboard-modal-content {
+    @apply overflow-hidden rounded-2xl border border-border shadow-[0_12px_40px_rgba(28,75,115,0.14)];
+  }
+
+  .coin-swap-modal-header,
+  .dashboard-modal-header {
+    @apply !mb-0 border-b border-border/60 !px-5 !py-3;
+    background: linear-gradient(
+      90deg,
+      rgba(28, 75, 115, 0.05) 0%,
+      rgba(75, 156, 211, 0.07) 55%,
+      rgba(255, 127, 80, 0.05) 100%
+    );
+  }
+
+  .coin-swap-modal-title,
+  .dashboard-modal-title {
+    @apply text-lg font-extrabold tracking-tight text-deso-blue-deep sm:text-xl;
+  }
+
+  .coin-swap-modal-body,
+  .dashboard-modal-body {
+    @apply !px-4 !py-3;
+  }
+
+  .coin-swap-modal-footer,
+  .dashboard-modal-footer {
+    @apply !px-5 !py-3;
+  }
+
+  .coin-swap-modal-footer .coin-swap-close-btn.ant-btn-primary,
+  .dashboard-modal-footer .dashboard-modal-primary-btn.ant-btn-primary {
+    @apply h-10 rounded-lg border-none px-6 font-semibold text-white shadow-[0_4px_14px_rgba(255,127,80,0.3)] transition-[transform,box-shadow] duration-200 hover:-translate-y-px hover:!text-white;
+    background: linear-gradient(135deg, #ff9166 0%, #ff7f50 45%, #e86a3a 100%) !important;
+  }
+
+  .coin-swap-modal-footer .coin-swap-close-btn.ant-btn-primary:hover,
+  .dashboard-modal-footer .dashboard-modal-primary-btn.ant-btn-primary:hover {
+    box-shadow: 0 6px 18px rgba(255, 127, 80, 0.38) !important;
+    background: linear-gradient(135deg, #ff9a70 0%, #ff8a5c 45%, #ec7444 100%) !important;
+  }
+
+  .dashboard-modal-footer .dashboard-modal-cancel-btn.ant-btn-default {
+    @apply h-10 rounded-lg border-border bg-surface px-5 font-semibold text-foreground shadow-sm transition-colors duration-200 hover:border-deso-blue hover:!text-deso-blue;
+  }
+
+  .dashboard-modal-body .ant-table-thead > tr > th {
+    @apply bg-surface-muted/80 font-semibold text-foreground;
+  }
+
+  .dashboard-modal-body .ant-table-wrapper .ant-table {
+    @apply overflow-hidden rounded-lg border border-border;
+  }
+
+  .coin-swap-notes.ant-collapse {
+    @apply rounded-lg bg-warning/10;
+  }
+
+  .coin-swap-notes.ant-collapse > .ant-collapse-item > .ant-collapse-header {
+    @apply !py-2 !text-sm !font-semibold;
+  }
+
+  .coin-swap-notes.ant-collapse > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box {
+    @apply !py-2;
+  }
+
+  .dashboard-modal-body .ant-switch.ant-switch-checked {
+    @apply !bg-deso-orange;
+  }
+
+  .notifications-push-switch.ant-form-item {
+    @apply flex justify-center;
+  }
+
+  .notifications-push-switch .ant-form-item-control-input-content {
+    @apply flex justify-center;
+  }
+
+  .toolbar-user-trigger:hover {
+    @apply opacity-90;
+  }
+
+  .toolbar-user-dropdown-menu.ant-dropdown-menu {
+    @apply min-w-[220px] overflow-hidden rounded-xl border border-border p-1.5 shadow-[0_12px_40px_rgba(28,75,115,0.14)];
+  }
+
+  .toolbar-user-dropdown-menu .toolbar-user-dropdown-item {
+    @apply rounded-lg px-3 py-2.5 text-sm font-semibold text-foreground;
+  }
+
+  .toolbar-user-dropdown-menu .toolbar-user-dropdown-item:hover {
+    @apply bg-surface-muted;
+  }
+
+  .toolbar-user-dropdown-menu .toolbar-user-dropdown-item-danger.ant-dropdown-menu-item-danger {
+    @apply text-error;
+  }
+
+  .toolbar-user-dropdown-menu .toolbar-user-dropdown-item-version {
+    @apply cursor-default text-xs font-normal text-muted;
+  }
+
+  .toolbar-user-dropdown-menu .toolbar-user-dropdown-item-version:hover {
+    @apply bg-transparent;
+  }
+
+  .toolbar-user-dropdown-menu .ant-dropdown-menu-item-icon {
+    @apply mr-2.5;
+  }
+
+  .desoops-confirm-modal.ant-modal-confirm .ant-modal-content {
+    @apply overflow-hidden rounded-2xl border border-border p-0 shadow-[0_12px_40px_rgba(28,75,115,0.14)];
+  }
+
+  .desoops-confirm-modal.ant-modal-confirm .ant-modal-confirm-body {
+    @apply px-6 pb-2 pt-5;
+  }
+
+  .desoops-confirm-modal.ant-modal-confirm .ant-modal-confirm-body > .anticon {
+    @apply text-deso-orange;
+    font-size: 1.375rem;
+  }
+
+  .desoops-confirm-modal.ant-modal-confirm .ant-modal-confirm-paragraph {
+    @apply max-w-none;
+  }
+
+  .desoops-confirm-modal.ant-modal-confirm .ant-modal-confirm-title {
+    @apply text-lg font-bold text-deso-blue-deep;
+  }
+
+  .desoops-confirm-modal.ant-modal-confirm .ant-modal-confirm-content {
+    @apply text-sm leading-relaxed text-muted;
+  }
+
+  .desoops-confirm-modal.ant-modal-confirm .ant-modal-confirm-btns {
+    @apply mt-4 flex justify-end gap-2 px-6 pb-5;
+  }
+
+  .desoops-confirm-ok.ant-btn-dangerous {
+    @apply h-10 rounded-lg border-none px-5 font-semibold text-white shadow-[0_4px_14px_rgba(255,127,80,0.3)] transition-[transform,box-shadow] duration-200 hover:-translate-y-px hover:!text-white;
+    background: linear-gradient(135deg, #ff9166 0%, #ff7f50 45%, #e86a3a 100%) !important;
+  }
+
+  .desoops-confirm-ok.ant-btn-dangerous:hover {
+    box-shadow: 0 6px 18px rgba(255, 127, 80, 0.38) !important;
+    background: linear-gradient(135deg, #ff9a70 0%, #ff8a5c 45%, #ec7444 100%) !important;
+  }
+
+  .desoops-confirm-cancel.ant-btn-default {
+    @apply h-10 rounded-lg border-border bg-surface px-5 font-semibold text-foreground shadow-sm transition-colors duration-200 hover:border-deso-blue hover:!text-deso-blue;
+  }
+
   .toolbar-header-gradient {
     background: linear-gradient(90deg, #1c4b73 0%, rgba(75, 156, 211, 0.96) 38%, rgba(255, 127, 80, 0.92) 100%);
   }

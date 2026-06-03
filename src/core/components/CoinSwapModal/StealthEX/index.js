@@ -1,61 +1,43 @@
 import React from 'react'
-
-import { Row, Col, Alert, Space, Collapse } from 'antd'
-import Enums from 'core/infra/enums'
+import { Collapse } from 'antd'
 import { CaretRightOutlined } from '@ant-design/icons'
+import Enums from 'core/infra/enums'
 
 const StealthEX = () => {
   return (
-    <Row style={{ height: '100%' }}>
-      <Space direction='vertical' style={{ width: '100%' }}>
-        <Col span={24}>
-          <Alert
-            type='warning'
-            message={
-              <Collapse
-                size='small'
-                bordered={false}
-                expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
-                items={[
-                  {
-                    key: '1',
-                    label: 'Important Notes:',
-                    children: (
-                      <Space direction='vertical'>
-                        <span>1. Please swap using the exact amount as stated in the payment details below.</span>
-                        <span>2. A minimum amount of around $100 in tokens is required for any swap.</span>
-                        <span>
-                          3. Transactions can take up to an hour to complete depending on StealthEX's Funding Pool.
-                        </span>
-                        <span>
-                          4. StealthEX performs liquidity maintenance from time to time, making certain exchange-pairs
-                          temporarily unavailable.
-                        </span>
-                      </Space>
-                    )
-                  }
-                ]}
-              />
-            }
-          />
-        </Col>
-        <Col span={24} style={{ height: 450 }}>
-          <iframe
-            title={Enums.coinSwap.stealthEX.title}
-            id={Enums.coinSwap.stealthEX.id}
-            src={`${Enums.coinSwap.stealthEX.url}/${Enums.coinSwap.stealthEX.affiliateId}`}
-            style={{
-              width: '100%',
-              height: '100%',
-              border: 'none',
-              borderRadius: 10,
-              overflow: 'hidden',
-              boxShadow: '0px 0px 32px 0px rgba(0, 0, 0, 0.06)'
-            }}
-          />
-        </Col>
-      </Space>
-    </Row>
+    <div className='flex w-full flex-col gap-2'>
+      <Collapse
+        size='small'
+        bordered={false}
+        className='coin-swap-notes shrink-0'
+        expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
+        items={[
+          {
+            key: '1',
+            label: 'Important Notes',
+            children: (
+              <ul className='m-0 list-disc space-y-1 pl-4 text-sm text-foreground'>
+                <li>Please swap using the exact amount as stated in the payment details below.</li>
+                <li>A minimum amount of around $100 in tokens is required for any swap.</li>
+                <li>Transactions can take up to an hour to complete depending on StealthEX&apos;s Funding Pool.</li>
+                <li>
+                  StealthEX performs liquidity maintenance from time to time, making certain exchange-pairs
+                  temporarily unavailable.
+                </li>
+              </ul>
+            )
+          }
+        ]}
+      />
+      <div className='h-[450px] w-full overflow-hidden rounded-[10px] shadow-[0_0_32px_rgba(0,0,0,0.06)]'>
+        <iframe
+          title={Enums.coinSwap.stealthEX.title}
+          id={Enums.coinSwap.stealthEX.id}
+          src={`${Enums.coinSwap.stealthEX.url}/${Enums.coinSwap.stealthEX.affiliateId}`}
+          className='h-full w-full border-0'
+        />
+      </div>
+    </div>
   )
 }
 
