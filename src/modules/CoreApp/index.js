@@ -9,7 +9,6 @@ import { useDispatch, useSelector, useStore } from 'react-redux'
 import { DeSoIdentityContext } from 'react-deso-protocol'
 import { isMobile, isTablet } from 'react-device-detect'
 import { useApolloClient } from '@apollo/client/react'
-import { Spin } from 'antd'
 import { Outlet } from 'react-router-dom'
 import { usePwaFeatures } from '../PWADetector/hooks'
 // import { setNotificationsVisible } from 'core/store/slices/custom/reducer'
@@ -23,7 +22,7 @@ import Notifications from '../Notifications'
 
 // Utils
 import Enums from 'core/infra/enums'
-import logo from 'assets/deso-ops-logo-full.png'
+import CoreAppLoadingScreen from './components/CoreAppLoadingScreen'
 import {
   setDeSoData,
   setConfigData,
@@ -258,17 +257,7 @@ const CoreApp = () => {
     switch (state.renderState) {
       case Enums.appRenderState.INIT:
       case Enums.appRenderState.SIGNING_IN:
-        return (
-          <>
-            <div className='mt-5 flex h-full flex-col items-center justify-center'>
-              <Spin size='large' />
-              <span className='mt-[15px] text-xl text-foreground'>{state.spinTip}</span>
-            </div>
-            <center>
-              <img src={logo} alt={process.env.REACT_APP_NAME} className='w-[300px]' />
-            </center>
-          </>
-        )
+        return <CoreAppLoadingScreen message={state.spinTip} />
       case Enums.appRenderState.LAUNCH:
         return (
           <>
