@@ -225,6 +225,20 @@
     background-color: #ff7f50;
   }
 
+  .optout-success-btn.ant-btn-primary {
+    @apply h-12 rounded-lg border-none px-8 font-semibold text-white shadow-[0_4px_14px_rgba(41,167,69,0.28)] transition-[transform,box-shadow] duration-200 hover:-translate-y-px hover:!text-white;
+    background: linear-gradient(135deg, #34c759 0%, #29a745 55%, #228b3a 100%) !important;
+  }
+
+  .optout-danger-btn.ant-btn-primary {
+    @apply h-12 rounded-lg border-none px-8 font-semibold text-white shadow-[0_4px_14px_rgba(220,54,69,0.28)] transition-[transform,box-shadow] duration-200 hover:-translate-y-px hover:!text-white;
+    background: linear-gradient(135deg, #e84d5b 0%, #dc3645 55%, #c82333 100%) !important;
+  }
+
+  .optout-secondary-btn.ant-btn-default {
+    @apply h-12 rounded-lg border-border bg-surface px-8 font-semibold text-foreground shadow-sm transition-colors duration-200 hover:border-deso-blue hover:!text-deso-blue;
+  }
+
   .dashboard-bg {
     @apply pointer-events-none fixed inset-0 z-0 overflow-hidden;
     background: linear-gradient(

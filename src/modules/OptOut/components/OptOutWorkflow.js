@@ -2,8 +2,7 @@ import React, { useEffect, useReducer } from 'react'
 import { identity, configure, getUsernameForPublicKey } from 'deso-protocol'
 import { useLoaderData } from 'react-router-dom'
 import { useApolloClient } from '@apollo/client/react'
-import { Col, Row, message, Card } from 'antd'
-import { LoginOutlined } from '@ant-design/icons'
+import { message } from 'antd'
 
 // Utils
 import Enums from 'core/infra/enums'
@@ -11,13 +10,14 @@ import { useDispatch, useSelector } from 'react-redux'
 import { generateProfilePicUrl, getDeSoConfig } from 'core/infra/deso-controller-graphql'
 import AppToolbar from 'core/components/layout/AppToolbar'
 
-import Spinner from 'core/components/Spinner'
 import { FETCH_SINGLE_PROFILE } from 'core/infra/graphql-models'
 import { createOptOutProfile, getOptOutProfile, updateOptOutProfile } from 'core/infra/agilite-controller'
 import { optOutModel } from 'core/infra/data-models'
 import Completion from '../Completion'
+import OptOutLoadingState from './OptOutLoadingState'
+import OptOutLoginPrompt from './OptOutLoginPrompt'
+import OptOutPageShell from './OptOutPageShell'
 
-import logo from 'assets/deso-ops-logo-full.png'
 import { cloneDeep } from 'lodash'
 import { setDeSoData } from 'core/store/slices/custom/reducer'
 
@@ -303,65 +303,42 @@ const OptOut = () => {
     }
   }
 
+  const loadingMessage =
+    state.renderState === Enums.appRenderState.PREP
+      ? Enums.spinnerMessages.PREP
+      : state.renderState === Enums.appRenderState.LOADING
+        ? Enums.spinnerMessages.LOADING
+        : state.renderState === Enums.appRenderState.INIT
+          ? Enums.spinnerMessages.INIT_REQUEST
+          : null
+
+  const isLoadingState = Boolean(loadingMessage)
+
   return (
     <>
       <AppToolbar />
-      <Row className='justify-center'>
-        <Col span={24}>
-          <Card type='inner' size='small' className='border-none bg-transparent'>
-            <Row>
-              <Col span={24}>
-                <center>
-                  <img src={logo} alt='DeSoOps Portal' className='h-[200px] w-[200px]' />
-                  <span className='block text-2xl font-bold'>OPT IN/OUT OF DESO OPS TAGGING</span>
-                </center>
-                {state.renderState === Enums.appRenderState.PREP ? <Spinner tip={Enums.spinnerMessages.PREP} /> : null}
+      <OptOutPageShell
+        title={
+          <>
+            <span className='text-deso-blue-deep'>Opt In/Out of </span>
+            <span className='text-deso-orange'>DeSoOps</span>
+            <span className='text-deso-blue-deep'> Tagging</span>
+          </>
+        }
+      >
+        {isLoadingState ? <OptOutLoadingState message={loadingMessage} /> : null}
 
-                {state.renderState === Enums.appRenderState.LOADING ? (
-                  <Spinner tip={Enums.spinnerMessages.LOADING} />
-                ) : null}
+        {state.renderState === Enums.appRenderState.COMPLETION ? (
+          <Completion
+            handleOptIn={handleOptIn}
+            handleOptOut={handleOptOut}
+            rootState={state}
+            setRootState={setState}
+          />
+        ) : null}
 
-                {state.renderState === Enums.appRenderState.INIT ? (
-                  <Spinner tip={Enums.spinnerMessages.INIT_REQUEST} />
-                ) : null}
-
-                {state.renderState === Enums.appRenderState.COMPLETION ? (
-                  <Completion
-                    handleOptIn={handleOptIn}
-                    handleOptOut={handleOptOut}
-                    rootState={state}
-                    setRootState={setState}
-                  />
-                ) : null}
-
-                {state.renderState === Enums.appRenderState.LOGIN ? (
-                  <Row>
-                    <Col span={24}>
-                      <center>
-                        <p className='text-lg max-sm:text-base'>
-                          You will need to sign into your DeSo account to Opt Out of receiving notifications via DeSoOps
-                          tagging.
-                        </p>
-                      </center>
-                    </Col>
-                    <Col span={24} className='mt-5 flex justify-center'>
-                      <button
-                        onClick={handleLogin}
-                        className='mr-2.5 flex cursor-pointer flex-row items-center gap-3 rounded-lg border border-transparent bg-deso-blue px-2 py-2 text-white'
-                      >
-                        <div className='ml-2.5 text-xl max-sm:ml-[5px] max-sm:text-base'>
-                          <LoginOutlined className='text-xl max-sm:text-base' />
-                        </div>
-                        <span className='text-base max-sm:text-sm'>SIGN IN WITH DESO</span>
-                      </button>
-                    </Col>
-                  </Row>
-                ) : null}
-              </Col>
-            </Row>
-          </Card>
-        </Col>
-      </Row>
+        {state.renderState === Enums.appRenderState.LOGIN ? <OptOutLoginPrompt onLogin={handleLogin} /> : null}
+      </OptOutPageShell>
     </>
   )
 }
